@@ -1,10 +1,10 @@
-# Pool: Atmosphere (AT) — Outgoing Flows
+# Pool: Atmosphere (AT)
 
-This section documents the nitrogen flows leaving the atmosphere pool, as calculated and simulated through `at_mc.py`. It includes emissions across energy, manufacturing, transport, and agricultural sectors, as well as atmospheric deposition.
+This section documents the outgoing nitrogen flows from the atmosphere pool, including emissions across energy, manufacturing, transport, and agricultural sectors, as well as atmospheric deposition, as simulated in `at_mc.py`.
 
 ---
 
-## Table of Contents for AT Figures
+## Table of Contents for Atmospheric Flows
 * [AT AT AG SM Biological N2 fixation N2](#at-at-ag-sm-biological n2 fixation-n2)
 * [AT AT AG SM Deposition OXN](#at-at-ag-sm-deposition-oxn)
 * [AT AT AG SM Deposition RDN](#at-at-ag-sm-deposition-rdn)
@@ -25,14 +25,14 @@ This section documents the nitrogen flows leaving the atmosphere pool, as calcul
 
 ---
 
-## Documented Atmospheric Flows
+## Outflows from Atmosphere (AT)
 
 ## AT AT AG SM Biological N2 fixation N2
 
 ![AT AT AG SM Biological N2 fixation N2](output_files/plots/AT_AT_AG_SM_Biological N2 fixation_N2.png)
 
-### Flow Documentation
-*Simulated tracking aligned with NNB atmospheric outflow definitions.*
+### Flow Description
+*Simulated tracking for atmospheric outflow aligned with NNB guidelines.*
 
 ---
 
@@ -40,8 +40,8 @@ This section documents the nitrogen flows leaving the atmosphere pool, as calcul
 
 ![AT AT AG SM Deposition OXN](output_files/plots/AT_AT_AG_SM_Deposition_OXN.png)
 
-### Flow Documentation
-*Simulated tracking aligned with NNB atmospheric outflow definitions.*
+### Flow Description
+*Simulated tracking for atmospheric outflow aligned with NNB guidelines.*
 
 ---
 
@@ -49,8 +49,8 @@ This section documents the nitrogen flows leaving the atmosphere pool, as calcul
 
 ![AT AT AG SM Deposition RDN](output_files/plots/AT_AT_AG_SM_Deposition_RDN.png)
 
-### Flow Documentation
-*Simulated tracking aligned with NNB atmospheric outflow definitions.*
+### Flow Description
+*Simulated tracking for atmospheric outflow aligned with NNB guidelines.*
 
 ---
 
@@ -58,8 +58,8 @@ This section documents the nitrogen flows leaving the atmosphere pool, as calcul
 
 ![AT AT FS FO Deposition OXN](output_files/plots/AT_AT_FS_FO_Deposition_OXN.png)
 
-### Flow Documentation
-*Simulated tracking aligned with NNB atmospheric outflow definitions.*
+### Flow Description
+*Simulated tracking for atmospheric outflow aligned with NNB guidelines.*
 
 ---
 
@@ -67,8 +67,8 @@ This section documents the nitrogen flows leaving the atmosphere pool, as calcul
 
 ![AT AT FS FO Deposition RDN](output_files/plots/AT_AT_FS_FO_Deposition_RDN.png)
 
-### Flow Documentation
-*Simulated tracking aligned with NNB atmospheric outflow definitions.*
+### Flow Description
+*Simulated tracking for atmospheric outflow aligned with NNB guidelines.*
 
 ---
 
@@ -76,8 +76,8 @@ This section documents the nitrogen flows leaving the atmosphere pool, as calcul
 
 ![AT AT FS FO N2 fixation N2](output_files/plots/AT_AT_FS_FO_N2 fixation_N2.png)
 
-### Flow Documentation
-*Simulated tracking aligned with NNB atmospheric outflow definitions.*
+### Flow Description
+*Simulated tracking for atmospheric outflow aligned with NNB guidelines.*
 
 ---
 
@@ -85,8 +85,8 @@ This section documents the nitrogen flows leaving the atmosphere pool, as calcul
 
 ![AT AT FS OL Deposition OXN](output_files/plots/AT_AT_FS_OL_Deposition_OXN.png)
 
-### Flow Documentation
-*Simulated tracking aligned with NNB atmospheric outflow definitions.*
+### Flow Description
+*Simulated tracking for atmospheric outflow aligned with NNB guidelines.*
 
 ---
 
@@ -94,8 +94,8 @@ This section documents the nitrogen flows leaving the atmosphere pool, as calcul
 
 ![AT AT FS OL Deposition RDN](output_files/plots/AT_AT_FS_OL_Deposition_RDN.png)
 
-### Flow Documentation
-*Simulated tracking aligned with NNB atmospheric outflow definitions.*
+### Flow Description
+*Simulated tracking for atmospheric outflow aligned with NNB guidelines.*
 
 ---
 
@@ -103,8 +103,8 @@ This section documents the nitrogen flows leaving the atmosphere pool, as calcul
 
 ![AT AT FS OL N2 fixation N2](output_files/plots/AT_AT_FS_OL_N2 fixation_N2.png)
 
-### Flow Documentation
-*Simulated tracking aligned with NNB atmospheric outflow definitions.*
+### Flow Description
+*Simulated tracking for atmospheric outflow aligned with NNB guidelines.*
 
 ---
 
@@ -112,8 +112,8 @@ This section documents the nitrogen flows leaving the atmosphere pool, as calcul
 
 ![AT AT HS HS Deposition OXN](output_files/plots/AT_AT_HS_HS_Deposition_OXN.png)
 
-### Flow Documentation
-*Simulated tracking aligned with NNB atmospheric outflow definitions.*
+### Flow Description
+*Simulated tracking for atmospheric outflow aligned with NNB guidelines.*
 
 ---
 
@@ -121,8 +121,8 @@ This section documents the nitrogen flows leaving the atmosphere pool, as calcul
 
 ![AT AT HS HS Deposition RDN](output_files/plots/AT_AT_HS_HS_Deposition_RDN.png)
 
-### Flow Documentation
-*Simulated tracking aligned with NNB atmospheric outflow definitions.*
+### Flow Description
+*Simulated tracking for atmospheric outflow aligned with NNB guidelines.*
 
 ---
 
@@ -130,8 +130,8 @@ This section documents the nitrogen flows leaving the atmosphere pool, as calcul
 
 ![AT AT HY SW Deposition OXN](output_files/plots/AT_AT_HY_SW_Deposition_OXN.png)
 
-### Flow Documentation
-*Simulated tracking aligned with NNB atmospheric outflow definitions.*
+### Flow Description
+*Simulated tracking for atmospheric outflow aligned with NNB guidelines.*
 
 ---
 
@@ -139,8 +139,8 @@ This section documents the nitrogen flows leaving the atmosphere pool, as calcul
 
 ![AT AT HY SW Deposition RDN](output_files/plots/AT_AT_HY_SW_Deposition_RDN.png)
 
-### Flow Documentation
-*Simulated tracking aligned with NNB atmospheric outflow definitions.*
+### Flow Description
+*Simulated tracking for atmospheric outflow aligned with NNB guidelines.*
 
 ---
 
@@ -148,8 +148,8 @@ This section documents the nitrogen flows leaving the atmosphere pool, as calcul
 
 ![AT AT HY SW N2 fixation N2](output_files/plots/AT_AT_HY_SW_N2 fixation_N2.png)
 
-### Flow Documentation
-*Simulated tracking aligned with NNB atmospheric outflow definitions.*
+### Flow Description
+*Simulated tracking for atmospheric outflow aligned with NNB guidelines.*
 
 ---
 
@@ -157,8 +157,8 @@ This section documents the nitrogen flows leaving the atmosphere pool, as calcul
 
 ![AT AT MP OP Ammonia synthesis N2 fixation N2](output_files/plots/AT_AT_MP_OP_Ammonia synthesis N2 fixation_N2.png)
 
-### Flow Documentation
-*Simulated tracking aligned with NNB atmospheric outflow definitions.*
+### Flow Description
+*Simulated tracking for atmospheric outflow aligned with NNB guidelines.*
 
 ---
 
@@ -166,8 +166,8 @@ This section documents the nitrogen flows leaving the atmosphere pool, as calcul
 
 ![AT AT RW RW Atmospheric outflow OXN](output_files/plots/AT_AT_RW_RW_Atmospheric outflow_OXN.png)
 
-### Flow Documentation
-*Simulated tracking aligned with NNB atmospheric outflow definitions.*
+### Flow Description
+*Simulated tracking for atmospheric outflow aligned with NNB guidelines.*
 
 ---
 
@@ -175,8 +175,8 @@ This section documents the nitrogen flows leaving the atmosphere pool, as calcul
 
 ![AT AT RW RW Atmospheric outflow RDN](output_files/plots/AT_AT_RW_RW_Atmospheric outflow_RDN.png)
 
-### Flow Documentation
-*Simulated tracking aligned with NNB atmospheric outflow definitions.*
+### Flow Description
+*Simulated tracking for atmospheric outflow aligned with NNB guidelines.*
 
 ---
 
