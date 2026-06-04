@@ -39,7 +39,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
 
     # 1. SKRIV HOVEDSIDEN (index.md) - Fungerer som velkomstside
     with open(output_filename, 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Overview\nav_order: 1\n---\n\n")
+        f.write("---\nlayout: default\ntitle: Overview\nav_order: 1\nhas_children: true\n---\n\n")
         f.write("# National Nitrogen Budget for Norway\n\n")
         f.write("Welcome to the interactive data portal for the Norwegian atmospheric nitrogen budget. ")
         f.write("This platform visualizes and documents the simulated outputs from the Monte Carlo uncertainty analysis (`at_mc.py`).\n\n")

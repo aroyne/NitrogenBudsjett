@@ -2,6 +2,7 @@
 layout: default
 title: Overview
 av_order: 1
+has_children: true
 ---
 
 # National Nitrogen Budget for Norway
