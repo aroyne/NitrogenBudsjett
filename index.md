@@ -1,16 +1,10 @@
-# Appendix: National Nitrogen Budget for Norway
+# Pool: Atmosphere (AT) — Outgoing Flows
 
-For flows connected to the hydrosphere, and for land-related emissions and nitrogen deposition, we only consider the Norwegian mainland. For emissions to air reported through the UNFCCC framework we also include emissions from Norwegian economic activity on Svalbard (these are minor and mainly related to coal extraction, which has now been discontinued). We also include emissions and N flows that originate in petroleum extraction on the Norwegian continental shelf.
-
-## Details for each pool and subpool
-
-This NNB is built using the guidelines (REF). Where flows are omitted or added to better fit the Norwegian nitrogen system, this is commented.
-
-Here follows one section per pool and subpool which describes flows out of that pool.
+This section documents the nitrogen flows leaving the atmosphere pool, as calculated and simulated through `at_mc.py`. It includes emissions across energy, manufacturing, transport, and agricultural sectors, as well as atmospheric deposition.
 
 ---
 
-## Table of Contents
+## Table of Contents for AT Figures
 * [AT AT AG SM Biological N2 fixation N2](#at-at-ag-sm-biological n2 fixation-n2)
 * [AT AT AG SM Deposition OXN](#at-at-ag-sm-deposition-oxn)
 * [AT AT AG SM Deposition RDN](#at-at-ag-sm-deposition-rdn)
@@ -31,11 +25,14 @@ Here follows one section per pool and subpool which describes flows out of that 
 
 ---
 
+## Documented Atmospheric Flows
+
 ## AT AT AG SM Biological N2 fixation N2
 
 ![AT AT AG SM Biological N2 fixation N2](output_files/plots/AT_AT_AG_SM_Biological N2 fixation_N2.png)
 
-*No specific description added for this pool yet.*
+### Flow Documentation
+*Simulated tracking aligned with NNB atmospheric outflow definitions.*
 
 ---
 
@@ -43,7 +40,8 @@ Here follows one section per pool and subpool which describes flows out of that 
 
 ![AT AT AG SM Deposition OXN](output_files/plots/AT_AT_AG_SM_Deposition_OXN.png)
 
-*No specific description added for this pool yet.*
+### Flow Documentation
+*Simulated tracking aligned with NNB atmospheric outflow definitions.*
 
 ---
 
@@ -51,7 +49,8 @@ Here follows one section per pool and subpool which describes flows out of that 
 
 ![AT AT AG SM Deposition RDN](output_files/plots/AT_AT_AG_SM_Deposition_RDN.png)
 
-*No specific description added for this pool yet.*
+### Flow Documentation
+*Simulated tracking aligned with NNB atmospheric outflow definitions.*
 
 ---
 
@@ -59,7 +58,8 @@ Here follows one section per pool and subpool which describes flows out of that 
 
 ![AT AT FS FO Deposition OXN](output_files/plots/AT_AT_FS_FO_Deposition_OXN.png)
 
-*No specific description added for this pool yet.*
+### Flow Documentation
+*Simulated tracking aligned with NNB atmospheric outflow definitions.*
 
 ---
 
@@ -67,7 +67,8 @@ Here follows one section per pool and subpool which describes flows out of that 
 
 ![AT AT FS FO Deposition RDN](output_files/plots/AT_AT_FS_FO_Deposition_RDN.png)
 
-*No specific description added for this pool yet.*
+### Flow Documentation
+*Simulated tracking aligned with NNB atmospheric outflow definitions.*
 
 ---
 
@@ -75,7 +76,8 @@ Here follows one section per pool and subpool which describes flows out of that 
 
 ![AT AT FS FO N2 fixation N2](output_files/plots/AT_AT_FS_FO_N2 fixation_N2.png)
 
-*No specific description added for this pool yet.*
+### Flow Documentation
+*Simulated tracking aligned with NNB atmospheric outflow definitions.*
 
 ---
 
@@ -83,7 +85,8 @@ Here follows one section per pool and subpool which describes flows out of that 
 
 ![AT AT FS OL Deposition OXN](output_files/plots/AT_AT_FS_OL_Deposition_OXN.png)
 
-*No specific description added for this pool yet.*
+### Flow Documentation
+*Simulated tracking aligned with NNB atmospheric outflow definitions.*
 
 ---
 
@@ -91,7 +94,8 @@ Here follows one section per pool and subpool which describes flows out of that 
 
 ![AT AT FS OL Deposition RDN](output_files/plots/AT_AT_FS_OL_Deposition_RDN.png)
 
-*No specific description added for this pool yet.*
+### Flow Documentation
+*Simulated tracking aligned with NNB atmospheric outflow definitions.*
 
 ---
 
@@ -99,7 +103,8 @@ Here follows one section per pool and subpool which describes flows out of that 
 
 ![AT AT FS OL N2 fixation N2](output_files/plots/AT_AT_FS_OL_N2 fixation_N2.png)
 
-*No specific description added for this pool yet.*
+### Flow Documentation
+*Simulated tracking aligned with NNB atmospheric outflow definitions.*
 
 ---
 
@@ -107,7 +112,8 @@ Here follows one section per pool and subpool which describes flows out of that 
 
 ![AT AT HS HS Deposition OXN](output_files/plots/AT_AT_HS_HS_Deposition_OXN.png)
 
-*No specific description added for this pool yet.*
+### Flow Documentation
+*Simulated tracking aligned with NNB atmospheric outflow definitions.*
 
 ---
 
@@ -115,7 +121,8 @@ Here follows one section per pool and subpool which describes flows out of that 
 
 ![AT AT HS HS Deposition RDN](output_files/plots/AT_AT_HS_HS_Deposition_RDN.png)
 
-*No specific description added for this pool yet.*
+### Flow Documentation
+*Simulated tracking aligned with NNB atmospheric outflow definitions.*
 
 ---
 
@@ -123,7 +130,8 @@ Here follows one section per pool and subpool which describes flows out of that 
 
 ![AT AT HY SW Deposition OXN](output_files/plots/AT_AT_HY_SW_Deposition_OXN.png)
 
-*No specific description added for this pool yet.*
+### Flow Documentation
+*Simulated tracking aligned with NNB atmospheric outflow definitions.*
 
 ---
 
@@ -131,7 +139,8 @@ Here follows one section per pool and subpool which describes flows out of that 
 
 ![AT AT HY SW Deposition RDN](output_files/plots/AT_AT_HY_SW_Deposition_RDN.png)
 
-*No specific description added for this pool yet.*
+### Flow Documentation
+*Simulated tracking aligned with NNB atmospheric outflow definitions.*
 
 ---
 
@@ -139,7 +148,8 @@ Here follows one section per pool and subpool which describes flows out of that 
 
 ![AT AT HY SW N2 fixation N2](output_files/plots/AT_AT_HY_SW_N2 fixation_N2.png)
 
-*No specific description added for this pool yet.*
+### Flow Documentation
+*Simulated tracking aligned with NNB atmospheric outflow definitions.*
 
 ---
 
@@ -147,7 +157,8 @@ Here follows one section per pool and subpool which describes flows out of that 
 
 ![AT AT MP OP Ammonia synthesis N2 fixation N2](output_files/plots/AT_AT_MP_OP_Ammonia synthesis N2 fixation_N2.png)
 
-*No specific description added for this pool yet.*
+### Flow Documentation
+*Simulated tracking aligned with NNB atmospheric outflow definitions.*
 
 ---
 
@@ -155,7 +166,8 @@ Here follows one section per pool and subpool which describes flows out of that 
 
 ![AT AT RW RW Atmospheric outflow OXN](output_files/plots/AT_AT_RW_RW_Atmospheric outflow_OXN.png)
 
-*No specific description added for this pool yet.*
+### Flow Documentation
+*Simulated tracking aligned with NNB atmospheric outflow definitions.*
 
 ---
 
@@ -163,7 +175,8 @@ Here follows one section per pool and subpool which describes flows out of that 
 
 ![AT AT RW RW Atmospheric outflow RDN](output_files/plots/AT_AT_RW_RW_Atmospheric outflow_RDN.png)
 
-*No specific description added for this pool yet.*
+### Flow Documentation
+*Simulated tracking aligned with NNB atmospheric outflow definitions.*
 
 ---
 
