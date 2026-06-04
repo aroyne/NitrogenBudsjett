@@ -12,7 +12,13 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         print(f"[INFO] Ingen plot-filer funnet i '{plot_dir}'.")
         return
 
-    print("[RAPPORT] Bygger rapport for alle utgående strømmer fra Atmosphere (AT)...")
+    print("[RAPPORT] Sletter gamle temporære markdown-filer for ren gjenoppbygging...")
+    # Renser mappen for eventuelle gamle flow-sider før vi lager nye
+    for f_old in os.listdir('.'):
+        if f_old.startswith("flow_") and f_old.endswith(".md"):
+            os.remove(f_old)
+
+    print("[RAPPORT] Bygger komplett dokumentasjonsportal med sidemeny for Atmosphere (AT)...")
 
     # Felles tekstblokk for atmosfærisk deposisjon
     deposition_text = (
@@ -31,153 +37,96 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         "for estimating biome-dependent N deposition rates."
     )
 
+    # 1. SKRIV HOVEDSIDEN (index.md) - Fungerer som velkomstside
     with open(output_filename, 'w', encoding='utf-8') as f:
-        # --- NYTT: FRONT MATTER FOR "JUST THE DOCS" TEMAET ---
-        f.write("---\n")
-        f.write("layout: default\n")
-        f.write("title: Atmosphere Outflows\n")
-        f.write("nav_order: 1\n")
-        f.write("---\n\n")
+        f.write("---\nlayout: default\ntitle: Overview\nav_order: 1\n---\n\n")
+        f.write("# National Nitrogen Budget for Norway\n\n")
+        f.write("Welcome to the interactive data portal for the Norwegian atmospheric nitrogen budget. ")
+        f.write("This platform visualizes and documents the simulated outputs from the Monte Carlo uncertainty analysis (`at_mc.py`).\n\n")
+        f.write("### Atmospheric Outflows\n")
+        f.write("Use the navigation menu on the left side to explore the detailed time-series trends, ")
+        f.write("methodological background, and parameterizations for each individual nitrogen flow leaving the atmosphere pool.\n\n")
 
-        # --- HOVEDTEKST ---
-        f.write("# Pool: Atmosphere (AT) — Outgoing Flows\n\n")
-        f.write("This section documents all nitrogen flows leaving the atmosphere pool, ")
-        f.write("including biological nitrogen fixation, industrial synthesis, atmospheric deposition, ")
-        f.write("and atmospheric boundary outflows, as simulated in `at_mc.py`.\n\n")
+    # 2. GENERER EN EGEN FIL PER STRØM (De vil dukke opp i venstremenyen!)
+    menu_counter = 2  # Oversikten har nav_order: 1, så strømmene starter på 2
+    
+    for filename in plot_files:
+        if not filename.startswith("AT_AT_"):
+            continue
+
+        # Lag et pent navn til menypunktet
+        clean_name = filename.replace('.png', '').replace('AT_AT_', '').replace('_', ' ')
         
-        f.write("---\n\n")
+        # Generer et unikt filnavn for denne spesifikke strømmen (f.eks flow_AG_SM_Deposition_OXN.md)
+        flow_file_name = f"flow_{filename.replace('.png', '')}.md"
+        
+        # Lag en normalisert streng for å finne riktig tekstbeskrivelse
+        norm = filename.lower().replace('-', '').replace('_', '').replace('.', '')
 
-        # --- SEKSJONER FOR HVER STRØM ---
-        f.write("## Outflow Documentation\n\n")
-        for filename in plot_files:
-            # Sørg for at vi kun behandler utgående strømmer fra AT
-            if not filename.startswith("AT_AT_"):
-                continue
-
-            clean_name = filename.replace('.png', '').replace('_', ' ').replace('-', ' ')
-            f.write(f"## {clean_name}\n\n")
+        with open(flow_file_name, 'w', encoding='utf-8') as f:
+            # Hver fil får sin egen Front Matter som Just the Docs bruker til å bygge sidemenyen!
+            f.write("---\n")
+            f.write("layout: default\n")
+            f.write(f"title: {clean_name}\n")  # Dette blir teksten i venstremenyen
+            f.write(f"nav_order: {menu_counter}\n")
+            f.write("---\n\n")
             
-            # Sett inn figuren fra at_mc.py
+            menu_counter += 1
+
+            # Innhold på siden
+            f.write(f"# {clean_name}\n\n")
             f.write(f"![{clean_name}]({plot_dir}/{filename})\n\n")
-            
             f.write("### Flow Description\n")
-            
-            # Normalisert streng (små bokstaver uten skilletegn) for trygg sjekk
-            norm = filename.lower().replace('-', '').replace('_', '').replace('.', '')
 
-            # 1. AT.AT -> AG.SM Biological N2 Fixation
+            # Gjenbruker de nøyaktige tekstsjekkene dine fra forrige runde:
             if "agsm" in norm and "fixation" in norm:
                 f.write("**AT.AT-AG.SM-Biological N2 fixation-N2**\n\n")
-                f.write("[^Schäppi2025] advises using data from the EUROSTAT Gross nutrient balance, but there is an ")
-                f.write("error in this dataset for Norway which is currently being corrected (as of February 2026; ")
-                f.write("personal correspondence, EUROSTAT). According to the EUROSTAT metadata, the BNF in this statistic ")
-                f.write("is calculated based on the area of leguminous crops and fixation coefficients. The production ")
-                f.write("of leguminous crops (peas, beans etc) in Norway is very low and we assume that agricultural BNF ")
-                f.write("for the most part determined by leguminous crops such as clover grown on pastures and in fodder production.\n\n")
-                f.write("(Bleken & Bakken, 1997) based their estimate for BNF from the sale of clover seeds: a sale of about ")
-                f.write("145 t seeds was estimated to be used to plant 95 000 ha of grass/clover mixtures (655 ha/t seeds). ")
-                f.write("Together with a rate of BNF of 80 kgN/ha on this area, they found a total of 7.6 ktN per year and ")
-                f.write("summed up to 8 ktN to account for BNF from free-living organisms and other sources. The rate of ")
-                f.write("80 kgN/ha agrees relatively well with later studies of agricultural BNF in Norway, where average ")
-                f.write("values between 10 and 100 kgN/ha have been found; the highest values in particularly productive areas ")
-                f.write("were up to 260 kgN/ha. Yearly statistics of clover seed sales are not available, but according to ")
-                f.write("NIBIO Totalkalkylen [^NIBIO2025b], the area where grass/clover mixes may be sown for pasture and ")
-                f.write("fodder production (fulldyrka eng) has remained constant to within about 3 % from 1995 up to today. ")
-                f.write("Our best estimate for BNF, and for consistency with the previous study, is therefore to assume ")
-                f.write("a constant value of 8 ktN/year. In Sweden [^Moldan2025] the value was found to be 34 kT in 2015, ")
-                f.write("which is more in line with the values found before 2000.\n\n")
-
-            # 2. AT.AT -> AG.SM Deposition (OXN & RDN)
+                f.write("[^Schäppi2025] advises using data from the EUROSTAT Gross nutrient balance, but there is an error in this dataset for Norway which is currently being corrected (as of February 2026; personal correspondence, EUROSTAT). According to the EUROSTAT metadata, the BNF in this statistic is calculated based on the area of leguminous crops and fixation coefficients. The production of leguminous crops (peas, beans etc) in Norway is very low and we assume that agricultural BNF for the most part determined by leguminous crops such as clover grown on pastures and in fodder production.\n\n(Bleken & Bakken, 1997) based their estimate for BNF from the sale of clover seeds: a sale of about 145 t seeds was estimated to be used to plant 95 000 ha of grass/clover mixtures (655 ha/t seeds). Together with a rate of BNF of 80 kgN/ha on this area, they found a total of 7.6 ktN per year and summed up to 8 ktN to account for BNF from free-living organisms and other sources. The rate of 80 kgN/ha agrees relatively well with later studies of agricultural BNF in Norway, where average values between 10 and 100 kgN/ha have been found; the highest values in particularly productive areas were up to 260 kgN/ha. Yearly statistics of clover seed sales are not available, but according to NIBIO Totalkalkylen [^NIBIO2025b], the area where grass/clover mixes may be sown for pasture and fodder production (fulldyrka eng) has remained constant to within about 3 % from 1995 up to today. Our best estimate for BNF, and for consistency with the previous study, is therefore to assume a constant value of 8 ktN/year. In Sweden [^Moldan2025] the value was found to be 34 kT in 2015, which is more in line with the values found before 2000.\n\n")
             elif "agsm" in norm and "deposition" in norm and "oxn" in norm:
-                f.write("**AT.AT-AG.SM-Deposition-OXN**\n\n")
-                f.write(deposition_text + "\n\n")
+                f.write("**AT.AT-AG.SM-Deposition-OXN**\n\n" + deposition_text + "\n\n")
             elif "agsm" in norm and "deposition" in norm and "rdn" in norm:
-                f.write("**AT.AT-AG.SM-Deposition-RDN**\n\n")
-                f.write(deposition_text + "\n\n")
-
-            # 3. AT.AT -> FS.FO N2 Fixation
+                f.write("**AT.AT-AG.SM-Deposition-RDN**\n\n" + deposition_text + "\n\n")
             elif "fsfo" in norm and "fixation" in norm:
-                f.write("**AT.AT-FS.FO-N2 fixation-N2**\n\n")
-                f.write("Following the Swedish NBB [^Moldan2025], we use an N-fixation rate of 1.5 kg/ha/year ")
-                f.write("and a forested area of 12.0 mill ha as given by SSB for 2019-2023 (table 14368); we assume ")
-                f.write("this value is constant for our entire time period. This gives an annual N-fixation rate of ")
-                f.write("18.0 ktN. For comparison, the value for Sweden in 2015 was found to be 39.5 ktN [^Moldan2025].\n\n")
-
-            # 4. AT.AT -> FS.FO Deposition (OXN & RDN)
+                f.write("**AT.AT-FS.FO-N2 fixation-N2**\n\nFollowing the Swedish NBB [^Moldan2025], we use an N-fixation rate of 1.5 kg/ha/year and a forested area of 12.0 mill ha as given by SSB for 2019-2023 (table 14368); we assume this value is constant for our entire time period. This gives an annual N-fixation rate of 18.0 ktN. For comparison, the value for Sweden in 2015 was found to be 39.5 ktN [^Moldan2025].\n\n")
             elif "fsfo" in norm and "deposition" in norm and "oxn" in norm:
-                f.write("**AT.AT-FS.FO-Deposition-OXN**\n\n")
-                f.write(deposition_text + "\n\n")
+                f.write("**AT.AT-FS.FO-Deposition-OXN**\n\n" + deposition_text + "\n\n")
             elif "fsfo" in norm and "deposition" in norm and "rdn" in norm:
-                f.write("**AT.AT-FS.FO-Deposition-RDN**\n\n")
-                f.write(deposition_text + "\n\n")
-
-            # 5. AT.AT -> FS.OL Deposition (OXN & RDN)
+                f.write("**AT.AT-FS.FO-Deposition-RDN**\n\n" + deposition_text + "\n\n")
             elif "fsol" in norm and "deposition" in norm and "oxn" in norm:
-                f.write("**AT.AT-FS.OL-Deposition-OXN**\n\n")
-                f.write(deposition_text + "\n\n")
+                f.write("**AT.AT-FS.OL-Deposition-OXN**\n\n" + deposition_text + "\n\n")
             elif "fsol" in norm and "deposition" in norm and "rdn" in norm:
-                f.write("**AT.AT-FS.OL-Deposition-RDN**\n\n")
-                f.write(deposition_text + "\n\n")
-
-            # 6. AT.AT -> HS.HS Deposition (OXN & RDN)
+                f.write("**AT.AT-FS.OL-Deposition-RDN**\n\n" + deposition_text + "\n\n")
             elif "hshs" in norm and "deposition" in norm and "oxn" in norm:
-                f.write("**AT.AT-HS.HS-Deposition-OXN**\n\n")
-                f.write(deposition_text + "\n\n")
+                f.write("**AT.AT-HS.HS-Deposition-OXN**\n\n" + deposition_text + "\n\n")
             elif "hshs" in norm and "deposition" in norm and "rdn" in norm:
-                f.write("**AT.AT-HS.HS-Deposition-RDN**\n\n")
-                f.write(deposition_text + "\n\n")
-
-            # 7. AT.AT -> HY.SW Deposition (OXN & RDN)
+                f.write("**AT.AT-HS.HS-Deposition-RDN**\n\n" + deposition_text + "\n\n")
             elif "hysw" in norm and "deposition" in norm and "oxn" in norm:
-                f.write("**AT.AT-HY.SW-Deposition-OXN**\n\n")
-                f.write(deposition_text + "\n\n")
-                f.write("For comparison, the data used in the TEOTIL model gives 3.5 ktN in 2013 and 3.0 ktN in 2023. ")
-                f.write("These comparable but slightly lower values are the results of different datasets used and different data treatment.\n\n")
+                f.write("**AT.AT-HY.SW-Deposition-OXN**\n\n" + deposition_text + "\n\nFor comparison, the data used in the TEOTIL model gives 3.5 ktN in 2013 and 3.0 ktN in 2023. These comparable but slightly lower values are the results of different datasets used and different data treatment.\n\n")
             elif "hysw" in norm and "deposition" in norm and "rdn" in norm:
-                f.write("**AT.AT-HY.SW-Deposition-RDN**\n\n")
-                f.write(deposition_text + "\n\n")
-
-            # 8. AT.AT -> HY.SW N2 Fixation
+                f.write("**AT.AT-HY.SW-Deposition-RDN**\n\n" + deposition_text + "\n\n")
             elif "hysw" in norm and "fixation" in norm:
-                f.write("**AT.AT-HY.SW-N2 fixation-N2**\n\n")
-                f.write("According to NIBIO, the surface water area is 20 457 km2 (https://arealbarometer.nibio.no/nb/norge/). ")
-                f.write("According to [^Schäppi2025], the biological fixation rate can vary between < 0.1 tN/km2 in oligotrophic ")
-                f.write("and mesotrophic lakes to up to 10 tN/km2 in eutrophic lakes. Most lakes in Norway are not eutrophic ")
-                f.write("and we use a low value of 0.1 tN/km2, which gives 2 ktN/year.\n\n")
-
-            # 9. AT.AT -> MP.OP Ammonia Synthesis N2 Fixation
+                f.write("**AT.AT-HY.SW-N2 fixation-N2**\n\nAccording to NIBIO, the surface water area is 20 457 km2 (https://arealbarometer.nibio.no/nb/norge/). According to [^Schäppi2025], the biological fixation rate can vary between < 0.1 tN/km2 in oligotrophic and mesotrophic lakes to up to 10 tN/km2 in eutrophic lakes. Most lakes in Norway are not eutrophic and we use a low value of 0.1 tN/km2, which gives 2 ktN/year.\n\n")
             elif "mpop" in norm and "synthesis" in norm:
-                f.write("**AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2**\n\n")
-                f.write("Is found through mass balance where we use data from FAOSTAT Fertilizer by nutrient, ")
-                f.write("domestic fertilizer production, and subtracted the amount of ammonia imported from SSB trade data ")
-                f.write("(table 08801). The result is a very variable curve which probably does not reflect year to year ")
-                f.write("production well and could be a result of how trade statistics are reported.\n\n")
-
-            # 10. AT.AT -> RW.RW Atmospheric Outflow (OXN & RDN)
+                f.write("**AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2**\n\nis found through mass balance where we use data from FAOSTAT Fertilizer by nutrient, domestic fertilizer production, and subtracted the amount of ammonia imported from SSB trade data (table 08801). The result is a very variable curve which probably does not reflect year to year production well and could be a result of how trade statistics are reported.\n\n")
             elif "rwrw" in norm and "outflow" in norm and "oxn" in norm:
-                f.write("**AT.AT-RW.RW-Atmospheric outflow-OXN**\n\n")
-                f.write("Is found using source-receptor data from EMEP [^EMEP2024], as advised by [^Schäppi2025].\n\n")
+                f.write("**AT.AT-RW.RW-Atmospheric outflow-OXN**\n\nIs found using source-receptor data from EMEP [^EMEP2024], as advised by [^Schäppi2025].\n\n")
             elif "rwrw" in norm and "outflow" in norm and "rdn" in norm:
-                f.write("**AT.AT-RW.RW-Atmospheric outflow-RDN**\n\n")
-                f.write("Is found using source-receptor data from EMEP [^EMEP2024], as advised by [^Schäppi2025].\n\n")
-
+                f.write("**AT.AT-RW.RW-Atmospheric outflow-RDN**\n\nIs found using source-receptor data from EMEP [^EMEP2024], as advised by [^Schäppi2025].\n\n")
             else:
                 f.write(f"*Atmospheric outflow plot detected. Filename: `{filename}`.*\n\n")
-            
-            f.write("---\n\n")
 
-        # --- REFERANSER ---
-        f.write("## References\n\n")
-        if os.path.exists(bib_filename):
-            bib_data = parse_file(bib_filename)
-            for key, entry in bib_data.entries.items():
-                authors = entry.persons.get('author', [])
-                author_str = ", ".join([str(a) for a in authors]) if authors else "Unknown Author"
-                year = entry.fields.get('year', 'n.d.')
-                title = entry.fields.get('title', 'No title')
-                journal = entry.fields.get('journal', entry.fields.get('publisher', ''))
-                f.write(f"[^{key}]: {author_str} ({year}). *{title}*. {journal}\n")
-        else:
-            f.write("*No reference file (referanser.bib) found.*\n")
+            # Skriv referanser nederst på hver enkelt side
+            f.write("\n### References\n\n")
+            if os.path.exists(bib_filename):
+                bib_data = parse_file(bib_filename)
+                for key, entry in bib_data.entries.items():
+                    authors = entry.persons.get('author', [])
+                    author_str = ", ".join([str(a) for a in authors]) if authors else "Unknown Author"
+                    year = entry.fields.get('year', 'n.d.')
+                    title = entry.fields.get('title', 'No title')
+                    journal = entry.fields.get('journal', entry.fields.get('publisher', ''))
+                    f.write(f"[^{key}]: {author_str} ({year}). *{title}*. {journal}\n")
+            else:
+                f.write("*No reference file found.*\n")
 
-    print(f"[SUKSESS] '{output_filename}' er generert med sideoppsett klart for GitHub Pages-temaet!")
+    print(f"[SUKSESS] Hele portalen er bygget opp! Sjekk venstremenyen på GitHub Pages etter neste push.")
