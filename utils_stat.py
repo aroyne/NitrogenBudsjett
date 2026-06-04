@@ -175,8 +175,8 @@ def process_and_export_mc_results(all_records):
         plt.legend(loc='upper left')
         
         # Lagre plottet som PNG
-        safe_filename = flow.replace('.', '_').replace('-', '_') + '.png'
-        plt.savefig(os.path.join(plot_dir, safe_filename), dpi=150, bbox_inches='tight')
+        safe_filename = flow.replace('.', '_').replace('-', '_').replace(' ', '_') + '.png'        
+        plt.savefig(os.path.join(plot_dir, safe_filename), dpi=150, bbox_inches='tight')        
 
     print(f"[SUKSESS] Plott lagret og tidsstemplet [{current_time_str}] i: {plot_dir}")
     print("="*60 + "\n")
