@@ -2,7 +2,7 @@
 layout: default
 title: HY SW N2 fixation N2
 parent: Atmosphere (AT)
-nav_order: 18
+nav_order: 14
 ---
 
 # HY SW N2 fixation N2

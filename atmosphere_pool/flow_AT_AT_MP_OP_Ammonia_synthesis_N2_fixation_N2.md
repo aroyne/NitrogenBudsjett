@@ -2,7 +2,7 @@
 layout: default
 title: MP OP Ammonia synthesis N2 fixation N2
 parent: Atmosphere (AT)
-nav_order: 20
+nav_order: 15
 ---
 
 # MP OP Ammonia synthesis N2 fixation N2

@@ -2,7 +2,7 @@
 layout: default
 title: AG SM Biological N2 fixation N2
 parent: Atmosphere (AT)
-nav_order: 2
+nav_order: 1
 ---
 
 # AG SM Biological N2 fixation N2

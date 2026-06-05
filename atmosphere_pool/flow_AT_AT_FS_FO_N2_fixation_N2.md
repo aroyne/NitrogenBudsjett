@@ -2,7 +2,7 @@
 layout: default
 title: FS FO N2 fixation N2
 parent: Atmosphere (AT)
-nav_order: 8
+nav_order: 6
 ---
 
 # FS FO N2 fixation N2
