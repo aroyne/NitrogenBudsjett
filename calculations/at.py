@@ -39,7 +39,7 @@ def execute_calculations(mc_params=None):
     # # consider moving uncertainty for mass balanced N fixation to data file
     
     # Industrial ammonia synthesis
-    _add_OP_N2_fixation(results, dataset_unc, trade_mapping, trade_params, dataset_noise)
+    _add_OP_N2_fixation(results, dataset_unc, trade_mapping, trade_params)
 
     # Biological N2 fixation
     _add_AG_N2_fixation(results, params, dataset_unc)
@@ -49,8 +49,8 @@ def execute_calculations(mc_params=None):
     # note on N fixation: check out recent data here https://aslopubs.onlinelibrary.wiley.com/doi/full/10.1002/lol2.10459
 
     # Atmospheric outflows
-    _add_atmospheric_outflow_oxn(results, dataset_unc, dataset_noise)
-    _add_atmospheric_outflow_rdn(results, dataset_unc, dataset_noise)
+    _add_atmospheric_outflow_oxn(results, dataset_unc)
+    _add_atmospheric_outflow_rdn(results, dataset_unc)
 
     # Deposition flows (per land class)
     _deposition_flow(results,
@@ -106,121 +106,79 @@ def execute_calculations(mc_params=None):
 
     return results  # Returns a list of flow records
 
-def _deposition_flow_mc(results, flow_code, class4, poll, preloaded_data, current_params, dataset_noise):
-    data = preloaded_data.get('deposition_data')
-    if data is None:
-        print(f"[ADVARSEL] Deponeringsdata mangler i preloaded_data for {flow_code}")
-        return
+def _deposition_flow(results, flow_code, class4, poll, dataset_unc, data_file='data_files/N_per_class_period_distributed_unallocated_long.csv'):
+    data = pd.read_csv(data_file)
+    u_dep = get_uncertainty(dataset_unc, 'Deposition')
+    u_interp = get_uncertainty(dataset_unc, 'trend interpolation')
+    uncertainty_base = u_dep
+    uncertainty_extrap = combine_uncertainties_percent(u_dep, u_interp)
 
-    # Definer de to unike dataset-nøklene som brukes i denne funksjonen
-    key_dep = 'Deposition'
-    key_interp = 'trend interpolation'
-    
-    # Sjekk om støydata finnes i denne rundens støy-ordbok
-    has_noise_dep = dataset_noise and key_dep in dataset_noise
-    has_noise_interp = dataset_noise and key_interp in dataset_noise
-
-    # --- ALARM/VARSEL: Sjekk om nøklene mangler i Excel (Kjøres kun én gang per nøkkel) ---
-    if dataset_noise and not hasattr(_deposition_flow_mc, "alarms_checked"):
-        setattr(_deposition_flow_mc, "alarms_checked", True)
-        if not has_noise_dep:
-            print(f"  [ALARM] Ingen gyldig usikkerhet funnet for '{key_dep}' i dataset_uncertainties!")
-        if not has_noise_interp:
-            print(f"  [ALARM] Ingen gyldig usikkerhet funnet for '{key_interp}' i dataset_uncertainties!")
-        if not has_noise_dep or not has_noise_interp:
-            print(f"          Mangler blir kjørt deterministisk (støy = 0) inntil Excel oppdateres.")
-
-    # Optimalisering: Filtrer på pollutant og arealklasse én gang utenfor års-løkka
-    mask_base = (data["pollutant"] == poll) & (data["class4"] == class4)
-    df_subset = data[mask_base]
-    
-    # Lag en lynrask oppslagstabell fra periode til verdi
-    period_map = dict(zip(df_subset["period"], df_subset["N_tonn"]))
-    
     def period_for_year(y):
-        if y < 1988: return "1983-1987"
-        elif y < 1992: return "1988-1992"
-        elif y < 1997: return "1992-1996"
-        elif y < 2002: return "1997-2001"
-        elif y < 2007: return "2002-2006"
-        elif y < 2012: return "2007-2011"
-        else: return "2012-2016"
+        if y < 1988:
+            return "1983-1987"
+        elif y < 1992:
+            return "1988-1992"
+        elif y < 1997:
+            return "1992-1996"
+        elif y < 2002:
+            return "1997-2001"
+        elif y < 2007:
+            return "2002-2006"
+        elif y < 2012:
+            return "2007-2011"
+        else:
+            return "2012-2016"
 
-    value_2016 = None
-    value_last = None
-    
-    # Løp igjennom alle år kronologisk (viktig for ekstrapoleringen)
-    for year in sorted(EXPECTED_YEARS):
-        comment = 'ok (MC-støy lagt på basert på uncertainty_type)'
-        
+    for year in sorted(expected_years):
         if year < 2017:
             period = period_for_year(year)
-            tonn_val = period_map.get(period)
-            if tonn_val is None:
-                raise ValueError(f"Ingen deponeringsdata funnet for {flow_code}, klasse={class4}, periode={period}")
-                
-            # Konverter tonn -> kt 
-            base_value = float(tonn_val) / 1000
+            mask = (
+                (data["period"] == period) &
+                (data["pollutant"] == poll) &
+                (data["class4"] == class4)
+            )
+            subset = data.loc[mask, "N_tonn"]
+            if subset.empty:
+                raise ValueError(
+                    f"No deposition data for flow={flow_code}, class4={class4}, "
+                    f"poll={poll}, year={year}"
+                )
+            value = subset.iloc[0] / 1000
             data_sources = 'NILU and geodata.no'
-            
-            # --- STØYLOGIKK FOR 'Deposition' ---
-            if has_noise_dep:
-                noise_info = dataset_noise[key_dep]
-                noise_val = noise_info['value']
-                if noise_info['type'] == 'perc':
-                    value = base_value * noise_val
-                else:
-                    if noise_val >= 0:
-                        value = base_value + (noise_val * noise_info['upp_bound'])
-                    else:
-                        value = base_value + (noise_val * noise_info['low_bound'])
-            else:
-                value = base_value
-                
+            uncertainty = uncertainty_base
             if year == 2016:
                 value_2016 = value
-                
-        elif year < 2022:
-            # Skalering basert på 2016-verdien (beholder opprinnelig støy herfra)
+        elif year < 2022: #bruker NILU data, men siste periode ligger ikke i Excel-arket jeg bruker
             if poll == 'NOx':
-                value = value_2016 * 61440 / 68166
+                value = value_2016*61440/68166
             else:
-                value = value_2016 * 61175 / 73494
+                value = value_2016*61175/73494
             value_last = value
-            data_sources = 'NILU and geodata.no'
-            
         else:
-            # Siste år ekstrapoleres flatt videre fra value_last
-            base_value = value_last
+            # mask = (
+            #     (data["period"] == "2012-2016") &
+            #     (data["pollutant"] == poll) &
+            #     (data["class4"] == class4)
+            # )
+            # values = data.loc[mask, "N_tonn"].values
+            # if values.size == 0:
+            #     raise ValueError(
+            #         f"No deposition data for extrapolation: flow={flow_code}, "
+            #         f"class4={class4}, poll={poll}"
+            #     )
+            value = value_last
             data_sources = 'extrapolated'
-            
-            # --- STØYLOGIKK FOR 'trend interpolation' ---
-            if has_noise_interp:
-                noise_info = dataset_noise[key_interp]
-                noise_val = noise_info['value']
-                if noise_info['type'] == 'perc':
-                    value = base_value * noise_val
-                else:
-                    if noise_val >= 0:
-                        value = base_value + (noise_val * noise_info['upp_bound'])
-                    else:
-                        value = base_value + (noise_val * noise_info['low_bound'])
-            else:
-                value = base_value
-
-        # Fysisk sperre: Deponering kan ikke bli negativ
-        if value < 0:
-            value = 0.0
+            uncertainty = uncertainty_extrap
 
         results.append({
             'flow_name': flow_code,
             'year': year,
             'value': value,
-            'comment': comment,
-            'data_sources': data_sources
+            'comment': 'ok',
+            'data_sources': data_sources,
+            'uncertainty': uncertainty,
         })
-        
-    
+
 def _add_OP_N2_fixation(results, dataset_unc, trade_mapping, trade_params):
     flow_code = 'AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2'
     collected_years = set()

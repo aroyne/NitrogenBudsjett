@@ -1,14 +1,21 @@
 ---
 layout: default
-title: Overview
+title: Home
 av_order: 1
-has_children: true
 ---
 
-# National Nitrogen Budget for Norway
+# Nitrogen Budget for Norway
 
-Welcome to the interactive data portal for the Norwegian atmospheric nitrogen budget. This platform visualizes and documents the simulated outputs from the Monte Carlo uncertainty analysis (`at_mc.py`).
+**Last Updated:** June 05, 2026
 
-### Atmospheric Outflows
-Use the navigation menu on the left side to explore the detailed time-series trends, methodological background, and parameterizations for each individual nitrogen flow leaving the atmosphere pool.
+{: .label .label-red }
+Work in Progress
 
+> **CRITICAL WARNING:** This project, including all underlying code, data parameterizations, and simulation results, is currently **under active development**. It is not yet validated or finalized. Using, copying, or relying on any part of this code or these results for research, decision-making, or any other application is **strongly discouraged** at this stage.
+
+---
+
+### Project Overview
+Welcome to the interactive data and documentation portal for the Norwegian national nitrogen budget. This platform visualizes and centralizes the outputs from our Monte Carlo uncertainty analysis simulations.
+
+Use the navigation menu on the left side to explore the individual nitrogen pools (e.g., Atmosphere, Hydrosphere) and access detailed statistical time-series graphs, methodological explanations, and parameterizations for each specific flow.
