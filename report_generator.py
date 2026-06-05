@@ -115,6 +115,8 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
             exact_flow_code = "AT.AT-FS.OL-Deposition-OXN"
         elif "fsol" in norm and "deposition" in norm and "rdn" in norm:
             exact_flow_code = "AT.AT-FS.OL-Deposition-RDN"
+        elif "fsol" in norm and "fixation" in norm:
+            exact_flow_code = "AT.AT-FS.OL-Biological N2 fixation-N2"
         elif "hshs" in norm and "deposition" in norm and "oxn" in norm:
             exact_flow_code = "AT.AT-HS.HS-Deposition-OXN"
         elif "hshs" in norm and "deposition" in norm and "rdn" in norm:
