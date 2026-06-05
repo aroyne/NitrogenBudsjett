@@ -5,7 +5,7 @@ parent: Atmosphere (AT)
 nav_order: 3
 ---
 
-# AT.AT-AG.SM-Deposition-RDN
+# Reduced N Deposition (Agricultural Soils)
 
 ![AT.AT-AG.SM-Deposition-RDN](../output_files/plots/AT_AT_AG_SM_Deposition_RDN.png)
 

@@ -5,7 +5,7 @@ parent: Atmosphere (AT)
 nav_order: 7
 ---
 
-# AT.AT-FS.OL-Deposition-OXN
+# Oxidized N Deposition (Other Land)
 
 ![AT.AT-FS.OL-Deposition-OXN](../output_files/plots/AT_AT_FS_OL_Deposition_OXN.png)
 

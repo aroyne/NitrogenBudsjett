@@ -1,11 +1,11 @@
 ---
 layout: default
-title: RW.RW-PR.SO-Solid waste import-Nmix
+title: Solid Waste Import
 parent: Rest of the world (RW)
 nav_order: 12
 ---
 
-# RW.RW-PR.SO-Solid waste import-Nmix
+# Solid Waste Import
 
 ![RW.RW-PR.SO-Solid waste import-Nmix](../output_files/plots/RW_RW_PR_SO_Solid_waste_import_Nmix.png)
 

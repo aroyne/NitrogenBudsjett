@@ -1,11 +1,11 @@
 ---
 layout: default
-title: RW.RW-AG.MM-Live animal import-Nmix
+title: Live Animal Import
 parent: Rest of the world (RW)
 nav_order: 2
 ---
 
-# RW.RW-AG.MM-Live animal import-Nmix
+# Live Animal Import
 
 ![RW.RW-AG.MM-Live animal import-Nmix](../output_files/plots/RW_RW_AG_MM_Live_animal_import_Nmix.png)
 

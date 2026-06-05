@@ -1,11 +1,11 @@
 ---
 layout: default
-title: RW.RW-MP.OP-Ammonia import-Nmix
+title: Ammonia Import
 parent: Rest of the world (RW)
 nav_order: 10
 ---
 
-# RW.RW-MP.OP-Ammonia import-Nmix
+# Ammonia Import
 
 ![RW.RW-MP.OP-Ammonia import-Nmix](../output_files/plots/RW_RW_MP_OP_Ammonia_import__Nmix.png)
 

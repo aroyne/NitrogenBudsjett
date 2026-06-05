@@ -5,7 +5,7 @@ parent: Atmosphere (AT)
 nav_order: 11
 ---
 
-# AT.AT-HS.HS-Deposition-RDN
+# Reduced N Deposition (Settlements)
 
 ![AT.AT-HS.HS-Deposition-RDN](../output_files/plots/AT_AT_HS_HS_Deposition_RDN.png)
 

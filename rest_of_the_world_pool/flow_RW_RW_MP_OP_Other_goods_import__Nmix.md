@@ -1,11 +1,11 @@
 ---
 layout: default
-title: RW.RW-MP.OP-Other goods import-Nmix
+title: Other Goods Import
 parent: Rest of the world (RW)
 nav_order: 11
 ---
 
-# RW.RW-MP.OP-Other goods import-Nmix
+# Other Goods Import
 
 ![RW.RW-MP.OP-Other goods import-Nmix](../output_files/plots/RW_RW_MP_OP_Other_goods_import__Nmix.png)
 

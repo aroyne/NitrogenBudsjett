@@ -5,7 +5,7 @@ parent: Atmosphere (AT)
 nav_order: 2
 ---
 
-# AT.AT-AG.SM-Deposition-OXN
+# Oxidized N Deposition (Agricultural Soils)
 
 ![AT.AT-AG.SM-Deposition-OXN](../output_files/plots/AT_AT_AG_SM_Deposition_OXN.png)
 

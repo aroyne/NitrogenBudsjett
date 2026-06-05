@@ -1,11 +1,11 @@
 ---
 layout: default
-title: RW.RW-AT.AT-Atmospheric inflow-RDN
+title: Atmospheric Inflow (Reduced N)
 parent: Rest of the world (RW)
 nav_order: 5
 ---
 
-# RW.RW-AT.AT-Atmospheric inflow-RDN
+# Atmospheric Inflow (Reduced N)
 
 ![RW.RW-AT.AT-Atmospheric inflow-RDN](../output_files/plots/RW_RW_AT_AT_Atmospheric_inflow_RDN.png)
 

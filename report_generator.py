@@ -150,7 +150,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
             f.write("---\n\n")
             menu_counter += 1
 
-            f.write(f"# {exact_flow_code}\n\n")
+            f.write(f"# {display_name}\n\n")
             f.write(f"![{exact_flow_code}](../{plot_dir}/{filename})\n\n")
             f.write("### Flow Description\n")
 
@@ -199,9 +199,10 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         exact_flow_code = "RW.RW-Unknown-Flow"
         description = ""
 
-        # Mapping for Rest of the World-strømmer basert på filnavn
+# Mapping for Rest of the World-strømmer basert på filnavn
         if "feed" in norm and "aquaculture" in norm:
             exact_flow_code = "RW.RW-HY.AC-Aquaculture feed import-Nmix"
+            display_name = "Aquaculture Feed Import"
             description = (
                 "The flow **RW.RW-HY.AC-Aquaculture feed import-Nmix** has been added to account for the substantial "
                 "import of feed to aquaculture. We assume a constant import fraction of 0.92 as given by Aas et al. (2022) [^aas_utilization_2022] "
@@ -212,6 +213,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
             )
         elif "feed" in norm and "animal" in norm:
             exact_flow_code = "RW.RW-AG.MM-Animal feed import-Nmix"
+            display_name = "Animal Feed Import"
             description = (
                 "Data on imported animal feed is taken from Landbruksdirektoratet [^landbruksdirektoratet_kraftforstatistikk_2025] and we have used the detailed "
                 "composition of animal feed given in Eidem & Ruud (2022) [^eidem_for-_2022] together with protein contents from FAO (2021) [^fao_annex_2021] "
@@ -223,12 +225,14 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
             )
         elif "live" in norm and "animal" in norm:
             exact_flow_code = "RW.RW-AG.MM-Live animal import-Nmix"
+            display_name = "Live Animal Import"
             description = (
                 "Is taken from FAOSTAT Crops and livestock products [^faostat_crops_2025], assuming typical weights of animals from various sources, "
                 "average 16% protein in whole animal and Jones factor 6.25 for nitrogen to protein (standard)."
             )
         elif "mineral" in norm and "fertilizer" in norm:
             exact_flow_code = "RW.RW-AG.SM-Mineral fertilizer import-Nmix"
+            display_name = "Mineral Fertilizer Import"
             description = (
                 "Is taken from FAOSTAT Fertilizer by nutrient (FAO, 2025) [^fao_fertilizer_2025]. Because anhydrous ammonia is not used directly "
                 "as fertilizer in Norway, it is not counted as a fertilizer in this particular FAO statistic. We therefore include NH3 import "
@@ -236,51 +240,59 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
             )
         elif "inflow" in norm and "oxn" in norm:
             exact_flow_code = "RW.RW-AT.AT-Atmospheric inflow-OXN"
+            display_name = "Atmospheric Inflow (Oxidized N)"
             description = (
                 "Is found from source-receptor data from EMEP [^emep_sr_2024], as advised by Schäppi (2025) [^schappi_annexes_2025]. There is a change "
                 "in methodology in the EMEP reporting between 2002 and 2003 data."
             )
         elif "inflow" in norm and "rdn" in norm:
             exact_flow_code = "RW.RW-AT.AT-Atmospheric inflow-RDN"
+            display_name = "Atmospheric Inflow (Reduced N)"
             description = (
                 "Is found from source-receptor data from EMEP [^emep_sr_2024], as advised by Schäppi (2025) [^schappi_annexes_2025]. There is a change "
                 "in methodology in the EMEP reporting between 2002 and 2003 data."
             )
         elif "fuel" in norm and "import" in norm and "transport" not in norm:
             exact_flow_code = "RW.RW-EF.EC-Fuel import-Nmix"
+            display_name = "Fuel Import"
             description = "Is taken from trade data, SSB table 08801 for all fuel items except those for transport."
         elif "transport" in norm and "fuel" in norm:
             exact_flow_code = "RW.RW-EF.TR-Import of transport fuel-Nmix"
+            display_name = "Transport Fuel Import"
             description = "Is taken from trade data, SSB table 08801 for all fuel items for transport."
         elif "food" in norm and "import" in norm:
             exact_flow_code = "RW.RW-MP.FP-Food import-Nmix"
+            display_name = "Food Import"
             description = "Is taken from trade data, SSB table 08801. The HS codes and associated nitrogen contents used are found in supplementary file."
         elif "ammonia" in norm and "import" in norm:
             exact_flow_code = "RW.RW-MP.OP-Ammonia import-Nmix"
+            display_name = "Ammonia Import"
             description = "Is taken from trade data, SSB table 08801."
         elif "other" in norm and "goods" in norm:
             exact_flow_code = "RW.RW-MP.OP-Other goods import-Nmix"
+            display_name = "Other Goods Import"
             description = (
                 "Is taken from trade data, SSB table 08801. Import of N2 is a large contributor but not included here "
                 "because it does not contribute to the reactive nitrogen cycle."
             )
         elif "solid" in norm and "waste" in norm:
             exact_flow_code = "RW.RW-PR.SO-Solid waste import-Nmix"
+            display_name = "Solid Waste Import"
             description = (
                 "Is taken from trade data, SSB table 08801. We include imports of municipal waste, wastewater sludge, "
                 "hazardous waste, plastic, paper and textile waste."
             )
-
+            
         with open(full_flow_path, 'w', encoding='utf-8') as f:
             f.write("---\n")
             f.write("layout: default\n")
-            f.write(f"title: {exact_flow_code}\n")
+            f.write(f"title: {display_name}\n")
             f.write("parent: Rest of the world (RW)\n")
             f.write(f"nav_order: {rw_menu_counter}\n")
             f.write("---\n\n")
             rw_menu_counter += 1
 
-            f.write(f"# {exact_flow_code}\n\n")
+            f.write(f"# {display_name}\n\n")
             f.write(f"![{exact_flow_code}](../{plot_dir}/{filename})\n\n")
             f.write("### Flow Description\n")
             if description:

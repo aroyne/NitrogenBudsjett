@@ -5,7 +5,7 @@ parent: Atmosphere (AT)
 nav_order: 13
 ---
 
-# AT.AT-HY.SW-Deposition-RDN
+# Reduced N Deposition (Surface Water)
 
 ![AT.AT-HY.SW-Deposition-RDN](../output_files/plots/AT_AT_HY_SW_Deposition_RDN.png)
 

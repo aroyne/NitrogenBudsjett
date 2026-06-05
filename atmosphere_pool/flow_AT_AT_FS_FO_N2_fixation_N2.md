@@ -5,7 +5,7 @@ parent: Atmosphere (AT)
 nav_order: 6
 ---
 
-# AT.AT-FS.FO-N2 fixation-N2
+# N2 Fixation (Forest)
 
 ![AT.AT-FS.FO-N2 fixation-N2](../output_files/plots/AT_AT_FS_FO_N2_fixation_N2.png)
 

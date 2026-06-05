@@ -5,7 +5,7 @@ parent: Atmosphere (AT)
 nav_order: 10
 ---
 
-# AT.AT-HS.HS-Deposition-OXN
+# Oxidized N Deposition (Settlements)
 
 ![AT.AT-HS.HS-Deposition-OXN](../output_files/plots/AT_AT_HS_HS_Deposition_OXN.png)
 

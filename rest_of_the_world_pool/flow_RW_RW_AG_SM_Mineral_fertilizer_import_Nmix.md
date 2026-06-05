@@ -1,11 +1,11 @@
 ---
 layout: default
-title: RW.RW-AG.SM-Mineral fertilizer import-Nmix
+title: Mineral Fertilizer Import
 parent: Rest of the world (RW)
 nav_order: 3
 ---
 
-# RW.RW-AG.SM-Mineral fertilizer import-Nmix
+# Mineral Fertilizer Import
 
 ![RW.RW-AG.SM-Mineral fertilizer import-Nmix](../output_files/plots/RW_RW_AG_SM_Mineral_fertilizer_import_Nmix.png)
 

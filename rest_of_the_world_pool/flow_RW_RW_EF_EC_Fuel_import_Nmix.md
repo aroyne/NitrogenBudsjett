@@ -1,11 +1,11 @@
 ---
 layout: default
-title: RW.RW-EF.EC-Fuel import-Nmix
+title: Fuel Import
 parent: Rest of the world (RW)
 nav_order: 6
 ---
 
-# RW.RW-EF.EC-Fuel import-Nmix
+# Fuel Import
 
 ![RW.RW-EF.EC-Fuel import-Nmix](../output_files/plots/RW_RW_EF_EC_Fuel_import_Nmix.png)
 

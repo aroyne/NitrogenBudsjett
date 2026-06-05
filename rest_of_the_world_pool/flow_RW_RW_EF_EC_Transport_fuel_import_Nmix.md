@@ -1,11 +1,11 @@
 ---
 layout: default
-title: RW.RW-EF.TR-Import of transport fuel-Nmix
+title: Transport Fuel Import
 parent: Rest of the world (RW)
 nav_order: 7
 ---
 
-# RW.RW-EF.TR-Import of transport fuel-Nmix
+# Transport Fuel Import
 
 ![RW.RW-EF.TR-Import of transport fuel-Nmix](../output_files/plots/RW_RW_EF_EC_Transport_fuel_import_Nmix.png)
 

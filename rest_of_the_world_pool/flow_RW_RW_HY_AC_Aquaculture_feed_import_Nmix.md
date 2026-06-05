@@ -1,11 +1,11 @@
 ---
 layout: default
-title: RW.RW-HY.AC-Aquaculture feed import-Nmix
+title: Aquaculture Feed Import
 parent: Rest of the world (RW)
 nav_order: 8
 ---
 
-# RW.RW-HY.AC-Aquaculture feed import-Nmix
+# Aquaculture Feed Import
 
 ![RW.RW-HY.AC-Aquaculture feed import-Nmix](../output_files/plots/RW_RW_HY_AC_Aquaculture_feed_import_Nmix.png)
 

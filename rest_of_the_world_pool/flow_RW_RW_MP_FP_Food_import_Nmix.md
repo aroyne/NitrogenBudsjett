@@ -1,11 +1,11 @@
 ---
 layout: default
-title: RW.RW-MP.FP-Food import-Nmix
+title: Food Import
 parent: Rest of the world (RW)
 nav_order: 9
 ---
 
-# RW.RW-MP.FP-Food import-Nmix
+# Food Import
 
 ![RW.RW-MP.FP-Food import-Nmix](../output_files/plots/RW_RW_MP_FP_Food_import_Nmix.png)
 

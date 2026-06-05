@@ -1,11 +1,11 @@
 ---
 layout: default
-title: RW.RW-AT.AT-Atmospheric inflow-OXN
+title: Atmospheric Inflow (Oxidized N)
 parent: Rest of the world (RW)
 nav_order: 4
 ---
 
-# RW.RW-AT.AT-Atmospheric inflow-OXN
+# Atmospheric Inflow (Oxidized N)
 
 ![RW.RW-AT.AT-Atmospheric inflow-OXN](../output_files/plots/RW_RW_AT_AT_Atmospheric_inflow_OXN.png)
 

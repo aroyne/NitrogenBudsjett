@@ -5,7 +5,7 @@ parent: Atmosphere (AT)
 nav_order: 17
 ---
 
-# AT.AT-RW.RW-Atmospheric outflow-RDN
+# Atmospheric Outflow (Reduced N)
 
 ![AT.AT-RW.RW-Atmospheric outflow-RDN](../output_files/plots/AT_AT_RW_RW_Atmospheric_outflow_RDN.png)
 

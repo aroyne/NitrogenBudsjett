@@ -5,7 +5,7 @@ parent: Atmosphere (AT)
 nav_order: 16
 ---
 
-# AT.AT-RW.RW-Atmospheric outflow-OXN
+# Atmospheric Outflow (Oxidized N)
 
 ![AT.AT-RW.RW-Atmospheric outflow-OXN](../output_files/plots/AT_AT_RW_RW_Atmospheric_outflow_OXN.png)
 
