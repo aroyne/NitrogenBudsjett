@@ -339,11 +339,10 @@ def find_trade_flow(
 
 
 def process_generic_trade_flow(preloaded_data, current_params, current_trade_factors, 
-                               target_types, is_import=True, flow_code=None, results=None, data_sources='SSB tab 08801'):
+                               target_types, is_import=True, dataset_noise=None, flow_code=None, results=None, data_sources='SSB tab 08801'):
     """
-    Generisk kjernefunksjon for å prosessere handelsstrømmer fra SSB 08801.
-    Returnerer en ordbok {år: verdi} med akkurat de årstallene som finnes i datagrunnlaget.
-    Hvis 'results' og 'flow_code' er oppgitt, pakkes dataene også inn i resultatlisten.
+    MC-KLAR GENERISK KJERNEFUNKSJON: Prosesserer handelsstrømmer fra SSB 08801.
+    Nå fullstendig koblet mot det sentrale usikkerhetssystemet (dataset_noise).
     """
     df_vol = preloaded_data.get('compressed_trade_volume')
     if df_vol is None or current_trade_factors is None:
@@ -351,8 +350,17 @@ def process_generic_trade_flow(preloaded_data, current_params, current_trade_fac
             print(f"[ADVARSEL] Mangler handelsdata eller faktorer for {flow_code}.")
         return {}
 
-    # 1. Hent simulert aktivitetsstøy for utenrikshandel
-    noise_trade = float(current_params.get('08801', current_params.get('13136', 1.0)))
+    # --- 1. KORREKT HÅNDTERING AV DATASETT-STØY FOR SSB 08801 ---
+    # Vi sjekker om 'SSB_08801' eller tabellnummeret ligger i dataset_noise
+    dataset_key = '08801'  # <--- SE MERKNAD UNDER: Juster dette navnet så det matcher ID-en i Excel!
+    if dataset_noise and 'SSB_08801' in dataset_noise:
+        dataset_key = 'SSB_08801'
+    elif dataset_noise and '08801' in dataset_noise:
+        dataset_key = '08801'
+        
+    has_noise = dataset_noise and dataset_key in dataset_noise
+    noise_val = dataset_noise[dataset_key]['value'] if has_noise else 1.0
+    unc_type = dataset_noise[dataset_key]['type'] if has_noise else 'perc'
     
     # 2. Sørg for at target_types er et sett med små bokstaver
     if isinstance(target_types, (str, int, float)):
@@ -367,16 +375,30 @@ def process_generic_trade_flow(preloaded_data, current_params, current_trade_fac
     
     df_filtered = df_vol[is_correct_type & is_correct_direction].copy()
     
-    # 4. Initialiser en tom ordbok for å matche din eksakte struktur dynamisk
     flow_dict = {}
     
     if not df_filtered.empty:
-        # 5. Map inn unike, perturberte N-faktorer og kjør vektorisert beregning (kg -> kt N)
-        # Merk: Endre til / 1e9 hvis budsjettet ditt krever 1e9 i stedet for 1e6 her.
+        # 4. Map inn unike, perturberte N-faktorer (støy på produkt-attributt)
         v_factors = df_filtered['konv'].astype(str).str.strip().map(current_trade_factors).fillna(0.0)
-        df_filtered['N_amount'] = df_filtered['amount'] * noise_trade * v_factors / 1e6 
         
-        # 6. Aggreger nitrogenmengde per år dynamisk (akkurat som i din opprinnelige loop)
+        # 5. Påfør datasett-støy vektorisert (støy på mengde/aktivitetsnivå)
+        if has_noise and unc_type == 'perc':
+            # Prosentvis støy multipliseres direkte inn på mengden
+            df_filtered['perturbed_amount'] = df_filtered['amount'] * noise_val
+        elif has_noise and unc_type == 'abs':
+            # Absolutt støy (siden det er en sammenslått tabell, fordeles absolutt støy flatt pr rad basert på fortegn)
+            bound = dataset_noise[dataset_key]['upp_bound'] if noise_val >= 0 else dataset_noise[dataset_key]['low_bound']
+            df_filtered['perturbed_amount'] = df_filtered['amount'] + (noise_val * bound / len(df_filtered))
+        else:
+            df_filtered['perturbed_amount'] = df_filtered['amount']
+            
+        # Sluttberegning: [Mengde med støy] * [N-faktor med støy] / 1e6 (kg -> kt N)
+        df_filtered['N_amount'] = df_filtered['perturbed_amount'] * v_factors / 1e6 
+        
+        # Fysisk sperre mot negative mengder etter støy
+        df_filtered.loc[df_filtered['N_amount'] < 0, 'N_amount'] = 0.0
+
+        # 6. Aggreger nitrogenmengde per år dynamisk
         for yr_raw, amt in zip(df_filtered['year'].values, df_filtered['N_amount'].values):
             try:
                 yr = int(float(yr_raw))
@@ -384,10 +406,9 @@ def process_generic_trade_flow(preloaded_data, current_params, current_trade_fac
             except (ValueError, TypeError):
                 continue
 
-    # 7. VALGFRITT: Pakk inn i det offisielle formatet for tidsserier hvis results er sendt med
+    # 7. Pakk inn i det offisielle formatet for tidsserier hvis results er sendt med
     if results is not None and flow_code is not None:
         collected_years = set()
-        # Her bruker vi EXPECTED_YEARS (hvis definert globalt) for å sikre komplette rapporter
         for year in EXPECTED_YEARS:
             if year in flow_dict:
                 collected_years.add(year)
@@ -395,11 +416,9 @@ def process_generic_trade_flow(preloaded_data, current_params, current_trade_fac
                     'flow_name': flow_code,
                     'year': year,
                     'value': float(flow_dict[year]), 
-                    'comment': 'ok',
+                    'comment': 'ok (MC-støy påført mengde og N-fraksjon)',
                     'data_sources': data_sources
                 })
         report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
 
-    # Returner ALLTID den rene dynamiske ordboken til bruk i massebalanser
     return flow_dict
-
