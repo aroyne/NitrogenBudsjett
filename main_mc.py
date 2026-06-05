@@ -1,11 +1,12 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import os
 import sys
 import time
 import argparse
 import numpy as np
 import pandas as pd
-import os
-
+import openpyxl
 
 # Sørg for at rotmappen ligger i Python-path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -13,6 +14,25 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from data_loader import load_all_data
 from calculations.n_params import NParameters
 from report_generator import generate_github_pages_report
+from utils_stat import process_and_export_mc_results
+
+# ==============================================================================
+# EXCEL-KONFIGURASJON FOR INTERNASJONAL RAPPORTERING
+# ==============================================================================
+REPORT_PATH = "Report.xlsx"  # Endre til din faktiske bane
+SHEET_NAME = "2a. Database N flows"                                       # Navnet på fanen i Excel
+FIRST_DATA_ROW = 3     # Raden der de faktiske dataene starter
+
+YEAR_COL = 1           # Kolonne A: Årstall
+NAME_COL = 2           # Kolonne B: Strømkode / Flow Name
+VALUE_COL = 3          # Kolonne C: Verdi (Median fra MC)
+UNCERTAINTY_COL = 4    # Kolonne D: Symmetrisk usikkerhet (CV% / 100)
+DATASOURCE_COL = 5     # Kolonne E: Datakilder
+COMMENT_COL = 6        # Kolonne F: Kommentarer
+
+class FlowNotFoundError(Exception): pass
+class YearNotFoundError(Exception): pass
+
 
 def parse_arguments():
     """Håndterer kommandolinjeargumenter for MC-kjøringen."""
@@ -29,7 +49,14 @@ def parse_arguments():
         default=100, 
         help="Antall Monte Carlo-simuleringer (iterasjoner) som skal kjøres"
     )
+    # Legg til denne:
+    parser.add_argument(
+        '--no-excel',
+        action='store_true',
+        help="Hopper over skriving av resultater til den offisielle Excel-rapporten"
+    )
     return parser.parse_args()
+
 
 def draw_from_pert(low, likely, high):
     """Hjelpefunksjon for PERT-distribusjon."""
@@ -39,6 +66,7 @@ def draw_from_pert(low, likely, high):
     alpha = 1 + 4 * (likely - low) / range_val
     beta = 1 + 4 * (high - likely) / range_val
     return low + np.random.beta(alpha, beta) * range_val
+
 
 def generate_mc_parameters_fast(base_params, df_global, df_datasets, is_deterministic=False):
     """
@@ -52,7 +80,6 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, is_determin
     custom_dict = {}
     df_perturbed = df_global.copy()
     
-    # Antar at global-arket bruker samme standardnavn:
     for idx, row in df_perturbed.iterrows():
         pid = row['parameter_id']
         val = float(row['value'])
@@ -100,11 +127,10 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, is_determin
     elif hasattr(base_params, 'tables') and 'global_parameters' in base_params.tables:
         base_params.tables['global_parameters'] = df_perturbed
 
-    # --- 2. STØYFAKTORER FOR DATASETT (Nå med de eksakte kolonnenavnene) ---
+    # --- 2. STØYFAKTORER FOR DATASETT ---
     dataset_noise_dict = {}
     
     for _, row in df_datasets.iterrows():
-        # Slår opp direkte med de korrekte kolonnenavnene fra bildene dine
         ds_id = str(row['dataset_name']).strip()
         low_b = float(row['lower_bound']) if not pd.isna(row['lower_bound']) else 0.0
         upp_b = float(row['upper_bound']) if not pd.isna(row['upper_bound']) else 0.0
@@ -128,7 +154,6 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, is_determin
                 noise_val = np.random.normal(base_val, std_dev)
                 
         else:
-            # Absolutt usikkerhet (Sentrert rundt 0.0, trekker standardisert avvik mellom -1 og +1)
             base_val = 0.0
             abs_min = -1.0
             abs_max = 1.0
@@ -139,7 +164,6 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, is_determin
             else:
                 noise_val = np.random.normal(base_val, std_dev)
         
-        # Lagre strukturen slik at beregningsfunksjonene i at_mc.py får alt de trenger
         dataset_noise_dict[ds_id] = {
             'value': noise_val,
             'type': unc_type,
@@ -149,130 +173,95 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, is_determin
 
     return base_params, dataset_noise_dict
 
-# def generate_mc_parameters_fast(base_params, df_global, df_datasets, is_deterministic=False):
-#     """
-#     Trekker globale parametere OG genererer unike støyfaktorer for datasettene.
-#     Tar strengt hensyn til om usikkerheten er oppgitt som 'perc' eller 'abs' 
-#     i kolonnen 'uncertainty_type'.
-#     """
-#     if is_deterministic:
-#         return base_params, {}
-        
-#     # --- 1. GLOBALE PARAMETERE ---
-#     custom_dict = {}
-#     df_perturbed = df_global.copy()
+
+def write_mc_flows_to_international_report(summary_df):
+    """
+    Skriver aggregerte resultater direkte til den offisielle Excel-malen.
+    Basert på nøyaktig kolonne-mapping fra arket '2a. Database N flows'.
+    """
+    if not os.path.exists(REPORT_PATH):
+        print(f"[INFO] Fant ikke Excel-malen på '{REPORT_PATH}'. Hopper over offisiell rapportering.")
+        return
+
+    print(f"[EXCEL] Åpner offisiell rapporteringsmal: {REPORT_PATH}...")
+    workbook = openpyxl.load_workbook(REPORT_PATH)
     
-#     col_lower = [c for c in df_perturbed.columns if 'lower_bound' in c][0]
-#     col_upper = [c for c in df_perturbed.columns if 'upper_bound' in c][0]
-#     col_unc_type = [c for c in df_perturbed.columns if 'uncertainty_type' in c or c.startswith('uncertainty_') and c != col_lower and c != col_upper][0]
-#     col_dist_type = [c for c in df_perturbed.columns if 'distribution_type' in c or 'dist' in c][0]
+    if SHEET_NAME not in workbook.sheetnames:
+        print(f"[ALARM] Fant ikke fanen '{SHEET_NAME}' i Excel-arket. Avbryter skriving.")
+        return
+        
+    sheet = workbook[SHEET_NAME]
+    print("[EXCEL] Skriver oppdaterte MC-resultater (Median og CV%) til Excel-databasen...")
 
-#     for idx, row in df_perturbed.iterrows():
-#         pid = row['parameter_id']
-#         val = float(row['value'])
-        
-#         low_b = row[col_lower]
-#         upp_b = row[col_upper]
-#         unc_type = str(row[col_unc_type]).lower().strip() if not pd.isna(row[col_unc_type]) else 'perc'
-#         dist_type = str(row[col_dist_type]).lower().strip() if not pd.isna(row[col_dist_type]) else 'norm'
-        
-#         if pd.isna(low_b) or pd.isna(upp_b) or (low_b == 0 and upp_b == 0):
-#             custom_dict[pid] = val
-#             continue
-            
-#         low_b = float(low_b)
-#         upp_b = float(upp_b)
-        
-#         # --- Sjekk uncertainty_type for globale parametere ---
-#         if unc_type == 'perc':
-#             abs_min = val * (1 - low_b / 100.0)
-#             abs_max = val * (1 + upp_b / 100.0)
-#             std_dev = ((low_b + upp_b) / 2.0 / 100.0) * val
-#         elif unc_type == 'abs':
-#             abs_min = val - low_b
-#             abs_max = val + upp_b
-#             std_dev = (low_b + upp_b) / 2.0 / 1.96  # Antar 95% KI for normalfordeling
-#         else:
-#             # Fallback hvis ukjent type
-#             abs_min = val * (1 - low_b / 100.0)
-#             abs_max = val * (1 + upp_b / 100.0)
-#             std_dev = ((low_b + upp_b) / 2.0 / 100.0) * val
-
-#         if 'pert' in dist_type:
-#             chosen_val = draw_from_pert(abs_min, val, abs_max)
-#         elif 'log' in dist_type:
-#             cv = std_dev / val if val > 0 else 0.1
-#             sigma_log = np.sqrt(np.log(1 + cv**2))
-#             mu_log = np.log(val) - (sigma_log ** 2) / 2
-#             chosen_val = np.random.lognormal(mu_log, sigma_log)
-#         else:
-#             chosen_val = np.random.normal(val, std_dev)
-
-#         if val >= 0 and chosen_val < 0:
-#             chosen_val = 0.0
-            
-#         custom_dict[pid] = chosen_val
-#         df_perturbed.at[idx, 'value'] = chosen_val
-        
-#     base_params.override_global_params(custom_dict)
+    # ==============================================================================
+    # STRENG KOLONNE-MAPPING BASERT PÅ BILDER FRA MALEN
+    # ==============================================================================
+    FIRST_DATA_ROW = 3     # Data starter på rad 3 (etter overskriftene på rad 1 og 2)
     
-#     if hasattr(base_params, '_tables') and 'global_parameters' in base_params._tables:
-#         base_params._tables['global_parameters'] = df_perturbed
-#     elif hasattr(base_params, 'tables') and 'global_parameters' in base_params.tables:
-#         base_params.tables['global_parameters'] = df_perturbed
+    CODE_COL = 3           # Kolonne C: 'Flow Code' (Det fulle unike navnet)
+    VALUE_COL = 14         # Kolonne N: 'Value' (kt N)
+    UNCERTAINTY_COL = 15   # Kolonne O: 'Uncertainty' (%)
+    YEAR_COL = 16          # Kolonne P: 'Year'
+    DATASOURCE_COL = 17    # Kolonne Q: 'Data sources'
+    COMMENT_COL = 18       # Kolonne R: 'Comment'
 
-#     # --- 2. STØYFAKTORER FOR DATASETT (Med 'abs' vs 'perc' logikk) ---
-#     # --- INNE I GENERATE_MC_PARAMETERS_FAST (DEL 2: DATASETT) ---
-#     dataset_noise_dict = {}
-    
-#     for _, row in df_datasets.iterrows():
-#         ds_id = str(row[d_name]).strip()
-#         low_b = float(row[d_lower]) if not pd.isna(row[d_lower]) else 0.0
-#         upp_b = float(row[d_upper]) if not pd.isna(row[d_upper]) else 0.0
-#         unc_type = str(row[d_unc_type]).lower().strip() if not pd.isna(row[d_unc_type]) else 'perc'
-#         dist_type = str(row[d_dist_type]).lower().strip() if not pd.isna(row[d_dist_type]) else 'pert'
-        
-#         if unc_type == 'perc':
-#             # PROSENT: Sentrert rundt 1.0. Grenser blir f.eks. 0.9 og 1.1 for 10%
-#             base_val = 1.0
-#             abs_min = base_val * (1 - low_b / 100.0)
-#             abs_max = base_val * (1 + upp_b / 100.0)
-#             std_dev = ((low_b + upp_b) / 2.0 / 100.0) * base_val
+    for _, row_data in summary_df.iterrows():
+        flow_name = str(row_data["flow_name"]).strip()
+        year = int(row_data["year"]) 
+        value = row_data["median"]
+        cv_percent = row_data["cv_percent"]
+        comment = row_data.get("comment", "")
+        data_sources = row_data.get("data_sources", "")
+
+        year_found = False
+        flow_found = False
+
+        # Gå gjennom tabellen vertikalt rad for rad
+        for row in range(FIRST_DATA_ROW, sheet.max_row + 1):
+            cell_value = sheet.cell(row=row, column=YEAR_COL).value
             
-#             if 'pert' in dist_type:
-#                 noise_val = draw_from_pert(abs_min, base_val, abs_max)
-#             elif 'log' in dist_type:
-#                 cv = std_dev / base_val
-#                 sigma_log = np.sqrt(np.log(1 + cv**2))
-#                 mu_log = np.log(base_val) - (sigma_log ** 2) / 2
-#                 noise_val = np.random.lognormal(mu_log, sigma_log)
-#             else:
-#                 noise_val = np.random.normal(base_val, std_dev)
+            if cell_value is None:
+                continue
                 
-#         else:
-#             # ABSOLUTT: Sentrert rundt 0.0. Vi trekker et tall mellom -1 og +1
-#             base_val = 0.0
-#             abs_min = -1.0
-#             abs_max = 1.0
-#             std_dev = 1.0 / 1.96 # Standardavvik for en standard normalfordeling
-            
-#             if 'pert' in dist_type:
-#                 noise_val = draw_from_pert(abs_min, base_val, abs_max)
-#             else:
-#                 # Normalfordeling sentrert rundt 0 med std=1
-#                 noise_val = np.random.normal(base_val, std_dev)
-        
-#         # Lagre både verdien og typen så beregningsfunksjonen vet hva den har fått!
-#         dataset_noise_dict[ds_id] = {
-#             'value': noise_val,
-#             'type': unc_type,
-#             'low_bound': low_b,
-#             'upp_bound': upp_b
-#         }
+            try:
+                # Sikker vask og konvertering av årstallet fra kolonne P
+                year_in_row = int(float(str(cell_value).strip()))
+            except (ValueError, TypeError):
+                continue
 
-#     return base_params, dataset_noise_dict
+            # Hvis vi matcher på året, sjekker vi om strømkoden i kolonne C også matcher
+            if year_in_row == year:
+                year_found = True
+                name_in_row = sheet.cell(row=row, column=CODE_COL).value or ""
+                
+                if str(name_in_row).strip() == flow_name:
+                    # Skriv data inn i de nøyaktige kolonnene
+                    sheet.cell(row=row, column=VALUE_COL, value=value)
+                    
+                    # CV% lagres vanligvis som et reelt tall (f.eks. 0.20 for 20 %) i Excel
+                    sheet.cell(row=row, column=UNCERTAINTY_COL, value=cv_percent / 100.0)
+                    
+                    if data_sources:
+                        sheet.cell(row=row, column=DATASOURCE_COL, value=data_sources)
+                    if comment:
+                        sheet.cell(row=row, column=COMMENT_COL, value=comment)
+                        
+                    flow_found = True
+                    break
 
+        if year_found and not flow_found:
+            # Vi logger i stedet for å krasje, i tilfelle enkelte strømmer ikke rapporteres i denne malen
+            print(f"[INFO] Strømkode '{flow_name}' ble ikke funnet for året {year} i Excel-malen. Hopper over.")
+        if not year_found:
+            raise YearNotFoundError(
+                f"Året {year} mangler helt eller har feil format i kolonne P (16) i Excel-malen! "
+                f"Sjekk rad {FIRST_DATA_ROW} og nedover."
+            )
 
+    workbook.save(REPORT_PATH)
+    print("[SUCCESS] Det offisielle Excel-dokumentet er oppdatert på en strukturert måte!")
+
+    
 def main():
     args = parse_arguments()
     
@@ -288,30 +277,19 @@ def main():
     print(f"[INFO] Antall ønskede iterasjoner: {args.nsim}")
     print("="*60)
 
-    # 1. PRE-LOAD DATA (Tung fil-I/O skjer kun ÉN gang her)
+    # 1. PRE-LOAD DATA OG PARAMETERE KUN ÉN GANG
     preloaded_data = load_all_data(selected_pools)
     
-    # --- 1. PRE-LOAD PARAMETERE KUN ÉN GANG HER (FØR LOOPEN) ---
     print("[INFO] Pre-loader N_parameters.xlsx inn i RAM...")
     base_params = NParameters("data_files/N_parameters.xlsx")
-    df_global_static = base_params.get_table('global_parameters') # Holdes i minnet
-    
-    # Hent ut tabellen over globale parametere med distribusjoner og grenser
     df_global_static = base_params.get_table('global_parameters')
-    
-    # Lag en ren ordbok med de originale deterministiske verdiene for nullstilling
     original_clean_dict = dict(zip(df_global_static['parameter_id'], df_global_static['value']))
-    
     df_dataset_uncertainties = base_params.get_table('dataset_uncertainties')
 
-    
-    # --- NY SIKKERHETSSJEKK FOR HANDELSDATA (Fikser advarselen din) ---
-    # Sørg for at 'trade_params' ligger i preloaded_data slik at at_mc.py finner det
+    # Sikkerhetssjekk og mapping for handelsdata
     if 'trade_params' not in preloaded_data:
         preloaded_data['trade_params'] = base_params.get_trade_params()
         
-    # Noen ganger lagrer data_loader tabellen under navnet 'trade' eller 'trade_data'.
-    # Vi mapper den om til 'prepared_trade_all' hvis at_mc.py krever det navnet:
     if 'prepared_trade_all' not in preloaded_data:
         if 'trade' in preloaded_data:
             preloaded_data['prepared_trade_all'] = preloaded_data['trade']
@@ -320,43 +298,29 @@ def main():
         elif 'ssb_trade' in preloaded_data:
             preloaded_data['prepared_trade_all'] = preloaded_data['ssb_trade']
 
-    # --- DIAGNOSTISK SJEKK FOR Å SE HVA SOM MANGLER HVIS DET FORTSATT IKKE GÅR ---
-    # print("[DEBUG] prepared_trade_all finnes:", preloaded_data.get('prepared_trade_all') is not None)
-    # print("[DEBUG] trade_params finnes:", preloaded_data.get('trade_params') is not None)
-    
-    # Liste for å samle opp absolutt alle rader fra alle iterasjoner
     all_mc_records = []
     
     print(f"\n[INFO] Starter simuleringsløkke: Kjører {args.nsim} iterasjoner...")
     start_time = time.time()
 
     for i in range(args.nsim):
+        # Nullstill tabeller til statiske verdier før hver runde
+        if hasattr(base_params, '_tables'):
+            base_params._tables['global_parameters'] = df_global_static.copy()
+        elif hasattr(base_params, 'tables'):
+            base_params.tables['global_parameters'] = df_global_static.copy()
+        base_params.override_global_params(original_clean_dict)
+
         if i == 0:
-            # Første runde: Helt deterministisk. 
-            # Vi tvinger objektet til å bruke den originale, rene tabellen.
-            if hasattr(base_params, '_tables'):
-                base_params._tables['global_parameters'] = df_global_static.copy()
-            elif hasattr(base_params, 'tables'):
-                base_params.tables['global_parameters'] = df_global_static.copy()
-            base_params.override_global_params(original_clean_dict)
+            # Første runde: Helt deterministisk baseline
             current_params = base_params
-            
-            # --- KRITISK FIKS: Definer en tom ordbok for den deterministiske runden ---
             dataset_noise = {} 
-            
         else:
-            # Følgende runder: Nullstill først til originalen, og generer så NY støy i tabellen
-            if hasattr(base_params, '_tables'):
-                base_params._tables['global_parameters'] = df_global_static.copy()
-            elif hasattr(base_params, 'tables'):
-                base_params.tables['global_parameters'] = df_global_static.copy()
-            base_params.override_global_params(original_clean_dict)
-            
-            # --- RETTET: Husk å sende med df_dataset_uncertainties her ---
+            # Følgende runder: Generer stokastisk støy
             current_params, dataset_noise = generate_mc_parameters_fast(
                 base_params, 
                 df_global_static, 
-                df_dataset_uncertainties,  # <--- Denne må med!
+                df_dataset_uncertainties,
                 is_deterministic=False
             )
         
@@ -365,71 +329,31 @@ def main():
         # 2. KJØR BEREGNINGER FOR AKTIVERTE POOLER
         if 'at' in selected_pools:
             from calculations.at_mc import execute_calculations_mc
-            # Nå eksisterer dataset_noise uansett om i == 0 eller i > 0!
             iteration_output['at'] = execute_calculations_mc(preloaded_data, current_params, dataset_noise)
-        
-        iteration_output = {}
-        
-        # 2. KJØR BEREGNINGER FOR AKTIVERTE POOLER
-        if 'at' in selected_pools:
-            from calculations.at_mc import execute_calculations_mc
-            iteration_output['at'] = execute_calculations_mc(preloaded_data, current_params, dataset_noise)
+            
+        # (Her legger du inn de andre poolene etter hvert: if 'rw' in selected_pools... osv.)
 
         # --- DIAGNOSTISK SJEKK FOR ITERASJON 0 (DETERMINISTISK) ---
         if i == 0 and 'at' in iteration_output:
             print("\n" + "="*60)
             print("DIAGNOSTISK SJEKK (Iterasjon 0 / Deterministisk):")
-            
             at_res = iteration_output['at']
-            value_rdn = None
-            value_oxn = None
-            verdi_2020_ammonia = None
-            verdi_2020_ag = None
-            verdi_2020_fo = None
-            verdi_2020_ol = None
-            verdi_2020_sw = None
-            verdi_dep_oxn = None
-            verdi_dep_rdn = None
+            
+            flows_to_check = {
+                'AT.AT-RW.RW-Atmospheric outflow-RDN': 'RDN outflow for år 2020',
+                'AT.AT-RW.RW-Atmospheric outflow-OXN': 'OXN outflow for år 2020',
+                'AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2': 'Ammoniakksyntese for år 2020',
+                'AT.AT-AG.SM-Biological N2 fixation-N2': 'AG Biological N2 fixation for år 2020',
+                'AT.AT-FS.FO-N2 fixation-N2': 'FO N2 fixation for år 2020',
+                'AT.AT-FS.OL-N2 fixation-N2': 'OL N2 fixation for år 2020',
+                'AT.AT-HY.SW-N2 fixation-N2': 'SW N2 fixation for år 2020',
+                'AT.AT-AG.SM-Deposition-OXN': 'Deposition OXN (jordbruk) for år 2020',
+                'AT.AT-AG.SM-Deposition-RDN': 'Deposition RDN (jordbruk) for år 2020'
+            }
             
             for r in at_res:
-                if r['year'] == 2020:
-                    if r['flow_name'] == 'AT.AT-RW.RW-Atmospheric outflow-RDN':
-                        value_rdn = r['value']
-                    elif r['flow_name'] == 'AT.AT-RW.RW-Atmospheric outflow-OXN':
-                        value_oxn = r['value']
-                    elif r['flow_name'] == 'AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2':
-                        verdi_2020_ammonia = r['value']
-                    elif r['flow_name'] == 'AT.AT-AG.SM-Biological N2 fixation-N2':
-                        verdi_2020_ag = r['value']
-                    elif r['flow_name'] == 'AT.AT-FS.FO-N2 fixation-N2':
-                        verdi_2020_fo = r['value']
-                    elif r['flow_name'] == 'AT.AT-FS.OL-N2 fixation-N2':
-                        verdi_2020_ol = r['value']
-                    elif r['flow_name'] == 'AT.AT-HY.SW-N2 fixation-N2':
-                        verdi_2020_sw = r['value']
-                    elif r['flow_name'] == 'AT.AT-AG.SM-Deposition-OXN':
-                        verdi_dep_oxn = r['value']
-                    elif r['flow_name'] == 'AT.AT-AG.SM-Deposition-RDN':
-                        verdi_dep_rdn = r['value']
-                        
-            print(f"  RDN outflow for år 2020: {value_rdn:.4f} kt N" if value_rdn is not None else "  RDN: Ikke funnet")
-            print(f"  OXN outflow for år 2020: {value_oxn:.4f} kt N" if value_oxn is not None else "  OXN: Ikke funnet")
-            
-            if verdi_2020_ammonia is not None:
-                print(f"  Ammoniakksyntese for år 2020: {verdi_2020_ammonia:.4f} kt N")
-            if verdi_2020_ag is not None:
-                print(f"  AG Biological N2 fixation for år 2020: {verdi_2020_ag:.4f} kt N")
-            if verdi_2020_fo is not None:
-                print(f"  FO N2 fixation for år 2020: {verdi_2020_fo:.4f} kt N")
-            if verdi_2020_ol is not None:
-                print(f"  OL N2 fixation for år 2020: {verdi_2020_ol:.4f} kt N")
-            if verdi_2020_sw is not None:
-                print(f"  SW N2 fixation for år 2020: {verdi_2020_sw:.4f} kt N")
-            if verdi_dep_oxn is not None:
-                print(f"  Deposition OXN (jordbruk) for år 2020: {verdi_dep_oxn:.4f} kt N")
-            if verdi_dep_rdn is not None:
-                print(f"  Deposition RDN (jordbruk) for år 2020: {verdi_dep_rdn:.4f} kt N")
-                
+                if r['year'] == 2020 and r['flow_name'] in flows_to_check:
+                    print(f"  {flows_to_check[r['flow_name']]}: {r['value']:.4f} kt N")
             print("="*60 + "\n")
 
         # --- SAMLE OPP OG TAGGE DATA MED SIM_ID ---
@@ -442,11 +366,18 @@ def main():
     elapsed_time = time.time() - start_time
     print(f"[SUKSESS] Simulering av {args.nsim} runder fullført på {elapsed_time:.4f} sekunder.")
 
-    # --- 3. STATISTISK ANALYSE, EXCEL-EKSPORT OG PLOTTING ---
-    from utils_stat import process_and_export_mc_results
-    process_and_export_mc_results(all_mc_records)
+    # 3. STATISTISK ANALYSE, EXCEL-EKSPORT OG PLOTTING
+    summary_df = process_and_export_mc_results(all_mc_records)
     
+    if args.no_excel:
+        print("[INFO] Kjører UTEN å skrive til offisiell Excel-mal (--no-excel er aktiv).")
+    else:
+        # Hvis flagget IKKE er med, kjører vi som vanlig
+        write_mc_flows_to_international_report(summary_df)
+    
+    # 5. NETTSIDE-GENERERING
     generate_github_pages_report()
+
 
 if __name__ == '__main__':
     main()
