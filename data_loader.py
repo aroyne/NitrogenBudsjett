@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import pandas as pd
 import numpy as np
+import openpyxl
 from calculations.utils import read_trade_data
 
 def load_all_data(selected_pools):
@@ -18,28 +19,24 @@ def load_all_data(selected_pools):
         except Exception as e:
             print(f"[KRITISK FEIL] Kunne ikke pre-loade atm_in_out.xlsx: {e}")
             
-    trade_needing_pools = {'at', 'rw', 'mp', 'pr', 'ef'}
+    # OPPDATERT: Lagt til 'ag' i trade_needing_pools
+    trade_needing_pools = {'at', 'rw', 'mp', 'pr', 'ef', 'ag'}
     if not trade_needing_pools.isdisjoint(selected_pools):
         print("[I/O] Pre-loader komplett varehandelsstatistikk koblet mot alle kategorier...")
         try:
-            # Last inn hele rådatafilen (6 mill rader) via din vaskefunksjon
             df_trade_raw = read_trade_data('data_files/Tab_08801_1988_2024.csv')
             
-            # Hent ut hele mappingen fra NParameters
             from calculations.n_params import NParameters
             params_excel = NParameters("data_files/N_parameters.xlsx")
             df_mapping = params_excel.get_trade_mapping()
             
-            # Sikre at mappingen har kolonnene flate
             if 'konv' not in df_mapping.columns:
                 df_mapping = df_mapping.reset_index()
                 
-            # Sørg for tekst-matching på varenummer på tvers av hele settet
             df_trade_raw['HS_code_str'] = df_trade_raw['HS_code'].astype(str).str.strip()
             v_col = 'Varenr' if 'Varenr' in df_mapping.columns else 'varenr'
             df_mapping['varenr_str'] = df_mapping[v_col].astype(str).str.strip()
             
-            # Gjør den tunge basemergen for ALLE varenumre én gang for alle
             df_prepared_all = df_trade_raw.merge(
                 df_mapping[[v_col, 'konv', 'type', 'varenr_str']],
                 left_on='HS_code_str',
@@ -47,13 +44,8 @@ def load_all_data(selected_pools):
                 how='inner'
             )
             
-            # --- ULTRA-OPTIMALISERING: Pre-aggreger tonnasje per år, import/eksport, type OG konv-type ---
             print("[INFO] Komprimerer 6 mill rader handelsdata til en kjapp volum-matrise...")
-            
-            # ENDRING: Legg til 'type' i listen inni .groupby([...])
             df_volum_aggregated = df_prepared_all.groupby(['year', 'impeks', 'type', 'konv'])['amount'].sum().reset_index()
-            
-            # Lagre denne superlette matrisen
             preloaded['compressed_trade_volume'] = df_volum_aggregated
             
         except Exception as e:
@@ -68,8 +60,9 @@ def load_all_data(selected_pools):
         except Exception as e:
             print(f"[ADVARSEL] Kunne ikke pre-loade FAOSTAT-data: {e}")
             
-    # 4. DEPONERINGSDATA
-    if 'at' in selected_pools:
+    # 4. DEPONERINGSDATA (OPPDATERT: Lagt til 'ag' i sjekken hvis aktuelt)
+    deposition_needing_pools = {'at', 'ag'}
+    if not deposition_needing_pools.isdisjoint(selected_pools):
         print("[I/O] Pre-loader NILU deponeringsdata (N_per_class_period_distributed_unallocated_long.csv)...")
         try:
             preloaded['deposition_data'] = pd.read_csv('data_files/N_per_class_period_distributed_unallocated_long.csv')
@@ -79,106 +72,102 @@ def load_all_data(selected_pools):
     # 5. IMPORT AV DYREFÔR
     if 'rw' in selected_pools:
         print("[I/O] Pre-loader Landbruksdirektoratets kraftfôrstatistikk (Årlig råvareforbruk.xlsx)...")
-        # 1. Hent data fra Landbruksdirektoratets kraftfôrstatistikk
-        # Forventer år i kolonne 1 (A), karbohydrat i kolonne 3 (C), protein i kolonne 9 (I)
         df_raavarer = pd.read_excel('data_files/Årlig råvareforbruk.xlsx', sheet_name='Varegrupper')
-        # Klipp ut de eksakte radene (rader 5 til 30 i Excel tilsvarer vanligvis index 3 til 28 i Pandas, avhengig av header)
-        # Det tryggeste er å gi kolonnene navn, men her bruker vi iloc for å speile din originale kode:
         df_raavarer_clean = pd.DataFrame({
             'year': df_raavarer.iloc[3:28, 0].astype(int),
             'value_carb': df_raavarer.iloc[3:28, 2].astype(float),
             'value_prot': df_raavarer.iloc[3:28, 8].astype(float)
         }).reset_index(drop=True)
+        preloaded['feed_raavarer'] = df_raavarer_clean
+
     if 'rw' in selected_pools:
         print("[I/O] Pre-loader NIBIO Totalkalkylen innkjøpt kraftfôr (NibioStatistics-4.xlsx)...")    
-        # 2. Hent data fra NIBIO Totalkalkylen
-        # Forventer år i kolonne 1 (A), tonn i kolonne 2 (B), dom_frac i kolonne 5 (E)
         df_totalkalkyle = pd.read_excel('data_files/NibioStatistics-4.xlsx', sheet_name='Sum innkjøpt kraftfôr ukorr.')
         df_totalkalkyle_clean = pd.DataFrame({
-            'year': df_totalkalkyle.iloc[26:41, 0].astype(int), # Tilsvarende rad 28 til 43 i Excel
+            'year': df_totalkalkyle.iloc[26:41, 0].astype(int),
             'value': df_totalkalkyle.iloc[26:41, 1].astype(float),
             'dom_frac': df_totalkalkyle.iloc[26:41, 4].astype(float)
         }).reset_index(drop=True)
+        preloaded['feed_totalkalkyle'] = df_totalkalkyle_clean
     
-    # Legg dem inn i preloaded_data-ordboken:
-    preloaded['feed_raavarer'] = df_raavarer_clean
-    preloaded['feed_totalkalkyle'] = df_totalkalkyle_clean
-    
-    
+    # 6. AKVAKULTUR
     aq_needing_pools = {'hy', 'rw'}
     if not aq_needing_pools.isdisjoint(selected_pools):
-        print("[I/O] Pre-loader data for akvakultur(A.06.002_20251111-140559.xlsx,akvakultur_1984_1994.xlsx)  ...")    
-        # ==========================================
-        # DATAINNLESING FOR AKVAKULTUR (MC-KLAR)
-        # ==========================================
-        
-        # 1. LES INN MODERNE DATA (Fra 1994 og utover)
-        # Siden årstallene ligger i rad 3, og dataene i rad 5-44, leser vi inn uten header først
-        df_aqua_modern_raw = pd.read_excel(
-            'data_files/A.06.002_20251111-140559.xlsx', 
-            sheet_name='A.06.002', 
-            header=None
-        )
-        
-        # Rad 3 i Excel er index 2 i Pandas. Kolonne 3 (C) og utover er index 2 og utover.
+        print("[I/O] Pre-loader data for akvakultur...")    
+        df_aqua_modern_raw = pd.read_excel('data_files/A.06.002_20251111-140559.xlsx', sheet_name='A.06.002', header=None)
         years_modern = df_aqua_modern_raw.iloc[2, 2:].astype(int).tolist()
-        
-        # Klipp ut rad 5 til 44 (index 4 til 43 i Pandas) for kolonnene fra C og utover
-        # Erstatter '-' med 0 med en gang, slik at tabellen blir numerisk og rask å summere
         df_modern_data_cells = df_aqua_modern_raw.iloc[4:43, 2:].replace('-', 0).astype(float)
-        
-        # Gi kolonnene navn etter årstallene, slik at find_aquaculture_production enkelt kan løpe gjennom dem
         df_modern_data_cells.columns = years_modern
         preloaded['aqua_modern'] = df_modern_data_cells
         
-        
-        # 2. LES INN GAMLE DATA (Før 1994)
-        # Rad 2 til 12 i Excel blir index 1 til 11 i Pandas (hvis vi leser uten header)
-        df_aqua_old_raw = pd.read_excel(
-            'data_files/akvakultur_1984_1994.xlsx', 
-            sheet_name='Ark1', 
-            header=None
-        )
-        
-        # Hent ut år (kolonne A/index 0) og verdi (kolonne B/index 1) for radene 2 til 12
+        df_aqua_old_raw = pd.read_excel('data_files/akvakultur_1984_1994.xlsx', sheet_name='Ark1', header=None)
         df_old_clean = pd.DataFrame({
             'year': df_aqua_old_raw.iloc[1:11, 0].astype(int),
             'value': df_aqua_old_raw.iloc[1:11, 1].astype(float)
         }).reset_index(drop=True)
-        
         preloaded['aqua_old'] = df_old_clean
         
+    # 7. FAOSTAT LEVENDE DYR
     if 'rw' in selected_pools:
-        print("[I/O] Pre-loader FAOSTAT data for levende dyr (FAOSTAT_data_en_11-12-2025)...")    
-        
-        # ==========================================
-        # DATAINNLESING FOR LEVENDE DYR (MC-KLAR)
-        # ==========================================
-        
-        # 1. Les inn og grovfiltrer FAOSTAT-dataen med en gang for å spare minne
+        print("[I/O] Pre-loader FAOSTAT data for levende dyr...")    
         df_fao_raw = pd.read_csv('data_files/FAOSTAT_data_en_11-12-2025.csv')
-        df_fao_filtered = df_fao_raw[
-            (df_fao_raw['Element'] == 'Import quantity') & 
-            (df_fao_raw['Value'] != 0)
-        ][['Item', 'Year', 'Unit', 'Value']].copy()
-        
+        df_fao_filtered = df_fao_raw[(df_fao_raw['Element'] == 'Import quantity') & (df_fao_raw['Value'] != 0)][['Item', 'Year', 'Unit', 'Value']].copy()
         preloaded['fao_live_animals'] = df_fao_filtered
         
+    # 8. MINERALGJØDSELIMPORT
     fert_needing_pools = {'rw'}
     if not fert_needing_pools.isdisjoint(selected_pools):
-        print("[I/O] Pre-loader FAOSTAT data for gjødselimport (FAOSTAT_data_en_11-12-2025-2)...")    
-        # ==========================================
-        # DATAINNLESING FOR MINERALGJØDSEL (MC-KLAR)
-        # ==========================================
-        
-        # Les inn og grovfiltrer FAOSTAT-gjødseldata med en gang
+        print("[I/O] Pre-loader FAOSTAT data for gjødselimport...")    
         df_fert_raw = pd.read_csv('data_files/FAOSTAT_data_en_11-12-2025-2.csv')
-        df_fert_filtered = df_fert_raw[
-            (df_fert_raw['Element'] == 'Import quantity') & 
-            (df_fert_raw['Value'] != 0)
-        ][['Year', 'Value']].copy()
-        
-        # Lagre i preloaded_data
+        df_fert_filtered = df_fert_raw[(df_fert_raw['Element'] == 'Import quantity') & (df_fert_raw['Value'] != 0)][['Year', 'Value']].copy()
         preloaded['fao_mineral_fertilizer'] = df_fert_filtered
+
+    # =========================================================================
+    # NYTT: NYE DATAINNLESINGER FOR LANDBRUKS-POOLEN (AG / AG_MC)
+    # =========================================================================
+    if 'ag' in selected_pools:
+        print("[I/O] Pre-loader data spesifikt for Landbruk (ag)...")
         
+        # Eurostat Gross Nutrient Balance (GNB) Excel-ark
+        try:
+            wb_gnb = openpyxl.load_workbook('data_files/aei_pr_gnb__custom_18744910_spreadsheet.xlsx', data_only=True)
+            preloaded['ag_gnb_workbook'] = wb_gnb
+        except Exception as e:
+            print(f"[KRITISK FEIL] Kunne ikke laste Eurostat GNB Excel: {e}")
+
+        # SSB Grovfôrtabeller
+        try:
+            preloaded['ag_ssb_13648'] = openpyxl.load_workbook('data_files/13648_20251117-154625.xlsx', data_only=True)
+            preloaded['ag_ssb_05772'] = openpyxl.load_workbook('data_files/05772_20251210-142618.xlsx', data_only=True)
+            preloaded['ag_grovfor_old'] = openpyxl.load_workbook('data_files/grovfor_før_2000.xlsx', data_only=True)
+        except Exception as e:
+            print(f"[KRITISK FEIL] Kunne ikke laste SSB grovfôrtabeller: {e}")
+
+        # CRLTAP Tekstfil (Sektordata for utslipp)
+        try:
+            # Siden denne leses rått via load_crltap_emissions_to_N i utils, lagrer vi banen eller innholdet.
+            # Det tryggeste for open() i eksterne funksjoner er å lagre filbanen, eventuelt lese filen som streng-liste:
+            with open('data_files/webdabData1863365.txt', 'r', encoding='utf-8', errors='ignore') as f:
+                preloaded['ag_crltap_raw_lines'] = f.readlines()
+        except Exception as e:
+            print(f"[KRITISK FEIL] Kunne ikke pre-loade CRLTAP tekstfil: {e}")
+
+        # UNFCCC N2O og NOx Excel
+        try:
+            preloaded['ag_unfccc_excel'] = openpyxl.load_workbook('data_files/N2O_NOx_AG.xlsx', data_only=True)
+        except Exception as e:
+            print(f"[KRITISK FEIL] Kunne ikke laste N2O_NOx_AG.xlsx: {e}")
+
+        # Hydrologi / avrenningsdata CSV (Nr_AG--HY.csv)
+        try:
+            preloaded['ag_leaching_csv'] = pd.read_csv('data_files/Nr_AG--HY.csv')
+        except Exception as e:
+            print(f"[KRITISK FEIL] Kunne ikke laste Nr_AG--HY.csv: {e}")
+
+        # FAOSTAT Animals and Production (FAOSTAT_data_en_11-18-2025.csv)
+        try:
+            preloaded['ag_faostat_production'] = pd.read_csv('data_files/FAOSTAT_data_en_11-18-2025.csv')
+        except Exception as e:
+            print(f"[KRITISK FEIL] Kunne ikke laste FAOSTAT animal production: {e}")
+            
     return preloaded
