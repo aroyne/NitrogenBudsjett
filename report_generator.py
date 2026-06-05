@@ -4,7 +4,8 @@ import shutil
 from datetime import datetime
 from pybtex.database import parse_file
 
-def generate_github_pages_report(plot_dir='output_files/plots', output_filename='index.md', bib_filename='referanser.bib'):
+# Endret standard bib_filename til 'library.bib'
+def generate_github_pages_report(plot_dir='output_files/plots', output_filename='index.md', bib_filename='library.bib'):
     if not os.path.exists(plot_dir):
         print(f"[INFO] Fant ikke mappen '{plot_dir}'. Rapporten ble ikke laget.")
         return
@@ -31,7 +32,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         "1988-1992, 1997-2001, 2002-2006, 2007-2011 and 2012-2016. For 2017-2021 we use "
         "total NILU data for that period and scale with the distribution across land classes "
         "for the previous period. Values after 2021 are extrapolated. To find deposition on "
-        "different land categories we use the map resource AR5 from NIBIO [^NIBIO2016]. "
+        "different land categories we use the map resource AR5 from NIBIO [^nibio_ar5_2016]. "
         "We find the total value of atmospheric deposition to the Norwegian mainland is, "
         "as given by NILU, 142 ktN in 2012-2016.\n\n"
         "As noted, our value for agricultural soils is much larger than given by FAOSTAT. "
@@ -111,12 +112,12 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
             exact_flow_code = "AT.AT-FS.FO-Deposition-OXN"
         elif "fsfo" in norm and "deposition" in norm and "rdn" in norm:
             exact_flow_code = "AT.AT-FS.FO-Deposition-RDN"
+        elif "fsol" in norm and "fixation" in norm:
+            exact_flow_code = "AT.AT-FS.OL-Biological N2 fixation-N2"
         elif "fsol" in norm and "deposition" in norm and "oxn" in norm:
             exact_flow_code = "AT.AT-FS.OL-Deposition-OXN"
         elif "fsol" in norm and "deposition" in norm and "rdn" in norm:
             exact_flow_code = "AT.AT-FS.OL-Deposition-RDN"
-        elif "fsol" in norm and "fixation" in norm:
-            exact_flow_code = "AT.AT-FS.OL-Biological N2 fixation-N2"
         elif "hshs" in norm and "deposition" in norm and "oxn" in norm:
             exact_flow_code = "AT.AT-HS.HS-Deposition-OXN"
         elif "hshs" in norm and "deposition" in norm and "rdn" in norm:
@@ -138,21 +139,21 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         with open(full_flow_path, 'w', encoding='utf-8') as f:
             f.write("---\n")
             f.write("layout: default\n")
-            f.write(f"title: {exact_flow_code}\n")  # <-- Dette blir navnet i venstremenyen
+            f.write(f"title: {exact_flow_code}\n")
             f.write("parent: Atmosphere (AT)\n")
             f.write(f"nav_order: {menu_counter}\n")
             f.write("---\n\n")
             
             menu_counter += 1
 
-            f.write(f"# {exact_flow_code}\n\n")  # <-- Dette blir overskriften øverst på siden
+            f.write(f"# {exact_flow_code}\n\n")
             f.write(f"![{exact_flow_code}](../{plot_dir}/{filename})\n\n")
             f.write("### Flow Description\n")
 
             # Skriv tekstblokkene basert på kode-mappingen
             if exact_flow_code == "AT.AT-AG.SM-Biological N2 fixation-N2":
                 f.write("**AT.AT-AG.SM-Biological N2 fixation-N2**\n\n")
-                f.write("[^Schäppi2025] advises using data from the EUROSTAT Gross nutrient balance, but there is an error in this dataset for Norway which is currently being corrected (as of February 2026; personal correspondence, EUROSTAT). According to the EUROSTAT metadata, the BNF in this statistic is calculated based on the area of leguminous crops and fixation coefficients. The production of leguminous crops (peas, beans etc) in Norway is very low and we assume that agricultural BNF for the most part determined by leguminous crops such as clover grown on pastures and in fodder production.\n\n(Bleken & Bakken, 1997) based their estimate for BNF from the sale of clover seeds: a sale of about 145 t seeds was estimated to be used to plant 95 000 ha of grass/clover mixtures (655 ha/t seeds). Together with a rate of BNF of 80 kgN/ha on this area, they found a total of 7.6 ktN per year and summed up to 8 ktN to account for BNF from free-living organisms and other sources. The rate of 80 kgN/ha agrees relatively well with later studies of agricultural BNF in Norway, where average values between 10 and 100 kgN/ha have been found; the highest values in particularly productive areas were up to 260 kgN/ha. Yearly statistics of clover seed sales are not available, but according to NIBIO Totalkalkylen [^NIBIO2025b], the area where grass/clover mixes may be sown for pasture and fodder production (fulldyrka eng) has remained constant to within about 3 % from 1995 up to today. Our best estimate for BNF, and for consistency with the previous study, is therefore to assume a constant value of 8 ktN/year. In Sweden [^Moldan2025] the value was found to be 34 kT in 2015, which is more in line with the values found before 2000.\n\n")
+                f.write("[^schappi_annexes_2025] advises using data from the EUROSTAT Gross nutrient balance, but there is an error in this dataset for Norway which is currently being corrected (as of February 2026; personal correspondence, EUROSTAT). According to the EUROSTAT metadata, the BNF in this statistic is calculated based on the area of leguminous crops and fixation coefficients. The production of leguminous crops (peas, beans etc) in Norway is very low and we assume that agricultural BNF for the most part determined by leguminous crops such as clover grown on pastures and in fodder production.\n\n(Bleken & Bakken, 1997) based their estimate for BNF from the sale of clover seeds: a sale of about 145 t seeds was estimated to be used to plant 95 000 ha of grass/clover mixtures (655 ha/t seeds). Together with a rate of BNF of 80 kgN/ha on this area, they found a total of 7.6 ktN per year and summed up to 8 ktN to account for BNF from free-living organisms and other sources. The rate of 80 kgN/ha agrees relatively well with later studies of agricultural BNF in Norway, where average values between 10 and 100 kgN/ha have been found; the highest values in particularly productive areas were up to 260 kgN/ha. Yearly statistics of clover seed sales are not available, but according to NIBIO Totalkalkylen [^nibio_totalkalkylen_2025], the area where grass/clover mixes may be sown for pasture and fodder production (fulldyrka eng) has remained constant to within about 3 % from 1995 up to today. Our best estimate for BNF, and for consistency with the previous study, is therefore to assume a constant value of 8 ktN/year. In Sweden [^moldan_where_2025] the value was found to be 34 kT in 2015, which is more in line with the values found before 2000.\n\n")
             elif exact_flow_code in ["AT.AT-AG.SM-Deposition-OXN", "AT.AT-AG.SM-Deposition-RDN", 
                                      "AT.AT-FS.FO-Deposition-OXN", "AT.AT-FS.FO-Deposition-RDN",
                                      "AT.AT-FS.OL-Deposition-OXN", "AT.AT-FS.OL-Deposition-RDN",
@@ -160,30 +161,50 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
                                      "AT.AT-HY.SW-Deposition-RDN"]:
                 f.write(f"**{exact_flow_code}**\n\n" + deposition_text + "\n\n")
             elif exact_flow_code == "AT.AT-FS.FO-N2 fixation-N2":
-                f.write("**AT.AT-FS.FO-N2 fixation-N2**\n\nFollowing the Swedish NBB [^Moldan2025], we use an N-fixation rate of 1.5 kg/ha/year and a forested area of 12.0 mill ha as given by SSB for 2019-2023 (table 14368); we assume this value is constant for our entire time period. This gives an annual N-fixation rate of 18.0 ktN. For comparison, the value for Sweden in 2015 was found to be 39.5 ktN [^Moldan2025].\n\n")
+                f.write("**AT.AT-FS.FO-N2 fixation-N2**\n\nFollowing the Swedish NBB [^moldan_where_2025], we use an N-fixation rate of 1.5 kg/ha/year and a forested area of 12.0 mill ha as given by SSB for 2019-2023 (table 14368); we assume this value is constant for our entire time period. This gives an annual N-fixation rate of 18.0 ktN. For comparison, the value for Sweden in 2015 was found to be 39.5 ktN [^moldan_where_2025].\n\n")
+            elif exact_flow_code == "AT.AT-FS.OL-Biological N2 fixation-N2":
+                f.write("**AT.AT-FS.OL-Biological N2 fixation-N2**\n\nMethodology and parameterization for biological N2 fixation on other land areas (unmanaged land, alpine areas, etc.).\n\n")
             elif exact_flow_code == "AT.AT-HY.SW-Deposition-OXN":
                 f.write("**AT.AT-HY.SW-Deposition-OXN**\n\n" + deposition_text + "\n\nFor comparison, the data used in the TEOTIL model gives 3.5 ktN in 2013 and 3.0 ktN in 2023. These comparable but slightly lower values are the results of different datasets used and different data treatment.\n\n")
             elif exact_flow_code == "AT.AT-HY.SW-N2 fixation-N2":
-                f.write("**AT.AT-HY.SW-N2 fixation-N2**\n\nAccording to NIBIO, the surface water area is 20 457 km2 (https://arealbarometer.nibio.no/nb/norge/). According to [^Schäppi2025], the biological fixation rate can vary between < 0.1 tN/km2 in oligotrophic and mesotrophic lakes to up to 10 tN/km2 in eutrophic lakes. Most lakes in Norway are not eutrophic and we use a low value of 0.1 tN/km2, which gives 2 ktN/year.\n\n")
+                f.write("**AT.AT-HY.SW-N2 fixation-N2**\n\nAccording to NIBIO, the surface water area is 20 457 km2 (https://arealbarometer.nibio.no/nb/norge/). According to [^schappi_annexes_2025], the biological fixation rate can vary between < 0.1 tN/km2 in oligotrophic and mesotrophic lakes to up to 10 tN/km2 in eutrophic lakes. Most lakes in Norway are not eutrophic and we use a low value of 0.1 tN/km2, which gives 2 ktN/year.\n\n")
             elif exact_flow_code == "AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2":
                 f.write("**AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2**\n\nis found through mass balance where we use data from FAOSTAT Fertilizer by nutrient, domestic fertilizer production, and subtracted the amount of ammonia imported from SSB trade data (table 08801). The result is a very variable curve which probably does not reflect year to year production well and could be a result of how trade statistics are reported.\n\n")
             elif exact_flow_code in ["AT.AT-RW.RW-Atmospheric outflow-OXN", "AT.AT-RW.RW-Atmospheric outflow-RDN"]:
-                f.write(f"**{exact_flow_code}**\n\nIs found using source-receptor data from EMEP [^EMEP2024], as advised by [^Schäppi2025].\n\n")
+                f.write(f"**{exact_flow_code}**\n\nIs found using source-receptor data from EMEP [^emep_sr_2024], as advised by [^schappi_annexes_2025].\n\n")
             else:
                 f.write(f"*Atmospheric outflow plot detected. Filename: `{filename}`.*\n\n")
 
-            # Referanser
+            # ========================================================
+            # 3. AUTOMATISK GENERERING AV BIBTEX-REFERANSER (Markdown-fotnoter)
+            # ========================================================
             f.write("\n### References\n\n")
             if os.path.exists(bib_filename):
-                bib_data = parse_file(bib_filename)
-                for key, entry in bib_data.entries.items():
-                    authors = entry.persons.get('author', [])
-                    author_str = ", ".join([str(a) for a in authors]) if authors else "Unknown Author"
-                    year = entry.fields.get('year', 'n.d.')
-                    title = entry.fields.get('title', 'No title')
-                    journal = entry.fields.get('journal', entry.fields.get('publisher', ''))
-                    f.write(f"[^{key}]: {author_str} ({year}). *{title}*. {journal}\n")
+                try:
+                    # Leser library.bib direkte fra rotmappen
+                    bib_data = parse_file(bib_filename)
+                    for key, entry in bib_data.entries.items():
+                        # Hent forfattere sikkert ut
+                        authors = entry.persons.get('author', [])
+                        author_str = ", ".join([str(a) for a in authors]) if authors else "Unknown Author"
+                        
+                        # Hent ut standardfeltene med reserve-løsninger (fallbacks)
+                        year = entry.fields.get('year', 'n.d.')
+                        title = entry.fields.get('title', 'No title').replace('{', '').replace('}', '')
+                        journal = entry.fields.get('journal', entry.fields.get('publisher', entry.fields.get('booktitle', '')))
+                        volume = entry.fields.get('volume', '')
+                        pages = entry.fields.get('pages', '')
+                        
+                        # Formater tidsskrift/publikasjon-detaljer pent om de finnes
+                        pub_details = f" *{journal}*" if journal else ""
+                        if volume: pub_details += f" {volume}"
+                        if pages: pub_details += f", pp. {pages}"
+                        
+                        # Skriv ut som en standard Markdown-fotnote [^Nøkkel]
+                        f.write(f"[^{key}]: {author_str} ({year}). *{title}*.{pub_details}.\n")
+                except Exception as e:
+                    f.write(f"*Error parsing BibTeX file:* `{str(e)}`\n")
             else:
-                f.write("*No reference file found.*\n")
+                f.write(f"*Reference file '{bib_filename}' not found in root directory.*\n")
 
-    print("[SUKSESS] Portalen er oppdatert med nøyaktige koder som titler!")
+    print(f"[SUKSESS] Portalen er oppdatert med referanser fra '{bib_filename}'!")
