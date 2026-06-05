@@ -54,7 +54,6 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         f.write("# Nitrogen Budget for Norway\n\n")
         f.write(f"**Last Updated:** {current_date_str}\n\n")
         
-        # Tydelig advarselsboks (Callout i Just the Docs-temaet)
         f.write("{: .label .label-red }\n")
         f.write("Work in Progress\n\n")
         f.write("> **CRITICAL WARNING:** This project, including all underlying code, data parameterizations, ")
@@ -94,61 +93,80 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         if not filename.startswith("AT_AT_"):
             continue
 
-        clean_name = filename.replace('.png', '').replace('AT_AT_', '').replace('_', ' ')
         flow_file_name = f"flow_{filename.replace('.png', '')}.md"
         norm = filename.lower().replace('-', '').replace('_', '').replace('.', '')
-
         full_flow_path = os.path.join(at_folder, flow_file_name)
 
-        # HER SKRIVES DATTERFILENE - PASSED PÅ AT ALT SKRIVES KORREKT
+        # Map filnavn-mønstrene direkte til de nøyaktige offisielle kodene dine
+        exact_flow_code = "AT.AT-Unknown-Flow"
+        if "agsm" in norm and "fixation" in norm:
+            exact_flow_code = "AT.AT-AG.SM-Biological N2 fixation-N2"
+        elif "agsm" in norm and "deposition" in norm and "oxn" in norm:
+            exact_flow_code = "AT.AT-AG.SM-Deposition-OXN"
+        elif "agsm" in norm and "deposition" in norm and "rdn" in norm:
+            exact_flow_code = "AT.AT-AG.SM-Deposition-RDN"
+        elif "fsfo" in norm and "fixation" in norm:
+            exact_flow_code = "AT.AT-FS.FO-N2 fixation-N2"
+        elif "fsfo" in norm and "deposition" in norm and "oxn" in norm:
+            exact_flow_code = "AT.AT-FS.FO-Deposition-OXN"
+        elif "fsfo" in norm and "deposition" in norm and "rdn" in norm:
+            exact_flow_code = "AT.AT-FS.FO-Deposition-RDN"
+        elif "fsol" in norm and "deposition" in norm and "oxn" in norm:
+            exact_flow_code = "AT.AT-FS.OL-Deposition-OXN"
+        elif "fsol" in norm and "deposition" in norm and "rdn" in norm:
+            exact_flow_code = "AT.AT-FS.OL-Deposition-RDN"
+        elif "hshs" in norm and "deposition" in norm and "oxn" in norm:
+            exact_flow_code = "AT.AT-HS.HS-Deposition-OXN"
+        elif "hshs" in norm and "deposition" in norm and "rdn" in norm:
+            exact_flow_code = "AT.AT-HS.HS-Deposition-RDN"
+        elif "hysw" in norm and "deposition" in norm and "oxn" in norm:
+            exact_flow_code = "AT.AT-HY.SW-Deposition-OXN"
+        elif "hysw" in norm and "deposition" in norm and "rdn" in norm:
+            exact_flow_code = "AT.AT-HY.SW-Deposition-RDN"
+        elif "hysw" in norm and "fixation" in norm:
+            exact_flow_code = "AT.AT-HY.SW-N2 fixation-N2"
+        elif "mpop" in norm and "synthesis" in norm:
+            exact_flow_code = "AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2"
+        elif "rwrw" in norm and "outflow" in norm and "oxn" in norm:
+            exact_flow_code = "AT.AT-RW.RW-Atmospheric outflow-OXN"
+        elif "rwrw" in norm and "outflow" in norm and "rdn" in norm:
+            exact_flow_code = "AT.AT-RW.RW-Atmospheric outflow-RDN"
+
+        # Skriv datterfilen med nøyaktig kode
         with open(full_flow_path, 'w', encoding='utf-8') as f:
             f.write("---\n")
             f.write("layout: default\n")
-            f.write(f"title: {clean_name}\n")
+            f.write(f"title: {exact_flow_code}\n")  # <-- Dette blir navnet i venstremenyen
             f.write("parent: Atmosphere (AT)\n")
             f.write(f"nav_order: {menu_counter}\n")
             f.write("---\n\n")
             
             menu_counter += 1
 
-            f.write(f"# {clean_name}\n\n")
-            f.write(f"![{clean_name}](../{plot_dir}/{filename})\n\n")
+            f.write(f"# {exact_flow_code}\n\n")  # <-- Dette blir overskriften øverst på siden
+            f.write(f"![{exact_flow_code}](../{plot_dir}/{filename})\n\n")
             f.write("### Flow Description\n")
 
-            # Tekstsjekker
-            if "agsm" in norm and "fixation" in norm:
+            # Skriv tekstblokkene basert på kode-mappingen
+            if exact_flow_code == "AT.AT-AG.SM-Biological N2 fixation-N2":
                 f.write("**AT.AT-AG.SM-Biological N2 fixation-N2**\n\n")
                 f.write("[^Schäppi2025] advises using data from the EUROSTAT Gross nutrient balance, but there is an error in this dataset for Norway which is currently being corrected (as of February 2026; personal correspondence, EUROSTAT). According to the EUROSTAT metadata, the BNF in this statistic is calculated based on the area of leguminous crops and fixation coefficients. The production of leguminous crops (peas, beans etc) in Norway is very low and we assume that agricultural BNF for the most part determined by leguminous crops such as clover grown on pastures and in fodder production.\n\n(Bleken & Bakken, 1997) based their estimate for BNF from the sale of clover seeds: a sale of about 145 t seeds was estimated to be used to plant 95 000 ha of grass/clover mixtures (655 ha/t seeds). Together with a rate of BNF of 80 kgN/ha on this area, they found a total of 7.6 ktN per year and summed up to 8 ktN to account for BNF from free-living organisms and other sources. The rate of 80 kgN/ha agrees relatively well with later studies of agricultural BNF in Norway, where average values between 10 and 100 kgN/ha have been found; the highest values in particularly productive areas were up to 260 kgN/ha. Yearly statistics of clover seed sales are not available, but according to NIBIO Totalkalkylen [^NIBIO2025b], the area where grass/clover mixes may be sown for pasture and fodder production (fulldyrka eng) has remained constant to within about 3 % from 1995 up to today. Our best estimate for BNF, and for consistency with the previous study, is therefore to assume a constant value of 8 ktN/year. In Sweden [^Moldan2025] the value was found to be 34 kT in 2015, which is more in line with the values found before 2000.\n\n")
-            elif "agsm" in norm and "deposition" in norm and "oxn" in norm:
-                f.write("**AT.AT-AG.SM-Deposition-OXN**\n\n" + deposition_text + "\n\n")
-            elif "agsm" in norm and "deposition" in norm and "rdn" in norm:
-                f.write("**AT.AT-AG.SM-Deposition-RDN**\n\n" + deposition_text + "\n\n")
-            elif "fsfo" in norm and "fixation" in norm:
+            elif exact_flow_code in ["AT.AT-AG.SM-Deposition-OXN", "AT.AT-AG.SM-Deposition-RDN", 
+                                     "AT.AT-FS.FO-Deposition-OXN", "AT.AT-FS.FO-Deposition-RDN",
+                                     "AT.AT-FS.OL-Deposition-OXN", "AT.AT-FS.OL-Deposition-RDN",
+                                     "AT.AT-HS.HS-Deposition-OXN", "AT.AT-HS.HS-Deposition-RDN",
+                                     "AT.AT-HY.SW-Deposition-RDN"]:
+                f.write(f"**{exact_flow_code}**\n\n" + deposition_text + "\n\n")
+            elif exact_flow_code == "AT.AT-FS.FO-N2 fixation-N2":
                 f.write("**AT.AT-FS.FO-N2 fixation-N2**\n\nFollowing the Swedish NBB [^Moldan2025], we use an N-fixation rate of 1.5 kg/ha/year and a forested area of 12.0 mill ha as given by SSB for 2019-2023 (table 14368); we assume this value is constant for our entire time period. This gives an annual N-fixation rate of 18.0 ktN. For comparison, the value for Sweden in 2015 was found to be 39.5 ktN [^Moldan2025].\n\n")
-            elif "fsfo" in norm and "deposition" in norm and "oxn" in norm:
-                f.write("**AT.AT-FS.FO-Deposition-OXN**\n\n" + deposition_text + "\n\n")
-            elif "fsfo" in norm and "deposition" in norm and "rdn" in norm:
-                f.write("**AT.AT-FS.FO-Deposition-RDN**\n\n" + deposition_text + "\n\n")
-            elif "fsol" in norm and "deposition" in norm and "oxn" in norm:
-                f.write("**AT.AT-FS.OL-Deposition-OXN**\n\n" + deposition_text + "\n\n")
-            elif "fsol" in norm and "deposition" in norm and "rdn" in norm:
-                f.write("**AT.AT-FS.OL-Deposition-RDN**\n\n" + deposition_text + "\n\n")
-            elif "hshs" in norm and "deposition" in norm and "oxn" in norm:
-                f.write("**AT.AT-HS.HS-Deposition-OXN**\n\n" + deposition_text + "\n\n")
-            elif "hshs" in norm and "deposition" in norm and "rdn" in norm:
-                f.write("**AT.AT-HS.HS-Deposition-RDN**\n\n" + deposition_text + "\n\n")
-            elif "hysw" in norm and "deposition" in norm and "oxn" in norm:
+            elif exact_flow_code == "AT.AT-HY.SW-Deposition-OXN":
                 f.write("**AT.AT-HY.SW-Deposition-OXN**\n\n" + deposition_text + "\n\nFor comparison, the data used in the TEOTIL model gives 3.5 ktN in 2013 and 3.0 ktN in 2023. These comparable but slightly lower values are the results of different datasets used and different data treatment.\n\n")
-            elif "hysw" in norm and "deposition" in norm and "rdn" in norm:
-                f.write("**AT.AT-HY.SW-Deposition-RDN**\n\n" + deposition_text + "\n\n")
-            elif "hysw" in norm and "fixation" in norm:
+            elif exact_flow_code == "AT.AT-HY.SW-N2 fixation-N2":
                 f.write("**AT.AT-HY.SW-N2 fixation-N2**\n\nAccording to NIBIO, the surface water area is 20 457 km2 (https://arealbarometer.nibio.no/nb/norge/). According to [^Schäppi2025], the biological fixation rate can vary between < 0.1 tN/km2 in oligotrophic and mesotrophic lakes to up to 10 tN/km2 in eutrophic lakes. Most lakes in Norway are not eutrophic and we use a low value of 0.1 tN/km2, which gives 2 ktN/year.\n\n")
-            elif "mpop" in norm and "synthesis" in norm:
+            elif exact_flow_code == "AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2":
                 f.write("**AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2**\n\nis found through mass balance where we use data from FAOSTAT Fertilizer by nutrient, domestic fertilizer production, and subtracted the amount of ammonia imported from SSB trade data (table 08801). The result is a very variable curve which probably does not reflect year to year production well and could be a result of how trade statistics are reported.\n\n")
-            elif "rwrw" in norm and "outflow" in norm and "oxn" in norm:
-                f.write("**AT.AT-RW.RW-Atmospheric outflow-OXN**\n\nIs found using source-receptor data from EMEP [^EMEP2024], as advised by [^Schäppi2025].\n\n")
-            elif "rwrw" in norm and "outflow" in norm and "rdn" in norm:
-                f.write("**AT.AT-RW.RW-Atmospheric outflow-RDN**\n\nIs found using source-receptor data from EMEP [^EMEP2024], as advised by [^Schäppi2025].\n\n")
+            elif exact_flow_code in ["AT.AT-RW.RW-Atmospheric outflow-OXN", "AT.AT-RW.RW-Atmospheric outflow-RDN"]:
+                f.write(f"**{exact_flow_code}**\n\nIs found using source-receptor data from EMEP [^EMEP2024], as advised by [^Schäppi2025].\n\n")
             else:
                 f.write(f"*Atmospheric outflow plot detected. Filename: `{filename}`.*\n\n")
 
@@ -166,4 +184,4 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
             else:
                 f.write("*No reference file found.*\n")
 
-    print("[SUKSESS] Portalen er oppdatert med fulle datterfiler!")
+    print("[SUKSESS] Portalen er oppdatert med nøyaktige koder som titler!")

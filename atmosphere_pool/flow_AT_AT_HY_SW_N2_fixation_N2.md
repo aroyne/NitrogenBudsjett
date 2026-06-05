@@ -1,13 +1,13 @@
 ---
 layout: default
-title: HY SW N2 fixation N2
+title: AT.AT-HY.SW-N2 fixation-N2
 parent: Atmosphere (AT)
 nav_order: 14
 ---
 
-# HY SW N2 fixation N2
+# AT.AT-HY.SW-N2 fixation-N2
 
-![HY SW N2 fixation N2](../output_files/plots/AT_AT_HY_SW_N2_fixation_N2.png)
+![AT.AT-HY.SW-N2 fixation-N2](../output_files/plots/AT_AT_HY_SW_N2_fixation_N2.png)
 
 ### Flow Description
 **AT.AT-HY.SW-N2 fixation-N2**

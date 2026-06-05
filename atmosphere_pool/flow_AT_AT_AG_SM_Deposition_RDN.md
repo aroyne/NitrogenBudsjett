@@ -1,13 +1,13 @@
 ---
 layout: default
-title: AG SM Deposition RDN
+title: AT.AT-AG.SM-Deposition-RDN
 parent: Atmosphere (AT)
 nav_order: 3
 ---
 
-# AG SM Deposition RDN
+# AT.AT-AG.SM-Deposition-RDN
 
-![AG SM Deposition RDN](../output_files/plots/AT_AT_AG_SM_Deposition_RDN.png)
+![AT.AT-AG.SM-Deposition-RDN](../output_files/plots/AT_AT_AG_SM_Deposition_RDN.png)
 
 ### Flow Description
 **AT.AT-AG.SM-Deposition-RDN**

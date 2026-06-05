@@ -1,13 +1,13 @@
 ---
 layout: default
-title: HY SW Deposition OXN
+title: AT.AT-HY.SW-Deposition-OXN
 parent: Atmosphere (AT)
 nav_order: 12
 ---
 
-# HY SW Deposition OXN
+# AT.AT-HY.SW-Deposition-OXN
 
-![HY SW Deposition OXN](../output_files/plots/AT_AT_HY_SW_Deposition_OXN.png)
+![AT.AT-HY.SW-Deposition-OXN](../output_files/plots/AT_AT_HY_SW_Deposition_OXN.png)
 
 ### Flow Description
 **AT.AT-HY.SW-Deposition-OXN**

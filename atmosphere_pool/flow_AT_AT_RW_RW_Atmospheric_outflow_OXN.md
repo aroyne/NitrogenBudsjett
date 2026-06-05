@@ -1,13 +1,13 @@
 ---
 layout: default
-title: RW RW Atmospheric outflow OXN
+title: AT.AT-RW.RW-Atmospheric outflow-OXN
 parent: Atmosphere (AT)
 nav_order: 16
 ---
 
-# RW RW Atmospheric outflow OXN
+# AT.AT-RW.RW-Atmospheric outflow-OXN
 
-![RW RW Atmospheric outflow OXN](../output_files/plots/AT_AT_RW_RW_Atmospheric_outflow_OXN.png)
+![AT.AT-RW.RW-Atmospheric outflow-OXN](../output_files/plots/AT_AT_RW_RW_Atmospheric_outflow_OXN.png)
 
 ### Flow Description
 **AT.AT-RW.RW-Atmospheric outflow-OXN**

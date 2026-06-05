@@ -1,21 +1,20 @@
 import os
+import shutil
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
 
-# Global configuration: Height reduced to 60% of original (from 6 to 3.6)
-plt.rcParams['figure.figsize'] = (10, 3.6)
-
 def process_and_export_mc_results(all_records):
     """
     Receives a list of dictionaries from ALL MC iterations.
     Calculates statistics, exports to Excel, and generates plots with:
+      - Automatic cleaning of old plot files to prevent mixing generations
       - Fixed x-axis (1984-2025)
       - Y-axis starting at 0
       - Distinct uncertainty intervals (95% CI)
-      - Clean single-line right-aligned titles
-      - Dynamic verification timestamps
+      - Clean single-line left-aligned titles (loc='left')
+      - Explicit lower/wider figure dimensions (10, 3.6)
     """
     if not all_records:
         print("[WARNING] No records available to process.")
@@ -113,14 +112,21 @@ def process_and_export_mc_results(all_records):
     print(f"[SUCCESS] Statistical report saved to: {excel_path}")
 
     # 5. GENERATE TIME-SERIES PLOTS
-    print("[PLOTTING] Generating time-series plots for each nitrogen flow...")
     plot_dir = os.path.join(output_dir, 'plots')
+    
+    # Slett gamle plott-filer for å unngå blanding av generasjoner
+    if os.path.exists(plot_dir):
+        print(f"[PLOTTING] Cleaning old directory '{plot_dir}' to avoid stale generation leaks...")
+        shutil.rmtree(plot_dir)
     os.makedirs(plot_dir, exist_ok=True)
+
+    print("[PLOTTING] Generating fresh time-series plots for each nitrogen flow...")
 
     for flow in summary_df['flow_name'].unique():
         df_flow = summary_df[summary_df['flow_name'] == flow].sort_values('year')
         
-        plt.clf()
+        # Tvinger ny figur med lav/avlang størrelse for HVERT plott
+        plt.figure(figsize=(10, 3.6))
         
         # Shade the 95% Confidence Interval
         plt.fill_between(
@@ -150,8 +156,8 @@ def process_and_export_mc_results(all_records):
         short_name = flow.split('-')[-2] if '-' in flow else flow
         component = flow.split('-')[-1] if '-' in flow else ''
         
-        # --- REQ 3: Right-aligned single-line title ---
-        plt.title(f"MC Uncertainty Trends: {short_name} ({component})", fontsize=11, fontweight='bold', loc='right')
+        # --- ENDRET: loc='left' gjør nå tittelen venstrestilt på én linje ---
+        plt.title(f"MC Uncertainty Trends: {short_name} ({component})", fontsize=11, fontweight='bold', loc='left')
         
         # X-Axis Settings
         plt.xlim(1984, 2025)
@@ -162,7 +168,6 @@ def process_and_export_mc_results(all_records):
         current_ymax = plt.ylim()[1]
         plt.ylim(top=current_ymax * 1.15 if current_ymax > 0 else 10)
         
-        # --- REQ 1: Texts in English ---
         # Data range indicator (bottom left)
         plt.text(1985, plt.ylim()[1] * 0.05, 
                  f"Data Range: {flow_start}-{flow_end}", 
@@ -181,6 +186,9 @@ def process_and_export_mc_results(all_records):
         # Save plot as PNG
         safe_filename = flow.replace('.', '_').replace('-', '_').replace(' ', '_') + '.png'        
         plt.savefig(os.path.join(plot_dir, safe_filename), dpi=150, bbox_inches='tight')        
+        
+        # Lukker plottet for å frigjøre minnet
+        plt.close()
 
-    print(f"[SUCCESS] All plots saved and timestamped [{current_time_str}] in: {plot_dir}")
+    print(f"[SUCCESS] All fresh plots saved and timestamped [{current_time_str}] in: {plot_dir}")
     print("="*60 + "\n")

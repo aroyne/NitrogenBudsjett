@@ -1,13 +1,13 @@
 ---
 layout: default
-title: AG SM Biological N2 fixation N2
+title: AT.AT-AG.SM-Biological N2 fixation-N2
 parent: Atmosphere (AT)
 nav_order: 1
 ---
 
-# AG SM Biological N2 fixation N2
+# AT.AT-AG.SM-Biological N2 fixation-N2
 
-![AG SM Biological N2 fixation N2](../output_files/plots/AT_AT_AG_SM_Biological_N2_fixation_N2.png)
+![AT.AT-AG.SM-Biological N2 fixation-N2](../output_files/plots/AT_AT_AG_SM_Biological_N2_fixation_N2.png)
 
 ### Flow Description
 **AT.AT-AG.SM-Biological N2 fixation-N2**
