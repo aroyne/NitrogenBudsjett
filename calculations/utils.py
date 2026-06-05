@@ -337,3 +337,69 @@ def find_trade_flow(
 
     return aggregated_data, uncertainty
 
+
+def process_generic_trade_flow(preloaded_data, current_params, current_trade_factors, 
+                               target_types, is_import=True, flow_code=None, results=None, data_sources='SSB tab 08801'):
+    """
+    Generisk kjernefunksjon for å prosessere handelsstrømmer fra SSB 08801.
+    Returnerer en ordbok {år: verdi} med akkurat de årstallene som finnes i datagrunnlaget.
+    Hvis 'results' og 'flow_code' er oppgitt, pakkes dataene også inn i resultatlisten.
+    """
+    df_vol = preloaded_data.get('compressed_trade_volume')
+    if df_vol is None or current_trade_factors is None:
+        if flow_code:
+            print(f"[ADVARSEL] Mangler handelsdata eller faktorer for {flow_code}.")
+        return {}
+
+    # 1. Hent simulert aktivitetsstøy for utenrikshandel
+    noise_trade = float(current_params.get('08801', current_params.get('13136', 1.0)))
+    
+    # 2. Sørg for at target_types er et sett med små bokstaver
+    if isinstance(target_types, (str, int, float)):
+        types_to_match = {str(target_types).lower().strip()}
+    else:
+        types_to_match = {str(t).lower().strip() for t in target_types}
+
+    # 3. Filtrer ut gitte typer og riktig handelsretning (1 = Import, 2 = Eksport)
+    impeks_target = ['1', '1.0'] if is_import else ['2', '2.0']
+    is_correct_type = df_vol['type'].astype(str).str.lower().str.strip().isin(types_to_match)
+    is_correct_direction = df_vol['impeks'].astype(str).str.strip().isin(impeks_target)
+    
+    df_filtered = df_vol[is_correct_type & is_correct_direction].copy()
+    
+    # 4. Initialiser en tom ordbok for å matche din eksakte struktur dynamisk
+    flow_dict = {}
+    
+    if not df_filtered.empty:
+        # 5. Map inn unike, perturberte N-faktorer og kjør vektorisert beregning (kg -> kt N)
+        # Merk: Endre til / 1e9 hvis budsjettet ditt krever 1e9 i stedet for 1e6 her.
+        v_factors = df_filtered['konv'].astype(str).str.strip().map(current_trade_factors).fillna(0.0)
+        df_filtered['N_amount'] = df_filtered['amount'] * noise_trade * v_factors / 1e6 
+        
+        # 6. Aggreger nitrogenmengde per år dynamisk (akkurat som i din opprinnelige loop)
+        for yr_raw, amt in zip(df_filtered['year'].values, df_filtered['N_amount'].values):
+            try:
+                yr = int(float(yr_raw))
+                flow_dict[yr] = flow_dict.get(yr, 0.0) + amt
+            except (ValueError, TypeError):
+                continue
+
+    # 7. VALGFRITT: Pakk inn i det offisielle formatet for tidsserier hvis results er sendt med
+    if results is not None and flow_code is not None:
+        collected_years = set()
+        # Her bruker vi EXPECTED_YEARS (hvis definert globalt) for å sikre komplette rapporter
+        for year in EXPECTED_YEARS:
+            if year in flow_dict:
+                collected_years.add(year)
+                results.append({
+                    'flow_name': flow_code,
+                    'year': year,
+                    'value': float(flow_dict[year]), 
+                    'comment': 'ok',
+                    'data_sources': data_sources
+                })
+        report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
+
+    # Returner ALLTID den rene dynamiske ordboken til bruk i massebalanser
+    return flow_dict
+

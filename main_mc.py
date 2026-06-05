@@ -68,7 +68,7 @@ def draw_from_pert(low, likely, high):
     return low + np.random.beta(alpha, beta) * range_val
 
 
-def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_trade_params=None, is_deterministic=False):
+def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_trade_params=None, df_animal_weights=None, is_deterministic=False):
     """
     Trekker globale parametere, genererer unike støyfaktorer for datasettene,
     OG genererer unike perturberte N-faktorer for handelsvarer (trade_parameters).
@@ -240,6 +240,54 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_trade_pa
                 chosen_val = 0.0
                 
             trade_noise_dict[t_id] = chosen_val
+            
+    # 4. PERTURBERING AV ANIMAL WEIGHTS ---
+    # Vi lagrer de ferdig-trekte vektene direkte inn i custom_dict (som overstyrer globale parametere),
+    # eller vi kan returnere en egen ordbok. Siden de fungerer som parametere, legger vi dem i custom_dict!
+    if df_animal_weights is not None:
+        for _, row in df_animal_weights.iterrows():
+            # Vi antar indeksen er 'item_name' etter vaskingen i main_mc, eller henter kolonne:
+            t_id = f"weight_{str(row.name).strip()}" if df_animal_weights.index.name == 'item_name' else f"weight_{str(row['item_name']).strip()}"
+            val = float(row['avg_weight_kg'])
+            low_b = float(row['low_bound']) if 'low_bound' in row and not pd.isna(row['low_bound']) else 0.0
+            upp_b = float(row['upp_bound']) if 'upp_bound' in row and not pd.isna(row['upp_bound']) else 0.0
+            unc_type = str(row['type']).lower().strip() if 'type' in row and not pd.isna(row['type']) else 'perc'
+            dist_type = str(row['distribution_type']).lower().strip() if 'distribution_type' in row and not pd.isna(row['distribution_type']) else 'norm'
+            
+            if low_b == 0 and upp_b == 0:
+                custom_dict[t_id] = val
+                continue
+                
+            if unc_type == 'perc':
+                abs_min = val * (1 - low_b / 100.0)
+                abs_max = val * (1 + upp_b / 100.0)
+                std_dev = ((low_b + upp_b) / 2.0 / 100.0) * val
+            else:
+                abs_min = val - low_b
+                abs_max = val + upp_b
+                std_dev = (low_b + upp_b) / 2.0 / 1.96
+
+            # Trekk fra riktig distribusjon
+            if 'pert' in dist_type:
+                chosen_val = draw_from_pert(abs_min, val, abs_max)
+            elif 'log' in dist_type:
+                cv = std_dev / val if val > 0 else 0.1
+                sigma_log = np.sqrt(np.log(1 + cv**2))
+                mu_log = np.log(val) - (sigma_log ** 2) / 2
+                chosen_val = np.random.lognormal(mu_log, sigma_log)
+            else:
+                chosen_val = np.random.normal(val, std_dev)
+
+            if val >= 0 and chosen_val < 0:
+                chosen_val = 0.0
+                
+            # Dytt den perturberte verdien inn i den globale parameterordboken!
+            custom_dict[t_id] = chosen_val
+
+    # Oppdater base_params til å inneholde både de globale parametere og de perturberte dyrevektene
+    base_params.override_global_params(custom_dict)
+    
+    return base_params, dataset_noise_dict, trade_noise_dict
 
     return base_params, dataset_noise_dict, trade_noise_dict
 
@@ -355,7 +403,15 @@ def main():
     df_global_static = base_params.get_table('global_parameters')
     original_clean_dict = dict(zip(df_global_static['parameter_id'], df_global_static['value']))
     df_dataset_uncertainties = base_params.get_table('dataset_uncertainties')
-
+    
+    # --- HER DEFINERER DU df_animal_weights ---
+    print("[INFO] Henter animal_weights tabell fra base_params...")
+    try:
+        df_animal_weights = base_params.get_table('animal_weights')
+    except Exception as e:
+        print(f"[ADVARSEL] Fant ikke 'animal_weights' i base_params. Setter til None: {e}")
+        df_animal_weights = None
+        
     # Sikkerhetssjekk og mapping for handelsdata
     if 'trade_params' not in preloaded_data:
         preloaded_data['trade_params'] = base_params.get_trade_params()

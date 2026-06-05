@@ -57,32 +57,61 @@ def find_ammonia_import(prepared_trade_data, current_params, trade_params):
     return year_values
 
 
-def find_aquaculture_production(df_aqua_modern, df_aqua_old, current_params):
-    """Henter akvakulturproduksjon med kildestøy fra Fiskeridirektoratet."""
+def find_aquaculture_production(df_aqua_modern, df_aqua_old, current_params, dataset_noise=None):
+    """
+    Henter akvakulturproduksjon fra Fiskeridirektoratet og konverterer til kt N.
+    Påfører parameterstøy (fish_N_frac) og dataset-støy for Fiskeridirektoratet.
+    """
     aquaculture_production = {}
-    fish_N_frac = float(current_params['fish_N_frac'])
     
-    # Hent støy fra Fiskeridirektoratet (fra dataset_uncertainties-arket ditt)
-    noise_aqua = float(current_params.get('Fiskeridirekt', 1.0))
+    # 1. Hent den perturberte N-faktoren for fisk (parameterstøy)
+    fish_N_frac = float(current_params.get('fish_N_frac', 0.028))
+    
+    # 2. Hent simulert aktivitetsstøy for Fiskeridirektoratet (dataset-støy)
+    # Vi sjekker om den ligger i 'dataset_noise' først, med fallback til 'current_params'
+    key_fisk = 'Fiskeridirektoratet'
+    noise_aqua = 1.0
+    
+    if dataset_noise and key_fisk in dataset_noise:
+        noise_info = dataset_noise[key_fisk]
+        if noise_info['type'] == 'perc':
+            noise_aqua = float(noise_info['value'])
+        # Hvis det skulle være 'abs' støy, må det håndteres i løkka, 
+        # men for aktivitetsdata fra Fiskeridirektoratet er det nesten alltid prosentvis (perc).
+    else:
+        # Fallback til din gamle logg dersom nøkkelen ble dyttet flatt inn i current_params
+        noise_aqua = float(current_params.get('Fiskeridirekt', current_params.get('Fiskeridirektoratet', 1.0)))
 
     # --- DEL 1: Moderne data (fra 1994 og utover) ---
     for col in df_aqua_modern.columns:
         try:
             year = int(col)
             col_data = pd.to_numeric(df_aqua_modern[col], errors='coerce').fillna(0)
-            value = col_data.sum()
-            # Ganger med fish_N_frac og noise_aqua
-            aquaculture_production[year] = (value / 1000) * fish_N_frac * noise_aqua
+            value_tonn = col_data.sum()
+            
+            # Formel: (Tonn / 1000 -> kt rundvekt) * N-fraksjon * aktivitetsstøy = kt N
+            val_kt_N = (value_tonn / 1000) * fish_N_frac * noise_aqua
+            
+            if val_kt_N < 0:
+                val_kt_N = 0.0
+            aquaculture_production[year] = val_kt_N
+            
         except ValueError:
             continue
 
     # --- DEL 2: Gamle data (før 1994) ---
-    for index, row in df_aqua_old.iterrows():
+    for _, row in df_aqua_old.iterrows():
         try:
-            year = int(row.iloc[0])
-            value = float(row.iloc[1])
-            # Ganger med fish_N_frac og noise_aqua
-            aquaculture_production[year] = value * fish_N_frac * noise_aqua
+            year = int(float(row.iloc[0]))
+            value_base = float(row.iloc[1])
+            
+            # Formel: kt rundvekt * N-fraksjon * aktivitetsstøy = kt N
+            val_kt_N = value_base * fish_N_frac * noise_aqua
+            
+            if val_kt_N < 0:
+                val_kt_N = 0.0
+            aquaculture_production[year] = val_kt_N
+            
         except (ValueError, TypeError):
             continue
 
@@ -686,6 +715,7 @@ def find_other_goods_import(prepared_trade_data, current_params, trade_params):
         year_values[yr] = year_values.get(yr, 0.0) + n_amounts[idx]
         
     return year_values
+
 
 
 def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params):
