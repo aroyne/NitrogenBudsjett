@@ -10,9 +10,7 @@ nav_order: 16
 ![AT.AT-RW.RW-Atmospheric outflow-OXN](../output_files/plots/AT_AT_RW_RW_Atmospheric_outflow_OXN.png)
 
 ### Flow Description
-**AT.AT-RW.RW-Atmospheric outflow-OXN**
-
-Is found using source-receptor data from EMEP [^emep_sr_2024], as advised by [^schappi_annexes_2025].
+*Flow details for AT.AT-RW.RW-Atmospheric outflow-OXN*
 
 
 ### References

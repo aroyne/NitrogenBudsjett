@@ -1,18 +1,18 @@
 ---
 layout: default
-title: AT.AT-AG.SM-Biological N2 fixation-N2
-parent: Atmosphere (AT)
+title: RW.RW-AG.MM-Animal feed import-Nmix
+parent: Rest of the world (RW)
 nav_order: 1
 ---
 
-# AT.AT-AG.SM-Biological N2 fixation-N2
+# RW.RW-AG.MM-Animal feed import-Nmix
 
-![AT.AT-AG.SM-Biological N2 fixation-N2](../output_files/plots/AT_AT_AG_SM_Biological_N2_fixation_N2.png)
+![RW.RW-AG.MM-Animal feed import-Nmix](../output_files/plots/RW_RW_AG_MM_Animal_feed_import_Nmix.png)
 
 ### Flow Description
-**AT.AT-AG.SM-Biological N2 fixation-N2**
+Data on imported animal feed is taken from Landbruksdirektoratet [^landbruksdir_2025b] and we have used the detailed composition of animal feed given in Eidem & Ruud (2022) [^eidem_ruud_2022] together with protein contents from FAO (2021) [^fao_protein_2021] and specific Jones factors from FAO (2023) [^fao_jones_2023] to get nitrogen contents. Based on the Landbruksdirektoratet data, the N content of the total amount of feed is 0.02 kgN/kg feed. NIBIO Totalkalkylen [^nibio_totalkalkylen_2025] gives statistics for total amount of feed to Norwegian farm animals between 1959 and 2026. Table 6.10 in Bruholt & Longva (1994) [^bruholt_longva_1994] gives the domestically produced fraction of farm animal feed between 1985 and 1994. We combine these data to find values before 2000, using an average import fraction for 1995-1999.
 
-[^schappi_annexes_2025] advises using data from the EUROSTAT Gross nutrient balance...
+
 ### References
 
 [^oita_substantial_2016]: Oita, Azusa, Malik, Arunima, Kanemoto, Keiichiro, Geschke, Arne, Nishijima, Shota, Lenzen, Manfred (2016). *Substantial nitrogen pollution embedded in international trade*. *Nature Geoscience* 9, pp. 111--115.

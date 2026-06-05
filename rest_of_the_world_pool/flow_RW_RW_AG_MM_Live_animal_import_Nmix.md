@@ -1,18 +1,18 @@
 ---
 layout: default
-title: AT.AT-AG.SM-Biological N2 fixation-N2
-parent: Atmosphere (AT)
-nav_order: 1
+title: RW.RW-AG.MM-Live animal import-Nmix
+parent: Rest of the world (RW)
+nav_order: 2
 ---
 
-# AT.AT-AG.SM-Biological N2 fixation-N2
+# RW.RW-AG.MM-Live animal import-Nmix
 
-![AT.AT-AG.SM-Biological N2 fixation-N2](../output_files/plots/AT_AT_AG_SM_Biological_N2_fixation_N2.png)
+![RW.RW-AG.MM-Live animal import-Nmix](../output_files/plots/RW_RW_AG_MM_Live_animal_import_Nmix.png)
 
 ### Flow Description
-**AT.AT-AG.SM-Biological N2 fixation-N2**
+Is taken from FAOSTAT Crops and livestock products [^faostat_crops_2025], assuming typical weights of animals from various sources, average 13% protein in whole animal based on FAO (1953) [^fao_1953] and Jones factor 6.25 for nitrogen to protein (standard).
 
-[^schappi_annexes_2025] advises using data from the EUROSTAT Gross nutrient balance...
+
 ### References
 
 [^oita_substantial_2016]: Oita, Azusa, Malik, Arunima, Kanemoto, Keiichiro, Geschke, Arne, Nishijima, Shota, Lenzen, Manfred (2016). *Substantial nitrogen pollution embedded in international trade*. *Nature Geoscience* 9, pp. 111--115.

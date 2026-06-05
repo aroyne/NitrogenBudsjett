@@ -10,9 +10,7 @@ nav_order: 9
 ![AT.AT-FS.OL-Biological N2 fixation-N2](../output_files/plots/AT_AT_FS_OL_N2_fixation_N2.png)
 
 ### Flow Description
-**AT.AT-FS.OL-Biological N2 fixation-N2**
-
-Methodology and parameterization for biological N2 fixation on other land areas (unmanaged land, alpine areas, etc.).
+*Flow details for AT.AT-FS.OL-Biological N2 fixation-N2*
 
 
 ### References

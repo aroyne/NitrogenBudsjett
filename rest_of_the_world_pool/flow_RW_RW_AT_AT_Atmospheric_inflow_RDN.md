@@ -1,18 +1,18 @@
 ---
 layout: default
-title: AT.AT-AG.SM-Biological N2 fixation-N2
-parent: Atmosphere (AT)
-nav_order: 1
+title: RW.RW-AT.AT-Atmospheric inflow-RDN
+parent: Rest of the world (RW)
+nav_order: 5
 ---
 
-# AT.AT-AG.SM-Biological N2 fixation-N2
+# RW.RW-AT.AT-Atmospheric inflow-RDN
 
-![AT.AT-AG.SM-Biological N2 fixation-N2](../output_files/plots/AT_AT_AG_SM_Biological_N2_fixation_N2.png)
+![RW.RW-AT.AT-Atmospheric inflow-RDN](../output_files/plots/RW_RW_AT_AT_Atmospheric_inflow_RDN.png)
 
 ### Flow Description
-**AT.AT-AG.SM-Biological N2 fixation-N2**
+Is found from source-receptor data from EMEP [^emep_sr_2024], as advised by Schäppi (2025) [^schappi_annexes_2025]. There is a change in methodology in the EMEP reporting between 2002 and 2003 data.
 
-[^schappi_annexes_2025] advises using data from the EUROSTAT Gross nutrient balance...
+
 ### References
 
 [^oita_substantial_2016]: Oita, Azusa, Malik, Arunima, Kanemoto, Keiichiro, Geschke, Arne, Nishijima, Shota, Lenzen, Manfred (2016). *Substantial nitrogen pollution embedded in international trade*. *Nature Geoscience* 9, pp. 111--115.

@@ -1,18 +1,18 @@
 ---
 layout: default
-title: AT.AT-AG.SM-Biological N2 fixation-N2
-parent: Atmosphere (AT)
-nav_order: 1
+title: RW.RW-HY.AC-Aquaculture feed import-Nmix
+parent: Rest of the world (RW)
+nav_order: 8
 ---
 
-# AT.AT-AG.SM-Biological N2 fixation-N2
+# RW.RW-HY.AC-Aquaculture feed import-Nmix
 
-![AT.AT-AG.SM-Biological N2 fixation-N2](../output_files/plots/AT_AT_AG_SM_Biological_N2_fixation_N2.png)
+![RW.RW-HY.AC-Aquaculture feed import-Nmix](../output_files/plots/RW_RW_HY_AC_Aquaculture_feed_import_Nmix.png)
 
 ### Flow Description
-**AT.AT-AG.SM-Biological N2 fixation-N2**
+The flow **RW.RW-HY.AC-Aquaculture feed import-Nmix** has been added to account for the substantial import of feed to aquaculture. We assume a constant import fraction of 0.92 as given by Aas et al. (2022) [^aas_utilization_2022] for the year 2020. The amount of feed used is based on the amount of fish produced, calculated using data from Fiskeridirektoratet [^fiskeridir_statistikk] on sold farmed fish, assuming average protein (N) retention of 35.75% ([^aas_utilization_2022]), 2.8% nitrogen content in fish and shellfish (Schäppi (2025) [^schappi_annexes_2025], p. 254) and 3% feed waste (Wang et al., 2013 [^wang_feed_2013]).
 
-[^schappi_annexes_2025] advises using data from the EUROSTAT Gross nutrient balance...
+
 ### References
 
 [^oita_substantial_2016]: Oita, Azusa, Malik, Arunima, Kanemoto, Keiichiro, Geschke, Arne, Nishijima, Shota, Lenzen, Manfred (2016). *Substantial nitrogen pollution embedded in international trade*. *Nature Geoscience* 9, pp. 111--115.

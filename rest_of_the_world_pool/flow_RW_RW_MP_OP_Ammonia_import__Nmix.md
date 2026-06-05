@@ -1,18 +1,18 @@
 ---
 layout: default
-title: AT.AT-AG.SM-Biological N2 fixation-N2
-parent: Atmosphere (AT)
-nav_order: 1
+title: RW.RW-MP.OP-Ammonia import-Nmix
+parent: Rest of the world (RW)
+nav_order: 10
 ---
 
-# AT.AT-AG.SM-Biological N2 fixation-N2
+# RW.RW-MP.OP-Ammonia import-Nmix
 
-![AT.AT-AG.SM-Biological N2 fixation-N2](../output_files/plots/AT_AT_AG_SM_Biological_N2_fixation_N2.png)
+![RW.RW-MP.OP-Ammonia import-Nmix](../output_files/plots/RW_RW_MP_OP_Ammonia_import__Nmix.png)
 
 ### Flow Description
-**AT.AT-AG.SM-Biological N2 fixation-N2**
+Is taken from trade data, SSB table 08801.
 
-[^schappi_annexes_2025] advises using data from the EUROSTAT Gross nutrient balance...
+
 ### References
 
 [^oita_substantial_2016]: Oita, Azusa, Malik, Arunima, Kanemoto, Keiichiro, Geschke, Arne, Nishijima, Shota, Lenzen, Manfred (2016). *Substantial nitrogen pollution embedded in international trade*. *Nature Geoscience* 9, pp. 111--115.

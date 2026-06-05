@@ -16,9 +16,7 @@ Atmospheric deposition was calculated using data from NILU which gives gridded d
 
 As noted, our value for agricultural soils is much larger than given by FAOSTAT. Hohmann-Marriott (2025) used values from Blake et al. (2023) to arrive at an average N deposition rate of 80.85 ktN for the period 2017-2021. Hohmann-Marriott (2025) also reported values of 74.7 and 33.5 ktN per year using two different methods for estimating biome-dependent N deposition rates.
 
-For comparison, the data used in the TEOTIL model gives 3.5 ktN in 2013 and 3.0 ktN in 2023. These comparable but slightly lower values are the results of different datasets used and different data treatment.
-
-
+For comparison, the data used in the TEOTIL model...
 ### References
 
 [^oita_substantial_2016]: Oita, Azusa, Malik, Arunima, Kanemoto, Keiichiro, Geschke, Arne, Nishijima, Shota, Lenzen, Manfred (2016). *Substantial nitrogen pollution embedded in international trade*. *Nature Geoscience* 9, pp. 111--115.
