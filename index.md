@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Home
-av_order: 1
+nav_order: 1
 ---
 
 # Nitrogen Budget for Norway

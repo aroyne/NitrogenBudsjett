@@ -1,4 +1,10 @@
 remote_theme: just-the-docs/just-the-docs
 title: Nitrogen Budget Norway
 description: Monte Carlo Simulation Results for Atmosphere (AT)
-nav_exclude: ["/index.md"] 
+
+# Tvinger temaet til å sortere basert på nav_order
+nav_sort: case_insensitive
+
+# Ekskluderer index.md fra selve menylisten (den blir i stedet til den store "Hovedknappen" øverst til venstre)
+nav_exclude:
+  - /index.md
