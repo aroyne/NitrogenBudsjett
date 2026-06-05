@@ -120,29 +120,31 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         norm = filename.lower().replace('-', '').replace('_', '').replace('.', '')
         full_flow_path = os.path.join(at_folder, flow_file_name)
 
-        exact_flow_code = "AT.AT-Unknown-Flow"
-        if "agsm" in norm and "fixation" in norm: exact_flow_code = "AT.AT-AG.SM-Biological N2 fixation-N2"
-        elif "agsm" in norm and "deposition" in norm and "oxn" in norm: exact_flow_code = "AT.AT-AG.SM-Deposition-OXN"
-        elif "agsm" in norm and "deposition" in norm and "rdn" in norm: exact_flow_code = "AT.AT-AG.SM-Deposition-RDN"
-        elif "fsfo" in norm and "fixation" in norm: exact_flow_code = "AT.AT-FS.FO-N2 fixation-N2"
-        elif "fsfo" in norm and "deposition" in norm and "oxn" in norm: exact_flow_code = "AT.AT-FS.FO-Deposition-OXN"
-        elif "fsfo" in norm and "deposition" in norm and "rdn" in norm: exact_flow_code = "AT.AT-FS.FO-Deposition-RDN"
-        elif "fsol" in norm and "fixation" in norm: exact_flow_code = "AT.AT-FS.OL-Biological N2 fixation-N2"
-        elif "fsol" in norm and "deposition" in norm and "oxn" in norm: exact_flow_code = "AT.AT-FS.OL-Deposition-OXN"
-        elif "fsol" in norm and "deposition" in norm and "rdn" in norm: exact_flow_code = "AT.AT-FS.OL-Deposition-RDN"
-        elif "hshs" in norm and "deposition" in norm and "oxn" in norm: exact_flow_code = "AT.AT-HS.HS-Deposition-OXN"
-        elif "hshs" in norm and "deposition" in norm and "rdn" in norm: exact_flow_code = "AT.AT-HS.HS-Deposition-RDN"
-        elif "hysw" in norm and "deposition" in norm and "oxn" in norm: exact_flow_code = "AT.AT-HY.SW-Deposition-OXN"
-        elif "hysw" in norm and "deposition" in norm and "rdn" in norm: exact_flow_code = "AT.AT-HY.SW-Deposition-RDN"
-        elif "hysw" in norm and "fixation" in norm: exact_flow_code = "AT.AT-HY.SW-N2 fixation-N2"
-        elif "mpop" in norm and "synthesis" in norm: exact_flow_code = "AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2"
-        elif "rwrw" in norm and "outflow" in norm and "oxn" in norm: exact_flow_code = "AT.AT-RW.RW-Atmospheric outflow-OXN"
-        elif "rwrw" in norm and "outflow" in norm and "rdn" in norm: exact_flow_code = "AT.AT-RW.RW-Atmospheric outflow-RDN"
+        # Sett standardverdier først i tilfelle ingen treffer
+        exact_flow_code, display_name = "AT.AT-Unknown-Flow", "Unknown Atmospheric Flow"
+        
+        if "agsm" in norm and "fixation" in norm: exact_flow_code, display_name = "AT.AT-AG.SM-Biological N2 fixation-N2", "Biological N2 Fixation (Agricultural Soils)"
+        elif "agsm" in norm and "deposition" in norm and "oxn" in norm: exact_flow_code, display_name = "AT.AT-AG.SM-Deposition-OXN", "Oxidized N Deposition (Agricultural Soils)"
+        elif "agsm" in norm and "deposition" in norm and "rdn" in norm: exact_flow_code, display_name = "AT.AT-AG.SM-Deposition-RDN", "Reduced N Deposition (Agricultural Soils)"
+        elif "fsfo" in norm and "fixation" in norm: exact_flow_code, display_name = "AT.AT-FS.FO-N2 fixation-N2", "N2 Fixation (Forest)"
+        elif "fsfo" in norm and "deposition" in norm and "oxn" in norm: exact_flow_code, display_name = "AT.AT-FS.FO-Deposition-OXN", "Oxidized N Deposition (Forest)"
+        elif "fsfo" in norm and "deposition" in norm and "rdn" in norm: exact_flow_code, display_name = "AT.AT-FS.FO-Deposition-RDN", "Reduced N Deposition (Forest)"
+        elif "fsol" in norm and "fixation" in norm: exact_flow_code, display_name = "AT.AT-FS.OL-Biological N2 fixation-N2", "Biological N2 Fixation (Other Land)"
+        elif "fsol" in norm and "deposition" in norm and "oxn" in norm: exact_flow_code, display_name = "AT.AT-FS.OL-Deposition-OXN", "Oxidized N Deposition (Other Land)"
+        elif "fsol" in norm and "deposition" in norm and "rdn" in norm: exact_flow_code, display_name = "AT.AT-FS.OL-Deposition-RDN", "Reduced N Deposition (Other Land)"
+        elif "hshs" in norm and "deposition" in norm and "oxn" in norm: exact_flow_code, display_name = "AT.AT-HS.HS-Deposition-OXN", "Oxidized N Deposition (Settlements)"
+        elif "hshs" in norm and "deposition" in norm and "rdn" in norm: exact_flow_code, display_name = "AT.AT-HS.HS-Deposition-RDN", "Reduced N Deposition (Settlements)"
+        elif "hysw" in norm and "deposition" in norm and "oxn" in norm: exact_flow_code, display_name = "AT.AT-HY.SW-Deposition-OXN", "Oxidized N Deposition (Surface Water)"
+        elif "hysw" in norm and "deposition" in norm and "rdn" in norm: exact_flow_code, display_name = "AT.AT-HY.SW-Deposition-RDN", "Reduced N Deposition (Surface Water)"
+        elif "hysw" in norm and "fixation" in norm: exact_flow_code, display_name = "AT.AT-HY.SW-N2 fixation-N2", "N2 Fixation (Surface Water)"
+        elif "mpop" in norm and "synthesis" in norm: exact_flow_code, display_name = "AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2", "Ammonia Synthesis N2 Fixation"
+        elif "rwrw" in norm and "outflow" in norm and "oxn" in norm: exact_flow_code, display_name = "AT.AT-RW.RW-Atmospheric outflow-OXN", "Atmospheric Outflow (Oxidized N)"
+        elif "rwrw" in norm and "outflow" in norm and "rdn" in norm: exact_flow_code, display_name = "AT.AT-RW.RW-Atmospheric outflow-RDN", "Atmospheric Outflow (Reduced N)"
 
         with open(full_flow_path, 'w', encoding='utf-8') as f:
             f.write("---\n")
             f.write("layout: default\n")
-            f.write(f"title: {exact_flow_code}\n")
+            f.write(f"title: {display_name}\n")
             f.write("parent: Atmosphere (AT)\n")
             f.write(f"nav_order: {menu_counter}\n")
             f.write("---\n\n")
@@ -204,18 +206,18 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
                 "The flow **RW.RW-HY.AC-Aquaculture feed import-Nmix** has been added to account for the substantial "
                 "import of feed to aquaculture. We assume a constant import fraction of 0.92 as given by Aas et al. (2022) [^aas_utilization_2022] "
                 "for the year 2020. The amount of feed used is based on the amount of fish produced, calculated using data from "
-                "Fiskeridirektoratet [^fiskeridir_statistikk] on sold farmed fish, assuming average protein (N) retention of 35.75% "
+                "Fiskeridirektoratet [^fiskeridirektoratet_06002_2025] on sold farmed fish, assuming average protein (N) retention of 35.75% "
                 "([^aas_utilization_2022]), 2.8% nitrogen content in fish and shellfish (Schäppi (2025) [^schappi_annexes_2025], p. 254) "
-                "and 3% feed waste (Wang et al., 2013 [^wang_feed_2013])."
+                "and 3% feed waste (Wang et al., 2013 [^wang_chemical_2013])."
             )
         elif "feed" in norm and "animal" in norm:
             exact_flow_code = "RW.RW-AG.MM-Animal feed import-Nmix"
             description = (
-                "Data on imported animal feed is taken from Landbruksdirektoratet [^landbruksdir_2025b] and we have used the detailed "
-                "composition of animal feed given in Eidem & Ruud (2022) [^eidem_ruud_2022] together with protein contents from FAO (2021) [^fao_protein_2021] "
-                "and specific Jones factors from FAO (2023) [^fao_jones_2023] to get nitrogen contents. Based on the Landbruksdirektoratet data, "
+                "Data on imported animal feed is taken from Landbruksdirektoratet [^landbruksdirektoratet_kraftforstatistikk_2025] and we have used the detailed "
+                "composition of animal feed given in Eidem & Ruud (2022) [^eidem_for-_2022] together with protein contents from FAO (2021) [^fao_annex_2021] "
+                "and specific Jones factors from FAO (2023) [^fao_chapter_2023] to get nitrogen contents. Based on the Landbruksdirektoratet data, "
                 "the N content of the total amount of feed is 0.02 kgN/kg feed. NIBIO Totalkalkylen [^nibio_totalkalkylen_2025] gives statistics for "
-                "total amount of feed to Norwegian farm animals between 1959 and 2026. Table 6.10 in Bruholt & Longva (1994) [^bruholt_longva_1994] "
+                "total amount of feed to Norwegian farm animals between 1959 and 2026. Table 6.10 in Bruholt & Longva (1994) [^bruholt_jordbruksstatistikk_1994] "
                 "gives the domestically produced fraction of farm animal feed between 1985 and 1994. We combine these data to find values "
                 "before 2000, using an average import fraction for 1995-1999."
             )
@@ -223,12 +225,12 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
             exact_flow_code = "RW.RW-AG.MM-Live animal import-Nmix"
             description = (
                 "Is taken from FAOSTAT Crops and livestock products [^faostat_crops_2025], assuming typical weights of animals from various sources, "
-                "average 13% protein in whole animal based on FAO (1953) [^fao_1953] and Jones factor 6.25 for nitrogen to protein (standard)."
+                "average 16% protein in whole animal and Jones factor 6.25 for nitrogen to protein (standard)."
             )
         elif "mineral" in norm and "fertilizer" in norm:
             exact_flow_code = "RW.RW-AG.SM-Mineral fertilizer import-Nmix"
             description = (
-                "Is taken from FAOSTAT Fertilizer by nutrient (FAO, 2025) [^faostat_fertilizer_2025]. Because anhydrous ammonia is not used directly "
+                "Is taken from FAOSTAT Fertilizer by nutrient (FAO, 2025) [^fao_fertilizer_2025]. Because anhydrous ammonia is not used directly "
                 "as fertilizer in Norway, it is not counted as a fertilizer in this particular FAO statistic. We therefore include NH3 import "
                 "in the flow **RW.RW-MP.OP-Other goods import-Nmix**."
             )

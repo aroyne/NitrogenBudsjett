@@ -1,6 +1,6 @@
 ---
 layout: default
-title: AT.AT-FS.OL-Deposition-OXN
+title: Oxidized N Deposition (Other Land)
 parent: Atmosphere (AT)
 nav_order: 7
 ---

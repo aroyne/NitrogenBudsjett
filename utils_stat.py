@@ -157,8 +157,7 @@ def process_and_export_mc_results(all_records):
         component = flow.split('-')[-1] if '-' in flow else ''
         
         # --- ENDRET: loc='left' gjør nå tittelen venstrestilt på én linje ---
-        plt.title(f"MC Uncertainty Trends: {short_name} ({component})", fontsize=11, fontweight='bold', loc='left')
-        
+        plt.title(f"{flow}", fontsize=11, fontweight='bold', loc='left')        
         # X-Axis Settings
         plt.xlim(1984, 2025)
         plt.xticks(np.arange(1984, 2026, 5))

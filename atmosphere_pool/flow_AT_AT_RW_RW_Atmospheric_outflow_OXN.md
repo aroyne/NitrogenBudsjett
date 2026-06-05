@@ -1,6 +1,6 @@
 ---
 layout: default
-title: AT.AT-RW.RW-Atmospheric outflow-OXN
+title: Atmospheric Outflow (Oxidized N)
 parent: Atmosphere (AT)
 nav_order: 16
 ---

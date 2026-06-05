@@ -1,6 +1,6 @@
 ---
 layout: default
-title: AT.AT-FS.FO-Deposition-RDN
+title: Reduced N Deposition (Forest)
 parent: Atmosphere (AT)
 nav_order: 5
 ---

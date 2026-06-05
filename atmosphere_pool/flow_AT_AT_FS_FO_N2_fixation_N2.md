@@ -1,6 +1,6 @@
 ---
 layout: default
-title: AT.AT-FS.FO-N2 fixation-N2
+title: N2 Fixation (Forest)
 parent: Atmosphere (AT)
 nav_order: 6
 ---

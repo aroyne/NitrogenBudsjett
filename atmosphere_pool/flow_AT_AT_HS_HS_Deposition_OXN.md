@@ -1,6 +1,6 @@
 ---
 layout: default
-title: AT.AT-HS.HS-Deposition-OXN
+title: Oxidized N Deposition (Settlements)
 parent: Atmosphere (AT)
 nav_order: 10
 ---

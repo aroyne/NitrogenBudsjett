@@ -1,6 +1,6 @@
 ---
 layout: default
-title: AT.AT-AG.SM-Biological N2 fixation-N2
+title: Biological N2 Fixation (Agricultural Soils)
 parent: Atmosphere (AT)
 nav_order: 1
 ---

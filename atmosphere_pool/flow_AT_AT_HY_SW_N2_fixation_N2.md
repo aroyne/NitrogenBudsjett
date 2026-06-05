@@ -1,6 +1,6 @@
 ---
 layout: default
-title: AT.AT-HY.SW-N2 fixation-N2
+title: N2 Fixation (Surface Water)
 parent: Atmosphere (AT)
 nav_order: 14
 ---

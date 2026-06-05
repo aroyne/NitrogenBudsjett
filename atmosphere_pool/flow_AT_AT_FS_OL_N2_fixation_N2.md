@@ -1,6 +1,6 @@
 ---
 layout: default
-title: AT.AT-FS.OL-Biological N2 fixation-N2
+title: Biological N2 Fixation (Other Land)
 parent: Atmosphere (AT)
 nav_order: 9
 ---

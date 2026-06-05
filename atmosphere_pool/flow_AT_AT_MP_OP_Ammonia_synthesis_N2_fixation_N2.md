@@ -1,6 +1,6 @@
 ---
 layout: default
-title: AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2
+title: Ammonia Synthesis N2 Fixation
 parent: Atmosphere (AT)
 nav_order: 15
 ---

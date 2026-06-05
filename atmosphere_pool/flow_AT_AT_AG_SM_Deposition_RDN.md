@@ -1,6 +1,6 @@
 ---
 layout: default
-title: AT.AT-AG.SM-Deposition-RDN
+title: Reduced N Deposition (Agricultural Soils)
 parent: Atmosphere (AT)
 nav_order: 3
 ---

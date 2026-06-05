@@ -1,6 +1,6 @@
 ---
 layout: default
-title: AT.AT-RW.RW-Atmospheric outflow-RDN
+title: Atmospheric Outflow (Reduced N)
 parent: Atmosphere (AT)
 nav_order: 17
 ---

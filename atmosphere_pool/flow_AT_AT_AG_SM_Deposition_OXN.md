@@ -1,6 +1,6 @@
 ---
 layout: default
-title: AT.AT-AG.SM-Deposition-OXN
+title: Oxidized N Deposition (Agricultural Soils)
 parent: Atmosphere (AT)
 nav_order: 2
 ---
