@@ -9,7 +9,8 @@ def load_all_data(selected_pools):
     preloaded = {}
     
     # 1. ATMOSFÆRE-DATA
-    if 'at' in selected_pools:
+    SR_needing_pools = {'at', 'rw'}
+    if not SR_needing_pools.isdisjoint(selected_pools):
         print("[I/O] Pre-loader data for Atmosfære (atm_in_out.xlsx)...")
         try:
             df_atm_raw = pd.read_excel('data_files/atm_in_out.xlsx', sheet_name='Ark1', header=None)
@@ -46,8 +47,14 @@ def load_all_data(selected_pools):
                 how='inner'
             )
             
-            # Lagre hele det koblede datasettet i minnet
-            preloaded['trade_data'] = df_prepared_all
+            # --- ULTRA-OPTIMALISERING: Pre-aggreger tonnasje per år, import/eksport, type OG konv-type ---
+            print("[INFO] Komprimerer 6 mill rader handelsdata til en kjapp volum-matrise...")
+            
+            # ENDRING: Legg til 'type' i listen inni .groupby([...])
+            df_volum_aggregated = df_prepared_all.groupby(['year', 'impeks', 'type', 'konv'])['amount'].sum().reset_index()
+            
+            # Lagre denne superlette matrisen
+            preloaded['compressed_trade_volume'] = df_volum_aggregated
             
         except Exception as e:
             print(f"[KRITISK FEIL] Kunne ikke pre-loade den generelle handelsdataen: {e}")

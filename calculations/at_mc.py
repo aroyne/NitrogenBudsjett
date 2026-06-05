@@ -21,7 +21,7 @@ from calculations.shared_flow_calculations import (
 
 expected_years = EXPECTED_YEARS
 
-def execute_calculations_mc(preloaded_data, current_params, dataset_noise):
+def execute_calculations_at(preloaded_data, current_params, dataset_noise, current_trade_factors):
     """
     MC-VERSJON: Beregner nitrogenflyt for atmosfæren uten fil-I/O i løkka.
     """
@@ -45,28 +45,31 @@ def execute_calculations_mc(preloaded_data, current_params, dataset_noise):
     
     if prepared_trade_all is not None and trade_params is not None:
         
-        # --- DIN FILTRERINGSLOGIKK UTFORS DIREKTE I MINNET ---
-        # 1. Filtrer ut kun rader der 'type' (fra mappingen) er 'NH3'
-        # 2. Filtrer ut kun import (impeks == 1)
-        is_nh3 = prepared_trade_all['type'] == 'NH3'
-        is_import = prepared_trade_all['impeks'] == 1
+    # 1. Hent den lette, pre-komprimerte volum-matrisen fra RAM
+        df_vol = preloaded_data.get('compressed_trade_volume')
         
-        # Lag et lett sub-grup-datasett i minnet for akkurat denne kjøringen
-        df_ammonia_prepared = prepared_trade_all[is_nh3 & is_import].copy()
-        
-        # Siden find_trade_flow internt krever en kolonne som heter 'type' som matcher 'impeks' 
-        # (eller 'Import'/'Eksport'), overskriver vi 'type'-kolonnen til å speile impeks, 
-        # akkurat slik find_trade_flow vil ha det for groupby:
-        df_ammonia_prepared['type'] = df_ammonia_prepared['impeks']
-        
-        # Nå sender vi den perfekte, isolerte pakken inn til fellesfunksjonen din
-        ammonia_import_dict = find_ammonia_import(df_ammonia_prepared, current_params, trade_params)
-        
-        # Kjør beregningen for fiksering
-        _add_OP_N2_fixation_mc(results, preloaded_data, current_params, ammonia_import_dict, dataset_noise)
-        
-    else:
-        print("[ADVARSEL] Mangler handelsdata i preloaded_data. Hopper over ammoniakk-strømmer.")    
+        if df_vol is not None:
+            # 2. Hent støy for SSB-aktivitetsdata
+            noise_trade = float(current_params.get('08801', current_params.get('13136', 1.0)))
+            
+            # 3. Filtrer ut kun rader for NH3 og Import (impeks == 1) direkte på den ferdig-komprimerte matrisen
+            df_nh3 = df_vol[(df_vol['konv'] == 'NH3') & (df_vol['impeks'] == 1)].copy()
+            
+            # 4. Hent den tilfeldig trukkede N-faktoren for 'NH3' for akkurat denne MC-runden
+            # (current_trade_factors ble generert av generate_mc_parameters_fast)
+            n_factor_nh3 = current_trade_factors.get('NH3', 0.822) # default-verdi hvis den mot formodning mangler
+            
+            # 5. Beregn Nitrogenmengde (kt N) vektorisert med BÅDE aktivitetsstøy og parameterstøy!
+            # Formel: Tonn * aktivitetsstøy * perturbert_N_faktor / 1e6 (omgjort til kilotonn)
+            df_nh3['N_amount'] = df_nh3['amount'] * noise_trade * n_factor_nh3 / 1e6
+            
+            # 6. Gjør om til den standardiserte ordboken {år: verdi}
+            ammonia_import_dict = dict(zip(df_nh3['year'].astype(int), df_nh3['N_amount']))
+            
+            # 7. Kjør fikseringsberegningen din som vanlig
+            _add_OP_N2_fixation_mc(results, preloaded_data, current_params, ammonia_import_dict, dataset_noise)        
+        else:
+            print("[ADVARSEL] Mangler handelsdata i preloaded_data. Hopper over ammoniakk-strømmer.")    
     
     # 3. Biologiske N2-fikseringer (parameter-baserte)
     _add_AG_N2_fixation_mc(results, current_params)
