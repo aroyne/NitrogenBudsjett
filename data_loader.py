@@ -165,10 +165,14 @@ def load_all_data(selected_pools):
 
         # UNFCCC N2O og NOx Excel
         try:
-            preloaded['ag_unfccc_excel'] = openpyxl.load_workbook('data_files/N2O_NOx_AG.xlsx', data_only=True)
+            wb_unfccc = openpyxl.load_workbook('data_files/N2O_NOx_AG.xlsx', data_only=True)
+            preloaded['ag_unfccc_excel'] = wb_unfccc
+            
+            # NYTT: Konverter Ark1 til en ren DataFrame med en gang under I/O-steget
+            preloaded['unfccc_ark1_raw'] = pd.DataFrame(list(wb_unfccc['Ark1'].values))
         except Exception as e:
             print(f"[KRITISK FEIL] Kunne ikke laste N2O_NOx_AG.xlsx: {e}")
-
+            
         # Hydrologi / avrenningsdata CSV (Nr_AG--HY.csv)
         try:
             preloaded['ag_leaching_csv'] = pd.read_csv('data_files/Nr_AG--HY.csv')

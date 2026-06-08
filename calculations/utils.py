@@ -192,39 +192,70 @@ def get_uncertainty(dataset_unc, name, default=None):
         return float(default)
     
 
-def load_crltap_emissions_to_N(filename, categories, pollutant, conv_to_N, skiprows = 4, sep = ';'):
-    """
-    Load CRLTAP/WebDab emission data and convert to N.
+import pandas as pd
 
-    Parameters
-    ----------
-    filename : str
-        Path to the CRLTAP/WebDab text file.
-    categories : list of str
-        List of CRF categories (column 2 in the file) to include.
-    pollutant : str
-        Pollutant code in column 3 (e.g. 'NH3', 'NOx', 'N2O', 'NO2').
-    conv_to_N : float
-        Conversion factor from reported units (usually kt of pollutant)
-        to kt N (e.g. NH3→N or NOx→N factor).
-    skiprows : int, optional
-        Number of header lines to skip (default 4).
-    sep : str, optional
-        Field separator (default ';').
-
-    Returns
-    -------
-    pd.Series
-        Index: year (int), values: emissions in kt N (float).
+def load_crltap_emissions_to_N(raw_lines, categories, pollutant, conv_to_N, dataset_noise, noise_key='CRLTAP', skiprows=4, sep=';'):
     """
-    data = pd.read_csv(filename, sep=sep, header=None, skiprows=skiprows)
-    data = data[data[2].isin(categories)]
-    data = data[data[3] == pollutant]
-    data[1] = data[1].astype(int)
-    data[5] = pd.to_numeric(data[5], errors='coerce').fillna(0)
-    sums = data.groupby(1)[5].sum() * conv_to_N
-    sums.index = sums.index.astype(int)
-    return sums
+    MC-VERSJON: Laster CRLTAP/WebDab utslippsdata fra ferdiginnlastede tekstlinjer i RAM.
+    Speiler nøyaktig logikken til den opprinnelige read_csv-baserte funksjonen.
+    Påfører parameterstøy (conv_to_N) og asymmetrisk datasettstøy robust.
+    """
+    # 1. Klargjør asymmetrisk datasettstøy
+    has_noise = dataset_noise and noise_key in dataset_noise
+    noise_val = dataset_noise[noise_key]['value'] if has_noise else 1.0
+    noise_type = dataset_noise[noise_key]['type'] if has_noise else 'perc'
+    
+    # 2. Prosesser tekstlinjene fra RAM (hopp over skiprows)
+    valid_lines = raw_lines[skiprows:] if len(raw_lines) > skiprows else []
+    
+    # Vi akkumulerer råverdier pr år i en ordbok
+    yearly_raw_sums = {}
+    
+    for line in valid_lines:
+        if not line.strip():
+            continue
+            
+        parts = line.split(sep)
+        if len(parts) < 6:  # Vi må ha minst opp til indeks 5
+            continue
+            
+        try:
+            cat_val = parts[2].strip()
+            poll_val = parts[3].strip()
+            
+            # Sjekk om raden matcher kategori og stoff (tilsvarer .isin() og ==)
+            if cat_val in categories and poll_val == pollutant:
+                year = int(parts[1].strip())
+                
+                # Konverter verdi (tilsvarer to_numeric med coerce og fillna(0))
+                val_str = parts[5].strip()
+                raw_val = float(val_str) if (val_str and val_str != '-') else 0.0
+                
+                yearly_raw_sums[year] = yearly_raw_sums.get(year, 0.0) + raw_val
+        except (ValueError, IndexError):
+            continue
+
+    # 3. Konverter til N og påfør støy matematisk korrekt for hvert år
+    final_sums = {}
+    for year, raw_sum in yearly_raw_sums.items():
+        # Grunnverdi etter konverteringsfaktor (f.eks. NH3 -> N)
+        base_value = raw_sum * conv_to_N
+        
+        if has_noise:
+            if noise_type == 'perc':
+                value = base_value * noise_val
+            else:
+                bound = dataset_noise[noise_key]['upp_bound'] if noise_val >= 0 else dataset_noise[noise_key]['low_bound']
+                value = base_value + (noise_val * bound)
+        else:
+            value = base_value
+            
+        if value < 0:
+            value = 0.0
+            
+        final_sums[year] = value
+        
+    return final_sums
 
 def read_trade_data(trade_file):
     trade_data = pd.read_csv(trade_file, sep=';', header=None)

@@ -10,12 +10,24 @@ from calculations.utils import (
     EXPECTED_YEARS,
     read_year_value_row,
     fill_missing_with_mean,
-    report_missing_years
+    report_missing_years,
+    load_crltap_emissions_to_N,
 )
 from calculations.shared_flow_calculations import (
     find_industrial_crop_products,
     find_non_edible_animal_products
     )
+
+AG_SM_CRLTAP_SECTORS = [
+    '3Da1','3Da2a','3Da2b','3Da2c','3Da3','3Da4',
+    '3Db','3Dc','3De','3Df','4B1','4B2','4C1','4C2',
+]
+
+AG_MM_CRLTAP_SECTORS = [
+    '3B1a','3B1b','3B2','3B3',
+    '3B4a','3B4d','3B4e','3B4f',
+    '3B4gi','3B4gii','3B4giii','3B4giv','3B4h',
+]
 
 
 def execute_calculations_ag(preloaded_data, current_params, dataset_noise, current_trade_factors):
@@ -29,6 +41,9 @@ def execute_calculations_ag(preloaded_data, current_params, dataset_noise, curre
     _add_food_crop_products_flow_mc(results, preloaded_data, current_params, dataset_noise)
     _add_industrial_crop_products_flow_mc(results, preloaded_data, current_params, dataset_noise)
     _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_NH3_emissions_soil_management_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_NOx_emissions_soil_management_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_N2O_emissions_soil_management_mc(results, preloaded_data, current_params, dataset_noise)
     
     # [Neste strømmer legges til fortløpende her...]
     
@@ -298,6 +313,128 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
                     'flow_name': flow_code, 'year': year, 'value': float(value),
                     'comment': comment, 'data_sources': data_sources
                 })
+
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+    
+
+def _add_NH3_emissions_soil_management_mc(results, preloaded_data, current_params, dataset_noise):
+    flow_code = 'AG.SM-AT.AT-Emissions-NH3'
+    collected_years = set()
+    comment = 'ok (MC-støy lagt på)'
+    data_sources = 'CRLTAP Inventory Submissions'
+
+    conv = float(current_params.get("NH3_to_N_factor", 0.822))
+    raw_lines = preloaded_data.get('ag_crltap_raw_lines')
+    
+    if raw_lines is None:
+        print(f"[ADVARSEL] Mangler ag_crltap_raw_lines i preloaded_data for {flow_code}.")
+        return
+
+    # Kall den oppdaterte hjelpefunksjonen
+    sums = load_crltap_emissions_to_N(
+        raw_lines=raw_lines,
+        categories=AG_SM_CRLTAP_SECTORS,
+        pollutant='NH3',
+        conv_to_N=conv,
+        dataset_noise=dataset_noise,
+        noise_key='CRLTAP'
+    )
+
+    for year, value in sums.items():
+        if year not in EXPECTED_YEARS:
+            continue
+        collected_years.add(year)
+        results.append({
+            'flow_name': flow_code, 'year': year, 'value': float(value),
+            'comment': comment, 'data_sources': data_sources
+        })
+
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+
+
+def _add_NOx_emissions_soil_management_mc(results, preloaded_data, current_params, dataset_noise):
+    flow_code = 'AG.SM-AT.AT-Emissions-NOx'
+    collected_years = set()
+    comment = 'ok (MC-støy lagt på)'
+    data_sources = 'CRLTAP Inventory Submissions'
+
+    conv = float(current_params.get("NOx_to_N_factor", 0.304))
+    raw_lines = preloaded_data.get('ag_crltap_raw_lines')
+    
+    if raw_lines is None:
+        print(f"[ADVARSEL] Mangler ag_crltap_raw_lines i preloaded_data for {flow_code}.")
+        return
+
+    # Kall den oppdaterte hjelpefunksjonen
+    sums = load_crltap_emissions_to_N(
+        raw_lines=raw_lines,
+        categories=AG_SM_CRLTAP_SECTORS,
+        pollutant='NOx',
+        conv_to_N=conv,
+        dataset_noise=dataset_noise,
+        noise_key='CRLTAP'
+    )
+
+    for year, value in sums.items():
+        if year not in EXPECTED_YEARS:
+            continue
+        collected_years.add(year)
+        results.append({
+            'flow_name': flow_code, 'year': year, 'value': float(value),
+            'comment': comment, 'data_sources': data_sources
+        })
+
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+
+
+def _add_N2O_emissions_soil_management_mc(results, preloaded_data, current_params, dataset_noise):
+    flow_code = 'AG.SM-AT.AT-Emissions-N2O'
+    collected_years = set()
+    comment = 'ok (MC-støy lagt på)'
+    data_sources = 'UNFCCC CRT'
+
+    conv_N2O = float(current_params.get("N2O_to_N_factor", 0.636))
+    
+    key_n2o = 'UNFCCC_emissions'
+    has_noise = dataset_noise and key_n2o in dataset_noise
+    noise_val = dataset_noise[key_n2o]['value'] if has_noise else 1.0
+    noise_type = dataset_noise[key_n2o]['type'] if has_noise else 'perc'
+
+    df_unfccc = preloaded_data.get('unfccc_ark1_raw')
+    if df_unfccc is None:
+        print(f"[ADVARSEL] Mangler unfccc_ark1_raw i preloaded_data for {flow_code}.")
+        return
+
+    for r_idx in range(4, 37):
+        year_val = df_unfccc.iloc[r_idx, 0]
+        ton_val = df_unfccc.iloc[r_idx, 2]
+
+        if pd.notna(year_val) and pd.notna(ton_val):
+            year = int(year_val)
+            if year not in EXPECTED_YEARS:
+                continue
+            collected_years.add(year)
+
+            base_value = float(ton_val) * conv_N2O
+
+            if has_noise:
+                if noise_type == 'perc':
+                    value = base_value * noise_val
+                else:
+                    bound = dataset_noise[key_n2o]['upp_bound'] if noise_val >= 0 else dataset_noise[key_n2o]['low_bound']
+                    value = base_value + (noise_val * bound)
+            else:
+                value = base_value
+
+            if value < 0: value = 0.0
+
+            results.append({
+                'flow_name': flow_code, 'year': year, 'value': float(value),
+                'comment': comment, 'data_sources': data_sources
+            })
 
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
