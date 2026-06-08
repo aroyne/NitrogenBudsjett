@@ -53,6 +53,7 @@ def execute_calculations_ag(preloaded_data, current_params, dataset_noise, curre
     _add_NOx_emissions_manure_management_mc(results, preloaded_data, current_params, dataset_noise)
     _add_N2O_emissions_manure_management_mc(results, preloaded_data, current_params, dataset_noise)
     _add_live_animal_export_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_N2_emissions_soil_management_mc(results, preloaded_data, current_params, dataset_noise)
     
     # [Neste strømmer legges til fortløpende her...]
     
@@ -978,5 +979,37 @@ def _add_live_animal_export_mc(results, preloaded_data, current_params, dataset_
                 'data_sources': data_sources
             })
             
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+    
+
+def _add_N2_emissions_soil_management_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    MC-VERSJON: Dinitrogen-utslipp fra jordforvaltning (AG.SM-AT.AT-Emissions-N2).
+    Bruker ferdig perturbert verdi for denitrifikasjon direkte fra current_params.
+    """
+    flow_code = 'AG.SM-AT.AT-Emissions-N2'
+    collected_years = set()
+    comment = 'ok (MC-støy lagt på global parameter)'
+    data_sources = 'Schäppi2025Ann + NIBIO'
+    
+    # Hent den ferdig perturberte parameterverdien fra denne MC-runden
+    # Fallback settes til f.eks. 16.0 ktN/år basert på kildekommentaren din
+    value = float(current_params.get("denitrification_AG_N2", 16.0))
+    
+    if value < 0: 
+        value = 0.0
+
+    # Fyll ut verdien konstant for alle forventede årstall
+    for year in sorted(EXPECTED_YEARS):
+        collected_years.add(year)
+        results.append({
+            'flow_name': flow_code,
+            'year': year,
+            'value': value,  
+            'comment': comment,
+            'data_sources': data_sources
+        })
+        
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
