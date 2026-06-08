@@ -412,16 +412,36 @@ def find_household_waste(df_05282, df_10514, current_params):
     return household_waste
 
 
-def find_industrial_crop_products(df_gnb_sheet30, current_params):
-    """Henter ut industrielle avlinger med datasettstøy og ekstrapoleringsstøy."""
+import numpy as np
+import pandas as pd
+
+import numpy as np
+import pandas as pd
+
+def find_industrial_crop_products(df_gnb_sheet30, dataset_noise):
+    """
+    Henter ut industrielle avlinger basert på pre-loadet DataFrame.
+    Påfører sentralt trukket datasett- og ekstrapoleringsstøy matematisk korrekt (perc vs abs).
+    """
     year_values = {}
     
-    noise_gnb = float(current_params.get('Gross nutrient balance', 1.0))
-    noise_trend = float(current_params.get('trend interpolation', 1.0))
+    # --- 1. Sjekk og klargjør støy for Gross nutrient balance ---
+    key_gnb = 'Gross nutrient balance'
+    has_noise_gnb = dataset_noise and key_gnb in dataset_noise
+    noise_gnb_val = dataset_noise[key_gnb]['value'] if has_noise_gnb else 1.0
+    noise_gnb_type = dataset_noise[key_gnb]['type'] if has_noise_gnb else 'perc'
     
+    # --- 2. Sjekk og klargjør støy for trendinterpolering ---
+    key_interp = 'trend interpolation'
+    has_noise_interp = dataset_noise and key_interp in dataset_noise
+    noise_interp_val = dataset_noise[key_interp]['value'] if has_noise_interp else 1.0
+    noise_interp_type = dataset_noise[key_interp]['type'] if has_noise_interp else 'perc'
+    
+    # Hent radene direkte basert på posisjon (rad 9 og rad 11 i Excel)
     year_row = df_gnb_sheet30.iloc[8]
     value_row = df_gnb_sheet30.iloc[10]
     
+    # --- 3. Les og påfør støy på ordinære år ---
     for col_idx in range(1, len(df_gnb_sheet30.columns)):
         year_val = year_row.iloc[col_idx]
         val_val = value_row.iloc[col_idx]
@@ -429,20 +449,44 @@ def find_industrial_crop_products(df_gnb_sheet30, current_params):
         if pd.notna(year_val) and pd.notna(val_val) and val_val != '-':
             try:
                 year = int(year_val)
-                value = float(val_val) * 1.0e-3 * noise_gnb
+                base_value = float(val_val) * 1.0e-3  # kg -> kt
+                
+                if has_noise_gnb:
+                    if noise_gnb_type == 'perc':
+                        value = base_value * noise_gnb_val
+                    else:
+                        bound = dataset_noise[key_gnb]['upp_bound'] if noise_gnb_val >= 0 else dataset_noise[key_gnb]['low_bound']
+                        value = base_value + (noise_gnb_val * bound)
+                else:
+                    value = base_value
+                
+                if value < 0:
+                    value = 0.0
+                    
                 year_values[year] = value
             except ValueError:
                 continue
 
-    # Ekstrapolering for hull i tidsserien (2017-2019)
+    # --- 4. Ekstrapolering for hull i tidsserien (2017-2019) ---
     if year_values:
         mean_value = float(np.mean(list(year_values.values())))
+        
         for year in range(2017, 2020):
-            # EKSTRAPOLERT ÅR: Vi ganger det støybelagte gjennomsnittet med noise_trend
-            year_values[year] = mean_value * noise_trend
+            if has_noise_interp:
+                if noise_interp_type == 'perc':
+                    value_interp = mean_value * noise_interp_val
+                else:
+                    bound = dataset_noise[key_interp]['upp_bound'] if noise_interp_val >= 0 else dataset_noise[key_interp]['low_bound']
+                    value_interp = mean_value + (noise_interp_val * bound)
+            else:
+                value_interp = mean_value
+                
+            if value_interp < 0:
+                value_interp = 0.0
+                
+            year_values[year] = value_interp
             
     return year_values
-
 
 def find_industrial_round_wood(df_conifer_year, df_nonconifer_year, current_params, expected_years):
     """Beregner industrirundvirke med kildestøy fra FAOSTAT."""

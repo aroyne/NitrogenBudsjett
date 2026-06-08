@@ -1,0 +1,171 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Modifisert MC-VERSJON: Beregner nitrogenflyt for landbruk (AG).
+Sikret full konsistens med sentral distribusjonstrekking i generate_mc_parameters_fast.
+"""
+import pandas as pd
+import numpy as np
+from calculations.utils import (
+    EXPECTED_YEARS,
+    read_year_value_row,
+    fill_missing_with_mean,
+    report_missing_years
+)
+from calculations.shared_flow_calculations import (
+    find_industrial_crop_products,
+    find_non_edible_animal_products
+    )
+
+
+def execute_calculations_ag(preloaded_data, current_params, dataset_noise, current_trade_factors):
+    """
+    Hovedfunksjon for AG-poolen. Kjører alle underberegninger.
+    Alle distribusjoner trekkes sentralt i main_mc før denne kjøres.
+    """
+    results = []
+    
+    # 1. Spesialstrømmer (Henter ferdig generert dataset_noise og parameterstøy)
+    _add_food_crop_products_flow_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_industrial_crop_products_flow_mc(results, preloaded_data, current_params, dataset_noise)
+    
+    # [Neste strømmer legges til fortløpende her...]
+    
+    return results
+
+
+# =============================================================================
+# SPESIALBEREGNINGER MED DATASETT- OG PARAMETERSTØY
+# =============================================================================
+
+def _add_food_crop_products_flow_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    MC-VERSJON: Food crop products.
+    Henter ferdiginnlastet workbook fra RAM og påfører sentralt trukket datasetstøy.
+    """
+    flow_code = 'AG.SM-MP.FP-Food crop products-Nmix'
+    collected_years = set()
+    data_sources = 'Eurostat Gross nutrient balance'
+    comment = 'ok (MC-støy lagt på basert på kildens usikkerhetstype)'
+
+    # 1. Hent ferdiglastet workbook fra RAM (lagt inn via din oppdaterte data_loader)
+    workbook = preloaded_data.get('ag_gnb_workbook')
+    if workbook is None:
+        print(f"[ADVARSEL] Mangler ag_gnb_workbook i preloaded_data for {flow_code}.")
+        return
+
+    # 2. Slå opp ferdig generert støy for dette datasettet fra dataset_noise
+    dataset_key = 'Gross nutrient balance'
+    has_noise = dataset_noise and dataset_key in dataset_noise
+    
+    noise_val = dataset_noise[dataset_key]['value'] if has_noise else 1.0
+    noise_type = dataset_noise[dataset_key]['type'] if has_noise else 'perc'
+
+    # --- Sheet 26: total crops ---
+    sheet_26 = workbook['Sheet 26']  # nutrient removal by harvest of crops
+    year_values = read_year_value_row(
+        sheet_26,
+        year_values=None,
+        year_row=9,
+        value_row=11,
+        first_col=2,
+        unit_factor=1.0e-3,
+        op='+',
+    )
+
+    # --- Sheet 30: industrial crops (subtract) ---
+    sheet_30 = workbook['Sheet 30']  # nutrient removal by harvest of industrial crops
+    year_values = read_year_value_row(
+        sheet_30,
+        year_values=year_values,
+        year_row=9,
+        value_row=11,
+        first_col=2,
+        unit_factor=-1.0e-3,  # minus/trekk fra industrial crops
+        op='+',
+    )
+
+    # 3. Skriv resultater og påfør asymmetrisk støy pr. år
+    for year, total_value in year_values.items():
+        if year not in EXPECTED_YEARS:
+            continue
+        collected_years.add(year)
+        
+        # Påfør støyen matematisk korrekt ut fra om den er prosent eller absolutt
+        if has_noise:
+            if noise_type == 'perc':
+                value = total_value * noise_val
+            else:
+                # Absolutt støy bruker grensene trukket fra den asymmetriske distribusjonen
+                bound = dataset_noise[dataset_key]['upp_bound'] if noise_val >= 0 else dataset_noise[dataset_key]['low_bound']
+                value = total_value + (noise_val * bound)
+        else:
+            value = total_value
+
+        if value < 0: 
+            value = 0.0
+
+        results.append({
+            'flow_name': flow_code,
+            'year': year,
+            'value': float(value),
+            'comment': comment,
+            'data_sources': data_sources,
+        })
+
+    # 4. Fyll manglende år med gjennomsnitt basert på de *støy-påførte* verdiene
+    # (eller basert på originale verdier og påfør støy etterpå, her gjør vi det på de ferdige verdiene)
+    actual_values = [r['value'] for r in results if r['flow_name'] == flow_code]
+    mean_value = np.mean(actual_values) if actual_values else 0.0
+    
+    # Siden fill_missing_with_mean forventer den originale ordboken, men vi allerede har støy-justert i results,
+    # lager vi en midlertidig støyjustert dict for å fore den funksjonen
+    perturbed_year_values = {r['year']: r['value'] for r in results if r['flow_name'] == flow_code}
+    
+    fill_missing_with_mean(
+        flow_code, perturbed_year_values, collected_years, results,
+        mean=mean_value,
+        comment='interpolated (MC-støy lagt på)',
+        data_sources='interpolated',
+    )
+    
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+    
+    
+def _add_industrial_crop_products_flow_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    MC-VERSJON: Crop products for industrial use.
+    Henter pre-loadet tabell-struktur fra RAM og sender til felles hjelpefunksjon.
+    """
+    flow_code = 'AG.SM-MP.OP-Crop products for industrial use-Nmix'
+    collected_years = set()
+    data_sources = 'Eurostat Gross nutrient balance, Nutrient removal by harvest of industrial crops'
+
+    # 1. Hent den ferdige DataFramen direkte fra RAM
+    df_gnb_sheet30 = preloaded_data.get('gnb_sheet30_raw')
+    if df_gnb_sheet30 is None:
+        print(f"[ADVARSEL] Mangler gnb_sheet30_raw i preloaded_data for {flow_code}.")
+        return
+
+    # 2. Hent ferdig støyjusterte verdier fra den delte hjelpefunksjonen
+    year_values = find_industrial_crop_products(df_gnb_sheet30, dataset_noise)
+
+    # 3. Bygg resultat-strukturen for denne simuleringsrunden
+    for year, value in year_values.items():
+        if year not in EXPECTED_YEARS:
+            continue
+        collected_years.add(year)
+        
+        comment = 'interpolated (MC-støy lagt på)' if year in range(2017, 2020) else 'ok (MC-støy lagt på)'
+        
+        results.append({
+            'flow_name': flow_code,
+            'year': year,
+            'value': float(value),
+            'comment': comment,
+            'data_sources': data_sources
+        })
+
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)

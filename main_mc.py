@@ -485,6 +485,10 @@ def main():
             from calculations.rw_mc import execute_calculations_rw  # Sjekk at funksjonsnavnet stemmer
             iteration_output['rw'] = execute_calculations_rw(preloaded_data, current_params, dataset_noise, current_trade_factors)
             
+        if 'ag' in selected_pools:
+            from calculations.ag_mc import execute_calculations_ag  # Sjekk at funksjonsnavnet stemmer
+            iteration_output['ag'] = execute_calculations_ag(preloaded_data, current_params, dataset_noise, current_trade_factors)
+            
         # (Her legger du inn de andre poolene etter hvert: if 'rw' in selected_pools... osv.)
 
         # --- DIAGNOSTISK SJEKK FOR ITERASJON 0 (DETERMINISTISK) ---
