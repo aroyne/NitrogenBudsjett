@@ -11,5 +11,5 @@ Because biofuel production in Norway is typically done as part of the waste mana
 
 This pool is divided into two operational sub-pools. Explore them using the side menu or links below:
 
-* [Manure management, storage and animal husbandry (AG.MM)](subpool_manure_management.html)
-* [Soil management (AG.SM)](subpool_soil_management.html)
+* [Manure Management (AG.MM)](subpool_manure_management.html)
+* [Soil Management (AG.SM)](subpool_soil_management.html)
