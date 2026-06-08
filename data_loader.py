@@ -138,12 +138,22 @@ def load_all_data(selected_pools):
 
         # SSB Grovfôrtabeller
         try:
-            preloaded['ag_ssb_13648'] = openpyxl.load_workbook('data_files/13648_20251117-154625.xlsx', data_only=True)
-            preloaded['ag_ssb_05772'] = openpyxl.load_workbook('data_files/05772_20251210-142618.xlsx', data_only=True)
-            preloaded['ag_grovfor_old'] = openpyxl.load_workbook('data_files/grovfor_før_2000.xlsx', data_only=True)
+            wb_13648 = openpyxl.load_workbook('data_files/13648_20251117-154625.xlsx', data_only=True)
+            wb_05772 = openpyxl.load_workbook('data_files/05772_20251210-142618.xlsx', data_only=True)
+            wb_old = openpyxl.load_workbook('data_files/grovfor_før_2000.xlsx', data_only=True)
+            
+            preloaded['ag_ssb_13648'] = wb_13648
+            preloaded['ag_ssb_05772'] = wb_05772
+            preloaded['ag_grovfor_old'] = wb_old
+            
+            # NYTT: Konverter til DataFrames med en gang for å unngå openpyxl i MC-løkka
+            preloaded['ssb_13648_raw'] = pd.DataFrame(list(wb_13648['Avling'].values))
+            preloaded['ssb_05772_raw'] = pd.DataFrame(list(wb_05772['Gronfor'].values))
+            preloaded['grovfor_old_raw'] = pd.DataFrame(list(wb_old['Ark1'].values))
+            
         except Exception as e:
             print(f"[KRITISK FEIL] Kunne ikke laste SSB grovfôrtabeller: {e}")
-
+            
         # CRLTAP Tekstfil (Sektordata for utslipp)
         try:
             # Siden denne leses rått via load_crltap_emissions_to_N i utils, lagrer vi banen eller innholdet.

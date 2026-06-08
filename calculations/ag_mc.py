@@ -28,6 +28,7 @@ def execute_calculations_ag(preloaded_data, current_params, dataset_noise, curre
     # 1. Spesialstrømmer (Henter ferdig generert dataset_noise og parameterstøy)
     _add_food_crop_products_flow_mc(results, preloaded_data, current_params, dataset_noise)
     _add_industrial_crop_products_flow_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_noise)
     
     # [Neste strømmer legges til fortløpende her...]
     
@@ -166,6 +167,137 @@ def _add_industrial_crop_products_flow_mc(results, preloaded_data, current_param
             'comment': comment,
             'data_sources': data_sources
         })
+
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+    
+def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    MC-VERSJON: Fodder crops.
+    Henter tre ferdiginnlastede DataFrames fra RAM og påfører sentralt trukket
+    parameterstøy (N_content) og datasettstøy (asymmetrisk perc vs abs).
+    """
+    flow_code = 'AG.SM-AG.MM-Fodder crops-Nmix'
+    collected_years = set()
+    comment = 'ok (MC-støy lagt på basert på kildens usikkerhetstype)'
+
+    # 1. Globale parametere (Allerede perturbert sentralt i generate_mc_parameters_fast)
+    fodder_prot = float(current_params.get("fodder_protein_frac", 0.12))
+    Jones = float(current_params.get("Jones_factor", 6.25))
+    N_content = fodder_prot / Jones
+
+    # 2. Hent og klargjør datasettstøy for de to SSB-kildene
+    key_13648 = '13648'
+    has_noise_13648 = dataset_noise and key_13648 in dataset_noise
+    noise_13648_val = dataset_noise[key_13648]['value'] if has_noise_13648 else 1.0
+    noise_13648_type = dataset_noise[key_13648]['type'] if has_noise_13648 else 'perc'
+
+    key_05772 = '05772'
+    has_noise_05772 = dataset_noise and key_05772 in dataset_noise
+    noise_05772_val = dataset_noise[key_05772]['value'] if has_noise_05772 else 1.0
+    noise_05772_type = dataset_noise[key_05772]['type'] if has_noise_05772 else 'perc'
+
+    # =========================================================================
+    # DEL A: SSB table 13648
+    # =========================================================================
+    df_13648 = preloaded_data.get('ssb_13648_raw')
+    if df_13648 is not None:
+        data_sources = 'SSB table 13648'
+        # Excel: cell(row=4, column=col) -> df.iloc[3, col-1]
+        for col_idx in range(1, 5):  # range(2, 6) i Excel blir indeks 1 til 4 i DataFrame
+            year_val = df_13648.iloc[3, col_idx]
+            val5 = df_13648.iloc[4, col_idx]  # Eng til slått
+            val6 = df_13648.iloc[5, col_idx]  # Grøntfôr- og silovekstar
+            
+            if pd.notna(year_val) and pd.notna(val5) and pd.notna(val6):
+                year = int(year_val)
+                collected_years.add(year)
+                
+                base_value = (float(val5) + float(val6)) * N_content
+                
+                if has_noise_13648:
+                    if noise_13648_type == 'perc':
+                        value = base_value * noise_13648_val
+                    else:
+                        bound = dataset_noise[key_13648]['upp_bound'] if noise_13648_val >= 0 else dataset_noise[key_13648]['low_bound']
+                        value = base_value + (noise_13648_val * bound)
+                else:
+                    value = base_value
+                
+                if value < 0: value = 0.0
+                
+                results.append({
+                    'flow_name': flow_code, 'year': year, 'value': float(value),
+                    'comment': comment, 'data_sources': data_sources
+                })
+
+    # =========================================================================
+    # DEL B: SSB table 05772
+    # =========================================================================
+    df_05772 = preloaded_data.get('ssb_05772_raw')
+    if df_05772 is not None:
+        data_sources = 'SSB table 05772'
+        # Excel: cell(row=3, column=col) -> df.iloc[2, col-1]
+        for col_idx in range(1, 22):  # range(2, 23) i Excel blir indeks 1 til 21
+            year_val = df_05772.iloc[2, col_idx]
+            val4 = df_05772.iloc[3, col_idx]  # Grøntfôr- og silovekstar
+            val5 = df_05772.iloc[4, col_idx]  # Høy
+            
+            if pd.notna(year_val) and pd.notna(val4) and pd.notna(val5):
+                year = int(year_val)
+                collected_years.add(year)
+                
+                base_value = (float(val4) + float(val5)) * N_content
+                
+                if has_noise_05772:
+                    if noise_05772_type == 'perc':
+                        value = base_value * noise_05772_val
+                    else:
+                        bound = dataset_noise[key_05772]['upp_bound'] if noise_05772_val >= 0 else dataset_noise[key_05772]['low_bound']
+                        value = base_value + (noise_05772_val * bound)
+                else:
+                    value = base_value
+                
+                if value < 0: value = 0.0
+                
+                results.append({
+                    'flow_name': flow_code, 'year': year, 'value': float(value),
+                    'comment': comment, 'data_sources': data_sources
+                })
+
+    # =========================================================================
+    # DEL C: Før 2000 (SSB Jordbruksstatistikk)
+    # =========================================================================
+    df_old = preloaded_data.get('grovfor_old_raw')
+    if df_old is not None:
+        data_sources = 'SSB Jordbruksstatistikk'
+        # Excel: cell(row=r, column=1) -> df.iloc[r-1, 0]
+        for r_idx in range(2, 18):  # range(3, 19) i Excel blir indeks 2 til 17
+            year_val = df_old.iloc[r_idx, 0]
+            val2 = df_old.iloc[r_idx, 1]  # Grøntfôr- og silovekstar
+            val3 = df_old.iloc[r_idx, 2]  # Høy
+            
+            if pd.notna(year_val) and pd.notna(val2) and pd.notna(val3):
+                year = int(year_val)
+                collected_years.add(year)
+                
+                base_value = (float(val2) + float(val3)) * N_content
+                
+                if has_noise_05772:
+                    if noise_05772_type == 'perc':
+                        value = base_value * noise_05772_val
+                    else:
+                        bound = dataset_noise[key_05772]['upp_bound'] if noise_05772_val >= 0 else dataset_noise[key_05772]['low_bound']
+                        value = base_value + (noise_05772_val * bound)
+                else:
+                    value = base_value
+                
+                if value < 0: value = 0.0
+                
+                results.append({
+                    'flow_name': flow_code, 'year': year, 'value': float(value),
+                    'comment': comment, 'data_sources': data_sources
+                })
 
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
