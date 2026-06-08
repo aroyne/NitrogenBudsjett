@@ -44,6 +44,8 @@ def execute_calculations_ag(preloaded_data, current_params, dataset_noise, curre
     _add_NH3_emissions_soil_management_mc(results, preloaded_data, current_params, dataset_noise)
     _add_NOx_emissions_soil_management_mc(results, preloaded_data, current_params, dataset_noise)
     _add_N2O_emissions_soil_management_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_leaching_soil_management_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_leaching_manure_management_mc(results, preloaded_data, current_params, dataset_noise)
     
     # [Neste strømmer legges til fortløpende her...]
     
@@ -435,6 +437,114 @@ def _add_N2O_emissions_soil_management_mc(results, preloaded_data, current_param
                 'flow_name': flow_code, 'year': year, 'value': float(value),
                 'comment': comment, 'data_sources': data_sources
             })
+
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+    
+    
+def _add_leaching_soil_management_mc(results, preloaded_data, current_params, dataset_noise):
+    flow_code = 'AG.SM-HY.SW-Leaching-Nmix'
+    collected_years = set()
+    data_sources = 'UNFCCC CRT'
+    comment = 'ok (MC-støy lagt på)'
+
+    # 1. Hent asymmetrisk datasettstøy
+    key_leach = 'UNFCCC_emissions'
+    has_noise = dataset_noise and key_leach in dataset_noise
+    noise_val = dataset_noise[key_leach]['value'] if has_noise else 1.0
+    noise_type = dataset_noise[key_leach]['type'] if has_noise else 'perc'
+
+    # 2. Hent ferdiglastet DataFrame fra RAM
+    df_leaching = preloaded_data.get('ag_leaching_csv')
+    if df_leaching is None:
+        print(f"[ADVARSEL] Mangler ag_leaching_csv i preloaded_data for {flow_code}.")
+        return
+
+    # 3. Kjapp iterasjon over array-verdier i stedet for .iterrows()
+    years = df_leaching['year'].values
+    values_sm = df_leaching['Nr_SM'].values
+
+    for i in range(len(years)):
+        year = int(years[i])
+        if year not in EXPECTED_YEARS:
+            continue
+        collected_years.add(year)
+        
+        base_value = float(values_sm[i])
+
+        # Påfør asymmetrisk støy robust
+        if has_noise:
+            if noise_type == 'perc':
+                value = base_value * noise_val
+            else:
+                bound = dataset_noise[key_leach]['upp_bound'] if noise_val >= 0 else dataset_noise[key_leach]['low_bound']
+                value = base_value + (noise_val * bound)
+        else:
+            value = base_value
+
+        if value < 0: value = 0.0
+
+        results.append({
+            'flow_name': flow_code,
+            'year': year,
+            'value': float(value),
+            'comment': comment,
+            'data_sources': data_sources,
+        })
+
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+
+
+def _add_leaching_manure_management_mc(results, preloaded_data, current_params, dataset_noise):
+    flow_code = 'AG.MM-HY.SW-Leaching-Nmix'
+    collected_years = set()
+    data_sources = 'UNFCCC CRT'
+    comment = 'ok (MC-støy lagt på)'
+
+    # 1. Hent asymmetrisk datasettstøy
+    key_leach = 'UNFCCC_emissions'
+    has_noise = dataset_noise and key_leach in dataset_noise
+    noise_val = dataset_noise[key_leach]['value'] if has_noise else 1.0
+    noise_type = dataset_noise[key_leach]['type'] if has_noise else 'perc'
+
+    # 2. Hent ferdiglastet DataFrame fra RAM
+    df_leaching = preloaded_data.get('ag_leaching_csv')
+    if df_leaching is None:
+        print(f"[ADVARSEL] Mangler ag_leaching_csv i preloaded_data for {flow_code}.")
+        return
+
+    # 3. Kjapp iterasjon over array-verdier i stedet for .iterrows()
+    years = df_leaching['year'].values
+    values_mm = df_leaching['Nr_MM'].values
+
+    for i in range(len(years)):
+        year = int(years[i])
+        if year not in EXPECTED_YEARS:
+            continue
+        collected_years.add(year)
+        
+        base_value = float(values_mm[i])
+
+        # Påfør asymmetrisk støy robust
+        if has_noise:
+            if noise_type == 'perc':
+                value = base_value * noise_val
+            else:
+                bound = dataset_noise[key_leach]['upp_bound'] if noise_val >= 0 else dataset_noise[key_leach]['low_bound']
+                value = base_value + (noise_val * bound)
+        else:
+            value = base_value
+
+        if value < 0: value = 0.0
+
+        results.append({
+            'flow_name': flow_code,
+            'year': year,
+            'value': float(value),
+            'comment': comment,
+            'data_sources': data_sources,
+        })
 
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
