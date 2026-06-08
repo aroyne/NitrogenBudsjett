@@ -108,11 +108,14 @@ def load_all_data(selected_pools):
         preloaded['aqua_old'] = df_old_clean
         
     # 7. FAOSTAT LEVENDE DYR
-    if 'rw' in selected_pools:
+    live_animals_needing_pools = {'ag','rw'}
+    if not live_animals_needing_pools.isdisjoint(selected_pools):
         print("[I/O] Pre-loader FAOSTAT data for levende dyr...")    
         df_fao_raw = pd.read_csv('data_files/FAOSTAT_data_en_11-12-2025.csv')
         df_fao_filtered = df_fao_raw[(df_fao_raw['Element'] == 'Import quantity') & (df_fao_raw['Value'] != 0)][['Item', 'Year', 'Unit', 'Value']].copy()
         preloaded['fao_live_animals'] = df_fao_filtered
+        df_fao_export = df_fao_raw[(df_fao_raw['Element'] == 'Export quantity') & (df_fao_raw['Value'] != 0)][['Item', 'Year', 'Unit', 'Value']].copy()
+        preloaded['fao_live_animals_export'] = df_fao_export
         
     # 8. MINERALGJØDSELIMPORT
     fert_needing_pools = {'rw'}

@@ -49,6 +49,10 @@ def execute_calculations_ag(preloaded_data, current_params, dataset_noise, curre
     _add_animal_products_flow_mc(results, preloaded_data, current_params, dataset_noise)
     _add_non_edible_animal_products_flow_mc(results, preloaded_data, current_params, dataset_noise)
     _add_manure_application_flow_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_NH3_emissions_manure_management_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_NOx_emissions_manure_management_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_N2O_emissions_manure_management_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_live_animal_export_mc(results, preloaded_data, current_params, dataset_noise)
     
     # [Neste strømmer legges til fortløpende her...]
     
@@ -578,12 +582,6 @@ def _add_animal_products_flow_mc(results, preloaded_data, current_params, datase
     noise_val = dataset_noise[key_fao]['value'] if has_noise else 1.0
     noise_type = dataset_noise[key_fao]['type'] if has_noise else 'perc'
     
-    # === MIDLERTIDIG DEBUG: Se alle tilgjengelige nøkler ===
-    print("\n" + "="*50)
-    print("[DEBUG] HER ER ALLE NØKLENE SOM FINNES I current_params NÅ:")
-    print(list(current_params.__dict__.keys()))
-    print("="*50 + "\n")
-
     # 3. Slå opp den flate, perturberte N-prosenten (Krasjer hardt ved manglende data)
     def get_perturbed_product_frac(item_name):
         param_key = f"prod_{str(item_name).strip()}"
@@ -793,5 +791,192 @@ def _add_manure_application_flow_mc(results, preloaded_data, current_params, dat
     else:
         print(f"[ADVARSEL] Kunne ikke interpolere 2017-2019 for {flow_code} fordi data for 2016 eller 2020 mangler.")
 
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+    
+    
+def _add_NH3_emissions_manure_management_mc(results, preloaded_data, current_params, dataset_noise):
+    """MC-VERSJON: AG.MM-AT.AT-Emissions-NH3"""
+    flow_code = 'AG.MM-AT.AT-Emissions-NH3'
+    collected_years = set()
+    comment = 'ok (MC-støy lagt på)'
+    data_sources = 'CRLTAP Inventory Submissions'
+
+    conv = float(current_params.get("NH3_to_N_factor", 0.822))
+    raw_lines = preloaded_data.get('ag_crltap_raw_lines')
+    
+    if raw_lines is None:
+        print(f"[ADVARSEL] Mangler ag_crltap_raw_lines i preloaded_data for {flow_code}.")
+        return
+
+    # Kall hjelpefunksjonen med AG_MM_CRLTAP_SECTORS i stedet for AG_SM
+    sums = load_crltap_emissions_to_N(
+        raw_lines=raw_lines,
+        categories=AG_MM_CRLTAP_SECTORS,
+        pollutant='NH3',
+        conv_to_N=conv,
+        dataset_noise=dataset_noise,
+        noise_key='CRLTAP'
+    )
+
+    for year, value in sums.items():
+        if year not in EXPECTED_YEARS:
+            continue
+        collected_years.add(year)
+        results.append({
+            'flow_name': flow_code, 'year': year, 'value': float(value),
+            'comment': comment, 'data_sources': data_sources
+        })
+
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+
+
+def _add_NOx_emissions_manure_management_mc(results, preloaded_data, current_params, dataset_noise):
+    """MC-VERSJON: AG.MM-AT.AT-Emissions-NOx"""
+    flow_code = 'AG.MM-AT.AT-Emissions-NOx'
+    collected_years = set()
+    comment = 'ok (MC-støy lagt på)'
+    data_sources = 'CRLTAP Inventory Submissions'
+
+    conv = float(current_params.get("NOx_to_N_factor", 0.304))
+    raw_lines = preloaded_data.get('ag_crltap_raw_lines')
+    
+    if raw_lines is None:
+        print(f"[ADVARSEL] Mangler ag_crltap_raw_lines i preloaded_data for {flow_code}.")
+        return
+
+    # Kall hjelpefunksjonen med AG_MM_CRLTAP_SECTORS i stedet for AG_SM
+    sums = load_crltap_emissions_to_N(
+        raw_lines=raw_lines,
+        categories=AG_MM_CRLTAP_SECTORS,
+        pollutant='NOx',
+        conv_to_N=conv,
+        dataset_noise=dataset_noise,
+        noise_key='CRLTAP'
+    )
+
+    for year, value in sums.items():
+        if year not in EXPECTED_YEARS:
+            continue
+        collected_years.add(year)
+        results.append({
+            'flow_name': flow_code, 'year': year, 'value': float(value),
+            'comment': comment, 'data_sources': data_sources
+        })
+
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+
+
+def _add_N2O_emissions_manure_management_mc(results, preloaded_data, current_params, dataset_noise):
+    """MC-VERSJON: AG.MM-AT.AT-Emissions-N2O"""
+    flow_code = 'AG.MM-AT.AT-Emissions-N2O'
+    collected_years = set()
+    comment = 'ok (MC-støy lagt på)'
+    data_sources = 'UNFCCC CRT'
+
+    conv_N2O = float(current_params.get("N2O_to_N_factor", 0.636))
+    
+    key_n2o = 'UNFCCC_emissions'
+    has_noise = dataset_noise and key_n2o in dataset_noise
+    noise_val = dataset_noise[key_n2o]['value'] if has_noise else 1.0
+    noise_type = dataset_noise[key_n2o]['type'] if has_noise else 'perc'
+
+    df_unfccc = preloaded_data.get('unfccc_ark1_raw')
+    if df_unfccc is None:
+        print(f"[ADVARSEL] Mangler unfccc_ark1_raw i preloaded_data for {flow_code}.")
+        return
+
+    for r_idx in range(4, 37):
+        year_val = df_unfccc.iloc[r_idx, 0]
+        ton_val = df_unfccc.iloc[r_idx, 1]  # ENDRET FRA 2 TIL 1: Rad 1 inneholder verdien for Manure Management
+
+        if pd.notna(year_val) and pd.notna(ton_val):
+            year = int(year_val)
+            if year not in EXPECTED_YEARS:
+                continue
+            collected_years.add(year)
+
+            base_value = float(ton_val) * conv_N2O
+
+            if has_noise:
+                if noise_type == 'perc':
+                    value = base_value * noise_val
+                else:
+                    bound = dataset_noise[key_n2o]['upp_bound'] if noise_val >= 0 else dataset_noise[key_n2o]['low_bound']
+                    value = base_value + (noise_val * bound)
+            else:
+                value = base_value
+
+            if value < 0: value = 0.0
+
+            results.append({
+                'flow_name': flow_code, 'year': year, 'value': float(value),
+                'comment': comment, 'data_sources': data_sources
+            })
+
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+    
+    
+def _add_live_animal_export_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    MC-VERSJON: Eksport av levende dyr (AG.MM-RW.RW-Live animal export-Nmix).
+    Slår opp ferdig perturberte vekter ('weight_HORSES' osv.) fra parametergeneratoren.
+    Ingen tunge fil-I/O eller .join()-operasjoner her.
+    """
+    flow_code = 'AG.MM-RW.RW-Live animal export-Nmix'
+    collected_years = set()
+    comment = 'ok (MC-støy ferdig beregnet sentralt)'
+    data_sources = 'FAOSTAT Crops and livestock products'
+    
+    # Hent ferdiglastet eksport-DataFrame fra RAM
+    final_data = preloaded_data.get('fao_live_animals_export')
+    if final_data is None:
+        print(f"[ADVARSEL] Mangler fao_live_animals_export i preloaded_data for {flow_code}.")
+        return
+
+    # Hent globale perturberte parametere
+    prot_frac = float(current_params.get("live_animal_protein_frac", 0.13))
+    prot_to_N = float(current_params.get("Jones_factor", 6.25))
+
+    # Hent asymmetrisk kildestøy
+    key_fao = 'Crops and livestock products'
+    has_noise_fao = dataset_noise and key_fao in dataset_noise
+    noise_fao = dataset_noise[key_fao]['value'] if has_noise_fao else 1.0
+
+    df_round = final_data.copy()
+    if has_noise_fao and dataset_noise[key_fao]['type'] == 'perc':
+        df_round['perturbed_value'] = df_round['Value'] * noise_fao
+    else:
+        df_round['perturbed_value'] = df_round['Value']
+
+    # Hjelpefunksjon for å hente de ferdig perturberte enkeltvektene per dyretype
+    def get_perturbed_weight(item_name):
+        return float(current_params.get(f"weight_{str(item_name).strip()}", 100.0))
+
+    # Beregn N-mengde per rad
+    df_round['perturbed_weight'] = df_round['Item'].apply(get_perturbed_weight)
+    df_round['N_amount'] = (df_round['perturbed_weight'] * df_round['perturbed_value'] * prot_frac * 1e-6 / prot_to_N)
+
+    # Aggreger per år til en kjapp ordbok
+    total_N_per_year = df_round.groupby('Year')['N_amount'].sum().to_dict()
+    
+    # Fyll ut for de forventede årstallene
+    for year in sorted(EXPECTED_YEARS):
+        if year in total_N_per_year:
+            collected_years.add(year)
+            val = total_N_per_year[year]
+            if val < 0: val = 0.0
+            
+            results.append({
+                'flow_name': flow_code, 
+                'year': year, 
+                'value': float(val),
+                'comment': comment, 
+                'data_sources': data_sources
+            })
+            
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
