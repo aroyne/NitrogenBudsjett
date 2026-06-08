@@ -47,6 +47,7 @@ def execute_calculations_ag(preloaded_data, current_params, dataset_noise, curre
     _add_leaching_soil_management_mc(results, preloaded_data, current_params, dataset_noise)
     _add_leaching_manure_management_mc(results, preloaded_data, current_params, dataset_noise)
     _add_animal_products_flow_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_non_edible_animal_products_flow_mc(results, preloaded_data, current_params, dataset_noise)
     
     # [Neste strømmer legges til fortløpende her...]
     
@@ -633,5 +634,54 @@ def _add_animal_products_flow_mc(results, preloaded_data, current_params, datase
                 'data_sources': data_sources
             })
 
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+    
+def _add_non_edible_animal_products_flow_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    MC-VERSJON: Non-edible animal products flow.
+    """
+    flow_code = 'AG.MM-MP.OP-Non-edible animal products-Nmix'
+    collected_years = set()
+    comment = 'ok (MC-støy lagt på parametere og kildedata)'
+
+    # Hent ferdiglastede dataframes fra RAM
+    df_hides_clean = preloaded_data.get('fao_hides_clean')
+    df_wool = preloaded_data.get('wool_production')
+    df_sheep = preloaded_data.get('ssb_sheep_numbers')
+    
+    if df_hides_clean is None or df_wool is None or df_sheep is None:
+        print(f"[ADVARSEL] Mangler preloaded datagrunnlag for {flow_code}. Hopper over flommen.")
+        return
+
+    # Kjør beregningen
+    year_values = find_non_edible_animal_products(
+        df_hides_clean, df_wool, df_sheep, current_params, dataset_noise
+    )
+
+    # Legg til i resultatlisten (antar at EXPECTED_YEARS er definert globalt, f.eks. range(1990, 2024))
+    for year in range(1990, 2024):
+        if year in year_values:
+            collected_years.add(year)
+            value = float(year_values[year])
+            
+            if value < 0: value = 0.0
+
+            if year > 2004 and year != 2001:
+                data_sources = 'FAOSTAT Crops and livestock products + Landbruksdirektoratet'
+            elif year != 2001:
+                data_sources = 'FAOSTAT Crops and livestock products + Landbruksdirektoratet + SSB, extrapolated'
+            else:
+                data_sources = 'FAOSTAT Crops and livestock products'
+
+            results.append({
+                'flow_name': flow_code,
+                'year': year,
+                'value': value,
+                'comment': comment,
+                'data_sources': data_sources
+            })
+
+    # Hvis du har en definert mengde forventede år (f.eks. EXPECTED_YEARS = set(range(1990, 2024)))
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)

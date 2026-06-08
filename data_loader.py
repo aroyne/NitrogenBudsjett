@@ -196,4 +196,47 @@ def load_all_data(selected_pools):
         except Exception as e:
             print(f"[KRITISK FEIL] Kunne ikke laste FAOSTAT animal production: {e}")
             
+        # =========================================================================
+        # REVIDERT: DATAINNLESINGER FOR HUDER OG ULL (AG / AG_MC)
+        # =========================================================================
+        try:
+            print("[I/O] Laster og klargjør FAOSTAT-data for kjøtt, melk og huder...")
+            # df_fao = pd.read_csv('data_files/FAOSTAT_data_en_11-18-2025.csv')
+            # preloaded['ag_faostat_production'] = df_fao
+            
+            # A. Renset tabell for vanlige spiselige dyreprodukter (Uten huder)
+            filtered_fao = df_fao[
+                (df_fao['Element'] == 'Production') & 
+                (df_fao['Value'] != 0) & 
+                (~df_fao['Item'].str.contains('hides', case=False, na=False))
+            ]
+            preloaded['fao_animal_production_clean'] = filtered_fao[['Item', 'Year', 'Value']].copy()
+            
+            # B. Egen renset tabell for huder (Kun huder)
+            filtered_hides = df_fao[
+                (df_fao['Element'] == 'Production') & 
+                (df_fao['Value'] != 0) & 
+                (df_fao['Item'].str.contains('hides', case=False, na=False))
+            ]
+            preloaded['fao_hides_clean'] = filtered_hides[['Item', 'Year', 'Value']].copy()
+            
+        except Exception as e:
+            print(f"[KRITISK FEIL] Kunne ikke laste FAOSTAT animal production: {e}")
+
+        # C. Last inn ull-produksjon (Landbruksdirektoratet)
+        try:
+            print("[I/O] Pre-loader ulldata (ull.xlsx)...")
+            df_wool_raw = pd.read_excel('data_files/ull.xlsx', skiprows=3)
+            preloaded['wool_production'] = df_wool_raw[['år', 'ull']].copy()
+        except Exception as e:
+            print(f"[KRITISK FEIL] Kunne ikke laste ull.xlsx: {e}")
+
+        # D. Last inn sauetall (SSB tabell 03710)
+        try:
+            print("[I/O] Pre-loader sauetall fra SSB (03710_20260128-152225.xlsx)...")
+            df_sheep_raw = pd.read_excel('data_files/03710_20260128-152225.xlsx', skiprows=2)
+            preloaded['ssb_sheep_numbers'] = df_sheep_raw[['År', 'Husdyr (sau)']].copy()
+        except Exception as e:
+            print(f"[KRITISK FEIL] Kunne ikke laste SSB-sauetall: {e}")
+            
     return preloaded

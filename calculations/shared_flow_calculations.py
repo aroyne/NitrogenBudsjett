@@ -644,61 +644,62 @@ def find_landfill_emissions_to_water(df_uts, df_tilk, current_params):
     return dict_tilkoblet, dict_ikke        
     
     
-def find_non_edible_animal_products(df_faostat, df_wool, df_sheep, current_params):
+def find_non_edible_animal_products(df_hides_clean, df_wool, df_sheep, current_params, dataset_noise):
     """
-    Beregner nitrogen i ikke-spiselige animalske produkter (huder og ull).
-    Henter alt av støyfaktorer og parametertabeller utelukkende fra current_params.
+    MC-VERSJON: Beregner nitrogen i ikke-spiselige animalske produkter (huder og ull) lynraskt.
+    Bruker ferdigfiltrerte data fra RAM, flate rundenøkler og asymmetrisk kildestøy.
     """
     year_values = {}
     
-    # 1. Hent ut kildestøy og trendstøy fra denne MC-runden
-    noise_faostat = float(current_params.get('faostat', 1.0))
-    noise_ssb     = float(current_params.get('ssb', 1.0))
-    noise_wool    = float(current_params.get('landbruksdirektoratet', current_params.get('wool_data', 1.0)))
-    noise_trend   = float(current_params.get('trend interpolation', 1.0))
+    # 1. Hent ut den asymmetriske datasettstøyen fra denne MC-runden (hvis den finnes, ellers 1.0)
+    has_fao = dataset_noise and 'Crops and livestock products' in dataset_noise
+    noise_faostat = dataset_noise['Crops and livestock products']['value'] if has_fao else 1.0
+
+    has_03710 = dataset_noise and '03710' in dataset_noise
+    noise_ssb = dataset_noise['03710']['value'] if has_03710 else 1.0
+
+    has_wool = dataset_noise and 'Landbruksdirektoratet_wool' in dataset_noise
+    noise_wool = dataset_noise['Landbruksdirektoratet_wool']['value'] if has_wool else 1.0
+
+    # Trendstøy (hvis definert i dataset_noise, ellers 1.0)
+    noise_trend = 1.0
+    if dataset_noise and 'trend interpolation' in dataset_noise:
+        noise_trend = dataset_noise['trend interpolation']['value']
+
+    # 2. Hent støybelagte parametere fra current_params (krasjer hardt om de mangler)
+    N_content_hides = current_params.get('prod_Raw hides and skins', None)
+    wool_pr_sheep = current_params.get('wool_per_sheep', None)
+    N_content_wool = current_params.get('wool_N_frac', None)
     
-    # 2. Hent støybelagt parameter for Huder (Raw hides and skins) fra tabellen i current_params
-    try:
-        N_table = current_params['animal_products']
-        N_table_indexed = N_table.set_index('item')
-        N_content_hides = float(N_table_indexed.loc['Raw hides and skins', 'N_content_percent'])
-    except Exception:
-        # Failsafe i tilfelle tabelloppslaget mot formodning skulle feile
-        N_content_hides = 11.0
+    if N_content_hides is None or wool_pr_sheep is None or N_content_wool is None:
+        raise KeyError(
+            f"[KRITISK FEIL] Mangler parametere for ikke-spiselige produkter i current_params! "
+            f"(prod_Raw hides and skins: {N_content_hides}, wool_per_sheep: {wool_pr_sheep}, wool_N_frac: {N_content_wool})"
+        )
 
-    # 3. Parameterstøy for Ull (hentes direkte fra rundenøkler i current_params)
-    wool_pr_sheep  = float(current_params.get('wool_per_sheep', 2.3))
-    N_content_wool = float(current_params.get('wool_N_frac', 0.12))
+    # 3. Beregn N-mengde for huder og legg på kildestøy
+    df_hides = df_hides_clean.copy()
+    df_hides['N_amount'] = df_hides['Value'] * float(N_content_hides) * 1e-5 * float(noise_faostat)
+    total_N_per_year = df_hides.groupby('Year')['N_amount'].sum().to_dict()
 
-    # 4. Prosesser FAOSTAT huder
-    filtered_fao = df_faostat[
-        (df_faostat['Element'] == 'Production') & 
-        (df_faostat['Value'] != 0) & 
-        df_faostat['Item'].str.contains('hides', case=False, na=False)
-    ].copy()
-    
-    # Beregn N-mengde for huder (tonn til kilotonn * 1e-5 fordi N_content er i %) og legg på kildestøy
-    filtered_fao['N_amount'] = filtered_fao['Value'] * N_content_hides * 1e-5 * noise_faostat
-    total_N_per_year = filtered_fao.groupby('Year')['N_amount'].sum().to_dict()
-
-    # 5. Loop over alle år og legg til ull
+    # 4. Løp gjennom årene og legg til ull
     for year in range(1990, 2024):
         value = total_N_per_year.get(year, 0.0)
         
         if year > 2004 and year != 2001:
-            # Rapporterte ulldata + kildestøy
+            # Bruk rapporterte ulldata + kildestøy
             wool_row = df_wool[df_wool['år'] == year]
             if not wool_row.empty:
-                value += float(wool_row['ull'].iloc[0]) * N_content_wool * noise_wool
+                value += float(wool_row['ull'].iloc[0]) * float(N_content_wool) * float(noise_wool)
                 
         elif year != 2001:
-            # Ekstrapolerte ulldata basert på SSB dyretall + ssb-kildestøy
+            # Bruk ekstrapolerte ulldata basert på SSB-sauetall + ssb-kildestøy
             sheep_row = df_sheep[df_sheep['År'] == year]
             if not sheep_row.empty:
-                value += float(sheep_row['Husdyr (sau)'].iloc[0]) * wool_pr_sheep * N_content_wool * 1e-6 * noise_ssb
+                value += float(sheep_row['Husdyr (sau)'].iloc[0]) * float(wool_pr_sheep) * float(N_content_wool) * 1e-6 * float(noise_ssb)
                 
         else:
-            # Interpolering for 2001 (mangler SSB-data) + trendstøy
+            # Interpolering for 2001 + ssb-støy * trendstøy
             sheep_prev = df_sheep[df_sheep['År'] == year-1]
             sheep_next = df_sheep[df_sheep['År'] == year+1]
             if not sheep_prev.empty and not sheep_next.empty:
@@ -706,12 +707,11 @@ def find_non_edible_animal_products(df_faostat, df_wool, df_sheep, current_param
                     float(sheep_prev['Husdyr (sau)'].iloc[0]) +
                     float(sheep_next['Husdyr (sau)'].iloc[0])
                 )
-                value += (avg_sheep * wool_pr_sheep * N_content_wool * 1e-6 * noise_ssb) * noise_trend
+                value += (avg_sheep * float(wool_pr_sheep) * float(N_content_wool) * 1e-6 * float(noise_ssb)) * float(noise_trend)
                 
         year_values[year] = value
         
     return year_values
-
 
 def find_other_goods_export(prepared_trade_data, current_params, trade_params):
     """
