@@ -133,6 +133,10 @@ def load_all_data(selected_pools):
             wb_gnb = openpyxl.load_workbook('data_files/aei_pr_gnb__custom_18744910_spreadsheet.xlsx', data_only=True)
             preloaded['ag_gnb_workbook'] = wb_gnb
             preloaded['gnb_sheet30_raw'] = pd.DataFrame(list(wb_gnb['Sheet 30'].values))
+            if 'Sheet 12' in wb_gnb.sheetnames:
+                preloaded['gnb_sheet12_raw'] = pd.DataFrame(list(wb_gnb['Sheet 12'].values))
+            else:
+                print("[ADVARSEL] Sheet 12 mangler i GNB-filen!")
         except Exception as e:
             print(f"[KRITISK FEIL] Kunne ikke laste Eurostat GNB Excel: {e}")
 

@@ -48,6 +48,7 @@ def execute_calculations_ag(preloaded_data, current_params, dataset_noise, curre
     _add_leaching_manure_management_mc(results, preloaded_data, current_params, dataset_noise)
     _add_animal_products_flow_mc(results, preloaded_data, current_params, dataset_noise)
     _add_non_edible_animal_products_flow_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_manure_application_flow_mc(results, preloaded_data, current_params, dataset_noise)
     
     # [Neste strømmer legges til fortløpende her...]
     
@@ -683,5 +684,114 @@ def _add_non_edible_animal_products_flow_mc(results, preloaded_data, current_par
             })
 
     # Hvis du har en definert mengde forventede år (f.eks. EXPECTED_YEARS = set(range(1990, 2024)))
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+    
+    
+def _add_manure_application_flow_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    MC-VERSJON: Manure application flow (AG.MM-AG.SM-Manure application-Nmix).
+    Henter data fra ferdiglastet Eurostat GNB Sheet 12, gjør lineær interpolasjon
+    for 2017-2019, og påfører asymmetrisk datasettstøy.
+    """
+    flow_code = 'AG.MM-AG.SM-Manure application-Nmix'
+    collected_years = set()
+    comment = 'ok (MC-støy lagt på datasett)'
+    
+    # 1. Hent rådata-matrisen fra RAM
+    df_sheet12 = preloaded_data.get('gnb_sheet12_raw')
+    if df_sheet12 is None:
+        print(f"[ADVARSEL] Mangler 'gnb_sheet12_raw' i preloaded_data. Hopper over {flow_code}.")
+        return
+
+    # 2. Hent ut den asymmetriske datasettstøyen fra denne iterasjonen
+    has_gnb = dataset_noise and 'Gross nutrient balance' in dataset_noise
+    noise_gnb = dataset_noise['Gross nutrient balance']['value'] if has_gnb else 1.0
+
+    has_interp = dataset_noise and 'trend interpolation' in dataset_noise
+    noise_interp = dataset_noise['trend interpolation']['value'] if has_interp else 1.0
+
+    # 3. Rekonstruer read_year_value_row logikken for en ren DataFrame
+    # Original: year_row=9 (indeks 8), value_row=11 (indeks 10), first_col=2 (indeks 1)
+    # Enhetsfaktor: 1.0e-3 (konverterer fra tonn til kilotonn)
+    year_row_idx = 8
+    value_row_idx = 10
+    first_col_idx = 1
+    unit_factor = 1.0e-3
+
+    # Hent radene ut fra DataFramen
+    years_row = df_sheet12.iloc[year_row_idx].values
+    values_row = df_sheet12.iloc[value_row_idx].values
+
+    year_values = {}
+    # Loop over kolonnene fra first_col_idx til enden
+    for col_idx in range(first_col_idx, len(years_row)):
+        yr = years_row[col_idx]
+        val = values_row[col_idx]
+        
+        # Sjekk at året er et gyldig tall/årstall
+        try:
+            yr = int(float(yr))
+            # Sjekk om verdien er numerisk og ikke tom (None/NaN)
+            if pd.notna(val) and val != '':
+                year_values[yr] = float(val) * unit_factor
+        except (ValueError, TypeError):
+            continue
+
+    # 4. Behandle dataene og legg til i resultatene
+    value_2016 = None
+    value_2020 = None
+    reported_entries = []
+
+    for year, base_value in year_values.items():
+        if year not in EXPECTED_YEARS:
+            continue
+            
+        collected_years.add(year)
+        
+        # Lagre referansepunkter for interpolasjonen
+        if year == 2016:
+            value_2016 = base_value
+        elif year == 2020:
+            value_2020 = base_value
+
+        # Påfør datasettstøy for rapporterte data
+        value = base_value * float(noise_gnb)
+        if value < 0: value = 0.0
+
+        reported_entries.append({
+            'flow_name': flow_code,
+            'year': year,
+            'value': float(value),
+            'comment': comment,
+            'data_sources': 'Eurostat Gross nutrient balance, Manure input'
+        })
+
+    # Legg til de rapporterte årene i resultatlisten
+    results.extend(reported_entries)
+
+    # 5. Interpolering for 2017-2019 (hvis vi har 2016 og 2020 tilgjengelig)
+    if value_2016 is not None and value_2020 is not None:
+        for year in range(2017, 2020):
+            if year in EXPECTED_YEARS:
+                collected_years.add(year)
+                
+                # Lineær interpolasjon på de u-støyede basistallene
+                base_interp_val = value_2016 + (value_2020 - value_2016) / 4.0 * (year - 2016)
+                
+                # Påfør både GNB-støy og trend/interpolasjonsstøy harmonisert
+                value = base_interp_val * float(noise_gnb) * float(noise_interp)
+                if value < 0: value = 0.0
+
+                results.append({
+                    'flow_name': flow_code,
+                    'year': year,
+                    'value': float(value),
+                    'comment': comment,
+                    'data_sources': 'interpolated'
+                })
+    else:
+        print(f"[ADVARSEL] Kunne ikke interpolere 2017-2019 for {flow_code} fordi data for 2016 eller 2020 mangler.")
+
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
