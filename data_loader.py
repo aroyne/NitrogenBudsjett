@@ -181,7 +181,18 @@ def load_all_data(selected_pools):
 
         # FAOSTAT Animals and Production (FAOSTAT_data_en_11-18-2025.csv)
         try:
-            preloaded['ag_faostat_production'] = pd.read_csv('data_files/FAOSTAT_data_en_11-18-2025.csv')
+            df_fao = pd.read_csv('data_files/FAOSTAT_data_en_11-18-2025.csv')
+            preloaded['ag_faostat_production'] = df_fao
+            
+            # NYTT: Gjør unna den tunge filtreringen med en gang under I/O-steget
+            filtered_fao = df_fao[
+                (df_fao['Element'] == 'Production') & 
+                (df_fao['Value'] != 0) & 
+                (~df_fao['Item'].str.contains('hides', case=False, na=False))
+            ]
+            # Ta kun vare på kolonnene vi faktisk trenger videre
+            preloaded['fao_animal_production_clean'] = filtered_fao[['Item', 'Year', 'Value']].copy()
+            
         except Exception as e:
             print(f"[KRITISK FEIL] Kunne ikke laste FAOSTAT animal production: {e}")
             

@@ -42,8 +42,16 @@ class NParameters:
                 self.animal_weights[item_name] = avg_w
 
     def get(self, param_id, default=None):
+        """
+        Søker etter parameteren i prioritert rekkefølge:
+        1. Sjekker om den ligger direkte som et flatt objekt-attributt (MC-generert med setattr)
+        2. Sjekker om den ligger i global_params-ordboken
+        3. Faller tilbake på default-verdien
+        """
+        if hasattr(self, param_id):
+            return getattr(self, param_id)
         return self.global_params.get(param_id, default)
-
+    
     def waste_N_frac(self, category, default=None):
         return self.waste_fractions.get(category, default)
 
@@ -126,8 +134,14 @@ class NParameters:
     def override_global_params(self, custom_dict):
         """
         Gjør det mulig for Monte Carlo-motoren å dytte inn simulerte 
-        verdier før beregningene kjøres.
+        verdier før beregningene kjøres. Håndterer både eksisterende globale 
+        parametere og nye, flate MC-nøkler (f.eks. prod_ og weight_).
         """
         for param_id, new_value in custom_dict.items():
             if param_id in self.global_params:
+                # Hvis det er en eksisterende global parameter, oppdater den i dict-en
                 self.global_params[param_id] = new_value
+            else:
+                # Hvis det er en ny, flat parameter (f.eks. prod_ eller weight_),
+                # legger vi den direkte på objektet slik at .get() finner den!
+                setattr(self, param_id, new_value)

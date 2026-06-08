@@ -46,6 +46,7 @@ def execute_calculations_ag(preloaded_data, current_params, dataset_noise, curre
     _add_N2O_emissions_soil_management_mc(results, preloaded_data, current_params, dataset_noise)
     _add_leaching_soil_management_mc(results, preloaded_data, current_params, dataset_noise)
     _add_leaching_manure_management_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_animal_products_flow_mc(results, preloaded_data, current_params, dataset_noise)
     
     # [Neste strømmer legges til fortløpende her...]
     
@@ -545,6 +546,92 @@ def _add_leaching_manure_management_mc(results, preloaded_data, current_params, 
             'comment': comment,
             'data_sources': data_sources,
         })
+
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+    
+    
+def _add_animal_products_flow_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    MC-VERSJON: Animal products flow.
+    Bruker ferdigfiltrerte FAOSTAT-data fra RAM. Mapper inn unikt støybelagte 
+    N-faktorer direkte fra de flate parameterne i current_params (f.eks. 'prod_Milk').
+    
+    Krasjer med KeyError dersom et produkt mangler i parametergrunnlaget.
+    """
+    flow_code = 'AG.MM-MP.FP-Animal products-Nmix'
+    collected_years = set()
+    data_sources = 'FAOSTAT Crops and livestock products'
+    comment = 'ok (MC-støy lagt på unikt per produkt)'
+
+    # 1. Hent den ferdig slankenede tabellen fra RAM
+    df_fao = preloaded_data.get('fao_animal_production_clean')
+    if df_fao is None:
+        print(f"[ADVARSEL] Mangler fao_animal_production_clean i preloaded_data for {flow_code}.")
+        return
+
+    # 2. Hent datasettstøy for FAOSTAT (Crops and livestock products)
+    key_fao = 'Crops and livestock products'
+    has_noise = dataset_noise and key_fao in dataset_noise
+    noise_val = dataset_noise[key_fao]['value'] if has_noise else 1.0
+    noise_type = dataset_noise[key_fao]['type'] if has_noise else 'perc'
+    
+    # === MIDLERTIDIG DEBUG: Se alle tilgjengelige nøkler ===
+    print("\n" + "="*50)
+    print("[DEBUG] HER ER ALLE NØKLENE SOM FINNES I current_params NÅ:")
+    print(list(current_params.__dict__.keys()))
+    print("="*50 + "\n")
+
+    # 3. Slå opp den flate, perturberte N-prosenten (Krasjer hardt ved manglende data)
+    def get_perturbed_product_frac(item_name):
+        param_key = f"prod_{str(item_name).strip()}"
+        
+        # Siden current_params er et NParameters-objekt, må vi bruke .get()
+        # Vi setter default=None for å fange opp om den faktisk mangler.
+        val = current_params.get(param_key, None)
+        
+        if val is None:
+            raise KeyError(
+                f"[KRITISK FEIL] Produktet '{item_name}' ble funnet i FAOSTAT-dataene, "
+                f"men parameteren '{param_key}' mangler i N_parameters.xlsx (eller ble ikke generert i main_mc.py)!"
+            )
+            
+        return float(val)
+    # 4. Beregn N-mengder vektorisert med .apply()
+    working_df = df_fao.copy()
+    working_df['N_content_percent'] = working_df['Item'].apply(get_perturbed_product_frac)
+    
+    # Verdi (tonn produkt) * N_content_percent / 1e5 = kt N
+    working_df['N_amount_kt'] = working_df['Value'] * working_df['N_content_percent'] / 1.0e5
+
+    # 5. Aggreger per år
+    total_N_per_year = working_df.groupby('Year')['N_amount_kt'].sum().to_dict()
+
+    # 6. Bygg resultatstrukturen for de forventede årene
+    for year in EXPECTED_YEARS:
+        if year in total_N_per_year:
+            collected_years.add(year)
+            base_value = float(total_N_per_year[year])
+            
+            # Påfør asymmetrisk datasettstøy
+            if has_noise:
+                if noise_type == 'perc':
+                    value = base_value * noise_val
+                else:
+                    bound = dataset_noise[key_fao]['upp_bound'] if noise_val >= 0 else dataset_noise[key_fao]['low_bound']
+                    value = base_value + (noise_val * bound)
+            else:
+                value = base_value
+
+            if value < 0: value = 0.0
+
+            results.append({
+                'flow_name': flow_code,
+                'year': year,
+                'value': float(value),
+                'comment': comment,
+                'data_sources': data_sources
+            })
 
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
