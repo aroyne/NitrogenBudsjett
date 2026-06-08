@@ -412,16 +412,36 @@ def find_household_waste(df_05282, df_10514, current_params):
     return household_waste
 
 
-def find_industrial_crop_products(df_gnb_sheet30, current_params):
-    """Henter ut industrielle avlinger med datasettstøy og ekstrapoleringsstøy."""
+import numpy as np
+import pandas as pd
+
+import numpy as np
+import pandas as pd
+
+def find_industrial_crop_products(df_gnb_sheet30, dataset_noise):
+    """
+    Henter ut industrielle avlinger basert på pre-loadet DataFrame.
+    Påfører sentralt trukket datasett- og ekstrapoleringsstøy matematisk korrekt (perc vs abs).
+    """
     year_values = {}
     
-    noise_gnb = float(current_params.get('Gross nutrient balance', 1.0))
-    noise_trend = float(current_params.get('trend interpolation', 1.0))
+    # --- 1. Sjekk og klargjør støy for Gross nutrient balance ---
+    key_gnb = 'Gross nutrient balance'
+    has_noise_gnb = dataset_noise and key_gnb in dataset_noise
+    noise_gnb_val = dataset_noise[key_gnb]['value'] if has_noise_gnb else 1.0
+    noise_gnb_type = dataset_noise[key_gnb]['type'] if has_noise_gnb else 'perc'
     
+    # --- 2. Sjekk og klargjør støy for trendinterpolering ---
+    key_interp = 'trend interpolation'
+    has_noise_interp = dataset_noise and key_interp in dataset_noise
+    noise_interp_val = dataset_noise[key_interp]['value'] if has_noise_interp else 1.0
+    noise_interp_type = dataset_noise[key_interp]['type'] if has_noise_interp else 'perc'
+    
+    # Hent radene direkte basert på posisjon (rad 9 og rad 11 i Excel)
     year_row = df_gnb_sheet30.iloc[8]
     value_row = df_gnb_sheet30.iloc[10]
     
+    # --- 3. Les og påfør støy på ordinære år ---
     for col_idx in range(1, len(df_gnb_sheet30.columns)):
         year_val = year_row.iloc[col_idx]
         val_val = value_row.iloc[col_idx]
@@ -429,20 +449,44 @@ def find_industrial_crop_products(df_gnb_sheet30, current_params):
         if pd.notna(year_val) and pd.notna(val_val) and val_val != '-':
             try:
                 year = int(year_val)
-                value = float(val_val) * 1.0e-3 * noise_gnb
+                base_value = float(val_val) * 1.0e-3  # kg -> kt
+                
+                if has_noise_gnb:
+                    if noise_gnb_type == 'perc':
+                        value = base_value * noise_gnb_val
+                    else:
+                        bound = dataset_noise[key_gnb]['upp_bound'] if noise_gnb_val >= 0 else dataset_noise[key_gnb]['low_bound']
+                        value = base_value + (noise_gnb_val * bound)
+                else:
+                    value = base_value
+                
+                if value < 0:
+                    value = 0.0
+                    
                 year_values[year] = value
             except ValueError:
                 continue
 
-    # Ekstrapolering for hull i tidsserien (2017-2019)
+    # --- 4. Ekstrapolering for hull i tidsserien (2017-2019) ---
     if year_values:
         mean_value = float(np.mean(list(year_values.values())))
+        
         for year in range(2017, 2020):
-            # EKSTRAPOLERT ÅR: Vi ganger det støybelagte gjennomsnittet med noise_trend
-            year_values[year] = mean_value * noise_trend
+            if has_noise_interp:
+                if noise_interp_type == 'perc':
+                    value_interp = mean_value * noise_interp_val
+                else:
+                    bound = dataset_noise[key_interp]['upp_bound'] if noise_interp_val >= 0 else dataset_noise[key_interp]['low_bound']
+                    value_interp = mean_value + (noise_interp_val * bound)
+            else:
+                value_interp = mean_value
+                
+            if value_interp < 0:
+                value_interp = 0.0
+                
+            year_values[year] = value_interp
             
     return year_values
-
 
 def find_industrial_round_wood(df_conifer_year, df_nonconifer_year, current_params, expected_years):
     """Beregner industrirundvirke med kildestøy fra FAOSTAT."""
@@ -600,61 +644,62 @@ def find_landfill_emissions_to_water(df_uts, df_tilk, current_params):
     return dict_tilkoblet, dict_ikke        
     
     
-def find_non_edible_animal_products(df_faostat, df_wool, df_sheep, current_params):
+def find_non_edible_animal_products(df_hides_clean, df_wool, df_sheep, current_params, dataset_noise):
     """
-    Beregner nitrogen i ikke-spiselige animalske produkter (huder og ull).
-    Henter alt av støyfaktorer og parametertabeller utelukkende fra current_params.
+    MC-VERSJON: Beregner nitrogen i ikke-spiselige animalske produkter (huder og ull) lynraskt.
+    Bruker ferdigfiltrerte data fra RAM, flate rundenøkler og asymmetrisk kildestøy.
     """
     year_values = {}
     
-    # 1. Hent ut kildestøy og trendstøy fra denne MC-runden
-    noise_faostat = float(current_params.get('faostat', 1.0))
-    noise_ssb     = float(current_params.get('ssb', 1.0))
-    noise_wool    = float(current_params.get('landbruksdirektoratet', current_params.get('wool_data', 1.0)))
-    noise_trend   = float(current_params.get('trend interpolation', 1.0))
+    # 1. Hent ut den asymmetriske datasettstøyen fra denne MC-runden (hvis den finnes, ellers 1.0)
+    has_fao = dataset_noise and 'Crops and livestock products' in dataset_noise
+    noise_faostat = dataset_noise['Crops and livestock products']['value'] if has_fao else 1.0
+
+    has_03710 = dataset_noise and '03710' in dataset_noise
+    noise_ssb = dataset_noise['03710']['value'] if has_03710 else 1.0
+
+    has_wool = dataset_noise and 'Landbruksdirektoratet_wool' in dataset_noise
+    noise_wool = dataset_noise['Landbruksdirektoratet_wool']['value'] if has_wool else 1.0
+
+    # Trendstøy (hvis definert i dataset_noise, ellers 1.0)
+    noise_trend = 1.0
+    if dataset_noise and 'trend interpolation' in dataset_noise:
+        noise_trend = dataset_noise['trend interpolation']['value']
+
+    # 2. Hent støybelagte parametere fra current_params (krasjer hardt om de mangler)
+    N_content_hides = current_params.get('prod_Raw hides and skins', None)
+    wool_pr_sheep = current_params.get('wool_per_sheep', None)
+    N_content_wool = current_params.get('wool_N_frac', None)
     
-    # 2. Hent støybelagt parameter for Huder (Raw hides and skins) fra tabellen i current_params
-    try:
-        N_table = current_params['animal_products']
-        N_table_indexed = N_table.set_index('item')
-        N_content_hides = float(N_table_indexed.loc['Raw hides and skins', 'N_content_percent'])
-    except Exception:
-        # Failsafe i tilfelle tabelloppslaget mot formodning skulle feile
-        N_content_hides = 11.0
+    if N_content_hides is None or wool_pr_sheep is None or N_content_wool is None:
+        raise KeyError(
+            f"[KRITISK FEIL] Mangler parametere for ikke-spiselige produkter i current_params! "
+            f"(prod_Raw hides and skins: {N_content_hides}, wool_per_sheep: {wool_pr_sheep}, wool_N_frac: {N_content_wool})"
+        )
 
-    # 3. Parameterstøy for Ull (hentes direkte fra rundenøkler i current_params)
-    wool_pr_sheep  = float(current_params.get('wool_per_sheep', 2.3))
-    N_content_wool = float(current_params.get('wool_N_frac', 0.12))
+    # 3. Beregn N-mengde for huder og legg på kildestøy
+    df_hides = df_hides_clean.copy()
+    df_hides['N_amount'] = df_hides['Value'] * float(N_content_hides) * 1e-5 * float(noise_faostat)
+    total_N_per_year = df_hides.groupby('Year')['N_amount'].sum().to_dict()
 
-    # 4. Prosesser FAOSTAT huder
-    filtered_fao = df_faostat[
-        (df_faostat['Element'] == 'Production') & 
-        (df_faostat['Value'] != 0) & 
-        df_faostat['Item'].str.contains('hides', case=False, na=False)
-    ].copy()
-    
-    # Beregn N-mengde for huder (tonn til kilotonn * 1e-5 fordi N_content er i %) og legg på kildestøy
-    filtered_fao['N_amount'] = filtered_fao['Value'] * N_content_hides * 1e-5 * noise_faostat
-    total_N_per_year = filtered_fao.groupby('Year')['N_amount'].sum().to_dict()
-
-    # 5. Loop over alle år og legg til ull
+    # 4. Løp gjennom årene og legg til ull
     for year in range(1990, 2024):
         value = total_N_per_year.get(year, 0.0)
         
         if year > 2004 and year != 2001:
-            # Rapporterte ulldata + kildestøy
+            # Bruk rapporterte ulldata + kildestøy
             wool_row = df_wool[df_wool['år'] == year]
             if not wool_row.empty:
-                value += float(wool_row['ull'].iloc[0]) * N_content_wool * noise_wool
+                value += float(wool_row['ull'].iloc[0]) * float(N_content_wool) * float(noise_wool)
                 
         elif year != 2001:
-            # Ekstrapolerte ulldata basert på SSB dyretall + ssb-kildestøy
+            # Bruk ekstrapolerte ulldata basert på SSB-sauetall + ssb-kildestøy
             sheep_row = df_sheep[df_sheep['År'] == year]
             if not sheep_row.empty:
-                value += float(sheep_row['Husdyr (sau)'].iloc[0]) * wool_pr_sheep * N_content_wool * 1e-6 * noise_ssb
+                value += float(sheep_row['Husdyr (sau)'].iloc[0]) * float(wool_pr_sheep) * float(N_content_wool) * 1e-6 * float(noise_ssb)
                 
         else:
-            # Interpolering for 2001 (mangler SSB-data) + trendstøy
+            # Interpolering for 2001 + ssb-støy * trendstøy
             sheep_prev = df_sheep[df_sheep['År'] == year-1]
             sheep_next = df_sheep[df_sheep['År'] == year+1]
             if not sheep_prev.empty and not sheep_next.empty:
@@ -662,12 +707,11 @@ def find_non_edible_animal_products(df_faostat, df_wool, df_sheep, current_param
                     float(sheep_prev['Husdyr (sau)'].iloc[0]) +
                     float(sheep_next['Husdyr (sau)'].iloc[0])
                 )
-                value += (avg_sheep * wool_pr_sheep * N_content_wool * 1e-6 * noise_ssb) * noise_trend
+                value += (avg_sheep * float(wool_pr_sheep) * float(N_content_wool) * 1e-6 * float(noise_ssb)) * float(noise_trend)
                 
         year_values[year] = value
         
     return year_values
-
 
 def find_other_goods_export(prepared_trade_data, current_params, trade_params):
     """

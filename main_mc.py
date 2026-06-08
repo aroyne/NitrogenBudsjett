@@ -68,14 +68,13 @@ def draw_from_pert(low, likely, high):
     return low + np.random.beta(alpha, beta) * range_val
 
 
-def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_trade_params=None, df_animal_weights=None, is_deterministic=False):
+def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_animal_products_static, df_trade_params=None, df_animal_weights=None, is_deterministic=False):
     """
     Trekker globale parametere, genererer unike støyfaktorer for datasettene,
-    OG genererer unike perturberte N-faktorer for handelsvarer (trade_parameters).
-    Isolerer alle endringer ved å bruke .copy() og reset_index() for å unngå KeyError.
+    OG genererer unike perturberte N-faktorer for handelsvarer, dyrevekter og dyreprodukter.
+    Alt samles som flate nøkler inni custom_dict som sendes til base_params.
     """
-    
-    # --- ROBUST IDENTIFIKASJON AV ID FOR HANDELSDATA (Del 3) ---
+    # --- ROBUST IDENTIFIKASJON AV ID FOR HANDELSDATA ---
     pid_col = None
     df_trade_local = None
     if df_trade_params is not None:
@@ -100,18 +99,33 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_trade_pa
         if df_trade_local is not None and pid_col is not None:
             keys = df_trade_local[pid_col].astype(str).str.strip()
             static_trade = dict(zip(keys, df_trade_local['value']))
+            
+        custom_dict = {}
+        
+        # Flate ut animal_weights deterministisk (Lik original)
+        if df_animal_weights is not None:
+            for _, row in df_animal_weights.iterrows():
+                t_id = f"weight_{str(row.name).strip()}" if df_animal_weights.index.name == 'item_name' else f"weight_{str(row['item_name']).strip()}"
+                custom_dict[t_id] = float(row['avg_weight_kg'])
+                
+        # Flate ut animal_products deterministisk (Nye harmoniserte måten)
+        if df_animal_products_static is not None:
+            for _, row in df_animal_products_static.iterrows():
+                p_id = f"prod_{str(row['item']).strip()}"
+                custom_dict[p_id] = float(row['N_content_percent'])
+        
+        base_params.override_global_params(custom_dict)
+
         return base_params, {}, static_trade
         
     # --- 1. GLOBALE PARAMETERE ---
     custom_dict = {}
     df_perturbed = df_global.copy()
     
-    # SIKKERHETSSJEKK: Hvis param_id ligger i indeksen på df_global, flytt den til kolonne!
     global_idx_name = str(df_perturbed.index.name).lower().strip() if df_perturbed.index.name else ''
     if global_idx_name in ['param_id', 'parameter_id', 'id'] or 'param_id' not in df_perturbed.columns:
         df_perturbed = df_perturbed.reset_index()
     
-    # Finn nøyaktig kolonnenavn for param_id i df_global
     global_pid_col = 'param_id'
     for c in df_perturbed.columns:
         if str(c).lower().strip() in ['param_id', 'parameter_id', 'id']:
@@ -119,7 +133,7 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_trade_pa
             break
     
     for idx, row in df_perturbed.iterrows():
-        pid = row[global_pid_col] # Bruker det dynamisk funnede kolonnenavnet
+        pid = row[global_pid_col]
         val = float(row['value'])
         low_b = row['lower_bound']
         upp_b = row['upper_bound']
@@ -158,7 +172,6 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_trade_pa
         custom_dict[pid] = chosen_val
         df_perturbed.at[idx, 'value'] = chosen_val
         
-    base_params.override_global_params(custom_dict)
     if hasattr(base_params, '_tables') and 'global_parameters' in base_params._tables:
         base_params._tables['global_parameters'] = df_perturbed
     elif hasattr(base_params, 'tables') and 'global_parameters' in base_params.tables:
@@ -227,26 +240,23 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_trade_pa
                 std_dev = (low_b + upp_b) / 2.0 / 1.96
 
             if 'pert' in dist_type:
-                chosen_val = draw_from_pert(abs_min, val, abs_max)
+                noise_val = draw_from_pert(abs_min, val, abs_max)
             elif 'log' in dist_type:
                 cv = std_dev / val if val > 0 else 0.1
                 sigma_log = np.sqrt(np.log(1 + cv**2))
                 mu_log = np.log(val) - (sigma_log ** 2) / 2
-                chosen_val = np.random.lognormal(mu_log, sigma_log)
+                noise_val = np.random.lognormal(mu_log, sigma_log)
             else:
-                chosen_val = np.random.normal(val, std_dev)
+                noise_val = np.random.normal(val, std_dev)
 
-            if val >= 0 and chosen_val < 0:
-                chosen_val = 0.0
+            if val >= 0 and noise_val < 0:
+                noise_val = 0.0
                 
-            trade_noise_dict[t_id] = chosen_val
+            trade_noise_dict[t_id] = noise_val
             
-    # 4. PERTURBERING AV ANIMAL WEIGHTS ---
-    # Vi lagrer de ferdig-trekte vektene direkte inn i custom_dict (som overstyrer globale parametere),
-    # eller vi kan returnere en egen ordbok. Siden de fungerer som parametere, legger vi dem i custom_dict!
+    # --- 4. PERTURBERING AV ANIMAL WEIGHTS ---
     if df_animal_weights is not None:
         for _, row in df_animal_weights.iterrows():
-            # Vi antar indeksen er 'item_name' etter vaskingen i main_mc, eller henter kolonne:
             t_id = f"weight_{str(row.name).strip()}" if df_animal_weights.index.name == 'item_name' else f"weight_{str(row['item_name']).strip()}"
             val = float(row['avg_weight_kg'])
             low_b = float(row['low_bound']) if 'low_bound' in row and not pd.isna(row['low_bound']) else 0.0
@@ -267,7 +277,6 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_trade_pa
                 abs_max = val + upp_b
                 std_dev = (low_b + upp_b) / 2.0 / 1.96
 
-            # Trekk fra riktig distribusjon
             if 'pert' in dist_type:
                 chosen_val = draw_from_pert(abs_min, val, abs_max)
             elif 'log' in dist_type:
@@ -281,16 +290,33 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_trade_pa
             if val >= 0 and chosen_val < 0:
                 chosen_val = 0.0
                 
-            # Dytt den perturberte verdien inn i den globale parameterordboken!
             custom_dict[t_id] = chosen_val
 
-    # Oppdater base_params til å inneholde både de globale parametere og de perturberte dyrevektene
+    # --- 5. PERTURBERING AV ANIMAL PRODUCTS (NÅ HELT LIK SOM VEKTER) ---
+    if df_animal_products_static is not None:
+        for _, row in df_animal_products_static.iterrows():
+            p_id = f"prod_{str(row['item']).strip()}"
+            base_val = float(row['N_content_percent'])
+            dist_type = str(row.get('distribution_type', 'norm')).strip().lower()
+            u_val = float(row.get('upper_bound', 0.0)) / 100.0
+            
+            if u_val > 0:
+                if dist_type == 'unif':
+                    perturbed_val = base_val * np.random.uniform(1.0 - u_val, 1.0 + u_val)
+                else:
+                    perturbed_val = base_val * np.random.normal(1.0, u_val)
+            else:
+                perturbed_val = base_val
+            
+            if perturbed_val < 0: 
+                perturbed_val = 0.0
+            
+            custom_dict[p_id] = perturbed_val
+
+    # Send alle flate parametere inn sentralt
     base_params.override_global_params(custom_dict)
-    
+        
     return base_params, dataset_noise_dict, trade_noise_dict
-
-    return base_params, dataset_noise_dict, trade_noise_dict
-
 
 def write_mc_flows_to_international_report(summary_df):
     """
@@ -412,6 +438,14 @@ def main():
         print(f"[ADVARSEL] Fant ikke 'animal_weights' i base_params. Setter til None: {e}")
         df_animal_weights = None
         
+    # Hent animal_products tabellen fra base_params
+    print("[INFO] Henter animal_products tabell fra base_params...")
+    try:
+        df_animal_products_static = base_params.get_table('animal_products')
+    except Exception as e:
+        print(f"[KRITISK FEIL] Fant ikke 'animal_products' i base_params: {e}")
+        df_animal_products_static = None
+        
     # Sikkerhetssjekk og mapping for handelsdata
     if 'trade_params' not in preloaded_data:
         preloaded_data['trade_params'] = base_params.get_trade_params()
@@ -457,11 +491,11 @@ def main():
                 base_params, 
                 df_global_static, 
                 df_dataset_uncertainties,
+                df_animal_products_static,
                 df_trade_params=df_trade_params,
+                df_animal_weights=df_animal_weights,  # <-- LEGG TIL DENNE
                 is_deterministic=True
             )
-            # Dobbeltsjekk at current_params faktisk overskriver med det rene base_params
-            current_params = base_params
             dataset_noise = {}        
         else:
             # Følgende runder: Generer stokastisk støy
@@ -470,9 +504,11 @@ def main():
                 base_params, 
                 df_global_static, 
                 df_dataset_uncertainties,
+                df_animal_products_static,
                 df_trade_params=df_trade_params,
+                df_animal_weights=df_animal_weights,  # <-- LEGG TIL DENNE
                 is_deterministic=(i==0)
-            )        
+            )
             
         iteration_output = {}
         
@@ -484,6 +520,13 @@ def main():
         if 'rw' in selected_pools:
             from calculations.rw_mc import execute_calculations_rw  # Sjekk at funksjonsnavnet stemmer
             iteration_output['rw'] = execute_calculations_rw(preloaded_data, current_params, dataset_noise, current_trade_factors)
+            
+        if 'ag' in selected_pools:
+            from calculations.ag_mc import execute_calculations_ag  # Sjekk at funksjonsnavnet stemmer
+            iteration_output['ag'] = execute_calculations_ag(preloaded_data, current_params, dataset_noise, current_trade_factors)
+            
+            from calculations.ag_mc import execute_calculations_ag  # Sjekk at funksjonsnavnet stemmer
+            iteration_output['ag'] = execute_calculations_ag(preloaded_data, current_params, dataset_noise, current_trade_factors)
             
         # (Her legger du inn de andre poolene etter hvert: if 'rw' in selected_pools... osv.)
 

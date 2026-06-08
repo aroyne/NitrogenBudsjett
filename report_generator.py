@@ -66,7 +66,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         f.write("Welcome to the interactive data and documentation portal for the Norwegian national nitrogen budget. ")
         f.write("This platform visualizes and centralizes the outputs from our Monte Carlo uncertainty analysis simulations.\n\n")
         f.write("Use the navigation menu on the left side to explore the individual nitrogen pools ")
-        f.write("(e.g., Atmosphere, Rest of the World) and access detailed statistical time-series graphs, ")
+        f.write("(e.g., Agriculture, Atmosphere, Rest of the World) and access detailed statistical time-series graphs, ")
         f.write("methodological explanations, and parameterizations for each specific flow.\n")
 
     # Hjelpefunksjon for å legge til BibTeX-referanser i bunnen av filene
@@ -120,7 +120,6 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         norm = filename.lower().replace('-', '').replace('_', '').replace('.', '')
         full_flow_path = os.path.join(at_folder, flow_file_name)
 
-        # Sett standardverdier først i tilfelle ingen treffer
         exact_flow_code, display_name = "AT.AT-Unknown-Flow", "Unknown Atmospheric Flow"
         
         if "agsm" in norm and "fixation" in norm: exact_flow_code, display_name = "AT.AT-AG.SM-Biological N2 fixation-N2", "Biological N2 Fixation (Agricultural Soils)"
@@ -165,9 +164,8 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
 
             append_bibtex_references(f)
 
-
     # ========================================================
-    # 4. NYTT: OPPRETT UNDERMAPPE FOR REST OF THE WORLD (RW) POOL
+    # 3. OPPRETT UNDERMAPPE FOR REST OF THE WORLD (RW) POOL
     # ========================================================
     rw_folder = "rest_of_the_world_pool"
     os.makedirs(rw_folder, exist_ok=True)
@@ -199,7 +197,6 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         exact_flow_code = "RW.RW-Unknown-Flow"
         description = ""
 
-# Mapping for Rest of the World-strømmer basert på filnavn
         if "feed" in norm and "aquaculture" in norm:
             exact_flow_code = "RW.RW-HY.AC-Aquaculture feed import-Nmix"
             display_name = "Aquaculture Feed Import"
@@ -302,4 +299,171 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
 
             append_bibtex_references(f)
 
-    print(f"[SUKSESS] Portalen er oppdatert med referanser fra '{bib_filename}' samt ny RW-modul!")
+# ========================================================
+    # 4. OPPRETT HIERARKISK PORTAL FOR AGRICULTURE (AG) POOL
+    # ========================================================
+    ag_folder = "agriculture_pool"
+    os.makedirs(ag_folder, exist_ok=True)
+
+    # 4a. Hovedside for Agriculture (Grandparent)
+    with open(os.path.join(ag_folder, "pool_agriculture.md"), 'w', encoding='utf-8') as f:
+        f.write("---\n")
+        f.write("layout: default\n")
+        f.write("title: Agriculture (AG)\n") # <--- Dette er Grandparent-tittelen
+        f.write("nav_order: 4\n")
+        f.write("has_children: true\n")
+        f.write("---\n\n")
+        f.write("# Pool: Agriculture (AG)\n\n")
+        f.write("Because biofuel production in Norway is typically done as part of the waste management sector, ")
+        f.write("flows of agricultural wastes to biofuel production are directed to PR.SO and we do not include the subpool AG.BC.\n\n")
+        f.write("This pool is divided into two operational sub-pools. Explore them using the side menu or links below:\n\n")
+        f.write("* [Manure Management (AG.MM)](subpool_manure_management.html)\n")
+        f.write("* [Soil Management (AG.SM)](subpool_soil_management.html)\n")
+
+    # 4b. Sub-hovedside for Manure Management (Parent 1)
+    with open(os.path.join(ag_folder, "subpool_manure_management.md"), 'w', encoding='utf-8') as f:
+        f.write("---\n")
+        f.write("layout: default\n")
+        f.write("title: Manure Management (AG.MM)\n") # <--- Denne må matche 'parent' under eksakt
+        f.write("parent: Agriculture (AG)\n")
+        f.write("nav_order: 1\n")
+        f.write("has_children: true\n") # <--- VIKTIG: Denne må være true for å vise plottene
+        f.write("---\n\n")
+        f.write("# Subpool: Manure management, storage and animal husbandry (AG.MM)\n\n")
+        f.write("### Flows that are zero or neglected:\n\n")
+        f.write("* **AG.MM-RW.RW-Manure export-Nmix** is assumed small and neglected.\n")
+
+    # 4c. Sub-hovedside for Soil Management (Parent 2)
+    with open(os.path.join(ag_folder, "subpool_soil_management.md"), 'w', encoding='utf-8') as f:
+        f.write("---\n")
+        f.write("layout: default\n")
+        f.write("title: Soil Management (AG.SM)\n") # <--- Denne må matche 'parent' under eksakt
+        f.write("parent: Agriculture (AG)\n")
+        f.write("nav_order: 2\n")
+        f.write("has_children: true\n") # <--- VIKTIG: Denne må være true for å vise plottene
+        f.write("---\n\n")
+        f.write("# Subpool: Soil management (AG.SM)\n\n")
+        f.write("### Flows that are zero or neglected:\n\n")
+        f.write("* **AG.SM-HY.SW-Overland flow-Nmix** is not included because all runoff and leaching is included in Leaching.\n")
+
+# 4d. Sorter og generer filer for aktive flomplot under AG
+    ag_mm_counter = 1
+    ag_sm_counter = 1
+
+    for filename in plot_files:
+        # Siden filnavnene starter med understrek: AG_MM_... eller AG_SM_...
+        if not (filename.upper().startswith("AG_MM_") or filename.upper().startswith("AG_SM_")):
+            continue
+
+        # Lag markdown-filnavn ved å fjerne .png/.PNG trygt
+        base_name = filename.rsplit('.', 1)[0]
+        flow_file_name = f"flow_{base_name}.md"
+        full_flow_path = os.path.join(ag_folder, flow_file_name)
+
+        # Lag en "vasket" versjon for å sjekke unike nøkkelord i resten av filnavnet
+        norm = filename.lower().replace('-', '').replace('_', '').replace('.', '')
+
+        exact_flow_code = "AG-Unknown-Flow"
+        display_name = "Unknown Agricultural Flow"
+        parent_subpool = ""
+        description = ""
+
+        # MAPPING FOR MANURE MANAGEMENT (AG.MM)
+        if filename.upper().startswith("AG_MM_"):
+            parent_subpool = "Manure Management (AG.MM)"
+            if "application" in norm:
+                exact_flow_code = "AG.MM-AG.SM-Manure application-Nmix"
+                display_name = "Manure Application"
+                description = "Taken from EUROSTAT Gross nutrient balance as advised by Schäppi (2025) [^schappi_annexes_2025]. We interpolate the missing values between 2016 and 2020."
+            elif "n2o" in norm:
+                exact_flow_code = "AG.MM-AT.AT-Emissions-N2O"
+                display_name = "Manure Emissions (N2O)"
+                description = "Taken from UNFCCC Common reporting tables, Table 3."
+            elif "nh3" in norm:
+                exact_flow_code = "AG.MM-AT.AT-Emissions-NH3"
+                display_name = "Manure Emissions (NH3)"
+                description = "We have used data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 29."
+            elif "nox" in norm:
+                exact_flow_code = "AG.MM-AT.AT-Emissions-NOx"
+                display_name = "Manure Emissions (NOx)"
+                description = "We have used data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 29."
+            elif "leaching" in norm:
+                exact_flow_code = "AG.MM-HY.SW-Leaching-Nmix"
+                display_name = "Manure Leaching"
+                description = "Taken from UNFCCC Common reporting tables, Table 3."
+            elif "product" in norm and "nonedible" not in norm and "op" not in norm:
+                exact_flow_code = "AG.MM-MP.FP-Animal products-Nmix"
+                display_name = "Animal Products"
+                description = "Taken from FAOSTAT Crops and livestock products, with N contents taken from Schäppi (2025) [^schappi_annexes_2025]."
+            elif "nonedible" in norm or "wool" in norm or ("animal" in norm and "op" in norm):
+                exact_flow_code = "AG.MM-MP.OP-Non-edible animal products-Nmix"
+                display_name = "Non-edible Animal Products"
+                description = "Schäppi (2025) [^schappi_annexes_2025] advises using FAOSTAT Commodity Balances (non-food). For Norway this statistic only contains wool for 4 individual years and we therefore use data for wool from Landbruksdirektoratet (2025c) for 2005-2024; for earlier years, we use the number of sheep (SSB table 03710) and extrapolate from a linear regression found between sheep and wool for 2005-2024. In addition, we use numbers for raw hides and skins from FAOSTAT Crops and livestock products. N contents are taken from Schäppi (2025) [^schappi_annexes_2025]."
+            elif "export" in norm or "live" in norm:
+                exact_flow_code = "AG.MM-RW.RW-Live animal export-Nmix"
+                display_name = "Live Animal Export"
+                description = "Taken from FAOSTAT Crop and livestock products, assuming typical weights of animals from various sources, average 13 % protein in whole animal from FAO (FAO, 1953) and Jones factor 6.25 for nitrogen to protein (standard)."
+
+        # MAPPING FOR SOIL MANAGEMENT (AG.SM)
+        elif filename.upper().startswith("AG_SM_"):
+            parent_subpool = "Soil Management (AG.SM)"
+            if "fodder" in norm or "grass" in norm:
+                exact_flow_code = "AG.SM-AG.MM-Fodder crops-Nmix"
+                display_name = "Fodder Crops Production"
+                description = "We have used data for grass and fodder production from SSB table 13648 «Avling i jordbruket (1000 tonn) og avling per dekar (kg), etter ymse jordbruksvekstar (F) 2021 – 2024» and 05772 «Avling i jordbruket, etter ymse jordbruksvekstar (1 000 tonn) (F) (avslutta serie) 2000 – 2020». Values prior to 2000 are found in the SSB Jordbruksstatistikk (Table 2.1/Table 20). The protein content of grass and fodder is known to be highly variable. We have assumed a protein content of 15 % based on 2025 analyses of 13 000 grass samples from all over Norway by Tine/NorFor, and 15 % N in protein (FAO, 2003).\n\nHohmann-Marriott (2025) used similar data sources but arrived at a smaller N flow (40- 45 ktN) using a protein content of 8 % and N content in protein of 15 % (Table S2)."
+            elif "n2" in norm and "n2o" not in norm:
+                exact_flow_code = "AG.SM-AT.AT-Emissions-N2"
+                display_name = "Soil Emissions (N2 Denitrification)"
+                description = "Schäppi (2025) [^schappi_annexes_2025] recommends using a value of 14 kgN/ha/year for denitrification if no other data are available. Together with a total agricultural area of 1 132 693 ha (NIBIO, 2026) this gives around 16 ktN/year."
+            elif "n2o" in norm:
+                exact_flow_code = "AG.SM-AT.AT-Emissions-N2O"
+                display_name = "Soil Emissions (N2O)"
+                description = "Taken from UNFCCC Common reporting tables, Table 3."
+            elif "nh3" in norm:
+                exact_flow_code = "AG.SM-AT.AT-Emissions-NH3"
+                display_name = "Soil Emissions (NH3)"
+                description = "We have used data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 30."
+            elif "nox" in norm:
+                exact_flow_code = "AG.SM-AT.AT-Emissions-NOx"
+                display_name = "Soil Emissions (NOx)"
+                description = "We have used data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 30."
+            elif "leaching" in norm:
+                exact_flow_code = "AG.SM-HY.SW-Leaching-Nmix"
+                display_name = "Soil Leaching"
+                description = "Taken from UNFCCC Common reporting tables, Table 3. The data agrees within the error range with what is reported in the TEOTIL3 model (Sample et al., 2024)."
+            elif "food" in norm or "crop" in norm:
+                exact_flow_code = "AG.SM-MP.FP-Food crop products-Nmix"
+                display_name = "Food Crop Products"
+                description = "Taken from EUROSTAT Gross nutrient balance as advised by Schäppi (2025) [^schappi_annexes_2025]: «Nutrient removal by harvest of crops» minus «Industrial crops». «Ornamental crops», which should also be removed, are negligible in Norway. For years with missing data, we have filled in the average of all other years."
+            elif "industrial" in norm or "use" in norm or ("crop" in norm and "op" in norm):
+                exact_flow_code = "AG.SM-MP.OP-Crop products for industrial use-Nmix"
+                display_name = "Crop Products Use"
+                description = "Taken from EUROSTAT Gross nutrient balance as advised by Schäppi (2025) [^schappi_annexes_2025]. For years with missing data, we have filled in the average of all other years."
+
+        # Generer filen dersom den ble matchet
+        if parent_subpool:
+            with open(full_flow_path, 'w', encoding='utf-8') as f:
+                f.write("---\n")
+                f.write("layout: default\n")
+                f.write(f"title: {display_name}\n")
+                f.write(f"parent: {parent_subpool}\n")
+                f.write(f"grand_parent: Agriculture (AG)\n")
+                
+                if filename.upper().startswith("AG_MM_"):
+                    f.write(f"nav_order: {ag_mm_counter}\n")
+                    ag_mm_counter += 1
+                else:
+                    f.write(f"nav_order: {ag_sm_counter}\n")
+                    ag_sm_counter += 1
+                    
+                f.write("---\n\n")
+                f.write(f"# {display_name}\n\n")
+                f.write(f"![{exact_flow_code}](../{plot_dir}/{filename})\n\n")
+                f.write("### Flow Description\n")
+                if description:
+                    f.write(f"{description}\n\n")
+                else:
+                    f.write(f"*Flow details detected for agricultural file: `{filename}`.*\n\n")
+
+                append_bibtex_references(f)                
+    print(f"[SUKSESS] Portalen er oppdatert med det dype hierarkiet for Agriculture (AG.MM og AG.SM)!")
