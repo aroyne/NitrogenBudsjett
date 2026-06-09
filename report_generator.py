@@ -41,6 +41,21 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         "for estimating biome-dependent N deposition rates."
     )
 
+    # HELPEFUNKSJON: Sjekker om et spesifikt balanseplott eksisterer
+    def get_balance_image_markdown(pool_code, relative_depth=""):
+        """Returnerer bilde-markdown hvis balanseplottet eksisterer, ellers tom streng."""
+        balance_file = f"balance_{pool_code.replace('.', '_')}.png"
+        if balance_file in plot_files:
+            return (
+                f"\n---\n\n"
+                f"## Mass Balance Overview (1990-2023)\n\n"
+                f"The chart below illustrates the integrated nitrogen mass balance for **{pool_code}**. "
+                f"It includes total system inflows (positive stack), total outflows (negative stack), "
+                f"and the net balance line with estimated uncertainty bounds (±1σ).\n\n"
+                f"![Mass Balance {pool_code}]({relative_depth}{plot_dir}/{balance_file})\n"
+            )
+        return ""
+
     # ========================================================
     # 1. GENERER HOVEDLANDINGSSIDEN (index.md) - MED ADVARSEL
     # ========================================================
@@ -110,6 +125,9 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         f.write("---\n\n")
         f.write("# Pool: Atmosphere (AT)\n\n")
         f.write("This section contains all documented nitrogen flows leaving the Atmosphere pool.\n")
+        
+        # INJEKSJON AV AT-BALANSEPLOTT (Hopp opp ett nivå, ../, siden filen ligger i en undermappe)
+        f.write(get_balance_image_markdown("AT", relative_depth="../"))
 
     menu_counter = 1
     for filename in plot_files:
@@ -180,7 +198,11 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         f.write("# Pool: Rest of the world (RW)\n\n")
         f.write("This section contains all documented nitrogen inflows and transfers originating from the Rest of the world (RW) pool. ")
         f.write("Click on the individual sub-flows in the left-hand menu to view graphs and methodological explanations.\n\n")
-        f.write("### Flows that are zero or neglected:\n\n")
+        
+        # INJEKSJON AV RW-BALANSEPLOTT
+        f.write(get_balance_image_markdown("RW", relative_depth="../"))
+        
+        f.write("\n### Flows that are zero or neglected:\n\n")
         f.write("* **RW.RW-MP.FP-Sea fish (landings)-Nmix** is set to zero because all wild fish catch is accounted for under HY.\n")
         f.write("* **RW.RW-AG.SM-Manure import-Nmix** is assumed small and neglected as advised by Schäppi (2025) [^schappi_annexes_2025].\n")
         f.write("* **RW.RW-HY.SW-Import of surface water-Nmix** are assumed negligible due to Norwegian topography.\n")
@@ -299,7 +321,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
 
             append_bibtex_references(f)
 
-# ========================================================
+    # ========================================================
     # 4. OPPRETT HIERARKISK PORTAL FOR AGRICULTURE (AG) POOL
     # ========================================================
     ag_folder = "agriculture_pool"
@@ -309,7 +331,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
     with open(os.path.join(ag_folder, "pool_agriculture.md"), 'w', encoding='utf-8') as f:
         f.write("---\n")
         f.write("layout: default\n")
-        f.write("title: Agriculture (AG)\n") # <--- Dette er Grandparent-tittelen
+        f.write("title: Agriculture (AG)\n")
         f.write("nav_order: 4\n")
         f.write("has_children: true\n")
         f.write("---\n\n")
@@ -319,48 +341,55 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         f.write("This pool is divided into two operational sub-pools. Explore them using the side menu or links below:\n\n")
         f.write("* [Manure Management (AG.MM)](subpool_manure_management.html)\n")
         f.write("* [Soil Management (AG.SM)](subpool_soil_management.html)\n")
+        
+        # INJEKSJON AV OVERORDNET AG-BALANSEPLOTT
+        f.write(get_balance_image_markdown("AG", relative_depth="../"))
 
     # 4b. Sub-hovedside for Manure Management (Parent 1)
     with open(os.path.join(ag_folder, "subpool_manure_management.md"), 'w', encoding='utf-8') as f:
         f.write("---\n")
         f.write("layout: default\n")
-        f.write("title: Manure Management (AG.MM)\n") # <--- Denne må matche 'parent' under eksakt
+        f.write("title: Manure Management (AG.MM)\n")
         f.write("parent: Agriculture (AG)\n")
         f.write("nav_order: 1\n")
-        f.write("has_children: true\n") # <--- VIKTIG: Denne må være true for å vise plottene
+        f.write("has_children: true\n")
         f.write("---\n\n")
         f.write("# Subpool: Manure management, storage and animal husbandry (AG.MM)\n\n")
-        f.write("### Flows that are zero or neglected:\n\n")
+        
+        # INJEKSJON AV AG.MM-BALANSEPLOTT
+        f.write(get_balance_image_markdown("AG.MM", relative_depth="../"))
+        
+        f.write("\n### Flows that are zero or neglected:\n\n")
         f.write("* **AG.MM-RW.RW-Manure export-Nmix** is assumed small and neglected.\n")
 
     # 4c. Sub-hovedside for Soil Management (Parent 2)
     with open(os.path.join(ag_folder, "subpool_soil_management.md"), 'w', encoding='utf-8') as f:
         f.write("---\n")
         f.write("layout: default\n")
-        f.write("title: Soil Management (AG.SM)\n") # <--- Denne må matche 'parent' under eksakt
+        f.write("title: Soil Management (AG.SM)\n")
         f.write("parent: Agriculture (AG)\n")
         f.write("nav_order: 2\n")
-        f.write("has_children: true\n") # <--- VIKTIG: Denne må være true for å vise plottene
+        f.write("has_children: true\n")
         f.write("---\n\n")
         f.write("# Subpool: Soil management (AG.SM)\n\n")
-        f.write("### Flows that are zero or neglected:\n\n")
+        
+        # INJEKSJON AV AG.SM-BALANSEPLOTT
+        f.write(get_balance_image_markdown("AG.SM", relative_depth="../"))
+        
+        f.write("\n### Flows that are zero or neglected:\n\n")
         f.write("* **AG.SM-HY.SW-Overland flow-Nmix** is not included because all runoff and leaching is included in Leaching.\n")
 
-# 4d. Sorter og generer filer for aktive flomplot under AG
+    # 4d. Sorter og generer filer for aktive flomplot under AG
     ag_mm_counter = 1
     ag_sm_counter = 1
 
     for filename in plot_files:
-        # Siden filnavnene starter med understrek: AG_MM_... eller AG_SM_...
         if not (filename.upper().startswith("AG_MM_") or filename.upper().startswith("AG_SM_")):
             continue
 
-        # Lag markdown-filnavn ved å fjerne .png/.PNG trygt
         base_name = filename.rsplit('.', 1)[0]
         flow_file_name = f"flow_{base_name}.md"
         full_flow_path = os.path.join(ag_folder, flow_file_name)
-
-        # Lag en "vasket" versjon for å sjekke unike nøkkelord i resten av filnavnet
         norm = filename.lower().replace('-', '').replace('_', '').replace('.', '')
 
         exact_flow_code = "AG-Unknown-Flow"
@@ -466,4 +495,5 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
                     f.write(f"*Flow details detected for agricultural file: `{filename}`.*\n\n")
 
                 append_bibtex_references(f)                
-    print(f"[SUKSESS] Portalen er oppdatert med det dype hierarkiet for Agriculture (AG.MM og AG.SM)!")
+                
+    print(f"[SUKSESS] Portalen er oppdatert med det dype hierarkiet og aktive balanseplott!")
