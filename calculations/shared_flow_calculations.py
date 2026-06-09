@@ -1045,3 +1045,65 @@ def find_solid_waste_export(prepared_waste_data, current_params, trade_params):
             
     return year_values
 
+def find_treated_wastewater_discharge(df_05280, df_utslipp, current_params, dataset_noise=None, expected_years=None):
+    """
+    Henter renset avløpsvann fra SSB-data, ekstrapolerer bakover til 1990,
+    og påfører simulert datasettstøy for tabell 05280.
+    
+    Returnerer:
+        dict: En ordbok med {år: verdi_kt_N}
+    """
+    ww_discharge = {}
+    
+    # 1. Hent aktivitetsstøy for avløp (SSB tabell 05280)
+    key_ssb = '05280'
+    noise_ww = 1.0
+    
+    if dataset_noise and key_ssb in dataset_noise:
+        noise_info = dataset_noise[key_ssb]
+        if noise_info['type'] == 'perc':
+            noise_ww = float(noise_info['value'])
+    else:
+        noise_ww = float(current_params.get('05280', 1.0))
+
+    # For ekstrapolering bakover til 1990 trenger vi å holde styr på 1997-verdien
+    value_1997 = 0.0
+
+    # --- DEL 1: Nyere data (SSB 05280) ---
+    # År ligger i radindeks 2 (Excel rad 3), verdier i radindeks 3 (Excel rad 4)
+    # Kolonne 3 til 25 (Excel kolonne D til Z)
+    if df_05280 is not None and df_05280.shape[0] > 3:
+        years_row = df_05280.iloc[2]
+        values_row = df_05280.iloc[3]
+        
+        for col_idx in range(3, min(26, df_05280.shape[1])):
+            try:
+                year = int(years_row.iloc[col_idx])
+                val_t = float(values_row.iloc[col_idx])
+                val_kt_N = (val_t / 1000.0) * noise_ww
+                ww_discharge[year] = max(0.0, val_kt_N)
+            except (ValueError, TypeError):
+                continue
+
+    # --- DEL 2: Historiske data 1997-2001 (utslipp_avløp.xlsx) ---
+    # Radindeks 1 til 5 (Excel rad 2 til 6)
+    if df_utslipp is not None:
+        for r_idx in range(1, min(6, len(df_utslipp))):
+            try:
+                year = int(df_utslipp.iloc[r_idx, 0])
+                val_kt_N = float(df_utslipp.iloc[r_idx, 1]) * noise_ww
+                ww_discharge[year] = max(0.0, val_kt_N)
+                
+                if year == 1997:
+                    value_1997 = val_kt_N
+            except (ValueError, TypeError):
+                continue
+
+    # --- DEL 3: Ekstrapolering 1990-1996 ---
+    # Bruker 1997-verdien som flat linje bakover hvis den ble funnet
+    if value_1997 > 0.0:
+        for year in range(1990, 1997):
+            ww_discharge[year] = value_1997
+            
+    return ww_discharge
+

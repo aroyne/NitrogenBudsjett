@@ -125,6 +125,60 @@ def load_all_data(selected_pools):
         df_fert_filtered = df_fert_raw[(df_fert_raw['Element'] == 'Import quantity') & (df_fert_raw['Value'] != 0)][['Year', 'Value']].copy()
         preloaded['fao_mineral_fertilizer'] = df_fert_filtered
 
+    
+    # TEOTIL Avløp fra Report.xlsx
+    kyst_needing_pools = {'hy'}
+    if not kyst_needing_pools.isdisjoint(selected_pools):
+        try:
+            df_kyst = pd.read_excel('data_files/Tilførsel av nitrogen til kystområdene fordelt på kilder.xlsx', sheet_name='Data fra Miljødirektoratet')
+            preloaded['hy_kyst_tilforsel'] = df_kyst
+        except Exception as e:
+            print(f"[KRITISK FEIL] Kunne ikke pre-loade kysttilførsel-Excel: {e}")
+
+    # TEOTIL3 N Summary (totn_to_coast, totn_by_source, totn_retention)
+    teotil3_needing_pools = {'hy'}
+    if not teotil3_needing_pools.isdisjoint(selected_pools):
+        try:
+            wb_teotil3 = openpyxl.load_workbook('data_files/teotil3_n_summary.xlsx', data_only=True)
+            preloaded['hy_teotil3_to_coast'] = pd.DataFrame(list(wb_teotil3['totn_to_coast'].values))
+            preloaded['hy_teotil3_by_source'] = pd.DataFrame(list(wb_teotil3['totn_by_source'].values))
+            preloaded['hy_teotil3_retention'] = pd.DataFrame(list(wb_teotil3['totn_retention'].values))
+        except Exception as e:
+            print(f"[KRITISK FEIL] Kunne ikke pre-loade teotil3_n_summary.xlsx: {e}")
+
+    # Fiskeridirektoratet: art.xlsx
+    fangst_needing_pools = {'hy'}
+    if not fangst_needing_pools.isdisjoint(selected_pools):
+        try:
+            wb_art = openpyxl.load_workbook('data_files/art.xlsx', data_only=True)
+            preloaded['hy_art_raw'] = pd.DataFrame(list(wb_art['Sheet 1'].values))
+        except Exception as e:
+            print(f"[KRITISK FEIL] Kunne ikke pre-loade art.xlsx: {e}")
+
+    # Historisk fiske: fiske_1990_2000.xlsx
+    fangst_old_needing_pools = {'hy'}
+    if not fangst_old_needing_pools.isdisjoint(selected_pools):
+        try:
+            wb_fiske_old = openpyxl.load_workbook('data_files/fiske_1990_2000.xlsx', data_only=True)
+            preloaded['hy_fiske_old_raw'] = pd.DataFrame(list(wb_fiske_old['Ark1'].values))
+        except Exception as e:
+            print(f"[KRITISK FEIL] Kunne ikke pre-loade fiske_1990_2000.xlsx: {e}")
+
+    # --- NYTT FOR AVLØP (SHARED FLOW) ---
+    sewage_needing_pools = {'hy','pr'}
+    if not sewage_needing_pools.isdisjoint(selected_pools):
+        try:
+            wb_05280 = openpyxl.load_workbook('data_files/05280_20251113-113329.xlsx', data_only=True)
+            preloaded['hy_ssb_05280_raw'] = pd.DataFrame(list(wb_05280['Nitrogen'].values))
+        except Exception as e:
+            print(f"[KRITISK FEIL] Kunne ikke pre-loade 05280_20251113-113329.xlsx: {e}")
+
+        try:
+            wb_utslipp = openpyxl.load_workbook('data_files/utslipp_avløp.xlsx', data_only=True)
+            preloaded['hy_utslipp_avlop_raw'] = pd.DataFrame(list(wb_utslipp['Ark1'].values))
+        except Exception as e:
+            print(f"[KRITISK FEIL] Kunne ikke pre-loade utslipp_avløp.xlsx: {e}")
+
     # =========================================================================
     # NYTT: NYE DATAINNLESINGER FOR LANDBRUKS-POOLEN (AG / AG_MC)
     # =========================================================================
