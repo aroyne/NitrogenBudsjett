@@ -10,7 +10,12 @@ def plot_pool_balance(df_flows, pool_code, output_dir="output_files/plots"):
     Genererer et balansediagram for en spesifikk pool eller subpool.
     Deler legenden inn i to ryddige blokker: "Inngående strømmer" og "Utgående strømmer",
     og viser den fulle flomkoden (flow_name) for hver strøm.
+    Rekkefølgen i legendene matcher stablingen i plottet (visuelt ovenfra og ned).
     """
+    import os
+    import numpy as np
+    import matplotlib.pyplot as plt
+
     os.makedirs(output_dir, exist_ok=True)
     
     # 1. Filtrer ut inngående og utgående strømmer for denne poolen
@@ -72,24 +77,36 @@ def plot_pool_balance(df_flows, pool_code, output_dir="output_files/plots"):
     ax.set_xlabel("Year", fontsize=10)
     ax.set_ylabel("Nitrogen Flow (kt N / year)", fontsize=10)
     
-    # --- OPPDATERTE AKSEBEGRENSNINGER ---
+    # --- AKSEBEGRENSNINGER ---
     ax.set_xlim(1990, 2023)
-    # Lager merker for 1990, 1995, 2000, 2005, 2010, 2015, 2020 og legger til 2023 til slutt
     custom_ticks = list(np.arange(1990, 2021, 5)) + [2023]
     ax.set_xticks(custom_ticks)
     ax.grid(True, linestyle='--', alpha=0.4)
+
     # ========================================================
-    # AVANSERT LEGEND-HÅNDTERING (To separate blokker på høyre side)
+    # AVANSERT LEGEND-HÅNDTERING MED KORREKT VISUELL REKKEFØLGE
     # ========================================================
     
-    # 1. Hent de fulle flomkodene som merkelapper
+    # 1. Hent de opprinnelige merkelappene kronologisk fra DataFrame-kolonnene
     in_labels = list(df_in_grouped.columns)
     out_labels = list(df_out_grouped.columns)
     
+    # Sortering for Inngående (Positive):
+    # Siste kolonne ligger øverst i plottet, så vi reverserer listene 
+    # for å få den øverst i den øverste legend-blokken.
+    in_handles_sorted = list(reversed(in_handles))
+    in_labels_sorted = list(reversed(in_labels))
+    
+    # Sortering for Utgående (Negative):
+    # Siste kolonne pushes lengst NED i plottet (bort fra 0). 
+    # Ved å beholde den opprinnelige rekkefølgen havner den også nederst i legend-blokken.
+    out_handles_sorted = out_handles
+    out_labels_sorted = out_labels
+    
     # 2. Opprett den første legenden for INNGÅENDE (øverst til høyre)
-    # Vi legger også med Net Balance og Uncertainty i denne toppblokken for ryddighet
-    top_handles = [line_balance, poly_unc] + in_handles
-    top_labels = ['Net Balance (Inn - Ut)', 'Uncertainty (±1σ)'] + in_labels
+    # Vi inkluderer Net Balance og Uncertainty øverst i denne blokken
+    top_handles = [line_balance, poly_unc] + in_handles_sorted
+    top_labels = ['Net Balance (Inn - Ut)', 'Uncertainty (±1σ)'] + in_labels_sorted
     
     legend_in = ax.legend(
         top_handles, 
@@ -102,19 +119,16 @@ def plot_pool_balance(df_flows, pool_code, output_dir="output_files/plots"):
         frameon=True
     )
     legend_in._legend_box.align = "left"
-    
-    # Viktig: Matplotlib sletter forrige legend hvis vi lager en ny, så vi må låse den første fast
     ax.add_artist(legend_in)
     
-    # 3. Opprett den andre legenden for UTGÅENDE (plassert rett under den første)
-    if out_handles:
-        # Dynamisk plassering: Vi flytter den ned basert på hvor stor den første legenden ble
-        # bbox_to_anchor=(X, Y) -> Jo flere elementer i den første, jo lavere må Y være (f.eks. 0.5)
+    # 3. Opprett den andre legenden for UTGÅENDE (plassert under den første)
+    if out_handles_sorted:
+        # Dynamisk plassering basert på antall inngående strømmer
         approx_offset = max(0.0, 0.55 - (len(in_labels) * 0.03))
         
         legend_out = ax.legend(
-            out_handles, 
-            out_labels, 
+            out_handles_sorted, 
+            out_labels_sorted, 
             bbox_to_anchor=(1.05, approx_offset), 
             loc='upper left', 
             fontsize=8, 
