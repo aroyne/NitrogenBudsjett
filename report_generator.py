@@ -547,10 +547,10 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
                     "We have also compared with data in Eurostat, which gives total amount of round removed (over or under bark) including use for firewood in households and industry. "
                     "Following the Swedish NBB (Moldan et al., 2025), we use an average wood density of 0.45 t/m3 for all wood categories, "
                     "and N-contents of 3.4 kg/t for coniferous and 4.3 kg/t for non-coniferous trees (ktN/mill m3 wood harvested).\n\n"
-                    "**Comparison & Discrepancies:**\n"
-                    "* For comparison, Moldan et al. (2025) found 36.4 ktN for industrial roundwood in 2015, or 2.3 times more than the flow we have found for Norway for the same year. In 2015 the FAOSTAT reported total value of industrial round wood is 6.6 times larger than that reported for Norway, so even though we have used the same parameters, they seem to end up with a smaller N content. *(Note: Ask Moldan regarding this reason)*\n"
-                    "* Hohmann-Marriott (2025) reports much larger values, with a total production of around 700 ktN for 2020, even though he used a lower N content (0.14 and 0.17 % N by weight for coniferous and noniferous wood, respectively) for a total amount of 120 million m3 of felled wood in 2020. In the statistics we use, table 08979 (the same as Hofmann used), the value is 10.242 million m3 for 2020. *(Note: Contact Hohmann to ask if he could have misread with a factor of 10 error? He reports using density values of 0.4 and 0.5 t/m3, which should have given the same result as what we got).* "
-                )
+                #     "**Comparison & Discrepancies:**\n"
+                #     "* For comparison, Moldan et al. (2025) found 36.4 ktN for industrial roundwood in 2015, or 2.3 times more than the flow we have found for Norway for the same year. In 2015 the FAOSTAT reported total value of industrial round wood is 6.6 times larger than that reported for Norway, so even though we have used the same parameters, they seem to end up with a smaller N content. *(Note: Ask Moldan regarding this reason)*\n"
+                #     "* Hohmann-Marriott (2025) reports much larger values, with a total production of around 700 ktN for 2020, even though he used a lower N content (0.14 and 0.17 % N by weight for coniferous and noniferous wood, respectively) for a total amount of 120 million m3 of felled wood in 2020. In the statistics we use, table 08979 (the same as Hofmann used), the value is 10.242 million m3 for 2020. *(Note: Contact Hohmann to ask if he could have misread with a factor of 10 error? He reports using density values of 0.4 and 0.5 t/m3, which should have given the same result as what we got).* "
+                 )
 
         elif filename.upper().startswith("FS_OL_"):
             parent_subpool = "Other Land (FS.OL)"
