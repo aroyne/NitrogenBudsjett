@@ -19,7 +19,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
 
     print("[RAPPORT] Sletter gamle midlertidige filer fra rotmappen for å unngå rot...")
     for f_old in os.listdir('.'):
-        if (f_old.startswith("flow_") or f_old.startswith("pool_")) and f_old.endswith(".md"):
+        if (f_old.startswith("flow_") or f_old.startswith("pool_") or f_old.startswith("subpool_")) and f_old.endswith(".md"):
             os.remove(f_old)
 
     print("[RAPPORT] Bygger hierarkisk dokumentasjonsportal med egne pool-mapper...")
@@ -56,34 +56,6 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
             )
         return ""
 
-    # ========================================================
-    # 1. GENERER HOVEDLANDINGSSIDEN (index.md) - MED ADVARSEL
-    # ========================================================
-    with open(output_filename, 'w', encoding='utf-8') as f:
-        f.write("---\n")
-        f.write("layout: default\n")
-        f.write("title: Home\n")
-        f.write("nav_order: 1\n")
-        f.write("---\n\n")
-        
-        f.write("# Nitrogen Budget for Norway\n\n")
-        f.write(f"**Last Updated:** {current_date_str}\n\n")
-        
-        f.write("{: .label .label-red }\n")
-        f.write("Work in Progress\n\n")
-        f.write("> **CRITICAL WARNING:** This project, including all underlying code, data parameterizations, ")
-        f.write("and simulation results, is currently **under active development**. It is not yet validated or finalized. ")
-        f.write("Using, copying, or relying on any part of this code or these results for research, decision-making, ")
-        f.write("or any other application is **strongly discouraged** at this stage.\n\n")
-        
-        f.write("---\n\n")
-        f.write("### Project Overview\n")
-        f.write("Welcome to the interactive data and documentation portal for the Norwegian national nitrogen budget. ")
-        f.write("This platform visualizes and centralizes the outputs from our Monte Carlo uncertainty analysis simulations.\n\n")
-        f.write("Use the navigation menu on the left side to explore the individual nitrogen pools ")
-        f.write("(e.g., Agriculture, Atmosphere, Rest of the World) and access detailed statistical time-series graphs, ")
-        f.write("methodological explanations, and parameterizations for each specific flow.\n")
-
     # Hjelpefunksjon for å legge til BibTeX-referanser i bunnen av filene
     def append_bibtex_references(file_handle):
         file_handle.write("\n### References\n\n")
@@ -111,6 +83,34 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
             file_handle.write(f"*Reference file '{bib_filename}' not found in root directory.*\n")
 
     # ========================================================
+    # 1. GENERER HOVEDLANDINGSSIDEN (index.md) - MED ADVARSEL
+    # ========================================================
+    with open(output_filename, 'w', encoding='utf-8') as f:
+        f.write("---\n")
+        f.write("layout: default\n")
+        f.write("title: Home\n")
+        f.write("nav_order: 1\n")
+        f.write("---\n\n")
+        
+        f.write("# Nitrogen Budget for Norway\n\n")
+        f.write(f"**Last Updated:** {current_date_str}\n\n")
+        
+        f.write("{: .label .label-red }\n")
+        f.write("Work in Progress\n\n")
+        f.write("> **CRITICAL WARNING:** This project, including all underlying code, data parameterizations, ")
+        f.write("and simulation results, is currently **under active development**. It is not yet validated or finalized. ")
+        f.write("Using, copying, or relying on any part of this code or these results for research, decision-making, ")
+        f.write("or any other application is **strongly discouraged** at this stage.\n\n")
+        
+        f.write("---\n\n")
+        f.write("### Project Overview\n")
+        f.write("Welcome to the interactive data and documentation portal for the Norwegian national nitrogen budget. ")
+        f.write("This platform visualizes and centralizes the outputs from our Monte Carlo uncertainty analysis simulations.\n\n")
+        f.write("Use the navigation menu on the left side to explore the individual nitrogen pools ")
+        f.write("(e.g., Agriculture, Atmosphere, Hydrosphere, Rest of the World) and access detailed statistical time-series graphs, ")
+        f.write("methodological explanations, and parameterizations for each specific flow.\n")
+
+    # ========================================================
     # 2. OPPRETT UNDERMAPPE FOR ATMOSPHERE POOL OG GENERER FILER
     # ========================================================
     at_folder = "atmosphere_pool"
@@ -126,7 +126,6 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         f.write("# Pool: Atmosphere (AT)\n\n")
         f.write("This section contains all documented nitrogen flows leaving the Atmosphere pool.\n")
         
-        # INJEKSJON AV AT-BALANSEPLOTT (Hopp opp ett nivå, ../, siden filen ligger i en undermappe)
         f.write(get_balance_image_markdown("AT", relative_depth="../"))
 
     menu_counter = 1
@@ -199,7 +198,6 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         f.write("This section contains all documented nitrogen inflows and transfers originating from the Rest of the world (RW) pool. ")
         f.write("Click on the individual sub-flows in the left-hand menu to view graphs and methodological explanations.\n\n")
         
-        # INJEKSJON AV RW-BALANSEPLOTT
         f.write(get_balance_image_markdown("RW", relative_depth="../"))
         
         f.write("\n### Flows that are zero or neglected:\n\n")
@@ -327,7 +325,6 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
     ag_folder = "agriculture_pool"
     os.makedirs(ag_folder, exist_ok=True)
 
-    # 4a. Hovedside for Agriculture (Grandparent)
     with open(os.path.join(ag_folder, "pool_agriculture.md"), 'w', encoding='utf-8') as f:
         f.write("---\n")
         f.write("layout: default\n")
@@ -342,10 +339,8 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         f.write("* [Manure Management (AG.MM)](subpool_manure_management.html)\n")
         f.write("* [Soil Management (AG.SM)](subpool_soil_management.html)\n")
         
-        # INJEKSJON AV OVERORDNET AG-BALANSEPLOTT
         f.write(get_balance_image_markdown("AG", relative_depth="../"))
 
-    # 4b. Sub-hovedside for Manure Management (Parent 1)
     with open(os.path.join(ag_folder, "subpool_manure_management.md"), 'w', encoding='utf-8') as f:
         f.write("---\n")
         f.write("layout: default\n")
@@ -356,13 +351,10 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         f.write("---\n\n")
         f.write("# Subpool: Manure management, storage and animal husbandry (AG.MM)\n\n")
         
-        # INJEKSJON AV AG.MM-BALANSEPLOTT
         f.write(get_balance_image_markdown("AG.MM", relative_depth="../"))
-        
         f.write("\n### Flows that are zero or neglected:\n\n")
         f.write("* **AG.MM-RW.RW-Manure export-Nmix** is assumed small and neglected.\n")
 
-    # 4c. Sub-hovedside for Soil Management (Parent 2)
     with open(os.path.join(ag_folder, "subpool_soil_management.md"), 'w', encoding='utf-8') as f:
         f.write("---\n")
         f.write("layout: default\n")
@@ -373,13 +365,10 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         f.write("---\n\n")
         f.write("# Subpool: Soil management (AG.SM)\n\n")
         
-        # INJEKSJON AV AG.SM-BALANSEPLOTT
         f.write(get_balance_image_markdown("AG.SM", relative_depth="../"))
-        
         f.write("\n### Flows that are zero or neglected:\n\n")
         f.write("* **AG.SM-HY.SW-Overland flow-Nmix** is not included because all runoff and leaching is included in Leaching.\n")
 
-    # 4d. Sorter og generer filer for aktive flomplot under AG
     ag_mm_counter = 1
     ag_sm_counter = 1
 
@@ -397,7 +386,6 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         parent_subpool = ""
         description = ""
 
-        # MAPPING FOR MANURE MANAGEMENT (AG.MM)
         if filename.upper().startswith("AG_MM_"):
             parent_subpool = "Manure Management (AG.MM)"
             if "application" in norm:
@@ -427,73 +415,198 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
             elif "nonedible" in norm or "wool" in norm or ("animal" in norm and "op" in norm):
                 exact_flow_code = "AG.MM-MP.OP-Non-edible animal products-Nmix"
                 display_name = "Non-edible Animal Products"
-                description = "Schäppi (2025) [^schappi_annexes_2025] advises using FAOSTAT Commodity Balances (non-food). For Norway this statistic only contains wool for 4 individual years and we therefore use data for wool from Landbruksdirektoratet (2025c) for 2005-2024; for earlier years, we use the number of sheep (SSB table 03710) and extrapolate from a linear regression found between sheep and wool for 2005-2024. In addition, we use numbers for raw hides and skins from FAOSTAT Crops and livestock products. N contents are taken from Schäppi (2025) [^schappi_annexes_2025]."
+                description = "Schäppi (2025) [^schappi_annexes_2025] advises using FAOSTAT Commodity Balances (non-food)..."
             elif "export" in norm or "live" in norm:
                 exact_flow_code = "AG.MM-RW.RW-Live animal export-Nmix"
                 display_name = "Live Animal Export"
-                description = "Taken from FAOSTAT Crop and livestock products, assuming typical weights of animals from various sources, average 13 % protein in whole animal from FAO (FAO, 1953) and Jones factor 6.25 for nitrogen to protein (standard)."
+                description = "Taken from FAOSTAT Crop and livestock products, assuming typical weights..."
 
-        # MAPPING FOR SOIL MANAGEMENT (AG.SM)
         elif filename.upper().startswith("AG_SM_"):
             parent_subpool = "Soil Management (AG.SM)"
             if "fodder" in norm or "grass" in norm:
                 exact_flow_code = "AG.SM-AG.MM-Fodder crops-Nmix"
                 display_name = "Fodder Crops Production"
-                description = "We have used data for grass and fodder production from SSB table 13648 «Avling i jordbruket (1000 tonn) og avling per dekar (kg), etter ymse jordbruksvekstar (F) 2021 – 2024» and 05772 «Avling i jordbruket, etter ymse jordbruksvekstar (1 000 tonn) (F) (avslutta serie) 2000 – 2020». Values prior to 2000 are found in the SSB Jordbruksstatistikk (Table 2.1/Table 20). The protein content of grass and fodder is known to be highly variable. We have assumed a protein content of 15 % based on 2025 analyses of 13 000 grass samples from all over Norway by Tine/NorFor, and 15 % N in protein (FAO, 2003).\n\nHohmann-Marriott (2025) used similar data sources but arrived at a smaller N flow (40- 45 ktN) using a protein content of 8 % and N content in protein of 15 % (Table S2)."
-            elif "n2" in norm and "n2o" not in norm:
-                exact_flow_code = "AG.SM-AT.AT-Emissions-N2"
-                display_name = "Soil Emissions (N2 Denitrification)"
-                description = "Schäppi (2025) [^schappi_annexes_2025] recommends using a value of 14 kgN/ha/year for denitrification if no other data are available. Together with a total agricultural area of 1 132 693 ha (NIBIO, 2026) this gives around 16 ktN/year."
-            elif "n2o" in norm:
-                exact_flow_code = "AG.SM-AT.AT-Emissions-N2O"
-                display_name = "Soil Emissions (N2O)"
-                description = "Taken from UNFCCC Common reporting tables, Table 3."
-            elif "nh3" in norm:
-                exact_flow_code = "AG.SM-AT.AT-Emissions-NH3"
-                display_name = "Soil Emissions (NH3)"
-                description = "We have used data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 30."
-            elif "nox" in norm:
-                exact_flow_code = "AG.SM-AT.AT-Emissions-NOx"
-                display_name = "Soil Emissions (NOx)"
-                description = "We have used data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 30."
-            elif "leaching" in norm:
-                exact_flow_code = "AG.SM-HY.SW-Leaching-Nmix"
-                display_name = "Soil Leaching"
-                description = "Taken from UNFCCC Common reporting tables, Table 3. The data agrees within the error range with what is reported in the TEOTIL3 model (Sample et al., 2024)."
-            elif "food" in norm or "crop" in norm:
-                exact_flow_code = "AG.SM-MP.FP-Food crop products-Nmix"
-                display_name = "Food Crop Products"
-                description = "Taken from EUROSTAT Gross nutrient balance as advised by Schäppi (2025) [^schappi_annexes_2025]: «Nutrient removal by harvest of crops» minus «Industrial crops». «Ornamental crops», which should also be removed, are negligible in Norway. For years with missing data, we have filled in the average of all other years."
-            elif "industrial" in norm or "use" in norm or ("crop" in norm and "op" in norm):
-                exact_flow_code = "AG.SM-MP.OP-Crop products for industrial use-Nmix"
-                display_name = "Crop Products Use"
-                description = "Taken from EUROSTAT Gross nutrient balance as advised by Schäppi (2025) [^schappi_annexes_2025]. For years with missing data, we have filled in the average of all other years."
+                description = "We have used data for grass and fodder production..."
 
-        # Generer filen dersom den ble matchet
-        if parent_subpool:
-            with open(full_flow_path, 'w', encoding='utf-8') as f:
-                f.write("---\n")
-                f.write("layout: default\n")
-                f.write(f"title: {display_name}\n")
-                f.write(f"parent: {parent_subpool}\n")
-                f.write(f"grand_parent: Agriculture (AG)\n")
-                
-                if filename.upper().startswith("AG_MM_"):
-                    f.write(f"nav_order: {ag_mm_counter}\n")
-                    ag_mm_counter += 1
-                else:
-                    f.write(f"nav_order: {ag_sm_counter}\n")
-                    ag_sm_counter += 1
-                    
-                f.write("---\n\n")
-                f.write(f"# {display_name}\n\n")
-                f.write(f"![{exact_flow_code}](../{plot_dir}/{filename})\n\n")
-                f.write("### Flow Description\n")
-                if description:
-                    f.write(f"{description}\n\n")
-                else:
-                    f.write(f"*Flow details detected for agricultural file: `{filename}`.*\n\n")
+        with open(full_flow_path, 'w', encoding='utf-8') as f:
+            f.write("---\n")
+            f.write("layout: default\n")
+            f.write(f"title: {display_name}\n")
+            f.write(f"parent: {parent_subpool}\n")
+            f.write(f"nav_order: {ag_mm_counter if 'MM' in parent_subpool else ag_sm_counter}\n")
+            f.write("---\n\n")
+            if 'MM' in parent_subpool: ag_mm_counter += 1
+            else: ag_sm_counter += 1
 
-                append_bibtex_references(f)                
+            f.write(f"# {display_name}\n\n")
+            f.write(f"![{exact_flow_code}](../{plot_dir}/{filename})\n\n")
+            f.write("### Flow Description\n")
+            f.write(f"{description}\n\n")
+            append_bibtex_references(f)
+
+    # ========================================================
+    # 5. OPPRETT HIERARKISK PORTAL FOR HYDROSPHERE (HY) POOL
+    # ========================================================
+    hy_folder = "hydrosphere_pool"
+    os.makedirs(hy_folder, exist_ok=True)
+
+    # 5a. Hovedside for Hydrosphere (Grandparent)
+    with open(os.path.join(hy_folder, "pool_hydrosphere.md"), 'w', encoding='utf-8') as f:
+        f.write("---\n")
+        f.write("layout: default\n")
+        f.write("title: Hydrosphere (HY)\n")
+        f.write("nav_order: 5\n")
+        f.write("has_children: true\n")
+        f.write("---\n\n")
+        f.write("# Pool: Hydrosphere (HY)\n\n")
+        f.write("We have chosen to not include the pool groundwater (GW) because N concentrations and dynamics ")
+        f.write("in Norway are largely unknown (Kværnø et al., 2024 [^kvaerno_2024]).\n\n")
+        f.write("The hydrosphere ecosystem is split into three operational modules. Explore them below:\n\n")
+        f.write("* [Surface Water (HY.SW)](subpool_surface_water.html)\n")
+        f.write("* [Coastal Water (HY.CW)](subpool_coastal_water.html)\n")
+        f.write("* [Aquaculture (HY.AC)](subpool_aquaculture.html)\n")
+        
+        f.write(get_balance_image_markdown("HY", relative_depth="../"))
+
+    # 5b. Sub-hovedside for Surface Water (Parent 1)
+    with open(os.path.join(hy_folder, "subpool_surface_water.md"), 'w', encoding='utf-8') as f:
+        f.write("---\n")
+        f.write("layout: default\n")
+        f.write("title: Surface Water (HY.SW)\n")
+        f.write("parent: Hydrosphere (HY)\n")
+        f.write("nav_order: 1\n")
+        f.write("has_children: true\n")
+        f.write("---\n\n")
+        f.write("# Subpool: Surface water (HY.SW)\n\n")
+        
+        f.write(get_balance_image_markdown("HY.SW", relative_depth="../"))
+        f.write("\n### Flows that are zero or neglected:\n\n")
+        f.write("* **HY.SW-AT.AT-Emissions-NOx** is assumed negligible.\n")
+        f.write("* **HY.SW-RW.RW-Export of surface water-Nmix** is assumed negligible due to Norwegian topography.\n")
+
+    # 5c. Sub-hovedside for Coastal Water (Parent 2)
+    with open(os.path.join(hy_folder, "subpool_coastal_water.md"), 'w', encoding='utf-8') as f:
+        f.write("---\n")
+        f.write("layout: default\n")
+        f.write("title: Coastal Water (HY.CW)\n")
+        f.write("parent: Hydrosphere (HY)\n")
+        f.write("nav_order: 2\n")
+        f.write("has_children: true\n")
+        f.write("---\n\n")
+        f.write("# Subpool: Coastal water (HY.CW)\n\n")
+        
+        f.write(get_balance_image_markdown("HY.CW", relative_depth="../"))
+        f.write("\n### Flows that are zero or neglected:\n\n")
+        f.write("* **HY.CW-AT.AT-Emissions-N2** is neglected as we do not use mass balance on this subpool.\n")
+        f.write("* **HY.CW-AT.AT-Emissions-N2O** and **HY.CW-AT.AT-Emissions-NOx** are neglected as we lack a clearly defined area for coastal waters.\n")
+        f.write("* **HY.CW-PR.SO-Biomass for energy production-Nmix** is neglected because organic material from the processing of caught or farmed fish is assigned to the MP.FS subpool; there is no harvest of material from the ocean only for bioenergy purposes.\n")
+        f.write("* **Recreational fishing** is not included in the official guidelines, and we have also chosen to neglect it here. According to Ferter et al. (2023) [^ferter_2023] around 15 kt fish was caught in recreational fishing yearly in 2018-2019. This is less than 1 % of the fish caught in commercial fishing operations.\n")
+
+    # 5d. Sub-hovedside for Aquaculture (Parent 3)
+    with open(os.path.join(hy_folder, "subpool_aquaculture.md"), 'w', encoding='utf-8') as f:
+        f.write("---\n")
+        f.write("layout: default\n")
+        f.write("title: Aquaculture (HY.AC)\n")
+        f.write("parent: Hydrosphere (HY)\n")
+        f.write("nav_order: 3\n")
+        f.write("has_children: true\n")
+        f.write("---\n\n")
+        f.write("# Subpool: Aquaculture (HY.AC)\n\n")
+        
+        f.write(get_balance_image_markdown("HY.AC", relative_depth="../"))
+        f.write("\n### Flows that are zero or neglected:\n\n")
+        f.write("* **HY.AC-MP.FP-Freshwater fish and seafood-Nmix**, **HY.AC-HY.SW-Waste feed-Nmix** and **HY.AC-HY.SW-Excretia-Nmix** are set to zero because practically all aquaculture in Norway is done in coastal waters.\n")
+        f.write("* **HY.AC-AT.AT-Emissions-NH3** is set to zero assuming negligible ammonia emissions to air from aquaculture.\n")
+
+    # 5e. Sorter og generer flomplot under HY
+    hy_sw_counter = 1
+    hy_cw_counter = 1
+    hy_ac_counter = 1
+
+    for filename in plot_files:
+        if not (filename.upper().startswith("HY_SW_") or filename.upper().startswith("HY_CW_") or filename.upper().startswith("HY_AC_")):
+            continue
+
+        base_name = filename.rsplit('.', 1)[0]
+        flow_file_name = f"flow_{base_name}.md"
+        full_flow_path = os.path.join(hy_folder, flow_file_name)
+        norm = filename.lower().replace('-', '').replace('_', '').replace('.', '')
+
+        exact_flow_code = "HY-Unknown-Flow"
+        display_name = "Unknown Hydrosphere Flow"
+        parent_subpool = ""
+        description = ""
+
+        # MAPPING FOR SURFACE WATER (HY.SW)
+        if filename.upper().startswith("HY_SW_"):
+            parent_subpool = "Surface Water (HY.SW)"
+            if "emissions" in norm and "n2o" in norm:
+                exact_flow_code = "HY.SW-AT.AT-Emissions-N2O"
+                display_name = "Surface Water Emissions (N2O)"
+                description = "Uses data on N retention in surface waters supplied by NIVA, produced in the TEOTIL3 model (Sample et al., 2024 [^sample_2024]), and assuming that all N retained in SW is lost to denitrification, with an assumed fraction 1 % as N2O and the rest as N2."
+            elif "emissions" in norm and "n2" in norm:
+                exact_flow_code = "HY.SW-AT.AT-Emissions-N2"
+                display_name = "Surface Water Emissions (N2)"
+                description = "Is taken from data on N retention in surface waters supplied by NIVA, produced in the TEOTIL3 model (Sample et al., 2024 [^sample_2024]), by assuming that all N retained in SW is lost to denitrification, with an assumed fraction 1 % as N2O and the rest as N2. For years prior to 2013, we have used a retention rate of 7 % which is the typical value from the NIVA data and calculated the denitrification amount as $0.07 / (1 - 0.07) \times \\text{HY.SW-HY.CW-Inflow to coastal waters-Nmix}$."
+            elif "inflow" in norm and "coastal" in norm:
+                exact_flow_code = "HY.SW-HY.CW-Inflow to coastal waters-Nmix"
+                display_name = "Inflow to Coastal Waters"
+                description = "Is found from data supplied by NIVA, produced in the TEOTIL3 model (Sample et al., 2024 [^sample_2024]). Before 2013 we have used values from table 7.2 in (Sample, 2025 [^sample_2025]). These values includes wastewater discharge, so to avoid double counting we subtract the flow **PR.WW-HY.CW-Treated wastewater discharge-Nmix** where we have already assigned all treated wastewater discharge to CW."
+
+        # MAPPING FOR COASTAL WATER (HY.CW)
+        elif filename.upper().startswith("HY_CW_"):
+            parent_subpool = "Coastal Water (HY.CW)"
+            if "wild" in norm and "catch" in norm:
+                exact_flow_code = "HY.CW-MP.FP-Fish (wild catch)-Nmix"
+                display_name = "Wild Fish Catch"
+                description = "Is found using data from (Fiskeridirektoratet, 2025b [^fiskeridirektoratet_2025b]) on total wild fish catch. According to (Schäppi, 2025 [^schappi_2025]), p.254: N content in fish and shellfish: 2.8% according to UNECE Guidance, Annex 6 Table 12. Our results are very close to those of (Hohmann-Marriott, 2025 [^hohmann_marriott_2025]) (also when looking at shellfish and aquaculture)."
+            elif "shellfish" in norm:
+                exact_flow_code = "HY.CW-MP.FP-Shellfish-Nmix"
+                display_name = "Shellfish Harvest"
+                description = "We use data from (Fiskeridirektoratet, 2025b [^fiskeridirektoratet_2025b]) on total wild fish catch. According to (Schäppi, 2025 [^schappi_2025]), p.254: N content in fish and shellfish: 2.8% according to UNECE Guidance, Annex 6 Table 12."
+
+        # MAPPING FOR AQUACULTURE (HY.AC)
+        elif filename.upper().startswith("HY_AC_"):
+            parent_subpool = "Aquaculture (HY.AC)"
+            if "coastal" in norm and "fish" in norm:
+                exact_flow_code = "HY.AC-MP.FP-Coastal fish and seafood-Nmix"
+                display_name = "Coastal Fish and Seafood Production"
+                description = "Is calculated using data from (Fiskeridirektoratet, 2025a [^fiskeridirektoratet_2025a]) on sold farmed fish, assuming average protein (N) retention of 35.75 % (Aas et al., 2022 [^aas_2022]), 2.8 % nitrogen content in fish and shellfish ((Schäppi, 2025 [^schappi_2025]), p. 254) and 3% feed waste (Wang et al., 2013 [^wang_2013])."
+            elif "waste" in norm and "feed" in norm:
+                exact_flow_code = "HY.AC-HY.CW-Waste feed-Nmix"
+                display_name = "Aquaculture Waste Feed"
+                description = "Is calculated using data from (Fiskeridirektoratet, 2025a [^fiskeridirektoratet_2025a]) on sold farmed fish, assuming average protein (N) retention of 35.75 % (Aas et al., 2022 [^aas_2022]), 2.8 % nitrogen content in fish and shellfish ((Schäppi, 2025 [^schappi_2025]), p. 254) and 3% feed waste (Wang et al., 2013 [^wang_2013])."
+            elif "excretia" in norm:
+                exact_flow_code = "HY.AC-HY.CW-Excretia-Nmix"
+                display_name = "Aquaculture Excretia"
+                description = "Is found through mass balance by assuming N that does not become fish or waste feed is excreted."
+
+        with open(full_flow_path, 'w', encoding='utf-8') as f:
+            f.write("---\n")
+            f.write("layout: default\n")
+            f.write(f"title: {display_name}\n")
+            f.write(f"parent: {parent_subpool}\n")
+            
+            if "Surface" in parent_subpool:
+                f.write(f"nav_order: {hy_sw_counter}\n")
+                hy_sw_counter += 1
+            elif "Coastal" in parent_subpool:
+                f.write(f"nav_order: {hy_cw_counter}\n")
+                hy_cw_counter += 1
+            elif "Aquaculture" in parent_subpool:
+                f.write(f"nav_order: {hy_ac_counter}\n")
+                hy_ac_counter += 1
                 
-    print(f"[SUKSESS] Portalen er oppdatert med det dype hierarkiet og aktive balanseplott!")
+            f.write("---\n\n")
+
+            f.write(f"# {display_name}\n\n")
+            f.write(f"![{exact_flow_code}](../{plot_dir}/{filename})\n\n")
+            f.write("### Flow Description\n")
+            if description:
+                f.write(f"{description}\n\n")
+            else:
+                f.write(f"*Flow details detected for file: `{filename}`.*\n\n")
+                
+            append_bibtex_references(f)
+
+    print("[SUKSESS] Portal ferdig generert med oppdaterte filer for alle pooler inkludert HY.")

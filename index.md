@@ -6,7 +6,7 @@ nav_order: 1
 
 # Nitrogen Budget for Norway
 
-**Last Updated:** June 09, 2026
+**Last Updated:** June 10, 2026
 
 {: .label .label-red }
 Work in Progress
@@ -18,4 +18,4 @@ Work in Progress
 ### Project Overview
 Welcome to the interactive data and documentation portal for the Norwegian national nitrogen budget. This platform visualizes and centralizes the outputs from our Monte Carlo uncertainty analysis simulations.
 
-Use the navigation menu on the left side to explore the individual nitrogen pools (e.g., Agriculture, Atmosphere, Rest of the World) and access detailed statistical time-series graphs, methodological explanations, and parameterizations for each specific flow.
+Use the navigation menu on the left side to explore the individual nitrogen pools (e.g., Agriculture, Atmosphere, Hydrosphere, Rest of the World) and access detailed statistical time-series graphs, methodological explanations, and parameterizations for each specific flow.
