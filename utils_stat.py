@@ -357,27 +357,48 @@ def process_and_export_mc_results(all_records):
     df_balance_input['uncertainty'] = df_balance_input['std']  # Bruker standardavviket som 1σ usikkerhet
     
 # 2. Hent ut alle unike pool-koder som faktisk er til stede i dataene
-    # Vi henter alle unike koder fra både source og target, og fjerner 'Unknown'
     all_codes = set(df_balance_input['source'].unique()) | set(df_balance_input['target'].unique())
     all_codes.discard('Unknown')
     
-    # Vi ønsker plott for både subpooler (f.eks. 'AG.MM') og hovedpooler (f.eks. 'AG')
     pools_to_plot = sorted(list(all_codes))
     
-    # HVIS du også ønsker overordnede hovedplott for 'AG' (siden dataene har 'AG.MM' og 'AG.SM'),
-    # kan vi sikre at 'AG' blir lagt til hvis en av underpoolene eksisterer:
-    if any(p.startswith('AG.') for p in pools_to_plot) and 'AG' not in pools_to_plot:
-        pools_to_plot.append('AG')
-        pools_to_plot.sort()
+    # Automatisk finn og legg til overordnede hovedpooler (f.eks. 'AG' fra 'AG.MM', 'HY' fra 'HY.SW')
+    main_pools = set()
+    for p in pools_to_plot:
+        if '.' in p:
+            main_code = p.split('.')[0]
+            main_pools.add(main_code)
+            
+    for main_code in main_pools:
+        if main_code not in pools_to_plot:
+            pools_to_plot.append(main_code)
+            
+    pools_to_plot.sort()
 
     print(f"[PLOTTING] Detected active pools for balance plots: {pools_to_plot}")
     
     print("[PLOTTING] Executing balance plots for active system pools...")
     for pool in pools_to_plot:
-        plot_pool_balance(df_balance_input, pool, output_dir=plot_dir)
+        # Lag en kopi av dataene for denne spesifikke iterasjonen
+        df_temppool = df_balance_input.copy()
+        
+        # Hvis vi plotter en hovedpool (f.eks. 'AG' eller 'HY' uten punktum)
+        if '.' not in pool:
+            # Endre source/target til å bare være hovedkoden (før punktum)
+            df_temppool['source_main'] = df_temppool['source'].apply(lambda x: x.split('.')[0])
+            df_temppool['target_main'] = df_temppool['target'].apply(lambda x: x.split('.')[0])
+            
+            # Filtrer ut interne strømmer (f.eks. AG.MM til AG.SM blir intern for AG og skal bort)
+            df_temppool = df_temppool[df_temppool['source_main'] != df_temppool['target_main']]
+            
+            # Forbered kolonner for plottefunksjonen slik at startswith(pool) fungerer
+            df_temppool['source'] = df_temppool['source_main']
+            df_temppool['target'] = df_temppool['target_main']
+            
+        plot_pool_balance(df_temppool, pool, output_dir=plot_dir)
         
     print("\n" + "="*60)
-    print("[SUCCESS] All MC iterations processed, statistics saved, and plots generated successfully.")    
+    print("[SUCCESS] All MC iterations processed, statistics saved, and plots generated successfully.")
     
 def extract_source_target(flow_name):
         """
