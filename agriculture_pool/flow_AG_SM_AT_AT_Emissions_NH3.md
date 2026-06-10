@@ -1,17 +1,16 @@
 ---
 layout: default
-title: Soil Emissions (NH3)
+title: Unknown Agricultural Flow
 parent: Soil Management (AG.SM)
-grand_parent: Agriculture (AG)
 nav_order: 4
 ---
 
-# Soil Emissions (NH3)
+# Unknown Agricultural Flow
 
-![AG.SM-AT.AT-Emissions-NH3](../output_files/plots/AG_SM_AT_AT_Emissions_NH3.png)
+![AG-Unknown-Flow](../output_files/plots/AG_SM_AT_AT_Emissions_NH3.png)
 
 ### Flow Description
-We have used data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 30.
+
 
 
 ### References

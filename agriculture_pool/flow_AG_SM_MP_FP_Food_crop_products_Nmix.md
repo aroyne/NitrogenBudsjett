@@ -1,17 +1,16 @@
 ---
 layout: default
-title: Food Crop Products
+title: Unknown Agricultural Flow
 parent: Soil Management (AG.SM)
-grand_parent: Agriculture (AG)
 nav_order: 7
 ---
 
-# Food Crop Products
+# Unknown Agricultural Flow
 
-![AG.SM-MP.FP-Food crop products-Nmix](../output_files/plots/AG_SM_MP_FP_Food_crop_products_Nmix.png)
+![AG-Unknown-Flow](../output_files/plots/AG_SM_MP_FP_Food_crop_products_Nmix.png)
 
 ### Flow Description
-Taken from EUROSTAT Gross nutrient balance as advised by Schäppi (2025) [^schappi_annexes_2025]: «Nutrient removal by harvest of crops» minus «Industrial crops». «Ornamental crops», which should also be removed, are negligible in Norway. For years with missing data, we have filled in the average of all other years.
+
 
 
 ### References

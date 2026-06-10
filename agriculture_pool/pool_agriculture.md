@@ -13,3 +13,11 @@ This pool is divided into two operational sub-pools. Explore them using the side
 
 * [Manure Management (AG.MM)](subpool_manure_management.html)
 * [Soil Management (AG.SM)](subpool_soil_management.html)
+
+---
+
+## Mass Balance Overview (1990-2023)
+
+The chart below illustrates the integrated nitrogen mass balance for **AG**. It includes total system inflows (positive stack), total outflows (negative stack), and the net balance line with estimated uncertainty bounds (±1σ).
+
+![Mass Balance AG](../output_files/plots/balance_AG.png)

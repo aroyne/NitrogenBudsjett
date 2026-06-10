@@ -1,17 +1,16 @@
 ---
 layout: default
-title: Soil Leaching
+title: Unknown Agricultural Flow
 parent: Soil Management (AG.SM)
-grand_parent: Agriculture (AG)
 nav_order: 6
 ---
 
-# Soil Leaching
+# Unknown Agricultural Flow
 
-![AG.SM-HY.SW-Leaching-Nmix](../output_files/plots/AG_SM_HY_SW_Leaching_Nmix.png)
+![AG-Unknown-Flow](../output_files/plots/AG_SM_HY_SW_Leaching_Nmix.png)
 
 ### Flow Description
-Taken from UNFCCC Common reporting tables, Table 3. The data agrees within the error range with what is reported in the TEOTIL3 model (Sample et al., 2024).
+
 
 
 ### References

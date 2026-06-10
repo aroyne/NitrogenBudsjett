@@ -2,7 +2,6 @@
 layout: default
 title: Manure Emissions (NH3)
 parent: Manure Management (AG.MM)
-grand_parent: Agriculture (AG)
 nav_order: 3
 ---
 

@@ -154,11 +154,6 @@ def _add_wild_shellfish_and_macroalgae(results, preloaded_data, current_params, 
 
     # Modern data
     df_art = preloaded_data.get('hy_art_raw')
-    print("Rad 34:", df_art.iloc[34, 0], "| Rad 35:", df_art.iloc[35, 0])
-    print("Rad 38:", df_art.iloc[38, 0], "| Rad 39:", df_art.iloc[39, 0])
-    for idx, val in enumerate(df_art.iloc[:, 0]):
-        if val is not None and ('skalldyr' in str(val).lower() or 'skall' in str(val).lower()):
-            print(f"--- FANT DET! Skalldyr ligger på indeks: {idx} (Tekst: '{val}')")    
     if df_art is not None:
         for col in range(2, df_art.shape[1]):
             try:
@@ -180,10 +175,10 @@ def _add_wild_shellfish_and_macroalgae(results, preloaded_data, current_params, 
                     # Hent Delsum Makroalger
                     if not pd.isna(df_art.iloc[algae_total_row, col]):
                         val += (float(df_art.iloc[algae_total_row, col]) / 1000.0) * seaweed_N_frac
-                        results.append({
-                        'flow_name': flow_code, 'year': year, 'value': max(0.0, val * noise_fisk),
-                        'comment': 'ok (MC-støy lagt på)', 'data_sources': 'Fiskeridirektoratet'
-                    })
+                    results.append({
+                    'flow_name': flow_code, 'year': year, 'value': max(0.0, val * noise_fisk),
+                    'comment': 'ok (MC-støy lagt på)', 'data_sources': 'Fiskeridirektoratet'
+                })
             except (ValueError, TypeError, IndexError):
                 continue
 

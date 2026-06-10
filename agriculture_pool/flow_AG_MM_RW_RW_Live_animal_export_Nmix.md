@@ -2,7 +2,6 @@
 layout: default
 title: Live Animal Export
 parent: Manure Management (AG.MM)
-grand_parent: Agriculture (AG)
 nav_order: 8
 ---
 
@@ -11,7 +10,7 @@ nav_order: 8
 ![AG.MM-RW.RW-Live animal export-Nmix](../output_files/plots/AG_MM_RW_RW_Live_animal_export_Nmix.png)
 
 ### Flow Description
-Taken from FAOSTAT Crop and livestock products, assuming typical weights of animals from various sources, average 13 % protein in whole animal from FAO (FAO, 1953) and Jones factor 6.25 for nitrogen to protein (standard).
+Taken from FAOSTAT Crop and livestock products, assuming typical weights...
 
 
 ### References

@@ -1,17 +1,16 @@
 ---
 layout: default
-title: Soil Emissions (N2O)
+title: Unknown Agricultural Flow
 parent: Soil Management (AG.SM)
-grand_parent: Agriculture (AG)
 nav_order: 3
 ---
 
-# Soil Emissions (N2O)
+# Unknown Agricultural Flow
 
-![AG.SM-AT.AT-Emissions-N2O](../output_files/plots/AG_SM_AT_AT_Emissions_N2O.png)
+![AG-Unknown-Flow](../output_files/plots/AG_SM_AT_AT_Emissions_N2O.png)
 
 ### Flow Description
-Taken from UNFCCC Common reporting tables, Table 3.
+
 
 
 ### References
