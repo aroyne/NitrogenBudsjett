@@ -3,7 +3,11 @@
 import pandas as pd
 import numpy as np
 import openpyxl
+import warnings
 from calculations.utils import read_trade_data
+
+# Undertrykk openpyxl sin spesifikke header/footer-advarsel
+warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl.worksheet.header_footer")
 
 def load_all_data(selected_pools):
     """
@@ -25,8 +29,8 @@ def load_all_data(selected_pools):
         'aqua_data': ({'hy', 'rw'}, 'data_files/A.06.002_20251111-140559.xlsx', 'excel_aquaculture', {}),
         'fao_live_animals_all': ({'ag', 'rw'}, 'data_files/FAOSTAT_data_en_11-12-2025.csv', 'csv_live_animals', {}),
         'fao_mineral_fertilizer': ({'rw'}, 'data_files/FAOSTAT_data_en_11-12-2025-2.csv', 'csv_fertilizer_import', {}),
-        'hy_kyst_tilforsel': ({'hy'}, 'data_files/Tilførsel av nitrogen til kystområdene fordelt på kilder.xlsx', 'excel', {'sheet_name': 'Data fra Miljødirektoratet'}),
-        'hy_teotil3': ({'hy'}, 'data_files/teotil3_n_summary.xlsx', 'openpyxl_teotil', {}),
+        'hy_kyst_tilforsel': ({'hy','fs'}, 'data_files/Tilførsel av nitrogen til kystområdene fordelt på kilder.xlsx', 'excel', {'sheet_name': 'Data fra Miljødirektoratet'}),
+        'hy_teotil3': ({'hy','fs'}, 'data_files/teotil3_n_summary.xlsx', 'openpyxl_teotil', {}),
         'hy_art_raw': ({'hy'}, 'data_files/art.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Sheet 1'}),
         'hy_fiske_old_raw': ({'hy'}, 'data_files/fiske_1990_2000.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Ark1'}),
         'avlop_sewage': ({'hy', 'pr'}, 'data_files/05280_20251113-113329.xlsx', 'openpyxl_sewage', {}),
@@ -38,7 +42,11 @@ def load_all_data(selected_pools):
         'ag_faostat_production_all': ({'ag'}, 'data_files/FAOSTAT_data_en_11-18-2025.csv', 'csv_faostat_production', {}),
         'wool_production': ({'ag'}, 'data_files/ull.xlsx', 'excel', {'skiprows': 3}),
         'ssb_sheep_numbers': ({'ag'}, 'data_files/03710_20260128-152225.xlsx', 'excel', {'skiprows': 2}),
-    }
+        'fs_unfccc_emissions_raw': ({'fs'}, 'data_files/N2O_NOx_HS_FS.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Ark1'}),
+        'fs_firewood_raw': ({'fs'}, 'data_files/09702_20251120-133716.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'VedTonn'}),
+        'fs_obb_grazing': ({'fs'}, 'data_files/OBB_Fylke_1970-2025.xlsx', 'openpyxl_obb_grazing', {}),
+        'faostat_forestry': ({'fs'}, 'data_files/FAOSTAT_data_en_2-20-2026.csv', 'csv_forestry', {})
+        }
 
     # =========================================================================
     # 2. TUNGE SPESIALPR_LOADS (Handelsdata)
@@ -170,6 +178,26 @@ def load_all_data(selected_pools):
                 preloaded['ag_faostat_production'] = df_fao
                 preloaded['fao_animal_production_clean'] = df_fao[(df_fao['Element'] == 'Production') & (df_fao['Value'] != 0) & (~df_fao['Item'].str.contains('hides', case=False, na=False))][['Item', 'Year', 'Value']].copy()
                 preloaded['fao_hides_clean'] = df_fao[(df_fao['Element'] == 'Production') & (df_fao['Value'] != 0) & (df_fao['Item'].str.contains('hides', case=False, na=False))][['Item', 'Year', 'Value']].copy()
+
+            elif method == 'openpyxl_obb_grazing':
+                # Konverterer alle de relevante fanene fra organisert beitebruk til DataFrames med en gang
+                wb_obb = openpyxl.load_workbook(filepath, data_only=True)
+                preloaded['fs_obb_workbook'] = wb_obb # Beholder workbook hvis nødvendig
+                
+                target_sheets = [
+                    'Sau1990-99', 'Sau2000-09', 'Sau2010-19', 'Sau2020-29', 
+                    'Storfe og geit1993-2019', 'Storfe og geit2020-29'
+                ]
+                for sheet_name in target_sheets:
+                    if sheet_name in wb_obb.sheetnames:
+                        preloaded[f"obb_{sheet_name}_raw"] = pd.DataFrame(list(wb_obb[sheet_name].values))
+                    else:
+                        print(f"[ADVARSEL] Beite-fane mangler i OBB-filen: {sheet_name}")
+                        
+            elif method == 'csv_forestry':
+                df_raw = pd.read_csv(filepath)
+                # Vi tar vare på hele filen i minnet så find_industrial_round_wood kan filtrere den lynraskt
+                preloaded[key] = df_raw
 
         except Exception as e:
             print(f"[KRITISK FEIL] Kunne ikke laste {key}: {e}")

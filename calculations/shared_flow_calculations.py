@@ -488,33 +488,59 @@ def find_industrial_crop_products(df_gnb_sheet30, dataset_noise):
             
     return year_values
 
-def find_industrial_round_wood(df_conifer_year, df_nonconifer_year, current_params, expected_years):
-    """Beregner industrirundvirke med kildestøy fra FAOSTAT."""
+def find_industrial_round_wood(preloaded_data, current_params):
+    """
+    Beregner industrirundvirke ved å bruke pre-loadet FAOSTAT-data fra RAM,
+    og ferdigstøysatte parametere/kildestøy fra NParameters-objektet.
+    """
     year_values = {}
     
-    # Hent FAOSTAT kildestøy (stilt inn under 'Forestry proc' i listen din)
+    # 1. Hent modellparametere og kildestøy fra current_params (NParameters)
     noise_faostat = float(current_params.get('Forestry proc', 1.0))
+    wood_density  = float(current_params.get('wood_density', 0.0))
+    conifer_N     = float(current_params.get('conifer_N_frac', 0.0))
+    nonconifer_N   = float(current_params.get('nonconifer_N_frac', 0.0))
     
-    wood_density = float(current_params['wood_density'])
-    conifer_N    = float(current_params['conifer_N_frac'])
-    nonconifer_N = float(current_params['nonconifer_N_frac'])
+    # 2. Hent rådata fra preloaded_data (eller fall tilbake til CSV hvis ikke preloaded)
+    # Merk: Sjekk om 'fs_unfccc_emissions_raw' eller lignende i loggen din er denne filen. 
+    # Hvis rammeverket laster den som 'faostat_forestry', bruker vi det, eller leser direkte:
+    data = preloaded_data.get('faostat_forestry')
+    if data is None:
+        data = pd.read_csv('data_files/FAOSTAT_data_en_2-20-2026.csv')
     
-    conifer_vol_dict = dict(zip(df_conifer_year['Year'], df_conifer_year['Value']))
-    nonconifer_vol_dict = dict(zip(df_nonconifer_year['Year'], df_nonconifer_year['Value']))
+    # 3. Filtrer og prosesser dataene på samme måte som før
+    filtered_data = data[(data['Element'] == 'Production') & (data['Value'] != 0)].copy()
     
-    for year in expected_years:
-        vol_conifer = conifer_vol_dict.get(year, 0.0)
-        vol_nonconifer = nonconifer_vol_dict.get(year, 0.0)
-        
-        if vol_conifer > 0 or vol_nonconifer > 0:
-            n_conifer = (vol_conifer * wood_density * conifer_N) / 1e3
-            n_nonconifer = (vol_nonconifer * wood_density * nonconifer_N) / 1e3
+    items_conifer = ['Industrial roundwood, coniferous']
+    items_nonconifer = ['Industrial roundwood, non-coniferous']
+    
+    final_data = filtered_data[filtered_data['Item'].isin(items_conifer + items_nonconifer)].copy()
+    
+    # Beregn tonn basert på iterasjonens wood_density
+    final_data['tonnes'] = final_data['Value'] * wood_density
+    
+    # Legg på N-fraksjoner
+    mask_conifer = final_data['Item'].isin(items_conifer)
+    mask_nonconifer = final_data['Item'].isin(items_nonconifer)
+    
+    final_data['N_kg_per_kg'] = 0.0
+    final_data.loc[mask_conifer, 'N_kg_per_kg'] = conifer_N
+    final_data.loc[mask_nonconifer, 'N_kg_per_kg'] = nonconifer_N
+    
+    # Tonn * kg N/tonn / 1e3 -> kt N
+    final_data['N_amount'] = final_data['tonnes'] * final_data['N_kg_per_kg'] / 1e3
+    
+    # Summer per år
+    total_N_per_year = final_data.groupby('Year')['N_amount'].sum().to_dict()
+    
+    # 4. Fyll year_values og legg på kildestøyen (noise_faostat)
+    for year in EXPECTED_YEARS:
+        value = total_N_per_year.get(year, 0.0)
+        if value > 0:
+            # Ganger med kildestøyen (Forestry proc) som har blitt generert for denne iterasjonen
+            year_values[year] = value * noise_faostat
             
-            # Ganger totalen med kildestøyen for FAOSTAT
-            year_values[year] = (n_conifer + n_nonconifer) * noise_faostat
-            
-    return year_values
-
+    return year_values, None
 
 def find_industrial_waste_fuels(df_bio_08205, df_bio_hist, current_params):
     """Beregner egentilvirket bioenergi med datasettstøy og ekstrapoleringsstøy."""

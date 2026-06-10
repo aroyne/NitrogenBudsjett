@@ -18,4 +18,4 @@ Work in Progress
 ### Project Overview
 Welcome to the interactive data and documentation portal for the Norwegian national nitrogen budget. This platform visualizes and centralizes the outputs from our Monte Carlo uncertainty analysis simulations.
 
-Use the navigation menu on the left side to explore the individual nitrogen pools (e.g., Agriculture, Atmosphere, Hydrosphere, Rest of the World) and access detailed statistical time-series graphs, methodological explanations, and parameterizations for each specific flow.
+Use the navigation menu on the left side to explore the individual nitrogen pools (e.g., Forests and Semi-natural Vegetation, Agriculture, Atmosphere, Hydrosphere, Rest of the World) and access detailed statistical time-series graphs, methodological explanations, and parameterizations for each specific flow.

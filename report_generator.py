@@ -107,8 +107,8 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         f.write("Welcome to the interactive data and documentation portal for the Norwegian national nitrogen budget. ")
         f.write("This platform visualizes and centralizes the outputs from our Monte Carlo uncertainty analysis simulations.\n\n")
         f.write("Use the navigation menu on the left side to explore the individual nitrogen pools ")
-        f.write("(e.g., Agriculture, Atmosphere, Hydrosphere, Rest of the World) and access detailed statistical time-series graphs, ")
-        f.write("methodological explanations, and parameterizations for each specific flow.\n")
+        f.write("(e.g., Forests and Semi-natural Vegetation, Agriculture, Atmosphere, Hydrosphere, Rest of the World) ")
+        f.write("and access detailed statistical time-series graphs, methodological explanations, and parameterizations for each specific flow.\n")
 
     # ========================================================
     # 2. OPPRETT UNDERMAPPE FOR ATMOSPHERE POOL OG GENERER FILER
@@ -445,17 +445,164 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
             append_bibtex_references(f)
 
     # ========================================================
-    # 5. OPPRETT HIERARKISK PORTAL FOR HYDROSPHERE (HY) POOL
+    # 5. OPPRETT HIERARKISK PORTAL FOR FORESTS AND SEMI-NATURAL VEGETATION (FS) POOL
+    # ========================================================
+    fs_folder = "forests_and_semi_natural_pool"
+    os.makedirs(fs_folder, exist_ok=True)
+
+    # 5a. Hovedside for Forests and semi-natural vegetation (Grandparent)
+    with open(os.path.join(fs_folder, "pool_forests_and_semi_natural.md"), 'w', encoding='utf-8') as f:
+        f.write("---\n")
+        f.write("layout: default\n")
+        f.write("title: Forests and semi-natural vegetation (FS)\n")
+        f.write("nav_order: 5\n")
+        f.write("has_children: true\n")
+        f.write("---\n\n")
+        f.write("# Pool: Forests and semi-natural vegetation (FS)\n\n")
+        f.write("Because of limited data on OL and because data on leaching are combined for WL and OL, ")
+        f.write("we have chosen to combine WL and OL into the OL subpool in this study.\n\n")
+        f.write("We have considered including meat from hunting of wild animals in flows from this subpool, but chosen not to. ")
+        f.write("According to (Steinset, 2021), the amount of wild game caught in 2019 was around 6000 tonnes, ")
+        f.write("which gives around 0.2 ktN and thus smaller than any of the included flows.\n\n")
+        f.write("This pool is divided into two operational sub-pools. Explore them using the side menu or links below:\n\n")
+        f.write("* [Forests (FS.FO)](subpool_forests.html)\n")
+        f.write("* [Other Land (FS.OL)](subpool_other_land.html)\n")
+        
+        f.write(get_balance_image_markdown("FS", relative_depth="../"))
+
+    # 5b. Sub-hovedside for Forests (FS.FO) (Parent 1)
+    with open(os.path.join(fs_folder, "subpool_forests.md"), 'w', encoding='utf-8') as f:
+        f.write("---\n")
+        f.write("layout: default\n")
+        f.write("title: Forests (FS.FO)\n")
+        f.write("parent: Forests and semi-natural vegetation (FS)\n")
+        f.write("nav_order: 1\n")
+        f.write("has_children: true\n")
+        f.write("---\n\n")
+        f.write("# Subpool: Forests (FS.FO)\n\n")
+        
+        f.write(get_balance_image_markdown("FS.FO", relative_depth="../"))
+        f.write("\n### Flows that are zero or neglected:\n\n")
+        f.write("* **FS.FO-AT.AT-Emissions-NOx** is neglected because no values are reported in the CRLTAP/WebDab categories 4A1 and 4A2 (forest soils).\n")
+        f.write("* **FS.FO-EF.EC-Fuel wood for co-fired power plants-Nmix** is set to zero because we assume such facilities do not exist in Norway.\n")
+        f.write("* **FS.FO-EF.IC-Fuel wood for industry-Nmix** is ignored because wood is typically not harvested specifically to be used for fuel in industry in Norway. The use of wood waste in the producing industry is reported as self-produced bioenergy in the SSB statistic, but this is a flow that goes from MP.OP to EF.IC.\n")
+        f.write("* Because the N-flow in forest fertilization is not large, we have chosen to ignore the associated N2O emissions that were included in the Swedish NBB (Moldan et al., 2025).\n")
+
+    # 5c. Sub-hovedside for Other Land (FS.OL) (Parent 2)
+    with open(os.path.join(fs_folder, "subpool_other_land.md"), 'w', encoding='utf-8') as f:
+        f.write("---\n")
+        f.write("layout: default\n")
+        f.write("title: Other Land (FS.OL)\n")
+        f.write("parent: Forests and semi-natural vegetation (FS)\n")
+        f.write("nav_order: 2\n")
+        f.write("has_children: true\n")
+        f.write("---\n\n")
+        f.write("# Subpool: Other land (FS.OL)\n\n")
+        
+        f.write(get_balance_image_markdown("FS.OL", relative_depth="../"))
+        f.write("\n### Flows that are zero or neglected:\n\n")
+        f.write("* **FS.OL-AT.AT-Emissions-NOx** is neglected because no values are reported in the CRLTAP/WebDab categories 4F1 and 4F2 (wetlands / other land NOx).\n")
+
+    fs_fo_counter = 1
+    fs_ol_counter = 1
+
+    for filename in plot_files:
+        if not (filename.upper().startswith("FS_FO_") or filename.upper().startswith("FS_OL_")):
+            continue
+
+        base_name = filename.rsplit('.', 1)[0]
+        flow_file_name = f"flow_{base_name}.md"
+        full_flow_path = os.path.join(fs_folder, flow_file_name)
+        norm = filename.lower().replace('-', '').replace('_', '').replace('.', '')
+
+        exact_flow_code = "FS-Unknown-Flow"
+        display_name = "Unknown Forestry Flow"
+        parent_subpool = ""
+        description = ""
+
+        if filename.upper().startswith("FS_FO_"):
+            parent_subpool = "Forests (FS.FO)"
+            if "emissionsn2" in norm and "n2o" not in norm:
+                exact_flow_code = "FS.FO-AT.AT-Emissions-N2"
+                display_name = "Forest Emissions (N2)"
+                description = "Calculated based on N2O emissions from UNFCCC Common reporting tables, Table 4 and assuming a mean N2:N2O ratio of 19.5 as discussed in (Schäppi, 2025)."
+            elif "emissionsn2o" in norm:
+                exact_flow_code = "FS.FO-AT.AT-Emissions-N2O"
+                display_name = "Forest Emissions (N2O)"
+                description = "Taken from UNFCCC Common reporting tables, Table 4."
+            elif "households" in norm or "fuelwood" in norm:
+                exact_flow_code = "FS.FO-EF.OE-Fuel wood for households-Nmix"
+                display_name = "Fuel Wood for Households"
+                description = "Taken from SSB table 09702 'Energibalansen. Vedforbruk i boliger og fritidsboliger 1990 – 2024' and we assume a mean N content of 4.0 kg/t (between coniferous and non-coniferous wood; see FS.FO-MP.OP-Industrial round wood-Nmix)."
+            elif "leaching" in norm:
+                exact_flow_code = "FS.FO-HY.SW-Leaching-Nmix"
+                display_name = "Forest Leaching"
+                description = "Found in data supplied by NIVA, produced in the TEOTIL3 model (Sample et al., 2024). For the period 1990-2013, we have used TEOTIL data published by Miljødirektoratet for nitrogen from nitrogen flows that reach the coast, where we have found that values for leaching from forest in the period 2013-2023 are a fraction 0.59 of what is reported by Miljødirektoratet as «Bakgrunn», to within a 2% error."
+            elif "roundwood" in norm or "industrial" in norm:
+                exact_flow_code = "FS.FO-MP.OP-Industrial round wood-Nmix"
+                display_name = "Industrial Round Wood"
+                description = (
+                    "Taken from FAOSTAT Forestry production and trade: industrial roundwood, which gives values under bark. "
+                    "The values given here are very close to those reported in SSB table 08979 'Avvirkning for salg (1 000 m3) 1996 – 2024'. "
+                    "We have also compared with data in Eurostat, which gives total amount of round removed (over or under bark) including use for firewood in households and industry. "
+                    "Following the Swedish NBB (Moldan et al., 2025), we use an average wood density of 0.45 t/m3 for all wood categories, "
+                    "and N-contents of 3.4 kg/t for coniferous and 4.3 kg/t for non-coniferous trees (ktN/mill m3 wood harvested).\n\n"
+                    "**Comparison & Discrepancies:**\n"
+                    "* For comparison, Moldan et al. (2025) found 36.4 ktN for industrial roundwood in 2015, or 2.3 times more than the flow we have found for Norway for the same year. In 2015 the FAOSTAT reported total value of industrial round wood is 6.6 times larger than that reported for Norway, so even though we have used the same parameters, they seem to end up with a smaller N content. *(Note: Ask Moldan regarding this reason)*\n"
+                    "* Hohmann-Marriott (2025) reports much larger values, with a total production of around 700 ktN for 2020, even though he used a lower N content (0.14 and 0.17 % N by weight for coniferous and noniferous wood, respectively) for a total amount of 120 million m3 of felled wood in 2020. In the statistics we use, table 08979 (the same as Hofmann used), the value is 10.242 million m3 for 2020. *(Note: Contact Hohmann to ask if he could have misread with a factor of 10 error? He reports using density values of 0.4 and 0.5 t/m3, which should have given the same result as what we got).* "
+                )
+
+        elif filename.upper().startswith("FS_OL_"):
+            parent_subpool = "Other Land (FS.OL)"
+            if "grazing" in norm:
+                exact_flow_code = "FS.OL-AG.MM-Grazing-Nmix"
+                display_name = "Organised Grazing"
+                description = (
+                    "Calculated using data from NIBIO on organised grazing (NIBIO, 2025a) together with estimated fodder intake for different animal groups "
+                    "taken from Table 1.2 in (Hegrenes & Asheim, 2006), assuming an average protein content of 150 g pr FEm and the standard Jones factor "
+                    "for the nitrogen content of protein. *(Note: Check if this trend is a continuous increase, see file OBB_fylke... in data_files)*"
+                )
+            elif "emissionsn2" in norm and "n2o" not in norm:
+                exact_flow_code = "FS.OL-AT.AT-Emissions-N2"
+                display_name = "Other Land Emissions (N2)"
+                description = "Calculated from N2O emissions from UNFCCC Common reporting tables, Table 4, assuming a mean N2:N2O ratio of 19.5 as has been calculated from studies of forest ecosystems, as discussed in (Schäppi, 2025)."
+            elif "emissionsn2o" in norm:
+                exact_flow_code = "FS.OL-AT.AT-Emissions-N2O"
+                display_name = "Other Land Emissions (N2O)"
+                description = "Taken from UNFCCC Common reporting tables, Table 4, where the only reported values are from wetlands."
+            elif "leaching" in norm:
+                exact_flow_code = "FS.OL-HY.SW-Leaching-Nmix"
+                display_name = "Other Land Leaching"
+                description = "Found in data supplied by NIVA, produced in the TEOTIL3 model (Sample et al., 2024), where it is aggregated with the value for WL. For the period 1990-2013, we have used TEOTIL data published by Miljødirektoratet for nitrogen from nitrogen flows that reach the coast, where we have found that values for leaching from forest in the period 2013-2023 are a fraction 0.42 of what is reported by Miljødirektoratet as «Bakgrunn», to within a 3 % error."
+
+        with open(full_flow_path, 'w', encoding='utf-8') as f:
+            f.write("---\n")
+            f.write("layout: default\n")
+            f.write(f"title: {display_name}\n")
+            f.write(f"parent: {parent_subpool}\n")
+            f.write(f"nav_order: {fs_fo_counter if 'FO' in parent_subpool else fs_ol_counter}\n")
+            f.write("---\n\n")
+            if 'FO' in parent_subpool: fs_fo_counter += 1
+            else: fs_ol_counter += 1
+
+            f.write(f"# {display_name}\n\n")
+            f.write(f"![{exact_flow_code}](../{plot_dir}/{filename})\n\n")
+            f.write("### Flow Description\n")
+            f.write(f"{description}\n\n")
+            append_bibtex_references(f)
+
+    # ========================================================
+    # 6. OPPRETT HIERARKISK PORTAL FOR HYDROSPHERE (HY) POOL
     # ========================================================
     hy_folder = "hydrosphere_pool"
     os.makedirs(hy_folder, exist_ok=True)
 
-    # 5a. Hovedside for Hydrosphere (Grandparent)
+    # 6a. Hovedside for Hydrosphere (Grandparent)
     with open(os.path.join(hy_folder, "pool_hydrosphere.md"), 'w', encoding='utf-8') as f:
         f.write("---\n")
         f.write("layout: default\n")
         f.write("title: Hydrosphere (HY)\n")
-        f.write("nav_order: 5\n")
+        f.write("nav_order: 6\n")
         f.write("has_children: true\n")
         f.write("---\n\n")
         f.write("# Pool: Hydrosphere (HY)\n\n")
@@ -468,7 +615,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         
         f.write(get_balance_image_markdown("HY", relative_depth="../"))
 
-    # 5b. Sub-hovedside for Surface Water (Parent 1)
+    # 6b. Sub-hovedside for Surface Water (Parent 1)
     with open(os.path.join(hy_folder, "subpool_surface_water.md"), 'w', encoding='utf-8') as f:
         f.write("---\n")
         f.write("layout: default\n")
@@ -484,7 +631,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         f.write("* **HY.SW-AT.AT-Emissions-NOx** is assumed negligible.\n")
         f.write("* **HY.SW-RW.RW-Export of surface water-Nmix** is assumed negligible due to Norwegian topography.\n")
 
-    # 5c. Sub-hovedside for Coastal Water (Parent 2)
+    # 6c. Sub-hovedside for Coastal Water (Parent 2)
     with open(os.path.join(hy_folder, "subpool_coastal_water.md"), 'w', encoding='utf-8') as f:
         f.write("---\n")
         f.write("layout: default\n")
@@ -502,7 +649,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         f.write("* **HY.CW-PR.SO-Biomass for energy production-Nmix** is neglected because organic material from the processing of caught or farmed fish is assigned to the MP.FS subpool; there is no harvest of material from the ocean only for bioenergy purposes.\n")
         f.write("* **Recreational fishing** is not included in the official guidelines, and we have also chosen to neglect it here. According to Ferter et al. (2023) [^ferter_2023] around 15 kt fish was caught in recreational fishing yearly in 2018-2019. This is less than 1 % of the fish caught in commercial fishing operations.\n")
 
-    # 5d. Sub-hovedside for Aquaculture (Parent 3)
+    # 6d. Sub-hovedside for Aquaculture (Parent 3) - Fullført her:
     with open(os.path.join(hy_folder, "subpool_aquaculture.md"), 'w', encoding='utf-8') as f:
         f.write("---\n")
         f.write("layout: default\n")
@@ -516,97 +663,4 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         f.write(get_balance_image_markdown("HY.AC", relative_depth="../"))
         f.write("\n### Flows that are zero or neglected:\n\n")
         f.write("* **HY.AC-MP.FP-Freshwater fish and seafood-Nmix**, **HY.AC-HY.SW-Waste feed-Nmix** and **HY.AC-HY.SW-Excretia-Nmix** are set to zero because practically all aquaculture in Norway is done in coastal waters.\n")
-        f.write("* **HY.AC-AT.AT-Emissions-NH3** is set to zero assuming negligible ammonia emissions to air from aquaculture.\n")
-
-    # 5e. Sorter og generer flomplot under HY
-    hy_sw_counter = 1
-    hy_cw_counter = 1
-    hy_ac_counter = 1
-
-    for filename in plot_files:
-        if not (filename.upper().startswith("HY_SW_") or filename.upper().startswith("HY_CW_") or filename.upper().startswith("HY_AC_")):
-            continue
-
-        base_name = filename.rsplit('.', 1)[0]
-        flow_file_name = f"flow_{base_name}.md"
-        full_flow_path = os.path.join(hy_folder, flow_file_name)
-        norm = filename.lower().replace('-', '').replace('_', '').replace('.', '')
-
-        exact_flow_code = "HY-Unknown-Flow"
-        display_name = "Unknown Hydrosphere Flow"
-        parent_subpool = ""
-        description = ""
-
-        # MAPPING FOR SURFACE WATER (HY.SW)
-        if filename.upper().startswith("HY_SW_"):
-            parent_subpool = "Surface Water (HY.SW)"
-            if "emissions" in norm and "n2o" in norm:
-                exact_flow_code = "HY.SW-AT.AT-Emissions-N2O"
-                display_name = "Surface Water Emissions (N2O)"
-                description = "Uses data on N retention in surface waters supplied by NIVA, produced in the TEOTIL3 model (Sample et al., 2024 [^sample_2024]), and assuming that all N retained in SW is lost to denitrification, with an assumed fraction 1 % as N2O and the rest as N2."
-            elif "emissions" in norm and "n2" in norm:
-                exact_flow_code = "HY.SW-AT.AT-Emissions-N2"
-                display_name = "Surface Water Emissions (N2)"
-                description = "Is taken from data on N retention in surface waters supplied by NIVA, produced in the TEOTIL3 model (Sample et al., 2024 [^sample_2024]), by assuming that all N retained in SW is lost to denitrification, with an assumed fraction 1 % as N2O and the rest as N2. For years prior to 2013, we have used a retention rate of 7 % which is the typical value from the NIVA data and calculated the denitrification amount as $0.07 / (1 - 0.07) \times \\text{HY.SW-HY.CW-Inflow to coastal waters-Nmix}$."
-            elif "inflow" in norm and "coastal" in norm:
-                exact_flow_code = "HY.SW-HY.CW-Inflow to coastal waters-Nmix"
-                display_name = "Inflow to Coastal Waters"
-                description = "Is found from data supplied by NIVA, produced in the TEOTIL3 model (Sample et al., 2024 [^sample_2024]). Before 2013 we have used values from table 7.2 in (Sample, 2025 [^sample_2025]). These values includes wastewater discharge, so to avoid double counting we subtract the flow **PR.WW-HY.CW-Treated wastewater discharge-Nmix** where we have already assigned all treated wastewater discharge to CW."
-
-        # MAPPING FOR COASTAL WATER (HY.CW)
-        elif filename.upper().startswith("HY_CW_"):
-            parent_subpool = "Coastal Water (HY.CW)"
-            if "wild" in norm and "catch" in norm:
-                exact_flow_code = "HY.CW-MP.FP-Fish (wild catch)-Nmix"
-                display_name = "Wild Fish Catch"
-                description = "Is found using data from (Fiskeridirektoratet, 2025b [^fiskeridirektoratet_2025b]) on total wild fish catch. According to (Schäppi, 2025 [^schappi_2025]), p.254: N content in fish and shellfish: 2.8% according to UNECE Guidance, Annex 6 Table 12. Our results are very close to those of (Hohmann-Marriott, 2025 [^hohmann_marriott_2025]) (also when looking at shellfish and aquaculture)."
-            elif "shellfish" in norm:
-                exact_flow_code = "HY.CW-MP.FP-Shellfish-Nmix"
-                display_name = "Shellfish Harvest"
-                description = "We use data from (Fiskeridirektoratet, 2025b [^fiskeridirektoratet_2025b]) on total wild fish catch. According to (Schäppi, 2025 [^schappi_2025]), p.254: N content in fish and shellfish: 2.8% according to UNECE Guidance, Annex 6 Table 12."
-
-        # MAPPING FOR AQUACULTURE (HY.AC)
-        elif filename.upper().startswith("HY_AC_"):
-            parent_subpool = "Aquaculture (HY.AC)"
-            if "coastal" in norm and "fish" in norm:
-                exact_flow_code = "HY.AC-MP.FP-Coastal fish and seafood-Nmix"
-                display_name = "Coastal Fish and Seafood Production"
-                description = "Is calculated using data from (Fiskeridirektoratet, 2025a [^fiskeridirektoratet_2025a]) on sold farmed fish, assuming average protein (N) retention of 35.75 % (Aas et al., 2022 [^aas_2022]), 2.8 % nitrogen content in fish and shellfish ((Schäppi, 2025 [^schappi_2025]), p. 254) and 3% feed waste (Wang et al., 2013 [^wang_2013])."
-            elif "waste" in norm and "feed" in norm:
-                exact_flow_code = "HY.AC-HY.CW-Waste feed-Nmix"
-                display_name = "Aquaculture Waste Feed"
-                description = "Is calculated using data from (Fiskeridirektoratet, 2025a [^fiskeridirektoratet_2025a]) on sold farmed fish, assuming average protein (N) retention of 35.75 % (Aas et al., 2022 [^aas_2022]), 2.8 % nitrogen content in fish and shellfish ((Schäppi, 2025 [^schappi_2025]), p. 254) and 3% feed waste (Wang et al., 2013 [^wang_2013])."
-            elif "excretia" in norm:
-                exact_flow_code = "HY.AC-HY.CW-Excretia-Nmix"
-                display_name = "Aquaculture Excretia"
-                description = "Is found through mass balance by assuming N that does not become fish or waste feed is excreted."
-
-        with open(full_flow_path, 'w', encoding='utf-8') as f:
-            f.write("---\n")
-            f.write("layout: default\n")
-            f.write(f"title: {display_name}\n")
-            f.write(f"parent: {parent_subpool}\n")
-            
-            if "Surface" in parent_subpool:
-                f.write(f"nav_order: {hy_sw_counter}\n")
-                hy_sw_counter += 1
-            elif "Coastal" in parent_subpool:
-                f.write(f"nav_order: {hy_cw_counter}\n")
-                hy_cw_counter += 1
-            elif "Aquaculture" in parent_subpool:
-                f.write(f"nav_order: {hy_ac_counter}\n")
-                hy_ac_counter += 1
-                
-            f.write("---\n\n")
-
-            f.write(f"# {display_name}\n\n")
-            f.write(f"![{exact_flow_code}](../{plot_dir}/{filename})\n\n")
-            f.write("### Flow Description\n")
-            if description:
-                f.write(f"{description}\n\n")
-            else:
-                f.write(f"*Flow details detected for file: `{filename}`.*\n\n")
-                
-            append_bibtex_references(f)
-
-    print("[SUKSESS] Portal ferdig generert med oppdaterte filer for alle pooler inkludert HY.")
+        f.write("* **HY.AC-AT.AT-Emissions-NH3** is set to zero assuming negligible ammonia emissions from these coastal marine cages.\n")

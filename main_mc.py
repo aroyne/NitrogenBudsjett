@@ -529,6 +529,10 @@ def main():
             from calculations.hy_mc import execute_calculations_hy  # Sjekk at funksjonsnavnet stemmer
             iteration_output['hy'] = execute_calculations_hy(preloaded_data, current_params, dataset_noise)
             
+        if 'fs' in selected_pools:
+            from calculations.fs_mc import execute_calculations_fs  # Sjekk at funksjonsnavnet stemmer
+            iteration_output['fs'] = execute_calculations_fs(preloaded_data, current_params, dataset_noise)
+            
         # (Her legger du inn de andre poolene etter hvert: if 'rw' in selected_pools... osv.)
 
         # --- DIAGNOSTISK SJEKK FOR ITERASJON 0 (DETERMINISTISK) ---
