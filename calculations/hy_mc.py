@@ -28,7 +28,6 @@ def execute_calculations_hy(preloaded_data, current_params, dataset_noise):
     outflow_tracker = pd.DataFrame({'value': 0.0, 'entries': 0}, index=years_sorted)
     
     # 1. Hent og registrer delte strømmer (Shared flows)
-    ww_discharge_dict = _add_shared_wastewater_discharge(results, preloaded_data, current_params, dataset_noise)
     aqua_production_dict = find_aquaculture_production(
         preloaded_data.get('aqua_modern'), 
         preloaded_data.get('aqua_old'), 
@@ -37,7 +36,7 @@ def execute_calculations_hy(preloaded_data, current_params, dataset_noise):
     )
     
     # 2. Kjør spesialstrømmer for hydrosfære og akvakultur
-    _add_inflow_to_coastal_waters(results, preloaded_data, dataset_noise, ww_discharge_dict, outflow_tracker)
+    _add_inflow_to_coastal_waters(results, preloaded_data, current_params, dataset_noise, outflow_tracker)
     _add_wild_shellfish_and_macroalgae(results, preloaded_data, current_params, dataset_noise)
     _add_surface_water_emissions(results, preloaded_data, current_params, dataset_noise, outflow_tracker)
     _add_wild_fish_catch(results, preloaded_data, current_params, dataset_noise)
@@ -50,37 +49,7 @@ def execute_calculations_hy(preloaded_data, current_params, dataset_noise):
 # UNDERFUNKSJONER FOR HYDROSFIÆRE- OG HAVBRUKSSTRØMMER
 # =============================================================================
 
-def _add_shared_wastewater_discharge(results, preloaded_data, current_params, dataset_noise):
-    """
-    Registrerer den delte avløpsstrømmen inn i HY-resultatene og returnerer 
-    en ordbok for bruk i fratrekk under kysttilførsel.
-    """
-    flow_code = 'PR.WW-HY.CW-Treated wastewater discharge-Nmix'
-    collected_years = set()
-    
-    ww_discharge_dict = find_treated_wastewater_discharge(
-        df_05280=preloaded_data.get('hy_ssb_05280_raw'),
-        df_utslipp=preloaded_data.get('hy_utslipp_avlop_raw'),
-        current_params=current_params,
-        dataset_noise=dataset_noise,
-        expected_years=EXPECTED_YEARS
-    )
-    
-    for year, val_kt_N in ww_discharge_dict.items():
-        if year in EXPECTED_YEARS:
-            collected_years.add(year)
-            results.append({
-                'flow_name': flow_code, 'year': year, 'value': float(val_kt_N),
-                'comment': 'ok (MC-støy beregnet via felles avløpsmatrise)',
-                'data_sources': 'SSB Tabell 05280 / utslipp_avløp'
-            })
-            
-    missing_years = EXPECTED_YEARS - collected_years
-    report_missing_years(flow_code, missing_years, results)
-    return ww_discharge_dict
-
-
-def _add_inflow_to_coastal_waters(results, preloaded_data, dataset_noise, ww_discharge_dict, outflow_tracker):
+def _add_inflow_to_coastal_waters(results, preloaded_data, current_params, dataset_noise, outflow_tracker):
     """
     Beregner ferskvannstilførsel til kysten fra TEOTIL/Miljødirektoratet, 
     og trekker fra renset avløp for å unngå dobbelttelling.
@@ -91,6 +60,14 @@ def _add_inflow_to_coastal_waters(results, preloaded_data, dataset_noise, ww_dis
     key_teotil = 'TEOTIL'
     has_noise_teotil = dataset_noise and key_teotil in dataset_noise
     noise_teotil = dataset_noise[key_teotil]['value'] if has_noise_teotil else 1.0
+    
+    ww_discharge_dict = find_treated_wastewater_discharge(
+        df_05280=preloaded_data.get('hy_ssb_05280_raw'),
+        df_utslipp=preloaded_data.get('hy_utslipp_avlop_raw'),
+        current_params=current_params,
+        dataset_noise=dataset_noise,
+        expected_years=EXPECTED_YEARS
+    )
     
     # --- Tidlige år (Miljødirektoratet-ark, 1990-2012-ish) ---
     df_kyst = preloaded_data.get('hy_kyst_tilforsel')
@@ -177,6 +154,11 @@ def _add_wild_shellfish_and_macroalgae(results, preloaded_data, current_params, 
 
     # Modern data
     df_art = preloaded_data.get('hy_art_raw')
+    print("Rad 34:", df_art.iloc[34, 0], "| Rad 35:", df_art.iloc[35, 0])
+    print("Rad 38:", df_art.iloc[38, 0], "| Rad 39:", df_art.iloc[39, 0])
+    for idx, val in enumerate(df_art.iloc[:, 0]):
+        if val is not None and ('skalldyr' in str(val).lower() or 'skall' in str(val).lower()):
+            print(f"--- FANT DET! Skalldyr ligger på indeks: {idx} (Tekst: '{val}')")    
     if df_art is not None:
         for col in range(2, df_art.shape[1]):
             try:
@@ -187,13 +169,18 @@ def _add_wild_shellfish_and_macroalgae(results, preloaded_data, current_params, 
                 if year in EXPECTED_YEARS:
                     collected_years.add(year)
                     val = 0.0
-                    # Rad 35: Skalldyr (tonn), Rad 39: Tang og tare (tonn)
-                    if not pd.isna(df_art.iloc[35, col]):
-                        val += (float(df_art.iloc[35, col]) / 1000.0) * fish_N_frac
-                    if not pd.isna(df_art.iloc[39, col]):
-                        val += (float(df_art.iloc[39, col]) / 1000.0) * seaweed_N_frac
+                    # Eksakte indekser basert på bildefasit (Excel-rad minus 1)
+                    shellfish_total_row = 35  # Excel rad 36 (Delsum skalldyr)
+                    algae_total_row = 41      # Excel rad 42 (Delsum makroalger)
                     
-                    results.append({
+                    # Hent Delsum Skalldyr
+                    if not pd.isna(df_art.iloc[shellfish_total_row, col]):
+                        val += (float(df_art.iloc[shellfish_total_row, col]) / 1000.0) * fish_N_frac
+                        
+                    # Hent Delsum Makroalger
+                    if not pd.isna(df_art.iloc[algae_total_row, col]):
+                        val += (float(df_art.iloc[algae_total_row, col]) / 1000.0) * seaweed_N_frac
+                        results.append({
                         'flow_name': flow_code, 'year': year, 'value': max(0.0, val * noise_fisk),
                         'comment': 'ok (MC-støy lagt på)', 'data_sources': 'Fiskeridirektoratet'
                     })
