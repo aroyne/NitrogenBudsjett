@@ -37,7 +37,7 @@ def execute_calculations_ef(preloaded_data, current_params, dataset_noise, curre
     _add_fuel_for_industry_mc(results, preloaded_data, dataset_noise)
     _add_fuel_for_transport_mc(results, preloaded_data, dataset_noise)
     _add_fuel_for_heating_mc(results, preloaded_data, dataset_noise)
-    _add_fuel_used_as_feedstock_mc(results, preloaded_data, current_params)
+    _add_fuel_used_as_feedstock_mc(results, preloaded_data, current_params, dataset_noise)
     _add_ec_NOx_emissions_mc(results, preloaded_data, current_params, dataset_noise)
     _add_ec_N2O_emissions_mc(results, preloaded_data, dataset_noise)
     _add_fuel_export_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise)
@@ -148,11 +148,11 @@ def _add_fuel_for_heating_mc(results, preloaded_data, dataset_noise):
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
 
 
-def _add_fuel_used_as_feedstock_mc(results, preloaded_data, current_params):
+def _add_fuel_used_as_feedstock_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'EF.EC-MP.OP-Fuel used as feedstock-Nmix'
     collected_years = set()
     
-    year_values, _ = find_feedstock_fuel(preloaded_data, current_params)
+    year_values, _ = find_feedstock_fuel(preloaded_data, current_params, dataset_noise)
     
     for year, value in year_values.items():
         year = int(year)
@@ -171,7 +171,7 @@ def _add_ec_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
     collected_years = set()
     dataset_key = 'CRLTAP'
     
-    conv = float(current_params.get("NOx_to_N_factor", 14/46))
+    conv = float(current_params.get("NOx_to_N_factor"))
     # Hent data med den korrekte nøkkelen fra data_loader, og send med dataset_noise som 5. argument
     crltap_data = preloaded_data.get('ag_crltap_raw_lines')
     
@@ -253,7 +253,7 @@ def _add_ic_NH3_emissions_mc(results, preloaded_data, current_params, dataset_no
     collected_years = set()
     dataset_key = 'CRLTAP'
     
-    conv = float(current_params.get("NH3_to_N_factor", 14/17))
+    conv = float(current_params.get("NH3_to_N_factor"))
     crltap_data = preloaded_data.get('ag_crltap_raw_lines')
     
     sums = load_crltap_emissions_to_N(
@@ -282,7 +282,7 @@ def _add_ic_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
     collected_years = set()
     dataset_key = 'CRLTAP'
     
-    conv = float(current_params.get("NOx_to_N_factor", 14/46))
+    conv = float(current_params.get("NOx_to_N_factor"))
     crltap_data = preloaded_data.get('ag_crltap_raw_lines')
     
     sums = load_crltap_emissions_to_N(
@@ -336,7 +336,7 @@ def _add_tr_NH3_emissions_mc(results, preloaded_data, current_params, dataset_no
     collected_years = set()
     dataset_key = 'CRLTAP'
     
-    conv = float(current_params.get("NH3_to_N_factor", 14/17))
+    conv = float(current_params.get("NH3_to_N_factor"))
     crltap_data = preloaded_data.get('ag_crltap_raw_lines')
     
     sums = load_crltap_emissions_to_N(
@@ -365,7 +365,7 @@ def _add_tr_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
     collected_years = set()
     dataset_key = 'CRLTAP'
     
-    conv = float(current_params.get("NOx_to_N_factor", 14/46))
+    conv = float(current_params.get("NOx_to_N_factor"))
     crltap_data = preloaded_data.get('ag_crltap_raw_lines')
     
     sums = load_crltap_emissions_to_N(
@@ -446,7 +446,7 @@ def _add_oe_NH3_emissions_mc(results, preloaded_data, current_params, dataset_no
     collected_years = set()
     dataset_key = 'CRLTAP'
     
-    conv = float(current_params.get("NH3_to_N_factor", 14/17))
+    conv = float(current_params.get("NH3_to_N_factor"))
     crltap_data = preloaded_data.get('ag_crltap_raw_lines')
     
     sums = load_crltap_emissions_to_N(
@@ -475,7 +475,7 @@ def _add_oe_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
     collected_years = set()
     dataset_key = 'CRLTAP'
     
-    conv = float(current_params.get("NOx_to_N_factor", 14/46))
+    conv = float(current_params.get("NOx_to_N_factor"))
     crltap_data = preloaded_data.get('ag_crltap_raw_lines')
     
     sums = load_crltap_emissions_to_N(

@@ -276,8 +276,7 @@ def _add_AG_N2_fixation_mc(results, current_params):
     data_sources = 'Bleken & Bakken'
     
     # Henter rundens ferdigstøysatte verdi direkte fra parameter-ordboka
-    value = float(current_params.get("AG_biological_fixation_N2", 0.0))
-    uncertainty = 50.0  # Beholdes statisk som metadata i ordboka
+    value = float(current_params.get("AG_biological_fixation_N2"))
     
     for year in EXPECTED_YEARS:
         results.append({
@@ -286,7 +285,6 @@ def _add_AG_N2_fixation_mc(results, current_params):
             'value': value, 
             'comment': comment,
             'data_sources': data_sources,
-            'uncertainty': uncertainty
         })
 
 
@@ -295,9 +293,7 @@ def _add_FO_N2_fixation_mc(results, current_params):
     comment = 'ok (MC-støy lagt på)'
     data_sources = 'Moldan (2025) and SSB'
     
-    # Fallback til 18.0 kt N hvis parameteren mot formodning skulle mangle
-    value = float(current_params.get("FO_biological_fixation_N2", 18.0))
-    uncertainty = 50.0
+    value = float(current_params.get("FO_biological_fixation_N2"))
     
     for year in EXPECTED_YEARS:
         results.append({
@@ -306,7 +302,6 @@ def _add_FO_N2_fixation_mc(results, current_params):
             'value': value, 
             'comment': comment,
             'data_sources': data_sources,
-            'uncertainty': uncertainty
         })
 
 
@@ -315,8 +310,7 @@ def _add_OL_N2_fixation_mc(results, current_params):
     comment = 'ok (MC-støy lagt på)'
     data_sources = 'CORINE land cover inventory and REddy & DeLaune (2008)'
     
-    value = float(current_params.get("OL_biological_fixation_N2", 0.0))
-    uncertainty = 50.0
+    value = float(current_params.get("OL_biological_fixation_N2"))
     
     for year in EXPECTED_YEARS:
         results.append({
@@ -325,7 +319,6 @@ def _add_OL_N2_fixation_mc(results, current_params):
             'value': value, 
             'comment': comment,
             'data_sources': data_sources,
-            'uncertainty': uncertainty
         })
 
 
@@ -334,9 +327,7 @@ def _add_SW_N2_fixation_mc(results, current_params):
     comment = 'ok (MC-støy lagt på)'
     data_sources = 'NIBIO and Reddy & DeLaune (2008)'
     
-    # Fallback til 2.0 kt N
-    value = float(current_params.get("SW_biological_fixation_N2", 2.0))
-    uncertainty = 50.0
+    value = float(current_params.get("SW_biological_fixation_N2"))
     
     for year in EXPECTED_YEARS:
         results.append({
@@ -345,7 +336,6 @@ def _add_SW_N2_fixation_mc(results, current_params):
             'value': value, 
             'comment': comment,
             'data_sources': data_sources,
-            'uncertainty': uncertainty
         })
         
         

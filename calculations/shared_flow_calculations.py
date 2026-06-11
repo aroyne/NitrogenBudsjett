@@ -39,7 +39,7 @@ def find_ammonia_import(prepared_trade_data, current_params, trade_params):
     year_values = {}
     
     # Hent støy for utenrikshandel (f.eks. tabell 08801 eller tilsvarende fra listen din)
-    noise_trade = float(current_params.get('08801', current_params.get('13136', 1.0)))
+    noise_trade = float(current_params.get('08801', current_params.get('13136')))
     
     aggregated_data, _ = find_trade_flow(
         data_impeks=prepared_trade_data, 
@@ -65,7 +65,7 @@ def find_aquaculture_production(df_aqua_modern, df_aqua_old, current_params, dat
     aquaculture_production = {}
     
     # 1. Hent den perturberte N-faktoren for fisk (parameterstøy)
-    fish_N_frac = float(current_params.get('fish_N_frac', 0.028))
+    fish_N_frac = float(current_params.get('fish_N_frac'))
     
     # 2. Hent simulert aktivitetsstøy for Fiskeridirektoratet (dataset-støy)
     # Vi sjekker om den ligger i 'dataset_noise' først, med fallback til 'current_params'
@@ -80,7 +80,7 @@ def find_aquaculture_production(df_aqua_modern, df_aqua_old, current_params, dat
         # men for aktivitetsdata fra Fiskeridirektoratet er det nesten alltid prosentvis (perc).
     else:
         # Fallback til din gamle logg dersom nøkkelen ble dyttet flatt inn i current_params
-        noise_aqua = float(current_params.get('Fiskeridirekt', current_params.get('Fiskeridirektoratet', 1.0)))
+        noise_aqua = float(current_params.get('Fiskeridirekt', current_params.get('Fiskeridirektoratet')))
 
     # --- DEL 1: Moderne data (fra 1994 og utover) ---
     for col in df_aqua_modern.columns:
@@ -121,7 +121,7 @@ def find_aquaculture_production(df_aqua_modern, df_aqua_old, current_params, dat
 def find_export_for_recycling(prepared_trade_data, current_params, trade_params):
     """Henter eksport for resirkulering med varehandelsstøy."""
     year_values = {}
-    noise_trade = float(current_params.get('08801', current_params.get('13136', 1.0)))
+    noise_trade = float(current_params.get('08801', current_params.get('13136')))
     
     aggregated_data, _ = find_trade_flow(
         data_impeks=prepared_trade_data, 
@@ -141,7 +141,7 @@ def find_export_for_recycling(prepared_trade_data, current_params, trade_params)
 def find_export_for_reuse(prepared_trade_data, current_params, trade_params):
     """Henter eksport for gjenbruk med varehandelsstøy."""
     year_values = {}
-    noise_trade = float(current_params.get('08801', current_params.get('13136', 1.0)))
+    noise_trade = float(current_params.get('08801', current_params.get('13136')))
     
     aggregated_data, _ = find_trade_flow(
         data_impeks=prepared_trade_data, 
@@ -160,15 +160,15 @@ def find_export_for_reuse(prepared_trade_data, current_params, trade_params):
 
 import pandas as pd
 
-def find_feedstock_fuel(preloaded_data, current_params):
+def find_feedstock_fuel(preloaded_data, current_params, dataset_noise):
     """
     Beregner nitrogen i råstoff med kildestøy fra energibalansen (11561).
     Henter data fra preloaded_data i stedet for å lese filen for hver iterasjon.
     """
     year_values = {}
     
-    # Hent støy for energibalansen (Tabell 11561) - Standard 1.0 hvis ikke satt
-    noise_energy = float(current_params.get('11561', 1.0))
+    # Hent støy for energibalansen (Tabell 11561) 
+    noise_energy = float(dataset_noise['11561']['value'])
     
     # Hent parametere trygt fra current_params (støtter både dict og NParameters)
     GWh_to_TJ_factor = float(current_params.get('GWh_to_TJ_factor'))
@@ -239,9 +239,9 @@ def find_food_industry_waste(df_05282, df_10514, current_params):
     year_values = {}
     wet_org_N = float(current_params['wet_organic'])
     
-    noise_05282 = float(current_params.get('05282', 1.0))
-    noise_10514 = float(current_params.get('10514', 1.0))
-    noise_trend = float(current_params.get('trend interpolation', 1.0))
+    noise_05282 = float(current_params.get('05282'))
+    noise_10514 = float(current_params.get('10514'))
+    noise_trend = float(current_params.get('trend interpolation'))
     
     value_2012 = 0.0
     value_2011 = 0.0
@@ -505,7 +505,7 @@ def find_industrial_crop_products(df_gnb_sheet30, dataset_noise):
             
     return year_values
 
-def find_industrial_round_wood(preloaded_data, current_params):
+def find_industrial_round_wood(preloaded_data, current_params, dataset_noise):
     """
     Beregner industrirundvirke ved å bruke pre-loadet FAOSTAT-data fra RAM,
     og ferdigstøysatte parametere/kildestøy fra NParameters-objektet.
@@ -513,10 +513,10 @@ def find_industrial_round_wood(preloaded_data, current_params):
     year_values = {}
     
     # 1. Hent modellparametere og kildestøy fra current_params (NParameters)
-    noise_faostat = float(current_params.get('Forestry proc', 1.0))
-    wood_density  = float(current_params.get('wood_density', 0.0))
-    conifer_N     = float(current_params.get('conifer_N_frac', 0.0))
-    nonconifer_N   = float(current_params.get('nonconifer_N_frac', 0.0))
+    noise_faostat = dataset_noise['Forestry production and trade']['value']
+    wood_density  = float(current_params.get('wood_density'))
+    conifer_N     = float(current_params.get('conifer_N_frac'))
+    nonconifer_N   = float(current_params.get('nonconifer_N_frac'))
     
     # 2. Hent rådata fra preloaded_data (eller fall tilbake til CSV hvis ikke preloaded)
     # Merk: Sjekk om 'fs_unfccc_emissions_raw' eller lignende i loggen din er denne filen. 
@@ -563,8 +563,8 @@ def find_industrial_waste_fuels(df_bio_08205, df_bio_hist, current_params):
     """Beregner egentilvirket bioenergi med datasettstøy og ekstrapoleringsstøy."""
     year_values = {}
     
-    noise_08205 = float(current_params.get('08205', 1.0))
-    noise_trend = float(current_params.get('trend interpolation', 1.0))
+    noise_08205 = float(current_params.get('08205'))
+    noise_trend = float(current_params.get('trend interpolation'))
     
     # Parametere
     NCV              = float(current_params['firewood_NCV'])
@@ -625,8 +625,8 @@ def find_landfill_emissions_to_water(df_uts, df_tilk, current_params):
     """
     # 1. Hent støyfaktorer fra denne MC-runden
     # NÅ OPPDATERT: Bruker 'norskeutslipp' som primærnøkkel!
-    noise_deponi = float(current_params.get('norskeutslipp', 1.0))
-    noise_trend  = float(current_params.get('trend interpolation', 1.0))
+    noise_deponi = float(current_params.get('norskeutslipp'))
+    noise_trend  = float(current_params.get('trend interpolation'))
     
     # Usikkerhet i tilkobling: For "ukjent" trekker vi en tilfeldig vekt mellom 0 og 1 for denne runden
     ukjent_vekt_tilkoblet = float(np.random.uniform(0.0, 1.0))
@@ -695,24 +695,19 @@ def find_non_edible_animal_products(df_hides_clean, df_wool, df_sheep, current_p
     year_values = {}
     
     # 1. Hent ut den asymmetriske datasettstøyen fra denne MC-runden (hvis den finnes, ellers 1.0)
-    has_fao = dataset_noise and 'Crops and livestock products' in dataset_noise
-    noise_faostat = dataset_noise['Crops and livestock products']['value'] if has_fao else 1.0
+    noise_faostat = dataset_noise['Crops and livestock products']['value']
 
-    has_03710 = dataset_noise and '03710' in dataset_noise
-    noise_ssb = dataset_noise['03710']['value'] if has_03710 else 1.0
+    noise_ssb = dataset_noise['03710']['value']
 
-    has_wool = dataset_noise and 'Landbruksdirektoratet_wool' in dataset_noise
-    noise_wool = dataset_noise['Landbruksdirektoratet_wool']['value'] if has_wool else 1.0
+    noise_wool = dataset_noise['Landbruksdirektoratet_wool']['value']
 
     # Trendstøy (hvis definert i dataset_noise, ellers 1.0)
-    noise_trend = 1.0
-    if dataset_noise and 'trend interpolation' in dataset_noise:
-        noise_trend = dataset_noise['trend interpolation']['value']
+    noise_trend = dataset_noise['trend interpolation']['value']
 
     # 2. Hent støybelagte parametere fra current_params (krasjer hardt om de mangler)
-    N_content_hides = current_params.get('prod_Raw hides and skins', None)
-    wool_pr_sheep = current_params.get('wool_per_sheep', None)
-    N_content_wool = current_params.get('wool_N_frac', None)
+    N_content_hides = current_params.get('prod_Raw hides and skins')
+    wool_pr_sheep = current_params.get('wool_per_sheep')
+    N_content_wool = current_params.get('wool_N_frac')
     
     if N_content_hides is None or wool_pr_sheep is None or N_content_wool is None:
         raise KeyError(
@@ -762,7 +757,7 @@ def find_other_goods_export(prepared_trade_data, current_params, trade_params):
     Forventer forhåndssummerte data. Ingen tunge Pandas groupby-operasjoner inni loopen!
     """
     year_values = {}
-    noise_trade = float(current_params.get('08801', current_params.get('13136', 1.0)))
+    noise_trade = float(current_params.get('08801', current_params.get('13136')))
     
     # 1. Hent N-faktorer
     n_factor_dict = trade_params['value'].to_dict()
@@ -786,7 +781,7 @@ def find_other_goods_import(prepared_trade_data, current_params, trade_params):
     Forventer forhåndssummerte data. Ingen tunge Pandas groupby-operasjoner inni loopen!
     """
     year_values = {}
-    noise_trade = float(current_params.get('08801', current_params.get('13136', 1.0)))
+    noise_trade = float(current_params.get('08801', current_params.get('13136')))
     
     # 1. Hent N-faktorer
     n_factor_dict = trade_params['value'].to_dict()
@@ -823,9 +818,9 @@ def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params)
     mixed_N     = float(current_params['mixed_waste'])
     
     # 2. Hent støyfaktorer for denne MC-runden
-    noise_05282 = float(current_params.get('05282', 1.0))
-    noise_10514 = float(current_params.get('10514', 1.0))
-    noise_trend = float(current_params.get('trend interpolation', 1.0))
+    noise_05282 = float(current_params.get('05282'))
+    noise_10514 = float(current_params.get('10514'))
+    noise_trend = float(current_params.get('trend interpolation'))
     
     # --- HASTIGHETS-BOOST: Konverter til NumPy-matriser ---
     arr_05282 = df_05282.values
@@ -929,7 +924,7 @@ def find_other_industry_wastewater(prepared_wastewater_dict, current_params):
     year_values = {}
     
     # Hent rundens støyfaktor for 'norskeutslipp' (hvis tom, bruk 1.0 som fallback)
-    noise_norskeutslipp = float(current_params.get('norskeutslipp', 1.0))
+    noise_norskeutslipp = float(current_params.get('norskeutslipp'))
     
     # Legg støy på de ferdige tallene for hvert år
     for year, base_value in prepared_wastewater_dict.items():
@@ -964,18 +959,18 @@ def find_recycling(data_05281, data_10513, data_hist_rec, current_params,
     year_values = {}
     
     # 1. Hent rundens støyfaktorer (avfallsfraksjoner og datasettmultiplikatorer)
-    paper_N   = float(current_params.get('paper', 0.0))
-    plastic_N = float(current_params.get('plastic', 0.0))
-    wood_N    = float(current_params.get('wood', 0.0))
-    textile_N = float(current_params.get('textiles', 0.0))
-    other_N   = float(current_params.get('other_materials', 0.0))
-    haz_N     = float(current_params.get('hazardous', 0.0))
-    contam_N  = float(current_params.get('contaminated_masses', 0.0))
-    rubber_N  = float(current_params.get('rubber', 0.0))
-    mixed_N   = float(current_params.get('mixed_waste', 0.0))
+    paper_N   = float(current_params.get('paper'))
+    plastic_N = float(current_params.get('plastic'))
+    wood_N    = float(current_params.get('wood'))
+    textile_N = float(current_params.get('textiles'))
+    other_N   = float(current_params.get('other_materials'))
+    haz_N     = float(current_params.get('hazardous'))
+    contam_N  = float(current_params.get('contaminated_masses'))
+    rubber_N  = float(current_params.get('rubber'))
+    mixed_N   = float(current_params.get('mixed_waste'))
     
-    u_05281 = float(current_params.get('05281', 1.0))
-    u_10513 = float(current_params.get('10513', 1.0))
+    u_05281 = float(current_params.get('05281'))
+    u_10513 = float(current_params.get('10513'))
 
     # 2. Beregn perioden 1995-2011 (vektorisert via NumPy)
     vals_05281 = (
@@ -1048,8 +1043,8 @@ def find_sewage_sludge_biogas(prepared_biogas_data, current_params):
     year_values = {}
     
     # 1. Hent rundens unike støyfaktorer fra current_params
-    sludge_N = float(current_params.get('sludge', 0.0))
-    u_12359  = float(current_params.get('12359', 1.0))
+    sludge_N = float(current_params.get('sludge'))
+    u_12359  = float(current_params.get('12359'))
     
     # 2. Beregn N_amount (vektorisert multiplikasjon: mengde * N-innhold * datasettstøy)
     n_amounts = prepared_biogas_data['amounts'] * sludge_N * u_12359
@@ -1070,7 +1065,7 @@ def find_solid_waste_export(prepared_waste_data, current_params, trade_params):
     year_values = {}
     
     # Hent rundens generelle støyfaktor for handelsdata
-    noise_trade = float(current_params.get('08801', current_params.get('13136', 1.0)))
+    noise_trade = float(current_params.get('08801', current_params.get('13136')))
     
     # 1. Hent rundens spesifikke N-faktorer for handelsvarene
     n_factor_dict = trade_params['value'].to_dict()
@@ -1107,7 +1102,7 @@ def find_treated_wastewater_discharge(df_05280, df_utslipp, current_params, data
         if noise_info['type'] == 'perc':
             noise_ww = float(noise_info['value'])
     else:
-        noise_ww = float(current_params.get('05280', 1.0))
+        noise_ww = float(current_params.get('05280'))
 
     # For ekstrapolering bakover til 1990 trenger vi å holde styr på 1997-verdien
     value_1997 = 0.0

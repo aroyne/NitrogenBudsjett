@@ -10,7 +10,7 @@ nav_order: 2
 ![EF.IC-AT.AT-Emissions-NOx](../output_files/plots/EF_IC_AT_AT_Emissions_NOx.png)
 
 ### Flow Description
-EF.IC-AT.AT-Emissions-NOx denotes NOx emissions from fuel combustion in industry. We have used data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 12.
+EF.IC-AT.AT-Emissions-NOx denotes NOx emissions from fuel combustion in industry. We have used data from CLRTAP Inventory Submissions [^emep_officially_2025] as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 12.
 
 
 ### References

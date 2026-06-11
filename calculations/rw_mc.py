@@ -112,8 +112,8 @@ def _add_animal_feed_import_mc(results, preloaded_data, current_params, dataset_
         return
 
     # Globale parametere (Allerede perturbert sentralt)
-    N_content_carb = float(current_params.get("feed_carb_N_frac", 0.015))
-    N_content_prot = float(current_params.get("feed_prot_N_frac", 0.070))
+    N_content_carb = float(current_params.get("feed_carb_N_frac"))
+    N_content_prot = float(current_params.get("feed_prot_N_frac"))
     
     # Datasetstøy: Kraftfôrstatistikk
     key_kraft = 'Kraftforstatistikk'
@@ -211,9 +211,9 @@ def _add_aquaculture_feed_import_mc(results, preloaded_data, current_params, dat
     # find_aquaculture_production bruker ferdigstøysatte parametere internt!
     aquaculture_production = find_aquaculture_production(df_modern, df_old, current_params, dataset_noise)
 
-    import_fraction = float(current_params.get("aquafeed_import_fraction", 0.80))
-    prot_ret = float(current_params.get("aquafeed_N_retention", 0.35))
-    feed_waste = float(current_params.get("aquafeed_waste_fraction", 0.05))
+    import_fraction = float(current_params.get("aquafeed_import_fraction"))
+    prot_ret = float(current_params.get("aquafeed_N_retention"))
+    feed_waste = float(current_params.get("aquafeed_waste_fraction"))
 
     for year, fish_harvested_N in aquaculture_production.items():
         if year not in EXPECTED_YEARS: continue
@@ -245,8 +245,8 @@ def _add_live_animal_import_mc(results, preloaded_data, current_params, dataset_
     final_data = preloaded_data.get('fao_live_animals')
     if final_data is None: return
 
-    prot_frac = float(current_params.get("live_animal_protein_frac", 0.15))
-    prot_to_N = float(current_params.get("Jones_factor", 6.25))
+    prot_frac = float(current_params.get("live_animal_protein_frac"))
+    prot_to_N = float(current_params.get("Jones_factor"))
 
     key_fao = 'Crops and livestock products'
     has_noise_fao = dataset_noise and key_fao in dataset_noise
@@ -260,7 +260,7 @@ def _add_live_animal_import_mc(results, preloaded_data, current_params, dataset_
 
     # Henter de ferdig perturberte enkeltvektene fra ordboken
     def get_perturbed_weight(item_name):
-        return float(current_params.get(f"weight_{str(item_name).strip()}", 100.0))
+        return float(current_params.get(f"weight_{str(item_name).strip()}"))
 
     df_round['perturbed_weight'] = df_round['Item'].apply(get_perturbed_weight)
     df_round['N_amount'] = (df_round['perturbed_weight'] * df_round['perturbed_value'] * prot_frac * 1e-6 / prot_to_N)

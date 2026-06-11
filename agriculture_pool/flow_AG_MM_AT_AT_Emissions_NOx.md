@@ -10,7 +10,7 @@ nav_order: 4
 ![AG.MM-AT.AT-Emissions-NOx](../output_files/plots/AG_MM_AT_AT_Emissions_NOx.png)
 
 ### Flow Description
-We have used data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 29.
+We have used data from CLRTAP Inventory Submissions [^emep_officially_2025] as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 29.
 
 
 ### References

@@ -10,7 +10,7 @@ nav_order: 2
 ![FS.OL-AT.AT-Emissions-N2](../output_files/plots/FS_OL_AT_AT_Emissions_N2.png)
 
 ### Flow Description
-Calculated from N2O emissions from UNFCCC Common reporting tables, Table 4, assuming a mean N2:N2O ratio of 19.5 as has been calculated from studies of forest ecosystems, as discussed in (Schäppi, 2025).
+Calculated from N2O emissions from UNFCCC Common reporting tables, Table 4, assuming a mean N2:N2O ratio of 19.5 as has been calculated from studies of forest ecosystems, as discussed in (Schäppi, 2025)[^schappi_annexes_2025].
 
 
 ### References

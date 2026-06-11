@@ -146,8 +146,8 @@ def _add_wild_shellfish_and_macroalgae(results, preloaded_data, current_params, 
     flow_code = 'HY.CW-MP.FP-Shellfish-Nmix'
     collected_years = set()
     
-    fish_N_frac = float(current_params.get("fish_N_frac", 0.028))
-    seaweed_N_frac = float(current_params.get("seaweed_N_frac", 0.01))
+    fish_N_frac = float(current_params.get("fish_N_frac"))
+    seaweed_N_frac = float(current_params.get("seaweed_N_frac"))
     
     key_fisk = 'Fiskeridirektoratet'
     noise_fisk = dataset_noise['Fiskeridirektoratet']['value'] if dataset_noise and key_fisk in dataset_noise else 1.0
@@ -214,8 +214,8 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
     flow_n2o = 'HY.SW-AT.AT-Emissions-N2O'
     collected_years = set()
     
-    fraction_N2O = float(current_params.get("surface_water_fraction_to_N2O", 0.0075))
-    ret_frac = float(current_params.get("surface_water_retention_fraction", 0.3))
+    fraction_N2O = float(current_params.get("surface_water_fraction_to_N2O"))
+    ret_frac = float(current_params.get("surface_water_retention_fraction"))
     
     key_teotil = 'TEOTIL'
     noise_teotil = dataset_noise['TEOTIL']['value'] if dataset_noise and key_teotil in dataset_noise else 1.0
@@ -263,7 +263,7 @@ def _add_wild_fish_catch(results, preloaded_data, current_params, dataset_noise)
     flow_code = 'HY.CW-MP.FP-Fish (wild catch)-Nmix'
     collected_years = set()
     
-    fish_N_frac = float(current_params.get("fish_N_frac", 0.028))
+    fish_N_frac = float(current_params.get("fish_N_frac"))
     key_fisk = 'Fiskeridirektoratet'
     noise_fisk = dataset_noise['Fiskeridirektoratet']['value'] if dataset_noise and key_fisk in dataset_noise else 1.0
 
@@ -325,8 +325,8 @@ def _add_aquaculture_internal_flows(results, aquaculture_production_dict, curren
     
     collected_years = set()
     
-    prot_ret = float(current_params.get("aquafeed_N_retention", 0.3575))
-    feed_waste = float(current_params.get("aquafeed_waste_fraction", 0.03))
+    prot_ret = float(current_params.get("aquafeed_N_retention"))
+    feed_waste = float(current_params.get("aquafeed_waste_fraction"))
 
     for year, fish_harvested_N in aquaculture_production_dict.items():
         if year in EXPECTED_YEARS:

@@ -10,7 +10,7 @@ nav_order: 2
 ![EF.TR-AT.AT-Emissions-NOx](../output_files/plots/EF_TR_AT_AT_Emissions_NOx.png)
 
 ### Flow Description
-EF.TR-AT.AT-Emissions-NOx denotes NOx emissions from fuel combustion in the transport sector. We have used data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 13.
+EF.TR-AT.AT-Emissions-NOx denotes NOx emissions from fuel combustion in the transport sector. We have used data from CLRTAP Inventory Submissions [^emep_officially_2025] as advised by Schäppi (2025)[^schappi_annexes_2025] [^schappi_annexes_2025], using the categories given in Table 13.
 
 
 ### References

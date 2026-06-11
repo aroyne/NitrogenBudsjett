@@ -207,8 +207,8 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
     comment = 'ok (MC-støy lagt på basert på kildens usikkerhetstype)'
 
     # 1. Globale parametere (Allerede perturbert sentralt i generate_mc_parameters_fast)
-    fodder_prot = float(current_params.get("fodder_protein_frac", 0.12))
-    Jones = float(current_params.get("Jones_factor", 6.25))
+    fodder_prot = float(current_params.get("fodder_protein_frac"))
+    Jones = float(current_params.get("Jones_factor"))
     N_content = fodder_prot / Jones
 
     # 2. Hent og klargjør datasettstøy for de to SSB-kildene
@@ -334,7 +334,7 @@ def _add_NH3_emissions_soil_management_mc(results, preloaded_data, current_param
     comment = 'ok (MC-støy lagt på)'
     data_sources = 'CRLTAP Inventory Submissions'
 
-    conv = float(current_params.get("NH3_to_N_factor", 0.822))
+    conv = float(current_params.get("NH3_to_N_factor"))
     raw_lines = preloaded_data.get('ag_crltap_raw_lines')
     
     if raw_lines is None:
@@ -370,7 +370,7 @@ def _add_NOx_emissions_soil_management_mc(results, preloaded_data, current_param
     comment = 'ok (MC-støy lagt på)'
     data_sources = 'CRLTAP Inventory Submissions'
 
-    conv = float(current_params.get("NOx_to_N_factor", 0.304))
+    conv = float(current_params.get("NOx_to_N_factor"))
     raw_lines = preloaded_data.get('ag_crltap_raw_lines')
     
     if raw_lines is None:
@@ -406,7 +406,7 @@ def _add_N2O_emissions_soil_management_mc(results, preloaded_data, current_param
     comment = 'ok (MC-støy lagt på)'
     data_sources = 'UNFCCC CRT'
 
-    conv_N2O = float(current_params.get("N2O_to_N_factor", 0.636))
+    conv_N2O = float(current_params.get("N2O_to_N_factor"))
     
     key_n2o = 'UNFCCC_emissions'
     has_noise = dataset_noise and key_n2o in dataset_noise
@@ -589,7 +589,7 @@ def _add_animal_products_flow_mc(results, preloaded_data, current_params, datase
         
         # Siden current_params er et NParameters-objekt, må vi bruke .get()
         # Vi setter default=None for å fange opp om den faktisk mangler.
-        val = current_params.get(param_key, None)
+        val = current_params.get(param_key)
         
         if val is None:
             raise KeyError(
@@ -803,7 +803,7 @@ def _add_NH3_emissions_manure_management_mc(results, preloaded_data, current_par
     comment = 'ok (MC-støy lagt på)'
     data_sources = 'CRLTAP Inventory Submissions'
 
-    conv = float(current_params.get("NH3_to_N_factor", 0.822))
+    conv = float(current_params.get("NH3_to_N_factor"))
     raw_lines = preloaded_data.get('ag_crltap_raw_lines')
     
     if raw_lines is None:
@@ -840,7 +840,7 @@ def _add_NOx_emissions_manure_management_mc(results, preloaded_data, current_par
     comment = 'ok (MC-støy lagt på)'
     data_sources = 'CRLTAP Inventory Submissions'
 
-    conv = float(current_params.get("NOx_to_N_factor", 0.304))
+    conv = float(current_params.get("NOx_to_N_factor"))
     raw_lines = preloaded_data.get('ag_crltap_raw_lines')
     
     if raw_lines is None:
@@ -877,7 +877,7 @@ def _add_N2O_emissions_manure_management_mc(results, preloaded_data, current_par
     comment = 'ok (MC-støy lagt på)'
     data_sources = 'UNFCCC CRT'
 
-    conv_N2O = float(current_params.get("N2O_to_N_factor", 0.636))
+    conv_N2O = float(current_params.get("N2O_to_N_factor"))
     
     key_n2o = 'UNFCCC_emissions'
     has_noise = dataset_noise and key_n2o in dataset_noise
@@ -939,8 +939,8 @@ def _add_live_animal_export_mc(results, preloaded_data, current_params, dataset_
         return
 
     # Hent globale perturberte parametere
-    prot_frac = float(current_params.get("live_animal_protein_frac", 0.13))
-    prot_to_N = float(current_params.get("Jones_factor", 6.25))
+    prot_frac = float(current_params.get("live_animal_protein_frac"))
+    prot_to_N = float(current_params.get("Jones_factor"))
 
     # Hent asymmetrisk kildestøy
     key_fao = 'Crops and livestock products'
@@ -955,8 +955,21 @@ def _add_live_animal_export_mc(results, preloaded_data, current_params, dataset_
 
     # Hjelpefunksjon for å hente de ferdig perturberte enkeltvektene per dyretype
     def get_perturbed_weight(item_name):
-        return float(current_params.get(f"weight_{str(item_name).strip()}", 100.0))
-
+        clean_item = str(item_name).strip()
+        param_key = f"weight_{clean_item}"
+        
+        # Hent den rå ordboken fra objektet for å se om denne dyretypen i det hele tatt er definert i modellen din
+        defined_weights = getattr(current_params, 'animal_weights', {})
+        
+        # Hvis dyretypen ikke finnes i Excel-arket 'animal_weights', ignorerer vi den ved å returnere 0.0
+        if clean_item not in defined_weights:
+            return 0.0
+            
+        # Hvis den derimot SKAL være der, bruker vi det vanlige oppslaget.
+        # Siden vi har fjernet fallbacks i get(), vil dette krasje hardt og riktig 
+        # dersom parameteren ble borte under Monte Carlo-genereringen.
+        return float(current_params.get(param_key))
+    
     # Beregn N-mengde per rad
     df_round['perturbed_weight'] = df_round['Item'].apply(get_perturbed_weight)
     df_round['N_amount'] = (df_round['perturbed_weight'] * df_round['perturbed_value'] * prot_frac * 1e-6 / prot_to_N)
@@ -995,7 +1008,7 @@ def _add_N2_emissions_soil_management_mc(results, preloaded_data, current_params
     
     # Hent den ferdig perturberte parameterverdien fra denne MC-runden
     # Fallback settes til f.eks. 16.0 ktN/år basert på kildekommentaren din
-    value = float(current_params.get("denitrification_AG_N2", 16.0))
+    value = float(current_params.get("denitrification_AG_N2"))
     
     if value < 0: 
         value = 0.0

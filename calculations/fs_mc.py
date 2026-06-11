@@ -22,7 +22,7 @@ def execute_calculations_fs(preloaded_data, current_params, dataset_noise):
     _add_fo_N2O_emissions_mc(results, preloaded_data, current_params, dataset_noise)
     _add_fo_N2_emissions_mc(results, preloaded_data, current_params, dataset_noise)
     _add_fo_leaching_mc(results, preloaded_data, current_params, dataset_noise)
-    _add_industrial_round_wood_mc(results, preloaded_data, current_params)  # Går via shared parameter-MC
+    _add_industrial_round_wood_mc(results, preloaded_data, current_params, dataset_noise)  # Går via shared parameter-MC
     _add_fuel_wood_for_households_mc(results, preloaded_data, current_params, dataset_noise)
     _add_ol_N2O_emissions_mc(results, preloaded_data, current_params, dataset_noise)
     _add_ol_N2_emissions_mc(results, preloaded_data, current_params, dataset_noise)
@@ -65,7 +65,7 @@ def _add_fo_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
     df_unfccc = preloaded_data.get('fs_unfccc_emissions_raw')
     if df_unfccc is None: return
 
-    N2O_to_N = float(current_params.get("N2O_to_N_factor", 28/44))
+    N2O_to_N = float(current_params.get("N2O_to_N_factor"))
     
     for row in range(5, 38):  
         try:
@@ -99,8 +99,8 @@ def _add_fo_N2_emissions_mc(results, preloaded_data, current_params, dataset_noi
     df_unfccc = preloaded_data.get('fs_unfccc_emissions_raw')
     if df_unfccc is None: return
 
-    N2O_to_N = float(current_params.get("N2O_to_N_factor", 28/44))
-    ratio = float(current_params.get("forest_N2_to_N2O_ratio", 3.0))
+    N2O_to_N = float(current_params.get("N2O_to_N_factor"))
+    ratio = float(current_params.get("forest_N2_to_N2O_ratio"))
 
     for row in range(5, 38):
         try:
@@ -133,7 +133,7 @@ def _add_fo_leaching_mc(results, preloaded_data, current_params, dataset_noise):
     df_teotil3 = preloaded_data.get('hy_teotil3_by_source')
     if df_kyst is None or df_teotil3 is None: return
 
-    frac = float(current_params.get("FO_leaching_bg_fraction", 0.59))
+    frac = float(current_params.get("FO_leaching_bg_fraction"))
     
     # Historiske år (Kysttilførsel)
     for r in range(1, 24):
@@ -173,12 +173,12 @@ def _add_fo_leaching_mc(results, preloaded_data, current_params, dataset_noise):
     report_missing_years(flow_code, missing_years, results)
 
 
-def _add_industrial_round_wood_mc(results, preloaded_data, current_params):
+def _add_industrial_round_wood_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'FS.FO-MP.OP-Industrial round wood-Nmix'
     collected_years = set()   
     
     # Henter data fra delt MC-funksjon som baserer seg på allerede støysatte current_params
-    year_values, _ = find_industrial_round_wood(preloaded_data, current_params)
+    year_values, _ = find_industrial_round_wood(preloaded_data, current_params, dataset_noise)
     
     for year, value in year_values.items():
         collected_years.add(year)
@@ -199,7 +199,7 @@ def _add_fuel_wood_for_households_mc(results, preloaded_data, current_params, da
     df_ved = preloaded_data.get('fs_firewood_raw')
     if df_ved is None: return
 
-    N_content = float(current_params.get("firewood_N_frac", 0.001))
+    N_content = float(current_params.get("firewood_N_frac"))
     
     for r in range(3, 38):  
         try:
@@ -231,7 +231,7 @@ def _add_ol_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
     df_unfccc = preloaded_data.get('fs_unfccc_emissions_raw')
     if df_unfccc is None: return
 
-    N2O_to_N = float(current_params.get("N2O_to_N_factor", 28/44))
+    N2O_to_N = float(current_params.get("N2O_to_N_factor"))
 
     for row in range(5, 38):
         try:
@@ -263,8 +263,8 @@ def _add_ol_N2_emissions_mc(results, preloaded_data, current_params, dataset_noi
     df_unfccc = preloaded_data.get('fs_unfccc_emissions_raw')
     if df_unfccc is None: return
 
-    ratio = float(current_params.get("forest_N2_to_N2O_ratio", 3.0))
-    N2O_to_N = float(current_params.get("N2O_to_N_factor", 28/44))
+    ratio = float(current_params.get("forest_N2_to_N2O_ratio"))
+    N2O_to_N = float(current_params.get("N2O_to_N_factor"))
 
     for row in range(5, 38):
         try:
@@ -359,13 +359,13 @@ def _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise):
     data_sources = 'NIBIO'
     dataset_key = 'beitestatistikk'
     
-    Jones = float(current_params.get("Jones_factor", 6.25))
+    Jones = float(current_params.get("Jones_factor"))
     
-    fu_sheep_1996 = float(current_params.get("fu_sheep_1996", 303 * 0.7))*1e6 # mill FEm -> FEm
-    fu_cattle_1996 = float(current_params.get("fu_cattle_1996", 303 * 0.27))*1e6 # mill FEm -> FEm
-    fu_goat_1996 = float(current_params.get("fu_goat_1996", 303 * 0.02)) *1e6 # mill FEm -> FEm   
+    fu_sheep_1996 = float(current_params.get("fu_sheep_1996"))*1e6 # mill FEm -> FEm
+    fu_cattle_1996 = float(current_params.get("fu_cattle_1996"))*1e6 # mill FEm -> FEm
+    fu_goat_1996 = float(current_params.get("fu_goat_1996")) *1e6 # mill FEm -> FEm   
 
-    protein_cont = float(current_params.get("protein_cont_grazing", 150))*1e-9 # g/FEm -> kt/FEm
+    protein_cont = float(current_params.get("protein_cont_grazing"))*1e-9 # g/FEm -> kt/FEm
 
     sau, lam, storfe, geit = {}, {}, {}, {}
 
