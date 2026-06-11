@@ -415,7 +415,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
             elif "nonedible" in norm or "wool" in norm or ("animal" in norm and "op" in norm):
                 exact_flow_code = "AG.MM-MP.OP-Non-edible animal products-Nmix"
                 display_name = "Non-edible Animal Products"
-                description = "Schäppi (2025) [^schappi_annexes_2025] advises using FAOSTAT Commodity Balances (non-food)..."
+                description = "Schäppi (2025) [^schappi_annexes_2025] advises using FAOSTAT Commodity Balances (non-food). For Norway this statistic only contains wool for 4 individual years and we therefore use data for wool from Landbruksdirektoratet[^landbruksdirektoratet_leveransedata-slakt-2005-2012_2025] for 2005-2024; for earlier years, we use the number of sheep (SSB table 03710) and extrapolate from a linear regression found between sheep and wool for 2005-2024. In addition, we use numbers for raw hides and skins from FAOSTAT Crops and livestock products. N contents are taken from [^schappi_annexes_2025]."
             elif "export" in norm or "live" in norm:
                 exact_flow_code = "AG.MM-RW.RW-Live animal export-Nmix"
                 display_name = "Live Animal Export"

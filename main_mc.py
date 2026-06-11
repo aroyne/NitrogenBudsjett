@@ -113,6 +113,15 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_animal_p
             for _, row in df_animal_products_static.iterrows():
                 p_id = f"prod_{str(row['item']).strip()}"
                 custom_dict[p_id] = float(row['N_content_percent'])
+                
+        # FLATE UT WASTE FRACTIONS DETERMINISTISK FOR ITERASJON 0
+        try:
+            df_waste_static = base_params.get_table('waste_fractions')
+            for _, row in df_waste_static.iterrows():
+                cat_id = str(row['waste_category']).strip()
+                custom_dict[cat_id] = float(row['N_frac'])
+        except Exception as e:
+            print(f"[INFO] Kunne ikke pre-loade waste_fractions deterministisk: {e}")
         
         base_params.override_global_params(custom_dict)
 
@@ -177,6 +186,62 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_animal_p
     elif hasattr(base_params, 'tables') and 'global_parameters' in base_params.tables:
         base_params.tables['global_parameters'] = df_perturbed
 
+    # ==============================================================================
+    # --- STEG 1.5: ROBUST PERTURBERING AV WASTE_FRACTIONS (HARMONISERT LOGIKK) ---
+    # ==============================================================================
+    try:
+        df_waste = base_params.get_table('waste_fractions')
+        
+        for idx, row in df_waste.iterrows():
+            cat_id = str(row['waste_category']).strip()
+            val = float(row['N_frac'])
+            
+            low_b = row.get('lower_bound', 0.0)
+            upp_b = row.get('upper_bound', 0.0)
+            
+            # Hent innstillingene, eller fall tilbake på standardverdier hvis tomme
+            unc_type = str(row.get('uncertainty_type', 'perc')).lower().strip() if not pd.isna(row.get('uncertainty_type')) else 'perc'
+            dist_type = str(row.get('distribution_type', 'norm')).lower().strip() if not pd.isna(row.get('distribution_type')) else 'norm'
+            
+            # Hvis det ikke er definert usikkerhet, behold originalverdien
+            if pd.isna(low_b) or pd.isna(upp_b) or (low_b == 0 and upp_b == 0):
+                custom_dict[cat_id] = val
+                continue
+                
+            low_b = float(low_b)
+            upp_b = float(upp_b)
+            
+            # Beregn absolutt min/maks og standardavvik basert på prosent eller absolutte verdier
+            if unc_type == 'perc':
+                abs_min = val * (1 - low_b / 100.0)
+                abs_max = val * (1 + upp_b / 100.0)
+                std_dev = ((low_b + upp_b) / 2.0 / 100.0) * val
+            else:
+                abs_min = val - low_b
+                abs_max = val + upp_b
+                std_dev = (low_b + upp_b) / 2.0 / 1.96
+
+            # Trekk tilfeldig verdi basert på valgt distribusjonstype
+            if 'pert' in dist_type:
+                chosen_val = draw_from_pert(abs_min, val, abs_max)
+            elif 'log' in dist_type:
+                cv = std_dev / val if val > 0 else 0.1
+                sigma_log = np.sqrt(np.log(1 + cv**2))
+                mu_log = np.log(val) - (sigma_log ** 2) / 2
+                chosen_val = np.random.lognormal(mu_log, sigma_log)
+            else:
+                chosen_val = np.random.normal(val, std_dev)
+
+            # Fysisk grensebetingelse (en nitrogenfraksjon kan aldri være negativ)
+            if val >= 0 and chosen_val < 0:
+                chosen_val = 0.0
+                
+            custom_dict[cat_id] = chosen_val
+            
+    except Exception as e:
+        raise RuntimeError(f"[KRITISK FEIL] Feilet under generering av MC-støy for 'waste_fractions': {e}")
+    # ==============================================================================
+    
     # --- 2. STØYFAKTORER FOR DATASETT ---
     dataset_noise_dict = {}
     for _, row in df_datasets.iterrows():
@@ -485,18 +550,29 @@ def main():
         base_params.override_global_params(original_clean_dict)
 
         if i == 0:
-            # Første runde: Helt deterministisk baseline (is_deterministic=True)
+            # Første runde: Helt deterministisk baseline
             df_trade_params = preloaded_data['trade_params']
-            current_params, dataset_noise, current_trade_factors = generate_mc_parameters_fast(
+            current_params, _, current_trade_factors = generate_mc_parameters_fast(
                 base_params, 
                 df_global_static, 
                 df_dataset_uncertainties,
                 df_animal_products_static,
                 df_trade_params=df_trade_params,
-                df_animal_weights=df_animal_weights,  # <-- LEGG TIL DENNE
+                df_animal_weights=df_animal_weights,
                 is_deterministic=True
             )
-            dataset_noise = {}        
+            
+            # Generer en fullstendig mock-struktur for alle registrerte datasett i runde 0
+            dataset_noise = {}
+            for _, row in df_dataset_uncertainties.iterrows():
+                ds_id = str(row['dataset_name']).strip()
+                dataset_noise[ds_id] = {
+                    'value': 1.0,
+                    'type': 'perc',
+                    'low_bound': 0.0,
+                    'upp_bound': 0.0
+                }            
+
         else:
             # Følgende runder: Generer stokastisk støy
             df_trade_params = preloaded_data['trade_params']
@@ -506,10 +582,9 @@ def main():
                 df_dataset_uncertainties,
                 df_animal_products_static,
                 df_trade_params=df_trade_params,
-                df_animal_weights=df_animal_weights,  # <-- LEGG TIL DENNE
-                is_deterministic=(i==0)
-            )
-            
+                df_animal_weights=df_animal_weights,
+                is_deterministic=False
+            )            
         iteration_output = {}
         
         # 2. KJØR BEREGNINGER FOR AKTIVERTE POOLER
@@ -536,6 +611,10 @@ def main():
         if 'ef' in selected_pools:
             from calculations.ef_mc import execute_calculations_ef  # Sjekk at funksjonsnavnet stemmer
             iteration_output['ef'] = execute_calculations_ef(preloaded_data, current_params, dataset_noise, current_trade_factors)
+            
+        if 'hs' in selected_pools:
+            from calculations.hs_mc import execute_calculations_hs  # Sjekk at funksjonsnavnet stemmer
+            iteration_output['hs'] = execute_calculations_hs(preloaded_data, current_params, dataset_noise, current_trade_factors)
             
         # (Her legger du inn de andre poolene etter hvert: if 'rw' in selected_pools... osv.)
 

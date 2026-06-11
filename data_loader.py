@@ -10,11 +10,14 @@ from calculations.utils import read_trade_data
 warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl.worksheet.header_footer")
 
 def load_all_data(selected_pools):
+    
+    
     """
     Sentral datalaster som sørger for at tunge I/O-operasjoner kun skjer ÉN gang.
     Konfigurert deklarativt for ekstremt enkel utvidelse av nye pools og filer.
     """
     preloaded = {}
+    print(f"\n[DATA_LOADER] Kalles med selected_pools: {selected_pools}") # <-- LEGG TIL DENNE
     
     # =========================================================================
     # 1. KONFIGURASJONSKART (Legg til nye filer eller pools her!)
@@ -29,8 +32,8 @@ def load_all_data(selected_pools):
         'aqua_data': ({'hy', 'rw'}, 'data_files/A.06.002_20251111-140559.xlsx', 'excel_aquaculture', {}),
         'fao_live_animals_all': ({'ag', 'rw'}, 'data_files/FAOSTAT_data_en_11-12-2025.csv', 'csv_live_animals', {}),
         'fao_mineral_fertilizer': ({'rw'}, 'data_files/FAOSTAT_data_en_11-12-2025-2.csv', 'csv_fertilizer_import', {}),
-        'hy_kyst_tilforsel': ({'hy','fs'}, 'data_files/Tilførsel av nitrogen til kystområdene fordelt på kilder.xlsx', 'excel', {'sheet_name': 'Data fra Miljødirektoratet'}),
-        'hy_teotil3': ({'hy','fs'}, 'data_files/teotil3_n_summary.xlsx', 'openpyxl_teotil', {}),
+        'hy_kyst_tilforsel': ({'hy','fs','hs'}, 'data_files/Tilførsel av nitrogen til kystområdene fordelt på kilder.xlsx', 'excel', {'sheet_name': 'Data fra Miljødirektoratet'}),
+        'hy_teotil3': ({'hy','fs','hs'}, 'data_files/teotil3_n_summary.xlsx', 'openpyxl_teotil', {}),
         'hy_art_raw': ({'hy'}, 'data_files/art.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Sheet 1'}),
         'hy_fiske_old_raw': ({'hy'}, 'data_files/fiske_1990_2000.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Ark1'}),
         'avlop_sewage': ({'hy', 'pr'}, 'data_files/05280_20251113-113329.xlsx', 'openpyxl_sewage', {}),
@@ -51,8 +54,15 @@ def load_all_data(selected_pools):
         'fuel_for_heating': ({'ef'}, 'data_files/N_fuel_for_heating.csv', 'csv_ef_fuel', {}),
         'n2o_ec_data': ({'ef'}, 'data_files/N2O_EC.csv', 'csv', {}),
         'trade_fuels_n_content': ({'ef'}, 'data_files/N_content_fuels.xlsx', 'excel', {}),
-        'ssb_energy_balance_11561': ({'ef'}, 'data_files/11561_20251113-154607.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'EnergibalansenGWh'})
-      }
+        'ssb_energy_balance_11561': ({'ef'}, 'data_files/11561_20251113-154607.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'EnergibalansenGWh'}),
+        'hs_pop_size_06913': ({'hs'}, 'data_files/06913_20251113-124117.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Folkemengde'}),
+        'hs_pop_age_groups_07459': ({'hs'}, 'data_files/07459_20251119-151434.xlsx', 'excel', {'sheet_name': 'Personer1', 'skiprows': 3, 'header': None}),
+        'hs_smoking_stats_05307': ({'hs'}, 'data_files/05307_20251119-152214.xlsx', 'excel', {'sheet_name': 'Dagroyk', 'skiprows': 3, 'header': None}),
+        'hs_unfccc_n2o_raw': ({'hs'}, 'data_files/N2O_NOx_HS_FS.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Ark1'}),
+        'hs_luc_crltap_raw_lines': ({'hs'}, 'data_files/webdabData1863365.txt', 'text_lines', {}),
+        'ssb_waste_05282': ({'hs'}, 'data_files/05282_20260211-091021.xlsx', 'openpyxl_single_sheet', {'sheet_name': '05282'}),
+        'ssb_waste_10514': ({'hs'}, 'data_files/10514_20260211-094101.xlsx', 'openpyxl_single_sheet', {'sheet_name': '10514'}),
+        }
 
     # =========================================================================
     # 2. TUNGE SPESIALPR_LOADS (Handelsdata)

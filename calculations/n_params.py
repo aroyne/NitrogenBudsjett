@@ -41,23 +41,30 @@ class NParameters:
                 avg_w = row['avg_weight_kg']
                 self.animal_weights[item_name] = avg_w
 
-    def get(self, param_id, default=None):
-        """
-        Søker etter parameteren i prioritert rekkefølge:
-        1. Sjekker om den ligger direkte som et flatt objekt-attributt (MC-generert med setattr)
-        2. Sjekker om den ligger i global_params-ordboken
-        3. Faller tilbake på default-verdien
-        """
+    def get(self, param_id):
+        """Søker etter global parameter. Krasjer hvis den ikke finnes."""
         if hasattr(self, param_id):
             return getattr(self, param_id)
-        return self.global_params.get(param_id, default)
+        if param_id in self.global_params:
+            return self.global_params[param_id]
+        raise KeyError(f"[STOPP] Global parameter '{param_id}' mangler helt i systemet!")
     
-    def waste_N_frac(self, category, default=None):
-        return self.waste_fractions.get(category, default)
+    def waste_N_frac(self, category):
+        """Søker etter avfallsfraksjon. Krasjer hvis den ikke finnes."""
+        if hasattr(self, category):
+            return getattr(self, category)
+        if category in self.waste_fractions:
+            return self.waste_fractions[category]
+        raise KeyError(f"[STOPP] Avfallsfraksjon '{category}' mangler helt i waste_fractions!")
 
-    def animal_weight(self, item_name, default=None):
-        return self.animal_weights.get(item_name, default)
-
+    def animal_weight(self, item_name):
+        """Søker etter dyrevekt. Krasjer hvis den ikke finnes."""
+        if hasattr(self, item_name):
+            return getattr(self, item_name)
+        if item_name in self.animal_weights:
+            return self.animal_weights[item_name]
+        raise KeyError(f"[STOPP] Dyrevekt for '{item_name}' mangler helt i animal_weights!")
+        
     def get_table(self, sheet_name):
         """
         Returnerer et pandas DataFrame for et gitt ark i N_parameters.xlsx.
