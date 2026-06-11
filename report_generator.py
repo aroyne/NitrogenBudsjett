@@ -664,3 +664,313 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         f.write("\n### Flows that are zero or neglected:\n\n")
         f.write("* **HY.AC-MP.FP-Freshwater fish and seafood-Nmix**, **HY.AC-HY.SW-Waste feed-Nmix** and **HY.AC-HY.SW-Excretia-Nmix** are set to zero because practically all aquaculture in Norway is done in coastal waters.\n")
         f.write("* **HY.AC-AT.AT-Emissions-NH3** is set to zero assuming negligible ammonia emissions from these coastal marine cages.\n")
+        
+    # ========================================================
+    # 7. OPPRETT HIERARKISK PORTAL FOR ENERGY AND FUELS (EF) POOL
+    # ========================================================
+    ef_folder = "energy_and_fuels_pool"
+    os.makedirs(ef_folder, exist_ok=True)
+
+    # 7a. Hovedside for Energy and fuels (Grandparent)
+    with open(os.path.join(ef_folder, "pool_energy_and_fuels.md"), 'w', encoding='utf-8') as f:
+        f.write("---\n")
+        f.write("layout: default\n")
+        f.write("title: Energy and fuels (EF)\n")
+        f.write("nav_order: 7\n")
+        f.write("has_children: true\n")
+        f.write("---\n\n")
+        f.write("# Pool: Energy and fuels (EF)\n\n")
+        f.write(
+            "In the guidelines, there are N2 flows assigned to and from EF sectors associated with nitrogen "
+            "conversions in the combustion process. We have chosen to ignore these here because they can only "
+            "be found by mass balance and, by doing so, they may hide other imbalances that could be significant. "
+            "They also do not make any significant contributions to the flows of reactive N.\n\n"
+        )
+        f.write(
+            "Note on subpools: it is not always clear where flows end up. For example, industrial waste fuels from "
+            "MP.OP is assigned to manufacturing industries EF.IC, meaning that waste for fuel is kept within the "
+            "industrial sector. This is not necessarily the case.\n\n"
+        )
+        f.write("This pool is divided into four operational sub-pools. Explore them using the side menu or links below:\n\n")
+        f.write("* [Energy conversion (EF.EC)](subpool_energy_conversion.html)\n")
+        f.write("* [Manufacturing industries and construction (EF.IC)](subpool_industry.html)\n")
+        f.write("* [Transportation (EF.TR)](subpool_transport.html)\n")
+        f.write("* [Other energy and fuels (EF.OE)](subpool_other_energy.html)\n\n")
+        
+        f.write(get_balance_image_markdown("EF", relative_depth="../"))
+
+    # 7b. Sub-hovedside for Energy conversion (EF.EC)
+    with open(os.path.join(ef_folder, "subpool_energy_conversion.md"), 'w', encoding='utf-8') as f:
+        f.write("---\n")
+        f.write("layout: default\n")
+        f.write("title: Energy conversion (EF.EC)\n")
+        f.write("parent: Energy and fuels (EF)\n")
+        f.write("nav_order: 1\n")
+        f.write("has_children: true\n")
+        f.write("---\n\n")
+        f.write("# Subpool: Energy conversion (EF.EC)\n\n")
+        f.write(
+            "This subpool includes extraction of fossil fuels from geological sources, which is a large sector "
+            "in Norway. Because of this there is no mass balance for EF.EC; nitrogen bound to extracted fuels "
+            "arises in the sector, and outflows are therefore significantly larger than inflows.\n\n"
+        )
+        f.write(get_balance_image_markdown("EF.EC", relative_depth="../"))
+        f.write("\n### Flows that are zero or neglected:\n\n")
+        f.write(
+            "* **EF.EC-AT.AT-Emissions-NH3**: Data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by "
+            "Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 11, give values that are "
+            "consistently below 0.001 ktN/year, which is negligible in this context.\n"
+        )
+
+    # 7c. Sub-hovedside for Manufacturing industries and construction (EF.IC)
+    with open(os.path.join(ef_folder, "subpool_industry.md"), 'w', encoding='utf-8') as f:
+        f.write("---\n")
+        f.write("layout: default\n")
+        f.write("title: Manufacturing industries and construction (EF.IC)\n")
+        f.write("parent: Energy and fuels (EF)\n")
+        f.write("nav_order: 2\n")
+        f.write("has_children: true\n")
+        f.write("---\n\n")
+        f.write("# Subpool: Manufacturing industries and construction (EF.IC)\n\n")
+        f.write(get_balance_image_markdown("EF.IC", relative_depth="../"))
+
+    # 7d. Sub-hovedside for Transportation (EF.TR)
+    with open(os.path.join(ef_folder, "subpool_transport.md"), 'w', encoding='utf-8') as f:
+        f.write("---\n")
+        f.write("layout: default\n")
+        f.write("title: Transportation (EF.TR)\n")
+        f.write("parent: Energy and fuels (EF)\n")
+        f.write("nav_order: 3\n")
+        f.write("has_children: true\n")
+        f.write("---\n\n")
+        f.write("# Subpool: Transportation (EF.TR)\n\n")
+        f.write(get_balance_image_markdown("EF.TR", relative_depth="../"))
+
+    # 7e. Sub-hovedside for Other energy and fuels (EF.OE)
+    with open(os.path.join(ef_folder, "subpool_other_energy.md"), 'w', encoding='utf-8') as f:
+        f.write("---\n")
+        f.write("layout: default\n")
+        f.write("title: Other energy and fuels (EF.OE)\n")
+        f.write("parent: Energy and fuels (EF)\n")
+        f.write("nav_order: 4\n")
+        f.write("has_children: true\n")
+        f.write("---\n\n")
+        f.write("# Subpool: Other energy and fuels (EF.OE)\n\n")
+        f.write(get_balance_image_markdown("EF.OE", relative_depth="../"))
+
+    # 7f. Generer flow-sider for EF-subpoolene
+    ef_ec_counter = 1
+    ef_ic_counter = 1
+    ef_tr_counter = 1
+    ef_oe_counter = 1
+
+    for filename in plot_files:
+        # Vi antar navnekonvensjon som starter med EF_EC_, EF_IC_, EF_TR_ eller EF_OE_
+        upper = filename.upper()
+        if not (upper.startswith("EF_EC_") or upper.startswith("EF_IC_") or upper.startswith("EF_TR_") or upper.startswith("EF_OE_")):
+            continue
+
+        base_name = filename.rsplit('.', 1)[0]
+        flow_file_name = f"flow_{base_name}.md"
+        full_flow_path = os.path.join(ef_folder, flow_file_name)
+        norm = filename.lower().replace('-', '').replace('_', '').replace('.', '')
+
+        exact_flow_code = "EF-Unknown-Flow"
+        display_name = "Unknown Energy and fuels Flow"
+        parent_subpool = ""
+        description = ""
+
+        # -------------------
+        # Energy conversion (EF.EC)
+        # -------------------
+        if upper.startswith("EF_EC_"):
+            parent_subpool = "Energy conversion (EF.EC)"
+
+            if "emissions" in norm and "nox" in norm:
+                exact_flow_code = "EF.EC-AT.AT-Emissions-NOx"
+                display_name = "Energy conversion emissions (NOx)"
+                description = (
+                    "EF.EC-AT.AT-Emissions-NOx: We have used data from CLRTAP Inventory Submissions (EMEP, 2025) "
+                    "as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 11."
+                )
+            elif "emissions" in norm and "n2o" in norm:
+                exact_flow_code = "EF.EC-AT.AT-Emissions-N2O"
+                display_name = "Energy conversion emissions (N2O)"
+                description = (
+                    "EF.EC-AT.AT-Emissions-N2O is taken from UNFCCC Common Reporting Tables, Table 1, using the "
+                    "categories given in Table 11 by Schäppi (2025) [^schappi_annexes_2025]."
+                )
+            elif "fuel" in norm and "industry" in norm:
+                exact_flow_code = "EF.EC-EF.IC-Fuel for industry-Nmix"
+                display_name = "Fuel for industry"
+                description = (
+                    "EF.EC-EF.IC-Fuel for industry-Nmix: As advised by Schäppi (2025) [^schappi_annexes_2025], we have "
+                    "found this in the UNFCCC Common Reporting Tables (Table 1) which gives amount of energy consumed "
+                    "in TJ, together with net caloric values from Table 1.2 in Garg et al. (2006) [^garg_2006] and "
+                    "nitrogen contents from Table 15 in Schäppi (2025) [^schappi_annexes_2025]."
+                )
+            elif "fuel" in norm and "heating" in norm:
+                exact_flow_code = "EF.EC-EF.OE-Fuel for heating-Nmix"
+                display_name = "Fuel for heating"
+                description = (
+                    "EF.EC-EF.OE-Fuel for heating-Nmix: As advised by Schäppi (2025) [^schappi_annexes_2025], we have "
+                    "found this in the UNFCCC Common Reporting Tables (Table 1) which gives amount of energy consumed "
+                    "in TJ, together with net caloric values from Table 1.2 in Garg et al. (2006) [^garg_2006] and "
+                    "nitrogen contents from Table 15 in Schäppi (2025) [^schappi_annexes_2025]."
+                )
+            elif "fuel" in norm and "transport" in norm:
+                exact_flow_code = "EF.EC-EF.TR-Fuel for transport-Nmix"
+                display_name = "Fuel for transport"
+                description = (
+                    "EF.EC-EF.TR-Fuel for transport-Nmix: As advised by Schäppi (2025) [^schappi_annexes_2025], we have "
+                    "found this in the UNFCCC Common Reporting Tables (Table 1) which gives amount of energy consumed "
+                    "in TJ, together with net caloric values from Table 1.2 in Garg et al. (2006) [^garg_2006] and "
+                    "nitrogen contents from Table 15 in Schäppi (2025) [^schappi_annexes_2025]."
+                )
+            elif "feedstock" in norm:
+                exact_flow_code = "EF.EC-MP.OP-Fuel used as feedstock-Nmix"
+                display_name = "Fuel used as feedstock"
+                description = (
+                    "EF.EC-MP.OP-Fuel used as feedstock-Nmix: We use SSB table 11561 ('Energibalansen') to obtain GWh "
+                    "of coal and oil used as feedstock. We convert GWh to TJ, divide by net caloric values for coal and "
+                    "oil, and multiply by N fractions from Schäppi (2025) [^schappi_annexes_2025]. Other minor feedstock "
+                    "categories listed in the guidelines are neglected as advised by Schäppi (2025)."
+                )
+            elif "export" in norm and "transport" not in norm:
+                exact_flow_code = "EF.EC-RW.RW-Fuel export-Nmix"
+                display_name = "Fuel export"
+                description = (
+                    "EF.EC-RW.RW-Fuel export-Nmix is the nitrogen content in exported fuels. We use trade data in SSB "
+                    "table 08801 to account for all petroleum products excluding those assumed to be used in the transport sector."
+                )
+
+        # -------------------
+        # Manufacturing industries and construction (EF.IC)
+        # -------------------
+        elif upper.startswith("EF_IC_"):
+            parent_subpool = "Manufacturing industries and construction (EF.IC)"
+
+            if "emissions" in norm and "n2o" in norm:
+                exact_flow_code = "EF.IC-AT.AT-Emissions-N2O"
+                display_name = "Industrial emissions (N2O)"
+                description = (
+                    "EF.IC-AT.AT-Emissions-N2O is taken from UNFCCC Common Reporting Tables, Table 1, using the "
+                    "categories given in Table 12 by Schäppi (2025) [^schappi_annexes_2025]."
+                )
+            elif "emissions" in norm and "nh3" in norm:
+                exact_flow_code = "EF.IC-AT.AT-Emissions-NH3"
+                display_name = "Industrial emissions (NH3)"
+                description = (
+                    "EF.IC-AT.AT-Emissions-NH3 denotes ammonia emissions from fuel combustion in industry. We have "
+                    "used data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by Schäppi (2025) "
+                    "[^schappi_annexes_2025], using the categories given in Table 12."
+                )
+            elif "emissions" in norm and "nox" in norm:
+                exact_flow_code = "EF.IC-AT.AT-Emissions-NOx"
+                display_name = "Industrial emissions (NOx)"
+                description = (
+                    "EF.IC-AT.AT-Emissions-NOx denotes NOx emissions from fuel combustion in industry. We have used "
+                    "data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by Schäppi (2025) "
+                    "[^schappi_annexes_2025], using the categories given in Table 12."
+                )
+
+        # -------------------
+        # Transportation (EF.TR)
+        # -------------------
+        elif upper.startswith("EF_TR_"):
+            parent_subpool = "Transportation (EF.TR)"
+
+            if "emissions" in norm and "n2o" in norm:
+                exact_flow_code = "EF.TR-AT.AT-Emissions-N2O"
+                display_name = "Transport emissions (N2O)"
+                description = (
+                    "EF.TR-AT.AT-Emissions-N2O is taken from UNFCCC Common Reporting Tables, Table 1, using the "
+                    "categories given in Table 13 by Schäppi (2025) [^schappi_annexes_2025]."
+                )
+            elif "emissions" in norm and "nh3" in norm:
+                exact_flow_code = "EF.TR-AT.AT-Emissions-NH3"
+                display_name = "Transport emissions (NH3)"
+                description = (
+                    "EF.TR-AT.AT-Emissions-NH3 denotes ammonia emissions from fuel combustion in the transport "
+                    "sector. We have used data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by "
+                    "Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 13."
+                )
+            elif "emissions" in norm and "nox" in norm:
+                exact_flow_code = "EF.TR-AT.AT-Emissions-NOx"
+                display_name = "Transport emissions (NOx)"
+                description = (
+                    "EF.TR-AT.AT-Emissions-NOx denotes NOx emissions from fuel combustion in the transport sector. "
+                    "We have used data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by Schäppi (2025) "
+                    "[^schappi_annexes_2025], using the categories given in Table 13."
+                )
+            elif "export" in norm or "transportfuel" in norm:
+                exact_flow_code = "EF.TR-RW.RW-Export of transport fuels-Nmix"
+                display_name = "Export of transport fuels"
+                description = (
+                    "EF.TR-RW.RW-Export of transport fuels-Nmix is export of fuels for transport. We use trade data in "
+                    "SSB table 08801 to account for all petroleum products assumed to be used in the transport sector."
+                )
+
+        # -------------------
+        # Other energy and fuels (EF.OE)
+        # -------------------
+        elif upper.startswith("EF_OE_"):
+            parent_subpool = "Other energy and fuels (EF.OE)"
+
+            if "emissions" in norm and "n2o" in norm:
+                exact_flow_code = "EF.OE-AT.AT-Emissions-N2O"
+                display_name = "Other energy emissions (N2O)"
+                description = (
+                    "EF.OE-AT.AT-Emissions-N2O is taken from UNFCCC Common Reporting Tables, Table 1, using the "
+                    "categories given in Table 14 by Schäppi (2025) [^schappi_annexes_2025]."
+                )
+            elif "emissions" in norm and "nh3" in norm:
+                exact_flow_code = "EF.OE-AT.AT-Emissions-NH3"
+                display_name = "Other energy emissions (NH3)"
+                description = (
+                    "EF.OE-AT.AT-Emissions-NH3 is ammonia emissions from fuel combustion in residential, commercial "
+                    "and other sectors that are not already covered. We have used data from CLRTAP Inventory "
+                    "Submissions (EMEP, 2025) as advised by Schäppi (2025) [^schappi_annexes_2025], using the "
+                    "categories given in Table 14."
+                )
+            elif "emissions" in norm and "nox" in norm:
+                exact_flow_code = "EF.OE-AT.AT-Emissions-NOx"
+                display_name = "Other energy emissions (NOx)"
+                description = (
+                    "EF.OE-AT.AT-Emissions-NOx is NOx emissions from fuel combustion in residential, commercial and "
+                    "other sectors that are not already covered. We have used data from CLRTAP Inventory Submissions "
+                    "(EMEP, 2025) as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given "
+                    "in Table 14."
+                )
+
+        # Skriv ut Markdown-fil for denne strømmen
+        with open(full_flow_path, 'w', encoding='utf-8') as f:
+            f.write("---\n")
+            f.write("layout: default\n")
+            f.write(f"title: {display_name}\n")
+            f.write(f"parent: {parent_subpool}\n")
+            if "EF.EC" in exact_flow_code:
+                f.write(f"nav_order: {ef_ec_counter}\n")
+                ef_ec_counter += 1
+            elif "EF.IC" in exact_flow_code:
+                f.write(f"nav_order: {ef_ic_counter}\n")
+                ef_ic_counter += 1
+            elif "EF.TR" in exact_flow_code:
+                f.write(f"nav_order: {ef_tr_counter}\n")
+                ef_tr_counter += 1
+            elif "EF.OE" in exact_flow_code:
+                f.write(f"nav_order: {ef_oe_counter}\n")
+                ef_oe_counter += 1
+            else:
+                f.write("nav_order: 99\n")
+            f.write("---\n\n")
+
+            f.write(f"# {display_name}\n\n")
+            f.write(f"![{exact_flow_code}](../{plot_dir}/{filename})\n\n")
+            f.write("### Flow Description\n")
+            if description:
+                f.write(f"{description}\n\n")
+            else:
+                f.write(f"*Flow details detected for file: `{filename}` (code: {exact_flow_code}).*\n\n")
+
+            append_bibtex_references(f)
