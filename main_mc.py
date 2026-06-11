@@ -535,7 +535,7 @@ def main():
             
         if 'ef' in selected_pools:
             from calculations.ef_mc import execute_calculations_ef  # Sjekk at funksjonsnavnet stemmer
-            iteration_output['ef'] = execute_calculations_ef(preloaded_data, current_params, dataset_noise)
+            iteration_output['ef'] = execute_calculations_ef(preloaded_data, current_params, dataset_noise, current_trade_factors)
             
         # (Her legger du inn de andre poolene etter hvert: if 'rw' in selected_pools... osv.)
 
