@@ -399,11 +399,11 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
             elif "nh3" in norm:
                 exact_flow_code = "AG.MM-AT.AT-Emissions-NH3"
                 display_name = "Manure Emissions (NH3)"
-                description = "We have used data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 29."
+                description = "We have used data from CLRTAP Inventory Submissions [^emep_officially_2025] as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 29."
             elif "nox" in norm:
                 exact_flow_code = "AG.MM-AT.AT-Emissions-NOx"
                 display_name = "Manure Emissions (NOx)"
-                description = "We have used data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 29."
+                description = "We have used data from CLRTAP Inventory Submissions [^emep_officially_2025] as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 29."
             elif "leaching" in norm:
                 exact_flow_code = "AG.MM-HY.SW-Leaching-Nmix"
                 display_name = "Manure Leaching"
@@ -525,7 +525,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
             if "emissionsn2" in norm and "n2o" not in norm:
                 exact_flow_code = "FS.FO-AT.AT-Emissions-N2"
                 display_name = "Forest Emissions (N2)"
-                description = "Calculated based on N2O emissions from UNFCCC Common reporting tables, Table 4 and assuming a mean N2:N2O ratio of 19.5 as discussed in (Schäppi, 2025)."
+                description = "Calculated based on N2O emissions from UNFCCC Common reporting tables, Table 4 and assuming a mean N2:N2O ratio of 19.5 as discussed in (Schäppi, 2025) [^schappi_annexes_2025]."
             elif "emissionsn2o" in norm:
                 exact_flow_code = "FS.FO-AT.AT-Emissions-N2O"
                 display_name = "Forest Emissions (N2O)"
@@ -565,7 +565,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
             elif "emissionsn2" in norm and "n2o" not in norm:
                 exact_flow_code = "FS.OL-AT.AT-Emissions-N2"
                 display_name = "Other Land Emissions (N2)"
-                description = "Calculated from N2O emissions from UNFCCC Common reporting tables, Table 4, assuming a mean N2:N2O ratio of 19.5 as has been calculated from studies of forest ecosystems, as discussed in (Schäppi, 2025)."
+                description = "Calculated from N2O emissions from UNFCCC Common reporting tables, Table 4, assuming a mean N2:N2O ratio of 19.5 as has been calculated from studies of forest ecosystems, as discussed in (Schäppi, 2025)[^schappi_annexes_2025]."
             elif "emissionsn2o" in norm:
                 exact_flow_code = "FS.OL-AT.AT-Emissions-N2O"
                 display_name = "Other Land Emissions (N2O)"
@@ -717,7 +717,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         f.write(get_balance_image_markdown("EF.EC", relative_depth="../"))
         f.write("\n### Flows that are zero or neglected:\n\n")
         f.write(
-            "* **EF.EC-AT.AT-Emissions-NH3**: Data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by "
+            "* **EF.EC-AT.AT-Emissions-NH3**: Data from CLRTAP Inventory Submissions [^emep_officially_2025] as advised by "
             "Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 11, give values that are "
             "consistently below 0.001 ktN/year, which is negligible in this context.\n"
         )
@@ -790,7 +790,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
                 exact_flow_code = "EF.EC-AT.AT-Emissions-NOx"
                 display_name = "Energy conversion emissions (NOx)"
                 description = (
-                    "EF.EC-AT.AT-Emissions-NOx: We have used data from CLRTAP Inventory Submissions (EMEP, 2025) "
+                    "EF.EC-AT.AT-Emissions-NOx: We have used data from CLRTAP Inventory Submissions [^emep_officially_2025] "
                     "as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 11."
                 )
             elif "emissions" in norm and "n2o" in norm:
@@ -806,7 +806,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
                 description = (
                     "EF.EC-EF.IC-Fuel for industry-Nmix: As advised by Schäppi (2025) [^schappi_annexes_2025], we have "
                     "found this in the UNFCCC Common Reporting Tables (Table 1) which gives amount of energy consumed "
-                    "in TJ, together with net caloric values from Table 1.2 in Garg et al. (2006) [^garg_2006] and "
+                    "in TJ, together with net caloric values from Table 1.2 in Garg et al. (2006) [^garg_chapter_2006] and "
                     "nitrogen contents from Table 15 in Schäppi (2025) [^schappi_annexes_2025]."
                 )
             elif "fuel" in norm and "heating" in norm:
@@ -815,7 +815,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
                 description = (
                     "EF.EC-EF.OE-Fuel for heating-Nmix: As advised by Schäppi (2025) [^schappi_annexes_2025], we have "
                     "found this in the UNFCCC Common Reporting Tables (Table 1) which gives amount of energy consumed "
-                    "in TJ, together with net caloric values from Table 1.2 in Garg et al. (2006) [^garg_2006] and "
+                    "in TJ, together with net caloric values from Table 1.2 in Garg et al. (2006) [^garg_chapter_2006] and "
                     "nitrogen contents from Table 15 in Schäppi (2025) [^schappi_annexes_2025]."
                 )
             elif "fuel" in norm and "transport" in norm:
@@ -824,7 +824,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
                 description = (
                     "EF.EC-EF.TR-Fuel for transport-Nmix: As advised by Schäppi (2025) [^schappi_annexes_2025], we have "
                     "found this in the UNFCCC Common Reporting Tables (Table 1) which gives amount of energy consumed "
-                    "in TJ, together with net caloric values from Table 1.2 in Garg et al. (2006) [^garg_2006] and "
+                    "in TJ, together with net caloric values from Table 1.2 in Garg et al. (2006) [^garg_chapter_2006] and "
                     "nitrogen contents from Table 15 in Schäppi (2025) [^schappi_annexes_2025]."
                 )
             elif "feedstock" in norm:
@@ -862,7 +862,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
                 display_name = "Industrial emissions (NH3)"
                 description = (
                     "EF.IC-AT.AT-Emissions-NH3 denotes ammonia emissions from fuel combustion in industry. We have "
-                    "used data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by Schäppi (2025) "
+                    "used data from CLRTAP Inventory Submissions [^emep_officially_2025] as advised by Schäppi (2025) "
                     "[^schappi_annexes_2025], using the categories given in Table 12."
                 )
             elif "emissions" in norm and "nox" in norm:
@@ -870,7 +870,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
                 display_name = "Industrial emissions (NOx)"
                 description = (
                     "EF.IC-AT.AT-Emissions-NOx denotes NOx emissions from fuel combustion in industry. We have used "
-                    "data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by Schäppi (2025) "
+                    "data from CLRTAP Inventory Submissions [^emep_officially_2025] as advised by Schäppi (2025) "
                     "[^schappi_annexes_2025], using the categories given in Table 12."
                 )
 
@@ -892,7 +892,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
                 display_name = "Transport emissions (NH3)"
                 description = (
                     "EF.TR-AT.AT-Emissions-NH3 denotes ammonia emissions from fuel combustion in the transport "
-                    "sector. We have used data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by "
+                    "sector. We have used data from CLRTAP Inventory Submissions [^emep_officially_2025] as advised by "
                     "Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 13."
                 )
             elif "emissions" in norm and "nox" in norm:
@@ -900,7 +900,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
                 display_name = "Transport emissions (NOx)"
                 description = (
                     "EF.TR-AT.AT-Emissions-NOx denotes NOx emissions from fuel combustion in the transport sector. "
-                    "We have used data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by Schäppi (2025) "
+                    "We have used data from CLRTAP Inventory Submissions [^emep_officially_2025] as advised by Schäppi (2025)[^schappi_annexes_2025] "
                     "[^schappi_annexes_2025], using the categories given in Table 13."
                 )
             elif "export" in norm or "transportfuel" in norm:
@@ -930,7 +930,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
                 description = (
                     "EF.OE-AT.AT-Emissions-NH3 is ammonia emissions from fuel combustion in residential, commercial "
                     "and other sectors that are not already covered. We have used data from CLRTAP Inventory "
-                    "Submissions (EMEP, 2025) as advised by Schäppi (2025) [^schappi_annexes_2025], using the "
+                    "Submissions [^emep_officially_2025] as advised by Schäppi (2025) [^schappi_annexes_2025], using the "
                     "categories given in Table 14."
                 )
             elif "emissions" in norm and "nox" in norm:
@@ -939,7 +939,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
                 description = (
                     "EF.OE-AT.AT-Emissions-NOx is NOx emissions from fuel combustion in residential, commercial and "
                     "other sectors that are not already covered. We have used data from CLRTAP Inventory Submissions "
-                    "(EMEP, 2025) as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given "
+                    "[^emep_officially_2025] as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given "
                     "in Table 14."
                 )
 
