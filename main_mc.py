@@ -533,6 +533,10 @@ def main():
             from calculations.fs_mc import execute_calculations_fs  # Sjekk at funksjonsnavnet stemmer
             iteration_output['fs'] = execute_calculations_fs(preloaded_data, current_params, dataset_noise)
             
+        if 'ef' in selected_pools:
+            from calculations.ef_mc import execute_calculations_ef  # Sjekk at funksjonsnavnet stemmer
+            iteration_output['ef'] = execute_calculations_ef(preloaded_data, current_params, dataset_noise)
+            
         # (Her legger du inn de andre poolene etter hvert: if 'rw' in selected_pools... osv.)
 
         # --- DIAGNOSTISK SJEKK FOR ITERASJON 0 (DETERMINISTISK) ---

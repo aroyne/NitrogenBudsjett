@@ -36,7 +36,7 @@ def load_all_data(selected_pools):
         'avlop_sewage': ({'hy', 'pr'}, 'data_files/05280_20251113-113329.xlsx', 'openpyxl_sewage', {}),
         'ag_gnb': ({'ag'}, 'data_files/aei_pr_gnb__custom_18744910_spreadsheet.xlsx', 'openpyxl_gnb', {}),
         'ag_grovfor': ({'ag'}, 'grovfor_filer_samling', 'excel_grovfor', {}), # Spesialhåndtert
-        'ag_crltap_raw_lines': ({'ag'}, 'data_files/webdabData1863365.txt', 'text_lines', {}),
+        'ag_crltap_raw_lines': ({'ag','ef'}, 'data_files/webdabData1863365.txt', 'text_lines', {}),
         'unfccc_ark1_raw': ({'ag'}, 'data_files/N2O_NOx_AG.xlsx', 'openpyxl_single_sheet_df', {'sheet_name': 'Ark1'}),        
         'ag_leaching_csv': ({'ag'}, 'data_files/Nr_AG--HY.csv', 'csv', {}),
         'ag_faostat_production_all': ({'ag'}, 'data_files/FAOSTAT_data_en_11-18-2025.csv', 'csv_faostat_production', {}),
@@ -45,8 +45,14 @@ def load_all_data(selected_pools):
         'fs_unfccc_emissions_raw': ({'fs'}, 'data_files/N2O_NOx_HS_FS.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Ark1'}),
         'fs_firewood_raw': ({'fs'}, 'data_files/09702_20251120-133716.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'VedTonn'}),
         'fs_obb_grazing': ({'fs'}, 'data_files/OBB_Fylke_1970-2025.xlsx', 'openpyxl_obb_grazing', {}),
-        'faostat_forestry': ({'fs'}, 'data_files/FAOSTAT_data_en_2-20-2026.csv', 'csv_forestry', {})
-        }
+        'faostat_forestry': ({'fs'}, 'data_files/FAOSTAT_data_en_2-20-2026.csv', 'csv_forestry', {}),
+        'fuel_for_industry': ({'ef'}, 'data_files/N_fuel_for_industry.csv', 'csv_ef_fuel', {}),
+        'fuel_for_transport': ({'ef'}, 'data_files/N_fuel_for_transport.csv', 'csv_ef_fuel', {}),
+        'fuel_for_heating': ({'ef'}, 'data_files/N_fuel_for_heating.csv', 'csv_ef_fuel', {}),
+        'n2o_ec_data': ({'ef'}, 'data_files/N2O_EC.csv', 'csv', {}),
+        'trade_fuels_n_content': ({'ef'}, 'data_files/N_content_fuels.xlsx', 'excel', {}),
+        'ssb_energy_balance_11561': ({'ef'}, 'data_files/11561_20251113-154607.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'EnergibalansenGWh'})
+      }
 
     # =========================================================================
     # 2. TUNGE SPESIALPR_LOADS (Handelsdata)
@@ -198,6 +204,10 @@ def load_all_data(selected_pools):
                 df_raw = pd.read_csv(filepath)
                 # Vi tar vare på hele filen i minnet så find_industrial_round_wood kan filtrere den lynraskt
                 preloaded[key] = df_raw
+                
+            elif method == 'csv_ef_fuel':
+                df = pd.read_csv(filepath)
+                preloaded[key] = df[['year', 'value']].copy()
 
         except Exception as e:
             print(f"[KRITISK FEIL] Kunne ikke laste {key}: {e}")

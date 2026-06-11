@@ -158,51 +158,78 @@ def find_export_for_reuse(prepared_trade_data, current_params, trade_params):
     return year_values
 
 
-def find_feedstock_fuel(df_energy, current_params):
-    """Beregner nitrogen i råstoff med kildestøy fra energibalansen (11561)."""
+import pandas as pd
+
+def find_feedstock_fuel(preloaded_data, current_params):
+    """
+    Beregner nitrogen i råstoff med kildestøy fra energibalansen (11561).
+    Henter data fra preloaded_data i stedet for å lese filen for hver iterasjon.
+    """
     year_values = {}
     
-    # Hent støy for energibalansen (Tabell 11561 står øverst i arket ditt)
+    # Hent støy for energibalansen (Tabell 11561) - Standard 1.0 hvis ikke satt
     noise_energy = float(current_params.get('11561', 1.0))
     
-    GWh_to_TJ_factor = float(current_params['GWh_to_TJ_factor'])
-    coal_NCV         = float(current_params['coal_feedstock_NCV'])
-    oil_NCV          = float(current_params['oil_feedstock_NCV'])
-    coal_N_frac      = float(current_params['coal_feedstock_N_frac'])
-    oil_N_frac       = float(current_params['oil_feedstock_N_frac'])
+    # Hent parametere trygt fra current_params (støtter både dict og NParameters)
+    GWh_to_TJ_factor = float(current_params.get('GWh_to_TJ_factor'))
+    coal_NCV         = float(current_params.get('coal_feedstock_NCV'))
+    oil_NCV          = float(current_params.get('oil_feedstock_NCV'))
+    coal_N_frac      = float(current_params.get('coal_feedstock_N_frac'))
+    oil_N_frac       = float(current_params.get('oil_feedstock_N_frac'))
 
-    # --- KULL ---
+    # Hent datarammen som ble preloaded i main_mc.py
+    df_energy = preloaded_data.get('ssb_energy_balance_11561')
+    
+    if df_energy is None:
+        print("  [ADVARSEL] ssb_energy_balance_11561 mangler i preloaded_data!")
+        return year_values, 0.0
+
+    # --- KULL OG KULLPRODUKTER ---
+    # Justert range: Siden openpyxl (1-indeksert) brukte rad 39-73, 
+    # tilsvarer dette indeks 38-72 i en rå data_only Pandas DataFrame.
     for row_idx in range(38, 73):
         try:
+            if row_idx >= len(df_energy): 
+                break
             row_data = df_energy.iloc[row_idx]
-            year_val = row_data.iloc[2]
-            value_val = row_data.iloc[3]
+            year_val = row_data.iloc[2]   # Kolonne C
+            value_val = row_data.iloc[3]  # Kolonne D
             
             if pd.notna(year_val) and pd.notna(value_val) and value_val != '-':
                 year = int(year_val)
                 value = float(value_val) / (GWh_to_TJ_factor * coal_NCV) * coal_N_frac
-                # Multipliser med kildestøy
                 year_values[year] = year_values.get(year, 0.0) + (value * noise_energy)
-        except Exception:
+        except (ValueError, TypeError) as e:
+            # Hvis år eller verdi ikke kan konverteres til tall (f.eks pga tekst på feil rad)
+            print(f"  [Beregning-info] Hoppet over kull-rad {row_idx + 1} i Excel: Inneholder ikke gyldige talldata.")
+            continue
+        except Exception as e:
+            print(f"  [Uventet feil] Kull-rad {row_idx}: {e}")
             continue
 
-    # --- OLJE ---
+    # --- OLJE OG OLJEPRODUKTER ---
+    # Justert range til 108-142 for å matche openpyxl 109-143
     for row_idx in range(108, 143):
         try:
+            if row_idx >= len(df_energy): 
+                break
             row_data = df_energy.iloc[row_idx]
-            year_val = row_data.iloc[2]
-            value_val = row_data.iloc[3]
+            year_val = row_data.iloc[2]   # Kolonne C
+            value_val = row_data.iloc[3]  # Kolonne D
             
             if pd.notna(year_val) and pd.notna(value_val) and value_val != '-':
                 year = int(year_val)
                 value = float(value_val) / (GWh_to_TJ_factor * oil_NCV) * oil_N_frac
-                # Multipliser med kildestøy
                 year_values[year] = year_values.get(year, 0.0) + (value * noise_energy)
-        except Exception:
+        except (ValueError, TypeError):
+            print(f"  [Beregning-info] Hoppet over olje-rad {row_idx + 1} i Excel: Inneholder ikke gyldige talldata.")
+            continue
+        except Exception as e:
+            print(f"  [Uventet feil] Olje-rad {row_idx}: {e}")
             continue
 
-    return year_values
-
+    # Returnerer ALLTID en tuppel med to verdier, slik at utpakkingen (expected 2, got 0) aldri feiler
+    return year_values, 0.0
 
 def find_food_industry_waste(df_05282, df_10514, current_params):
     """
