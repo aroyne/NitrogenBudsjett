@@ -10,9 +10,7 @@ nav_order: 5
 ![FS.FO-MP.OP-Industrial round wood-Nmix](../output_files/plots/FS_FO_MP_OP_Industrial_round_wood_Nmix.png)
 
 ### Flow Description
-Taken from FAOSTAT Forestry production and trade: industrial roundwood, which gives values under bark. The values given here are very close to those reported in SSB table 08979 'Avvirkning for salg (1 000 m3) 1996 – 2024'. We have also compared with data in Eurostat, which gives total amount of round removed (over or under bark) including use for firewood in households and industry. Following the Swedish NBB (Moldan et al., 2025), we use an average wood density of 0.45 t/m3 for all wood categories, and N-contents of 3.4 kg/t for coniferous and 4.3 kg/t for non-coniferous trees (ktN/mill m3 wood harvested).
-
-
+Taken from FAOSTAT Forestry production and trade: industrial roundwood, which gives values under bark...
 
 
 ### References

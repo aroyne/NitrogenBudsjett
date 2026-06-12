@@ -10,7 +10,7 @@ nav_order: 2
 ![EF.TR-AT.AT-Emissions-NH3](../output_files/plots/EF_TR_AT_AT_Emissions_NH3.png)
 
 ### Flow Description
-EF.TR-AT.AT-Emissions-NH3 denotes ammonia emissions from fuel combustion in the transport sector. We have used data from CLRTAP Inventory Submissions [^emep_officially_2025] as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 13.
+EF.TR-AT.AT-Emissions-NH3 denotes ammonia emissions from fuel combustion...
 
 
 ### References

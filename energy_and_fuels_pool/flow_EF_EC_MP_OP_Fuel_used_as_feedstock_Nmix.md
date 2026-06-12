@@ -10,7 +10,7 @@ nav_order: 6
 ![EF.EC-MP.OP-Fuel used as feedstock-Nmix](../output_files/plots/EF_EC_MP_OP_Fuel_used_as_feedstock_Nmix.png)
 
 ### Flow Description
-EF.EC-MP.OP-Fuel used as feedstock-Nmix: We use SSB table 11561 ('Energibalansen') to obtain GWh of coal and oil used as feedstock. We convert GWh to TJ, divide by net caloric values for coal and oil, and multiply by N fractions from Schäppi (2025) [^schappi_annexes_2025]. Other minor feedstock categories listed in the guidelines are neglected as advised by Schäppi (2025).
+EF.EC-MP.OP-Fuel used as feedstock-Nmix: We use SSB table 11561...
 
 
 ### References

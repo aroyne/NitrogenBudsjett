@@ -10,7 +10,7 @@ nav_order: 1
 ![EF.EC-AT.AT-Emissions-N2O](../output_files/plots/EF_EC_AT_AT_Emissions_N2O.png)
 
 ### Flow Description
-EF.EC-AT.AT-Emissions-N2O is taken from UNFCCC Common Reporting Tables, Table 1, using the categories given in Table 11 by Schäppi (2025) [^schappi_annexes_2025].
+EF.EC-AT.AT-Emissions-N2O is taken from UNFCCC Common Reporting Tables...
 
 
 ### References

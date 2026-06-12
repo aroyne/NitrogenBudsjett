@@ -199,9 +199,9 @@ def _add_wild_shellfish_and_macroalgae(results, preloaded_data, current_params, 
     if df_fiske_old is None:
         raise ValueError(f"[KRITISK] 'hy_fiske_old_raw' mangler i preloaded_data for {flow_code}!")
         
-    for r in range(len(df_fiske_old)):
+    for r in range(1, 12):
         val_at_col0 = str(df_fiske_old.iloc[r, 0]).strip()
-        if val_at_col0.lower() in ['year', 'år', 'årstall', 'nan', '']:
+        if val_at_col0.lower() in ['year', 'år', 'årstall', 'nan', '', 'none']:
             continue
             
         try:
@@ -224,8 +224,10 @@ def _add_wild_shellfish_and_macroalgae(results, preloaded_data, current_params, 
 def _add_surface_water_emissions(results, preloaded_data, current_params, dataset_noise, outflow_tracker):
     """
     Beregner ferskvannsretensjon og tilhørende atmosfæriske emisjoner av N2 og N2O.
-    Bruker målt TEOTIL3-retensjon der det finnes, og faller tilbake på historisk kalsium 
-    med EKSTRA usikkerhet for interpolering på de resterende årene.
+    Gjenskapt fra original logikk: 
+      - 2013+ bruker direkte TEOTIL3-retensjon.
+      - 1990-2012 bruker baklengs kalkyle fra outflow (typisk retensjonsbrøk).
+      - År før 1990 ignoreres.
     """
     flow_n2 = 'HY.SW-AT.AT-Emissions-N2'
     flow_n2o = 'HY.SW-AT.AT-Emissions-N2O'
@@ -237,24 +239,24 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
     key_teotil = 'TEOTIL'
     key_interp = 'trend interpolation'
     
-    # Sjekk at primærstøy eksisterer
     if not dataset_noise or key_teotil not in dataset_noise:
-        raise KeyError(f"[KRITISK] Støy-nøkkel '{key_teotil}' mangler i dataset_noise for retensjonsberegning!")
+        raise KeyError(f"[KRITISK] Støy-nøkkel '{key_teotil}' mangler i dataset_noise!")
     noise_teotil = dataset_noise[key_teotil]['value']
 
-    # 1. Modellering ut fra målt retensjon i TEOTIL3
+    # 1. Moderne år (2013+): Hent direkte fra TEOTIL3-retensjonsmatrisen
     df_t3_ret = preloaded_data.get('hy_teotil3_retention')
     if df_t3_ret is None:
         raise ValueError(f"[KRITISK] 'hy_teotil3_retention' mangler i preloaded_data!")
         
     for r in range(len(df_t3_ret)):
         val_at_col0 = str(df_t3_ret.iloc[r, 0]).strip()
-        if val_at_col0.lower() in ['year', 'år', 'årstall', 'nan', '']:
+        if val_at_col0.lower() in ['year', 'år', 'årstall', 'nan', '', 'none']:
             continue
             
         try:
             year = int(float(val_at_col0))
-            if year in EXPECTED_YEARS:
+            # Vi tar kun år som er i EXPECTED_YEARS og som er fra 2013 og fremover
+            if year in EXPECTED_YEARS and year >= 2013:
                 collected_years.add(year)
                 base_ret_val = (float(df_t3_ret.iloc[r, 1]) / 1000.0) * noise_teotil
                 
@@ -265,27 +267,22 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
         except (ValueError, TypeError, IndexError) as e:
             raise ValueError(f"[KRITISK DATAFEIL] Kunne ikke prosessere retensjonsmatrise på rad {r}: {e}")
 
-    # 2. Historisk beregning basert på fast retensjonsbrøk + interpoleringsstøy for resterende år
-    missing_years = EXPECTED_YEARS - collected_years
-    if missing_years:
-        if not dataset_noise or key_interp not in dataset_noise:
-            raise KeyError(
-                f"[KRITISK] Forhistoriske år krever interpolering, men støy-nøkkelen '{key_interp}' "
-                f"mangler i dataset_noise for retensjonsberegning!"
-            )
-        noise_interp = dataset_noise[key_interp]['value']
-        
-        for year in sorted(missing_years):
-            # Hvis vi ikke engang har outflow-data for dette året, må vi krasje
-            if outflow_tracker.loc[year, 'entries'] != 1:
-                raise ValueError(f"[KRITISK] Ingen inngående eller utgående ferskvannsdata funnet for året {year}. Kan ikke interpolere retensjon!")
-                
+    # 2. Historiske år (1990 - 2012): Bruk baklengs kalkyle basert på outflow_tracker
+    if not dataset_noise or key_interp not in dataset_noise:
+        raise KeyError(f"[KRITISK] Støy-nøkkelen '{key_interp}' mangler i dataset_noise!")
+    noise_interp = dataset_noise[key_interp]['value']
+    
+    # Finn hvilke av de forventede årene (fra 1990 og oppover) vi ikke har dekket ennå
+    missing_years = {y for y in EXPECTED_YEARS if y >= 1990} - collected_years
+    
+    for year in sorted(missing_years):
+        # Vi sjekker om det finnes utganger registrert for dette året (tilsvarende gamle: outflow.loc[year,'entries'] == 1)
+        if year in outflow_tracker.index and outflow_tracker.loc[year, 'entries'] == 1:
             collected_years.add(year)
             
             # Baklengs kalkyle: Retensjon = Outflow * ret_frac / (1 - ret_frac)
             hist_ret_val = outflow_tracker.loc[year, 'value'] * ret_frac / (1.0 - ret_frac)
-            
-            # Legger på den ekstra usikkerheten for interpolering/modellering her
+            # Legger på MC-støy for interpolering
             hist_ret_val *= noise_interp
             
             results.append({'flow_name': flow_n2, 'year': year, 'value': max(0.0, hist_ret_val * (1.0 - fraction_N2O)),
@@ -293,9 +290,11 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
             results.append({'flow_name': flow_n2o, 'year': year, 'value': max(0.0, hist_ret_val * fraction_N2O),
                             'comment': 'modeled (Fast retensjonsbrøk + interpoleringsstøy)', 'data_sources': 'Beregningsmodell'})
 
-    # Sluttkontroll
-    report_missing_years(flow_n2, EXPECTED_YEARS - collected_years, results)
-
+    # Sluttkontroll (kun for år fra 1990 og oppover)
+    expected_from_1990 = {y for y in EXPECTED_YEARS if y >= 1990}
+    report_missing_years(flow_n2, expected_from_1990 - collected_years, results)
+    
+    
 def _add_wild_fish_catch(results, preloaded_data, current_params, dataset_noise):
     """
     Beregner marint uttak av nitrogen via tradisjonelt saltvannsfiske (villfangst).
@@ -335,17 +334,18 @@ def _add_wild_fish_catch(results, preloaded_data, current_params, dataset_noise)
         except (ValueError, TypeError, IndexError) as e:
             raise ValueError(f"[KRITISK DATAFEIL] Feil i moderne villfisk-kolonne {col}: {e}")
 
+    # Historiske data (før 2000)
     df_fiske_old = preloaded_data.get('hy_fiske_old_raw')
     if df_fiske_old is None:
         raise ValueError(f"[KRITISK] 'hy_fiske_old_raw' mangler i preloaded_data for villfisk-beregning!")
         
-    for r in range(len(df_fiske_old)):
-        val_at_col0 = str(df_fiske_old.iloc[r, 0]).strip()
-        if val_at_col0.lower() in ['year', 'år', 'årstall', 'nan', '']:
-            continue
-            
+    # Låser løkken til radene 1 til og med 11 (tilsvarer rader 2 til 12 i openpyxl)
+    # Dette hopper over overskriftsraden (0) og stopper før tomme rader/kildetekst (12+)
+    for r in range(1, 12):
         try:
+            val_at_col0 = str(df_fiske_old.iloc[r, 0]).strip()
             year = int(float(val_at_col0))
+            
             if year in EXPECTED_YEARS:
                 collected_years.add(year)
                 val = (float(df_fiske_old.iloc[r, 1]) + float(df_fiske_old.iloc[r, 2])) * fish_N_frac * noise_fisk
@@ -359,7 +359,6 @@ def _add_wild_fish_catch(results, preloaded_data, current_params, dataset_noise)
 
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
-
 
 def _add_aquaculture_internal_flows(results, aquaculture_production_dict, current_params):
     """

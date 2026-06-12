@@ -10,7 +10,7 @@ nav_order: 2
 ![EF.OE-AT.AT-Emissions-NH3](../output_files/plots/EF_OE_AT_AT_Emissions_NH3.png)
 
 ### Flow Description
-EF.OE-AT.AT-Emissions-NH3 is ammonia emissions from fuel combustion in residential, commercial and other sectors that are not already covered. We have used data from CLRTAP Inventory Submissions [^emep_officially_2025] as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 14.
+EF.OE-AT.AT-Emissions-NH3 is ammonia emissions from fuel combustion...
 
 
 ### References

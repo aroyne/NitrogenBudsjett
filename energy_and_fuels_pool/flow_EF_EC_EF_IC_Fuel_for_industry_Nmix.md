@@ -10,7 +10,7 @@ nav_order: 3
 ![EF.EC-EF.IC-Fuel for industry-Nmix](../output_files/plots/EF_EC_EF_IC_Fuel_for_industry_Nmix.png)
 
 ### Flow Description
-EF.EC-EF.IC-Fuel for industry-Nmix: As advised by Schäppi (2025) [^schappi_annexes_2025], we have found this in the UNFCCC Common Reporting Tables (Table 1) which gives amount of energy consumed in TJ, together with net caloric values from Table 1.2 in Garg et al. (2006) [^garg_chapter_2006] and nitrogen contents from Table 15 in Schäppi (2025) [^schappi_annexes_2025].
+EF.EC-EF.IC-Fuel for industry-Nmix: As advised by Schäppi (2025)...
 
 
 ### References
