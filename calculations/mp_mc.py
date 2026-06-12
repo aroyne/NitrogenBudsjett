@@ -39,6 +39,7 @@ def execute_calculations_mp(preloaded_data, current_params, dataset_noise, curre
     _add_seeds_and_planting_material_mc(results, preloaded_data, current_params, dataset_noise)
     _add_farm_animal_feed_mc(results, preloaded_data, current_params, dataset_noise)
     _add_food_industry_waste_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_food_industry_wastewater_mc(results, preloaded_data, current_params, dataset_noise)
     
     
     return results
@@ -287,5 +288,74 @@ def _add_food_industry_waste_mc(results, preloaded_data, current_params, dataset
                 'data_sources': calculated_years[year]['data_sources']
             })
             
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+    
+    
+def _add_food_industry_wastewater_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    MC-VERSJON: Beregner nitrogen i avløpsvann fra matindustrien (MP.FP-PR.WW-Food industry wastewater-Nmix).
+    Bruker ferdiginnlastede data fra Miljødirektoratet og kategoriseringer.
+    """
+    flow_code = 'MP.FP-PR.WW-Food industry wastewater-Nmix'
+    collected_years = set()
+    
+    # 1. Hent tabeller fra preloaded_data
+    df_emissions_raw = preloaded_data.get('mildir_emissions')
+    df_categories = preloaded_data.get('industry_categories')
+    
+    if df_emissions_raw is None or df_categories is None:
+        raise ValueError(f"[KRITISK] Data ('mildir_emissions'/'industry_categories') mangler i preloaded_data for {flow_code}!")
+        
+    # 2. Hent støy fra dataset_noise
+    key_støy = 'norskeutslipp'
+    if not dataset_noise or key_støy not in dataset_noise:
+        raise KeyError(f"[KRITISK] Støy-nøkkel '{key_støy}' mangler i dataset_noise for {flow_code}!")
+        
+    noise_factor = float(dataset_noise[key_støy]['value'])
+    støy_type = dataset_noise[key_støy]['type']  # 'perc' eller 'abs'
+
+    # 3. Prosesser og filtrer data (Dette gjøres i RAM, lynraskt per iterasjon)
+    emissions = df_emissions_raw[df_emissions_raw['Komponent'] == 'nitrogen, totalt']
+    
+    categories_keep = df_categories[
+        (df_categories['kategori'] == 'FP') & 
+        (df_categories['kommunalt nett?'].isin(['ja']))
+    ]
+    
+    emissions_FP = emissions[emissions['AnleggNavn'].isin(categories_keep['Virksomhet'])]
+    sum_by_year = emissions_FP.groupby(['År'])['Mengde'].sum().reset_index()
+    
+    # 4. Loop over de aggregerte årene og legg på MC-støy
+    for index, row in sum_by_year.iterrows():
+        try:
+            year = int(row['År'])
+            if year in EXPECTED_YEARS:
+                collected_years.add(year)
+                
+                # Basisverdi (konverteres fra kg(?) til tonn/kt ved å dele på 1000)
+                base_value = float(row['Mengde']) / 1000.0
+                
+                # Håndtering av støytype (prosentvis vs absolutt)
+                if støy_type == 'perc':
+                    value_noisy = base_value * noise_factor
+                elif støy_type == 'abs':
+                    bound = dataset_noise[key_støy]['upper_bound'] if noise_factor >= 0 else dataset_noise[key_støy]['lower_bound']
+                    value_noisy = base_value + (noise_factor * bound)
+                else:
+                    raise ValueError(f"[KRITISK] Ukjent støytype '{støy_type}' for {flow_code}")
+                if year == 2020:
+                    print(f"[DEBUG] År: {year} | Base: {base_value:.4f} | Støyfaktor: {noise_factor:.4f} | Sluttverdi: {value_noisy:.4f}")
+                results.append({
+                    'flow_name': flow_code,
+                    'year': year,
+                    'value': max(0.0, value_noisy),
+                    'comment': 'ok (MC-støy lagt på)',
+                    'data_sources': 'Miljødirektoratet'
+                })
+        except (ValueError, TypeError) as e:
+            raise ValueError(f"[KRITISK DATAFEIL] Feil ved prosessering av år på rad {index} for {flow_code}: {e}")
+
+    # 5. Sluttkontroll på manglende år
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)

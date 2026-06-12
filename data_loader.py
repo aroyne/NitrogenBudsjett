@@ -69,6 +69,8 @@ def load_all_data(selected_pools):
         'mp_rotvekst_groennsak_raw': ({'mp'}, 'data_files/NibioStatistics-5.xlsx', 'excel', {'sheet_name': 'Sum rotvekst- og grønnsakfrø', 'header': None}),
         'ssb_10514': ({'mp'}, 'data_files/10514_20260211-094101.xlsx', 'excel_ssb_generic', {'sheet': '10514'}),
         'ssb_05282': ({'mp'}, 'data_files/05282_20260211-091021.xlsx', 'excel_ssb_generic', {'sheet': '05282'}),
+        'mildir_emissions': ({'mp'}, 'data_files/Årlig utslipp til vann - Landbasert 02-02-2026.xlsx', 'excel_mildir_emissions', {}),
+        'industry_categories': ({'mp'}, 'data_files/industry_categories.xlsx', 'excel_industry_categories', {}),
         }
 
     # =========================================================================
@@ -239,6 +241,13 @@ def load_all_data(selected_pools):
                 # Vi laster inn uten header for å beholde nøyaktig samme radindekser som i openpyxl
                 df = pd.read_excel(filepath, sheet_name=sheet_name, header=None)
                 preloaded[key] = df
+                
+            elif method == 'excel_mildir_emissions':
+                # Leses med vanlig header=0 slik som i koden din
+                preloaded[key] = pd.read_excel(filepath, header=0)
+
+            elif method == 'excel_industry_categories':
+                preloaded[key] = pd.read_excel(filepath)
 
         except Exception as e:
             print(f"[KRITISK FEIL] Kunne ikke laste {key}: {e}")
