@@ -93,7 +93,7 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_animal_p
             if isinstance(df_trade_local[df_trade_local.columns[0]].iloc[0], str):
                 pid_col = df_trade_local.columns[0]
 
-    # --- DETERMINISTISK GREN (Runde i=0) ---
+# --- DETERMINISTISK GREN (Runde i=0) ---
     if is_deterministic:
         static_trade = {}
         if df_trade_local is not None and pid_col is not None:
@@ -102,29 +102,23 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_animal_p
             
         custom_dict = {}
         
-        # Flate ut animal_weights deterministisk (Lik original)
         if df_animal_weights is not None:
             for _, row in df_animal_weights.iterrows():
                 t_id = f"weight_{str(row.name).strip()}" if df_animal_weights.index.name == 'item_name' else f"weight_{str(row['item_name']).strip()}"
                 custom_dict[t_id] = float(row['avg_weight_kg'])
                 
-        # Flate ut animal_products deterministisk (Nye harmoniserte måten)
         if df_animal_products_static is not None:
             for _, row in df_animal_products_static.iterrows():
                 p_id = f"prod_{str(row['item']).strip()}"
                 custom_dict[p_id] = float(row['N_content_percent'])
                 
-        # FLATE UT WASTE FRACTIONS DETERMINISTISK FOR ITERASJON 0
-        try:
-            df_waste_static = base_params.get_table('waste_fractions')
-            for _, row in df_waste_static.iterrows():
-                cat_id = str(row['waste_category']).strip()
-                custom_dict[cat_id] = float(row['N_frac'])
-        except Exception as e:
-            print(f"[INFO] Kunne ikke pre-loade waste_fractions deterministisk: {e}")
+        # Ingen try/except her – hvis arket mangler i runde 0, skal det krasje
+        df_waste_static = base_params.get_table('waste_fractions')
+        for _, row in df_waste_static.iterrows():
+            cat_id = str(row['waste_category']).strip()
+            custom_dict[cat_id] = float(row['N_frac'])
         
         base_params.override_global_params(custom_dict)
-
         return base_params, {}, static_trade
         
     # --- 1. GLOBALE PARAMETERE ---
@@ -186,70 +180,55 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_animal_p
     elif hasattr(base_params, 'tables') and 'global_parameters' in base_params.tables:
         base_params.tables['global_parameters'] = df_perturbed
 
-    # ==============================================================================
-    # --- STEG 1.5: ROBUST PERTURBERING AV WASTE_FRACTIONS (HARMONISERT LOGIKK) ---
-    # ==============================================================================
-    try:
-        df_waste = base_params.get_table('waste_fractions')
+ # --- STEG 1.5: PERTURBERING AV WASTE_FRACTIONS ---
+    df_waste = base_params.get_table('waste_fractions')
+    for idx, row in df_waste.iterrows():
+        cat_id = str(row['waste_category']).strip()
+        val = float(row['N_frac'])
         
-        for idx, row in df_waste.iterrows():
-            cat_id = str(row['waste_category']).strip()
-            val = float(row['N_frac'])
+        # FJERNERT .get() og pd.isna() fallbacks: Krever kolonnene eksplisitt
+        low_b = float(row['lower_bound'])
+        upp_b = float(row['upper_bound'])
+        unc_type = str(row['uncertainty_type']).lower().strip()
+        dist_type = str(row['distribution_type']).lower().strip()
+        
+        if low_b == 0 and upp_b == 0:
+            custom_dict[cat_id] = val
+            continue
             
-            low_b = row.get('lower_bound', 0.0)
-            upp_b = row.get('upper_bound', 0.0)
-            
-            # Hent innstillingene, eller fall tilbake på standardverdier hvis tomme
-            unc_type = str(row.get('uncertainty_type', 'perc')).lower().strip() if not pd.isna(row.get('uncertainty_type')) else 'perc'
-            dist_type = str(row.get('distribution_type', 'norm')).lower().strip() if not pd.isna(row.get('distribution_type')) else 'norm'
-            
-            # Hvis det ikke er definert usikkerhet, behold originalverdien
-            if pd.isna(low_b) or pd.isna(upp_b) or (low_b == 0 and upp_b == 0):
-                custom_dict[cat_id] = val
-                continue
-                
-            low_b = float(low_b)
-            upp_b = float(upp_b)
-            
-            # Beregn absolutt min/maks og standardavvik basert på prosent eller absolutte verdier
-            if unc_type == 'perc':
-                abs_min = val * (1 - low_b / 100.0)
-                abs_max = val * (1 + upp_b / 100.0)
-                std_dev = ((low_b + upp_b) / 2.0 / 100.0) * val
-            else:
-                abs_min = val - low_b
-                abs_max = val + upp_b
-                std_dev = (low_b + upp_b) / 2.0 / 1.96
+        if unc_type == 'perc':
+            abs_min = val * (1 - low_b / 100.0)
+            abs_max = val * (1 + upp_b / 100.0)
+            std_dev = ((low_b + upp_b) / 2.0 / 100.0) * val
+        else:
+            abs_min = val - low_b
+            abs_max = val + upp_b
+            std_dev = (low_b + upp_b) / 2.0 / 1.96
 
-            # Trekk tilfeldig verdi basert på valgt distribusjonstype
-            if 'pert' in dist_type:
-                chosen_val = draw_from_pert(abs_min, val, abs_max)
-            elif 'log' in dist_type:
-                cv = std_dev / val if val > 0 else 0.1
-                sigma_log = np.sqrt(np.log(1 + cv**2))
-                mu_log = np.log(val) - (sigma_log ** 2) / 2
-                chosen_val = np.random.lognormal(mu_log, sigma_log)
-            else:
-                chosen_val = np.random.normal(val, std_dev)
+        if 'pert' in dist_type:
+            chosen_val = draw_from_pert(abs_min, val, abs_max)
+        elif 'log' in dist_type:
+            cv = std_dev / val if val > 0 else 0.1
+            sigma_log = np.sqrt(np.log(1 + cv**2))
+            mu_log = np.log(val) - (sigma_log ** 2) / 2
+            chosen_val = np.random.lognormal(mu_log, sigma_log)
+        else:
+            chosen_val = np.random.normal(val, std_dev)
 
-            # Fysisk grensebetingelse (en nitrogenfraksjon kan aldri være negativ)
-            if val >= 0 and chosen_val < 0:
-                chosen_val = 0.0
-                
-            custom_dict[cat_id] = chosen_val
+        if val >= 0 and chosen_val < 0:
+            chosen_val = 0.0
             
-    except Exception as e:
-        raise RuntimeError(f"[KRITISK FEIL] Feilet under generering av MC-støy for 'waste_fractions': {e}")
-    # ==============================================================================
-    
+        custom_dict[cat_id] = chosen_val
+            
     # --- 2. STØYFAKTORER FOR DATASETT ---
     dataset_noise_dict = {}
     for _, row in df_datasets.iterrows():
         ds_id = str(row['dataset_name']).strip()
-        low_b = float(row['lower_bound']) if not pd.isna(row['lower_bound']) else 0.0
-        upp_b = float(row['upper_bound']) if not pd.isna(row['upper_bound']) else 0.0
-        unc_type = str(row['uncertainty_type']).lower().strip() if not pd.isna(row['uncertainty_type']) else 'perc'
-        dist_type = str(row['distribution_type']).lower().strip() if not pd.isna(row['distribution_type']) else 'pert'
+        # FJERNET fallbacks til 0.0 og standard distribusjoner
+        low_b = float(row['lower_bound'])
+        upp_b = float(row['upper_bound'])
+        unc_type = str(row['uncertainty_type']).lower().strip()
+        dist_type = str(row['distribution_type']).lower().strip()
         
         if unc_type == 'perc':
             base_val = 1.0
@@ -276,7 +255,7 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_animal_p
                 noise_val = np.random.normal(base_val, std_dev)
         
         dataset_noise_dict[ds_id] = {'value': noise_val, 'type': unc_type, 'low_bound': low_b, 'upp_bound': upp_b}
-
+        
     # --- 3. PERTURBERING AV TRADE_PARAMETERS ---
     trade_noise_dict = {}
     if df_trade_local is not None and pid_col is not None:
@@ -324,10 +303,12 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_animal_p
         for _, row in df_animal_weights.iterrows():
             t_id = f"weight_{str(row.name).strip()}" if df_animal_weights.index.name == 'item_name' else f"weight_{str(row['item_name']).strip()}"
             val = float(row['avg_weight_kg'])
-            low_b = float(row['low_bound']) if 'low_bound' in row and not pd.isna(row['low_bound']) else 0.0
-            upp_b = float(row['upp_bound']) if 'upp_bound' in row and not pd.isna(row['upp_bound']) else 0.0
-            unc_type = str(row['type']).lower().strip() if 'type' in row and not pd.isna(row['type']) else 'perc'
-            dist_type = str(row['distribution_type']).lower().strip() if 'distribution_type' in row and not pd.isna(row['distribution_type']) else 'norm'
+            
+            # FJERNET alle pd.isna() sjekker og hardkodede 0.0-fallbacks
+            low_b = float(row['lower_bound'])
+            upp_b = float(row['upper_bound'])
+            unc_type = str(row['uncertainty_type']).lower().strip()
+            dist_type = str(row['distribution_type']).lower().strip()
             
             if low_b == 0 and upp_b == 0:
                 custom_dict[t_id] = val
@@ -356,14 +337,16 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_animal_p
                 chosen_val = 0.0
                 
             custom_dict[t_id] = chosen_val
-
-    # --- 5. PERTURBERING AV ANIMAL PRODUCTS (NÅ HELT LIK SOM VEKTER) ---
+            
+    # --- 5. PERTURBERING AV ANIMAL PRODUCTS ---
     if df_animal_products_static is not None:
         for _, row in df_animal_products_static.iterrows():
             p_id = f"prod_{str(row['item']).strip()}"
             base_val = float(row['N_content_percent'])
-            dist_type = str(row.get('distribution_type', 'norm')).strip().lower()
-            u_val = float(row.get('upper_bound', 0.0)) / 100.0
+            
+            # FJERNET .get() fallbacks: Kolonnene MÅ eksistere i Excel
+            dist_type = str(row['distribution_type']).strip().lower()
+            u_val = float(row['upper_bound']) / 100.0
             
             if u_val > 0:
                 if dist_type == 'unif':
@@ -378,9 +361,7 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_animal_p
             
             custom_dict[p_id] = perturbed_val
 
-    # Send alle flate parametere inn sentralt
     base_params.override_global_params(custom_dict)
-        
     return base_params, dataset_noise_dict, trade_noise_dict
 
 def write_mc_flows_to_international_report(summary_df):
@@ -495,21 +476,12 @@ def main():
     original_clean_dict = dict(zip(df_global_static['parameter_id'], df_global_static['value']))
     df_dataset_uncertainties = base_params.get_table('dataset_uncertainties')
     
-    # --- HER DEFINERER DU df_animal_weights ---
+    # FJERNET try/except: Hvis tabellene mangler, stanser programmet her med en ekte Traceback
     print("[INFO] Henter animal_weights tabell fra base_params...")
-    try:
-        df_animal_weights = base_params.get_table('animal_weights')
-    except Exception as e:
-        print(f"[ADVARSEL] Fant ikke 'animal_weights' i base_params. Setter til None: {e}")
-        df_animal_weights = None
+    df_animal_weights = base_params.get_table('animal_weights')
         
-    # Hent animal_products tabellen fra base_params
     print("[INFO] Henter animal_products tabell fra base_params...")
-    try:
-        df_animal_products_static = base_params.get_table('animal_products')
-    except Exception as e:
-        print(f"[KRITISK FEIL] Fant ikke 'animal_products' i base_params: {e}")
-        df_animal_products_static = None
+    df_animal_products_static = base_params.get_table('animal_products')
         
     # Sikkerhetssjekk og mapping for handelsdata
     if 'trade_params' not in preloaded_data:

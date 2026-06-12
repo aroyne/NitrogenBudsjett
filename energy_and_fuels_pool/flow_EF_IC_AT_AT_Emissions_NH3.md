@@ -2,7 +2,7 @@
 layout: default
 title: Industrial emissions (NH3)
 parent: Manufacturing industries and construction (EF.IC)
-nav_order: 1
+nav_order: 2
 ---
 
 # Industrial emissions (NH3)

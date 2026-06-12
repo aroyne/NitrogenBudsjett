@@ -2,7 +2,7 @@
 layout: default
 title: Fuel used as feedstock
 parent: Energy conversion (EF.EC)
-nav_order: 5
+nav_order: 6
 ---
 
 # Fuel used as feedstock

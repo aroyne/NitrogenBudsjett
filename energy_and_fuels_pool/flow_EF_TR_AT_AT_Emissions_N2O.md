@@ -1,16 +1,16 @@
 ---
 layout: default
-title: Industrial emissions (NOx)
-parent: Manufacturing industries and construction (EF.IC)
-nav_order: 3
+title: Transport emissions (N2O)
+parent: Transportation (EF.TR)
+nav_order: 1
 ---
 
-# Industrial emissions (NOx)
+# Transport emissions (N2O)
 
-![EF.IC-AT.AT-Emissions-NOx](../output_files/plots/EF_IC_AT_AT_Emissions_NOx.png)
+![EF.TR-AT.AT-Emissions-N2O](../output_files/plots/EF_TR_AT_AT_Emissions_N2O.png)
 
 ### Flow Description
-EF.IC-AT.AT-Emissions-NOx denotes NOx emissions from fuel combustion in industry. We have used data from CLRTAP Inventory Submissions [^emep_officially_2025] as advised by Schäppi (2025) [^schappi_annexes_2025], using the categories given in Table 12.
+EF.TR-AT.AT-Emissions-N2O is taken from UNFCCC Common Reporting Tables, Table 1, using the categories given in Table 13 by Schäppi (2025) [^schappi_annexes_2025].
 
 
 ### References

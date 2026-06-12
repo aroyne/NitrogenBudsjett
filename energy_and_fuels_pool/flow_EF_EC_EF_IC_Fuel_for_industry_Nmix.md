@@ -2,7 +2,7 @@
 layout: default
 title: Fuel for industry
 parent: Energy conversion (EF.EC)
-nav_order: 2
+nav_order: 3
 ---
 
 # Fuel for industry
