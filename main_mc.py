@@ -117,6 +117,12 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_animal_p
         for _, row in df_waste_static.iterrows():
             cat_id = str(row['waste_category']).strip()
             custom_dict[cat_id] = float(row['N_frac'])
+            
+        # --- Matvareproteiner (Uten støy i runde 0) ---
+        df_food_static = base_params.get_table('protein_food_items')
+        for _, row in df_food_static.iterrows():
+            f_id = f"food_protein_{str(row['food_group']).strip()}"
+            custom_dict[f_id] = float(row['protein_content'])
         
         base_params.override_global_params(custom_dict)
         return base_params, {}, static_trade
@@ -360,6 +366,27 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_animal_p
                 perturbed_val = 0.0
             
             custom_dict[p_id] = perturbed_val
+            
+    # --- 6. PERTURBERING AV PROTEIN INNHOLD I MATVARER ---
+    df_food_items = base_params.get_table('protein_food_items')
+    for idx, row in df_food_items.iterrows():
+        f_group = str(row['food_group']).strip()
+        f_id = f"food_protein_{f_group}"
+        base_val = float(row['protein_content'])
+        
+        # Henter usikkerhet i prosent (f.eks. 10 betyr 10% usikkerhet)
+        u_val = float(row['uncertainty']) / 100.0 if 'uncertainty' in row else 0.0
+        
+        if u_val > 0:
+            # Trekker fra en normalfordeling rundt 1.0 med standardavvik u_val
+            perturbed_val = base_val * np.random.normal(1.0, u_val)
+        else:
+            perturbed_val = base_val
+            
+        if perturbed_val < 0:
+            perturbed_val = 0.0
+            
+        custom_dict[f_id] = perturbed_val
 
     base_params.override_global_params(custom_dict)
     return base_params, dataset_noise_dict, trade_noise_dict

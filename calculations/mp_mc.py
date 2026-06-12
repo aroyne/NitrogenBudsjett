@@ -28,6 +28,31 @@ from calculations.shared_flow_calculations import (
     )
 
 
+def protein_per_group(current_params, mapping_sheet, group_index):
+    """
+    MC-VERSJON: Kobler SSB-koder mot perturberte proteinverdier i current_params.
+    """
+    # 1) Hent mappingtabellen fra parameterobjektet
+    mapping = current_params.get_table(mapping_sheet)
+    mapping = mapping.set_index('code').reindex(group_index)
+
+    # 2) Slå opp den unike, perturberte verdien per matvaregruppe for denne iterasjonen
+    protein_fractions = []
+    for idx, row in mapping.iterrows():
+        food_group = str(row['food_group']).strip()
+        
+        # Hvis matvaregruppen finnes, hent ut den unike MC-verdien, ellers 0.0
+        if pd.notna(row['food_group']):
+            f_id = f"food_protein_{food_group}"
+            protein_pct = float(current_params.get(f_id))
+        else:
+            protein_pct = 0.0
+            
+        protein_fractions.append(protein_pct / 100.0) # Prosent -> Fraksjon
+
+    return pd.Series(protein_fractions, index=group_index)
+
+
 def execute_calculations_mp(preloaded_data, current_params, dataset_noise, current_trade_factors=None):
     """
     Hovedfunksjon for MP-poolen (MC). Mottar denne rundens parameter- og støyordbøker.
@@ -40,6 +65,7 @@ def execute_calculations_mp(preloaded_data, current_params, dataset_noise, curre
     _add_farm_animal_feed_mc(results, preloaded_data, current_params, dataset_noise)
     _add_food_industry_waste_mc(results, preloaded_data, current_params, dataset_noise)
     _add_food_industry_wastewater_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_food_products_mc(results, preloaded_data, current_params, dataset_noise)
     
     
     return results
@@ -344,8 +370,7 @@ def _add_food_industry_wastewater_mc(results, preloaded_data, current_params, da
                     value_noisy = base_value + (noise_factor * bound)
                 else:
                     raise ValueError(f"[KRITISK] Ukjent støytype '{støy_type}' for {flow_code}")
-                if year == 2020:
-                    print(f"[DEBUG] År: {year} | Base: {base_value:.4f} | Støyfaktor: {noise_factor:.4f} | Sluttverdi: {value_noisy:.4f}")
+
                 results.append({
                     'flow_name': flow_code,
                     'year': year,
@@ -357,5 +382,217 @@ def _add_food_industry_wastewater_mc(results, preloaded_data, current_params, da
             raise ValueError(f"[KRITISK DATAFEIL] Feil ved prosessering av år på rad {index} for {flow_code}: {e}")
 
     # 5. Sluttkontroll på manglende år
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+    
+    
+def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    MC-VERSJON (Samlet): Beregner nitrogen i matvarer og kjæledyrfôr 
+    (MP.FP-HS.HS-Food products-Nmix) og legger det direkte til i resultatene.
+    """
+    flow_code = 'MP.FP-HS.HS-Food products-Nmix'
+    collected_years = set()
+    year_values = {}
+    
+    # 1. Hent fysiske parametere fra current_params
+    dog_N_per_year = float(current_params.get('dog_feed_N_per_year'))
+    cat_N_per_year = float(current_params.get('cat_feed_N_per_year'))
+    dog_slope      = float(current_params.get('dog_number_trend_slope'))
+    dog_intercept  = float(current_params.get('dog_number_trend_intercept'))
+    cat_slope      = float(current_params.get('cat_number_trend_slope'))
+    cat_intercept  = float(current_params.get('cat_number_trend_intercept'))
+    Jones          = float(current_params.get('Jones_factor'))
+    
+    # 2. Hent støyfaktorer fra dataset_noise
+    required_noise = ['13695', '10249', '06376', '06913', 'trend interpolation']
+    if not dataset_noise or any(k not in dataset_noise for k in required_noise):
+        missing = [k for k in required_noise if not dataset_noise or k not in dataset_noise]
+        raise KeyError(f"[KRITISK] Mangler støy-nøkler for matvarer: {missing}")
+        
+    noise_13695 = float(dataset_noise['13695']['value'])
+    noise_10249 = float(dataset_noise['10249']['value'])
+    noise_06376 = float(dataset_noise['06376']['value'])
+    noise_pop = float(dataset_noise['06913']['value'])
+    noise_trend = float(dataset_noise['trend interpolation']['value'])
+
+    # 3. Hent datarammer fra preloaded_data
+    df_13695 = preloaded_data.get('ssb_13695')
+    df_pop = preloaded_data.get('ssb_06913')
+    df_10249 = preloaded_data.get('ssb_10249')
+    df_06376 = preloaded_data.get('ssb_06376')
+    
+    if any(df is None for df in [df_13695, df_pop, df_10249, df_06376]):
+        raise ValueError(f"[KRITISK] Én eller flere datatabeller mangler i preloaded_data for {flow_code}!")
+        
+    df_items = current_params.get_table('protein_food_items')
+    df_map_new = current_params.get_table('protein_map_new')
+    df_map_old = current_params.get_table('protein_map_old')   
+    
+    if any(df is None for df in [df_items, df_map_new, df_map_old]):
+        raise ValueError("[KRITISK] Protein-mappingtabeller mangler i preloaded_data!")
+
+    # Intern hjelpefunksjon for kjæledyrfôr
+    def pet_N_year(y):
+        n_dogs = dog_slope * y + dog_intercept
+        n_cats = cat_slope * y + cat_intercept
+        return (n_dogs * dog_N_per_year + n_cats * cat_N_per_year) * 1e-6
+
+    # --- DEL 1: 2018-2023 (Tabell 13695) ---
+    for col in range(1, df_13695.shape[1]):
+        try:
+            year_val = df_13695.iloc[3, col]
+            if pd.isna(year_val):
+                continue
+            year = int(float(year_val))
+            
+            # g/dag/pers -> kt/år/pers
+            v_protein_pers = float(df_13695.iloc[6, col]) * 1e-9 * 365
+            pop = float(df_pop.loc[year, 'Befolkning 1. januar']) * noise_pop
+            
+            v_human_N = (v_protein_pers * pop) / Jones
+            total_N = (v_human_N * noise_13695) + pet_N_year(year)
+            
+            year_values[year] = {
+                'value': max(0.0, total_N),
+                'comment': 'ok',
+                'data_sources': 'SSB'
+            }
+        except (ValueError, TypeError, KeyError, IndexError) as e:
+            raise ValueError(f"[KRITISK DATAFEIL] Feil i tabell 13695 kolonne {col}: {e}")
+
+    # --- DEL 2: 1999-2012 (Tabell 10249) ---
+    try:
+        # 1. Start på iloc[4:] for å kaste tekst/årstallsrader ut av matvaremengdene
+        mengde_10249 = df_10249.set_index(0).iloc[4:, 0::2].dropna(how='all')
+        mengde_10249 = mengde_10249.astype(str).applymap(lambda s: s.replace(',','.') if pd.notna(s) else s)
+        mengde_10249 = mengde_10249.apply(pd.to_numeric, errors='coerce')
+        
+        # 2. Beregn protein og nitrogen per person
+        protein_map_10249 = protein_per_group(current_params, 'protein_map_new', mengde_10249.index)
+        total_protein_pers_10249 = mengde_10249.mul(protein_map_10249, axis=0).sum(axis=0)
+        total_N_pers_10249 = total_protein_pers_10249 / Jones * 1e-6
+        
+        # 3. Loop over kolonnene og slå opp årstall fra rad-indeks 2
+        for col_idx, v_N_pers in total_N_pers_10249.items():
+            # Feilsøkingen viste at årstallet står på rad 2 i df_10249
+            year_val = df_10249.iloc[2, col_idx]
+            
+            # Hvis cellen over er tom, sjekk cellen til venstre (siden celler ofte er slått sammen i Excel)
+            if pd.isna(year_val) and col_idx > 0:
+                year_val = df_10249.iloc[2, col_idx - 1]
+                
+            if pd.isna(year_val):
+                continue
+                
+            year = int(float(year_val))
+            
+            # Hent befolkning basert på det reelle årstallet
+            pop = float(df_pop.loc[year, 'Befolkning 1. januar']) * noise_pop
+            
+            v_human_N = v_N_pers * pop
+            total_N = (v_human_N * noise_10249) + pet_N_year(year)
+            
+            year_values[year] = {
+                'value': max(0.0, total_N),
+                'comment': 'ok',
+                'data_sources': 'SSB'
+            }
+    except Exception as e:
+        raise ValueError(f"[KRITISK] Feil under prosessering av tabell 10249: {e}")
+        
+    # --- DEL 3: 1984-1998 (Tabell 06376) ---
+    try:
+        # 1. Start på iloc[4:] for å kaste tekst/intervallsrader ut av matvaremengdene
+        mengde_06376 = df_06376.set_index(0).iloc[4:, 0::2]
+        mengde_06376 = mengde_06376.astype(str).applymap(lambda s: s.replace(',','.') if pd.notna(s) else s)
+        mengde_06376 = mengde_06376.apply(pd.to_numeric, errors='coerce')
+        
+        # 2. Beregn protein og nitrogen per person
+        protein_map_06376 = protein_per_group(current_params, 'protein_map_old', mengde_06376.index)
+        total_protein_pers_06376 = mengde_06376.mul(protein_map_06376, axis=0).sum(axis=0)
+        total_N_pers_06376 = total_protein_pers_06376 / Jones * 1e-6  # kgN -> ktN
+        
+        # 3. Bygg en ordbok som mapper kolonneindeksen om til det ekte tidsintervallet fra rad 3
+        intervall_mapping = {}
+        for col_idx in total_N_pers_06376.index:
+            # Feilsøkingen viste at intervallene ligger på rad 3
+            val_interval = df_06376.iloc[3, col_idx]
+            
+            # Håndter sammenslåtte celler i Excel (titt til venstre hvis tom)
+            if pd.isna(val_interval) and col_idx > 0:
+                val_interval = df_06376.iloc[3, col_idx - 1]
+                
+            if pd.notna(val_interval):
+                intervall_mapping[col_idx] = str(val_interval).strip()
+
+        # 4. Loop over årene og slå opp i intervall_mapping ved hjelp av kolonneindeksene
+        for year in range(1984, 1999):
+            pop = float(df_pop.loc[year, 'Befolkning 1. januar']) * noise_pop
+            comment = 'ok'
+            
+            # Finn hvilken kolonneindeks som hører til hvilket intervall på rad 3
+            idx_83_85 = next((k for k, v in intervall_mapping.items() if '1983-1985' in v), None)
+            idx_89_91 = next((k for k, v in intervall_mapping.items() if '1989-1991' in v), None)
+            idx_96_98 = next((k for k, v in intervall_mapping.items() if '1996-1998' in v), None)
+            
+            if any(idx is None for idx in [idx_83_85, idx_89_91, idx_96_98]):
+                raise KeyError(f"[KRITISK] Fant ikke alle nødvendige tidsintervaller (1983-1985, 1989-1991, 1996-1998) i tabell 06376! Funnet: {list(intervall_mapping.values())}")
+
+            if year < 1986:
+                v_human_pers = total_N_pers_06376[idx_83_85]
+                src = 'SSB'
+            elif year < 1989:
+                v_human_pers = (total_N_pers_06376[idx_83_85] + total_N_pers_06376[idx_89_91]) / 2.0
+                src = 'interpolated'
+            elif year < 1992:
+                v_human_pers = total_N_pers_06376[idx_89_91]
+                src = 'SSB'
+            elif year < 1996:
+                v_human_pers = (total_N_pers_06376[idx_89_91] + total_N_pers_06376[idx_96_98]) / 2.0
+                src = 'interpolated'
+            else:
+                v_human_pers = total_N_pers_06376[idx_96_98]
+                src = 'SSB'
+                
+            v_human_N = v_human_pers * pop
+            total_N = (v_human_N * noise_06376) + pet_N_year(year)
+            
+            year_values[year] = {
+                'value': max(0.0, total_N),
+                'comment': comment,
+                'data_sources': src
+            }
+    except Exception as e:
+        raise ValueError(f"[KRITISK] Feil under prosessering av tabell 06376: {e}")    
+        
+    # --- DEL 4: Interpolering (2010-2011, 2013-2017) ---
+    valid_years = [y for y in sorted(year_values.keys()) if y not in [2010, 2011, 2013, 2014, 2015, 2016, 2017]]
+    y_arr = np.array(valid_years)
+    v_arr = np.array([year_values[k]['value'] for k in y_arr])
+    
+    m, b = np.polyfit(y_arr, v_arr, 1)
+    
+    for year in list(range(2010, 2012)) + list(range(2013, 2018)):
+        v_trend = m * year + b
+        year_values[year] = {
+            'value': max(0.0, v_trend * noise_trend),
+            'comment': 'interpolated trendline',
+            'data_sources': 'interpolated'
+        }
+
+    # --- DEL 5: Pakk ut alle årene til den sentrale resultatlisten ---
+    for year in sorted(year_values.keys()):
+        if year in EXPECTED_YEARS:
+            collected_years.add(year)
+            results.append({
+                'flow_name': flow_code,
+                'year': year,
+                'value': year_values[year]['value'],
+                'comment': year_values[year]['comment'],
+                'data_sources': year_values[year]['data_sources']
+            })
+            
+    # Sluttkontroll
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)

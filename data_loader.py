@@ -60,17 +60,19 @@ def load_all_data(selected_pools):
         'hs_smoking_stats_05307': ({'hs'}, 'data_files/05307_20251119-152214.xlsx', 'excel', {'sheet_name': 'Dagroyk', 'skiprows': 3, 'header': None}),
         'hs_unfccc_n2o_raw': ({'hs'}, 'data_files/N2O_NOx_HS_FS.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Ark1'}),
         'hs_luc_crltap_raw_lines': ({'hs'}, 'data_files/webdabData1863365.txt', 'text_lines', {}),
-        'ssb_waste_05282': ({'hs'}, 'data_files/05282_20260211-091021.xlsx', 'openpyxl_single_sheet', {'sheet_name': '05282'}),
-        'ssb_waste_10514': ({'hs'}, 'data_files/10514_20260211-094101.xlsx', 'openpyxl_single_sheet', {'sheet_name': '10514'}),
         'mp_sau_saakorn_raw': ({'mp'}, 'data_files/NibioStatistics-5.xlsx', 'excel', {'sheet_name': 'Sum innkjøpt såkorn', 'header': None}),
         'mp_oljefroe_raw': ({'mp'}, 'data_files/NibioStatistics-5.xlsx', 'excel', {'sheet_name': 'Oljefrø til modning', 'header': None}),
         'mp_erter_raw': ({'mp'}, 'data_files/NibioStatistics-5.xlsx', 'excel', {'sheet_name': 'Erter', 'header': None}),
         'mp_engfroe_raw': ({'mp'}, 'data_files/NibioStatistics-5.xlsx', 'excel', {'sheet_name': 'Sum engfrø', 'header': None}),
         'mp_rotvekst_groennsak_raw': ({'mp'}, 'data_files/NibioStatistics-5.xlsx', 'excel', {'sheet_name': 'Sum rotvekst- og grønnsakfrø', 'header': None}),
-        'ssb_10514': ({'mp'}, 'data_files/10514_20260211-094101.xlsx', 'excel_ssb_generic', {'sheet': '10514'}),
-        'ssb_05282': ({'mp'}, 'data_files/05282_20260211-091021.xlsx', 'excel_ssb_generic', {'sheet': '05282'}),
         'mildir_emissions': ({'mp'}, 'data_files/Årlig utslipp til vann - Landbasert 02-02-2026.xlsx', 'excel_mildir_emissions', {}),
         'industry_categories': ({'mp'}, 'data_files/industry_categories.xlsx', 'excel_industry_categories', {}),
+        'ssb_05282': ({'hs','mp'}, 'data_files/05282_20260211-091021.xlsx', 'openpyxl_single_sheet', {'sheet_name': '05282'}),
+        'ssb_06913': ({'mp'}, 'data_files/06913_20251113-124117.xlsx', 'excel_population', {}),
+        'ssb_06376': ({'mp'}, 'data_files/06376_20260129-155937.xlsx', 'excel_ssb_generic', {'sheet': '06376'}),
+        'ssb_10249': ({'mp'}, 'data_files/10249_20260129-155747.xlsx', 'excel_ssb_generic', {'sheet': '10249'}),
+        'ssb_10514': ({'hs','mp'}, 'data_files/10514_20260211-094101.xlsx', 'openpyxl_single_sheet', {'sheet_name': '10514'}),
+        'ssb_13695': ({'mp'}, 'data_files/13695_20260129-155515.xlsx', 'excel_ssb_generic', {'sheet': '13695'}),
         }
 
     # =========================================================================
@@ -248,6 +250,12 @@ def load_all_data(selected_pools):
 
             elif method == 'excel_industry_categories':
                 preloaded[key] = pd.read_excel(filepath)
+                
+            elif method == 'excel_population':
+                # Beholder nøyaktig samme rensing som din opprinnelige kode
+                df = pd.read_excel(filepath, skiprows=2, skipfooter=42)
+                df = df.set_index('Unnamed: 0')
+                preloaded[key] = df
 
         except Exception as e:
             print(f"[KRITISK FEIL] Kunne ikke laste {key}: {e}")
