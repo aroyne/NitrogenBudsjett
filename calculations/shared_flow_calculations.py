@@ -231,74 +231,110 @@ def find_feedstock_fuel(preloaded_data, current_params, dataset_noise):
     # Returnerer ALLTID en tuppel med to verdier, slik at utpakkingen (expected 2, got 0) aldri feiler
     return year_values, 0.0
 
-def find_food_industry_waste(df_05282, df_10514, current_params):
+def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
     """
-    NY/OPPDATERT: Beregner nitrogen i matindustriavfall basert på ferdiginnleste tabeller
-    og gjeldende MC-parametersett (inkludert både kildestøy og ekstrapoleringsstøy).
+    Beregner nitrogen i matindustriavfall basert på ferdiginnleste tabeller fra Pandas.
+    Indeksene matcher nøyaktig openpyxl-strukturen (row/col skiftet med -1).
     """
     year_values = {}
-    wet_org_N = float(current_params['wet_organic'])
+    wet_org_N = float(current_params.get('wet_organic'))
     
-    noise_05282 = float(current_params.get('05282'))
-    noise_10514 = float(current_params.get('10514'))
-    noise_trend = float(current_params.get('trend interpolation'))
+    # Hent støy fra dataset_noise
+    required_noise_keys = ['05282', '10514', 'trend interpolation']
+    if not dataset_noise or any(k not in dataset_noise for k in required_noise_keys):
+        missing = [k for k in required_noise_keys if not dataset_noise or k not in dataset_noise]
+        raise KeyError(f"[KRITISK] Støy-nøkler mangler i dataset_noise for matindustriavfall: {missing}")
+        
+    noise_05282 = float(dataset_noise['05282']['value'])
+    noise_10514 = float(dataset_noise['10514']['value'])
+    noise_trend = float(dataset_noise['trend interpolation']['value'])
     
-    value_2012 = 0.0
-    value_2011 = 0.0
-    mean_val = 0.0
+    value_2012_base = 0.0
 
     # --- DEL 1: Årene 2012-2023 (Tabell 10514) ---
-    for col in range(1, 114, 10):  
+    # I openpyxl: range(2, 115, 10). I Pandas endrer vi til kolonneindekser (col - 1)
+    for col in range(2, 115, 10):  
         try:
-            year = int(df_10514.iloc[3, col])
-            value = 0.0
-            # Summerer jordbruk(col+1), industri(col+3), annen næring(col+8) fra Rad 7 (indeks 6)
-            value += float(df_10514.iloc[6, col+1]) * wet_org_N
-            value += float(df_10514.iloc[6, col+3]) * wet_org_N
-            value += float(df_10514.iloc[6, col+8]) * wet_org_N
+            p_col = col - 1  # Konverter til Pandas 0-basert kolonneindeks
+            year_val = df_10514.iloc[3, p_col]  # row 4 -> indeks 3
+            if pd.isna(year_val):
+                continue
+            year = int(float(year_val))
+            
+            # row 7 -> indeks 6
+            v_base = 0.0
+            v_base += float(df_10514.iloc[6, p_col+1]) * wet_org_N
+            v_base += float(df_10514.iloc[6, p_col+3]) * wet_org_N
+            v_base += float(df_10514.iloc[6, p_col+8]) * wet_org_N
             
             if year == 2012:
-                value_2012 = value
+                value_2012_base = v_base
                 
-            year_values[year] = value * noise_10514
-        except Exception:
-            continue
+            year_values[year] = {
+                'value': max(0.0, v_base * noise_10514),
+                'comment': 'ok (SSB Tabell 10514)',
+                'data_sources': 'SSB'
+            }
+        except (ValueError, TypeError, IndexError) as e:
+            raise ValueError(f"[KRITISK DATAFEIL] Feil i ssb_10514 kolonne {col}: {e}")
+
+    if value_2012_base == 0.0:
+        raise ValueError("[KRITISK] Fant ikke basisverdi for år 2012 i Tabell 10514. Skalering umulig!")
 
     # --- DEL 2: Årene 1995-2011 (Tabell 05282) ---
-    # Først finn 2011-verdi for skalering (kolonne 162 i openpyxl -> indeks 161)
+    # Finner 2011-verdi for skalering (openpyxl col=162, row=14 -> Pandas col=161, row=13)
     try:
-        v_2011 = float(df_05282.iloc[13, 161+1]) * wet_org_N
-        v_2011 += float(df_05282.iloc[13, 161+3]) * wet_org_N
-        v_2011 += float(df_05282.iloc[13, 161+8]) * wet_org_N
-        value_2011 = v_2011
-    except Exception:
-        value_2011 = 1.0
+        p_col_2011 = 162 - 1
+        value_2011_base = float(df_05282.iloc[13, p_col_2011+1]) * wet_org_N
+        value_2011_base += float(df_05282.iloc[13, p_col_2011+3]) * wet_org_N
+        value_2011_base += float(df_05282.iloc[13, p_col_2011+8]) * wet_org_N
+    except Exception as e:
+        raise ValueError(f"[KRITISK] Kunne ikke beregne 2011-skaleringsfaktor fra df_05282: {e}")
 
-    for col in range(1, 169, 10):  
+    if value_2011_base == 0.0:
+        value_2011_base = 1.0
+
+    mean_val_accumulator = 0.0
+    mean_year_count = 0
+
+    # I openpyxl: range(2, 170, 10)
+    for col in range(2, 170, 10):  
         try:
-            year = int(df_05282.iloc[3, col])
-            value = 0.0
-            # Rad 14 (indeks 13)
-            value += float(df_05282.iloc[13, col+1]) * wet_org_N
-            value += float(df_05282.iloc[13, col+3]) * wet_org_N
-            value += float(df_05282.iloc[13, col+8]) * wet_org_N
+            p_col = col - 1
+            year_val = df_05282.iloc[3, p_col]  # row 4 -> indeks 3
+            if pd.isna(year_val):
+                continue
+            year = int(float(year_val))
             
-            # Skalering i henhold til opprinnelig formel
-            if value_2011 > 0:
-                value *= (value_2012 / value_2011)
+            # row 14 -> indeks 13
+            v_base = 0.0
+            v_base += float(df_05282.iloc[13, p_col+1]) * wet_org_N
+            v_base += float(df_05282.iloc[13, p_col+3]) * wet_org_N
+            v_base += float(df_05282.iloc[13, p_col+8]) * wet_org_N
+            
+            # Skaler verdien bakover i tid
+            v_scaled = v_base * (value_2012_base / value_2011_base)
+            
+            if 1995 <= year < 2000:
+                mean_val_accumulator += v_scaled
+                mean_year_count += 1
                 
-            if year < 2000:
-                mean_val += value  
-                
-            year_values[year] = value * noise_05282
-        except Exception:
-            continue
+            year_values[year] = {
+                'value': max(0.0, v_scaled * noise_05282),
+                'comment': 'ok (Skalert SSB Tabell 05282)',
+                'data_sources': 'SSB'
+            }
+        except (ValueError, TypeError, IndexError) as e:
+            raise ValueError(f"[KRITISK DATAFEIL] Feil i ssb_05282 kolonne {col}: {e}")
 
-    # --- DEL 3: Ekstrapolering for årene 1990-1994 (Gjennomsnitt) ---
-    final_mean = (mean_val / 5.0) if mean_val > 0 else 0.0
+    # --- DEL 3: Ekstrapolering for årene 1990-1994 ---
+    final_mean = (mean_val_accumulator / mean_year_count) if mean_year_count > 0 else 0.0
     for year in range(1990, 1995):
-        # Siden dette er ekstrapolert, legger vi på noise_trend!
-        year_values[year] = final_mean * noise_05282 * noise_trend
+        year_values[year] = {
+            'value': max(0.0, final_mean * noise_05282 * noise_trend),
+            'comment': 'extrapolated (added trend interpolation noise)',
+            'data_sources': 'extrapolated'
+        }
         
     return year_values
 

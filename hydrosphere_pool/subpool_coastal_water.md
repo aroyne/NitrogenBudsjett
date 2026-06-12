@@ -9,14 +9,6 @@ has_children: true
 # Subpool: Coastal water (HY.CW)
 
 
----
-
-## Mass Balance Overview (1990-2023)
-
-The chart below illustrates the integrated nitrogen mass balance for **HY.CW**. It includes total system inflows (positive stack), total outflows (negative stack), and the net balance line with estimated uncertainty bounds (±1σ).
-
-![Mass Balance HY.CW](../output_files/plots/balance_HY_CW.png)
-
 ### Flows that are zero or neglected:
 
 * **HY.CW-AT.AT-Emissions-N2** is neglected as we do not use mass balance on this subpool.

@@ -106,11 +106,11 @@ def _add_animal_feed_import_mc(results, preloaded_data, current_params, dataset_
     flow_code = 'RW.RW-AG.MM-Animal feed import-Nmix'
     collected_years = set()
     
-    df_raavarer = preloaded_data.get('feed_raavarer')
+    df_raavarer = preloaded_data.get('feed_raavarer_import')
     df_totalkalkyle = preloaded_data.get('feed_totalkalkyle')
     
     if df_raavarer is None or df_totalkalkyle is None:
-        raise ValueError(f"[KRITISK] Kraftfôrdata ('feed_raavarer'/'feed_totalkalkyle') mangler i preloaded_data for {flow_code}!")
+        raise ValueError(f"[KRITISK] Kraftfôrdata ('feed_raavarer_import'/'feed_totalkalkyle') mangler i preloaded_data for {flow_code}!")
 
     # Globale parametere (Kalles som metoder på NParameters-objektet. Krasjer internt om de mangler)
     N_content_carb = float(current_params.get("feed_carb_N_frac"))

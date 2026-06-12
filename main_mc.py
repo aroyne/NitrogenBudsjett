@@ -588,6 +588,10 @@ def main():
             from calculations.hs_mc import execute_calculations_hs  # Sjekk at funksjonsnavnet stemmer
             iteration_output['hs'] = execute_calculations_hs(preloaded_data, current_params, dataset_noise, current_trade_factors)
             
+        if 'mp' in selected_pools:
+            from calculations.mp_mc import execute_calculations_mp  # Sjekk at funksjonsnavnet stemmer
+            iteration_output['mp'] = execute_calculations_mp(preloaded_data, current_params, dataset_noise, current_trade_factors)
+            
         # (Her legger du inn de andre poolene etter hvert: if 'rw' in selected_pools... osv.)
 
         # --- DIAGNOSTISK SJEKK FOR ITERASJON 0 (DETERMINISTISK) ---

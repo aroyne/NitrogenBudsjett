@@ -27,8 +27,8 @@ def load_all_data(selected_pools):
         'atm_in_out': ({'at', 'rw'}, 'data_files/atm_in_out.xlsx', 'excel', {'sheet_name': 'Ark1', 'header': None}),
         'faostat_fertilizer': ({'at'}, 'data_files/FAOSTAT_data_en_11-25-2025.csv', 'csv', {}),
         'deposition_data': ({'at', 'ag'}, 'data_files/N_per_class_period_distributed_unallocated_long.csv', 'csv', {}),
-        'feed_raavarer': ({'rw'}, 'data_files/Årlig råvareforbruk.xlsx', 'excel_feed_raavarer', {}),
-        'feed_totalkalkyle': ({'rw'}, 'data_files/NibioStatistics-4.xlsx', 'excel_feed_totalkalkyle', {}),
+        'feed_raavarer_norsk': ({'mp'}, 'data_files/Årlig råvareforbruk.xlsx', 'excel_feed_raavarer_norsk', {}),
+        'feed_raavarer_import': ({'rw'}, 'data_files/Årlig råvareforbruk.xlsx', 'excel_feed_raavarer_import', {}),        'feed_totalkalkyle': ({'rw','mp'}, 'data_files/NibioStatistics-4.xlsx', 'excel_feed_totalkalkyle', {}),
         'aqua_data': ({'hy', 'rw'}, 'data_files/A.06.002_20251111-140559.xlsx', 'excel_aquaculture', {}),
         'fao_live_animals_all': ({'ag', 'rw'}, 'data_files/FAOSTAT_data_en_11-12-2025.csv', 'csv_live_animals', {}),
         'fao_mineral_fertilizer': ({'rw'}, 'data_files/FAOSTAT_data_en_11-12-2025-2.csv', 'csv_fertilizer_import', {}),
@@ -62,6 +62,13 @@ def load_all_data(selected_pools):
         'hs_luc_crltap_raw_lines': ({'hs'}, 'data_files/webdabData1863365.txt', 'text_lines', {}),
         'ssb_waste_05282': ({'hs'}, 'data_files/05282_20260211-091021.xlsx', 'openpyxl_single_sheet', {'sheet_name': '05282'}),
         'ssb_waste_10514': ({'hs'}, 'data_files/10514_20260211-094101.xlsx', 'openpyxl_single_sheet', {'sheet_name': '10514'}),
+        'mp_sau_saakorn_raw': ({'mp'}, 'data_files/NibioStatistics-5.xlsx', 'excel', {'sheet_name': 'Sum innkjøpt såkorn', 'header': None}),
+        'mp_oljefroe_raw': ({'mp'}, 'data_files/NibioStatistics-5.xlsx', 'excel', {'sheet_name': 'Oljefrø til modning', 'header': None}),
+        'mp_erter_raw': ({'mp'}, 'data_files/NibioStatistics-5.xlsx', 'excel', {'sheet_name': 'Erter', 'header': None}),
+        'mp_engfroe_raw': ({'mp'}, 'data_files/NibioStatistics-5.xlsx', 'excel', {'sheet_name': 'Sum engfrø', 'header': None}),
+        'mp_rotvekst_groennsak_raw': ({'mp'}, 'data_files/NibioStatistics-5.xlsx', 'excel', {'sheet_name': 'Sum rotvekst- og grønnsakfrø', 'header': None}),
+        'ssb_10514': ({'mp'}, 'data_files/10514_20260211-094101.xlsx', 'excel_ssb_generic', {'sheet': '10514'}),
+        'ssb_05282': ({'mp'}, 'data_files/05282_20260211-091021.xlsx', 'excel_ssb_generic', {'sheet': '05282'}),
         }
 
     # =========================================================================
@@ -121,14 +128,22 @@ def load_all_data(selected_pools):
                 wb = openpyxl.load_workbook(filepath, data_only=True)
                 preloaded[key] = pd.DataFrame(list(wb[kwargs['sheet_name']].values))
 
-            elif method == 'excel_feed_raavarer':
+            elif method == 'excel_feed_raavarer_norsk':
                 df = pd.read_excel(filepath, sheet_name='Varegrupper')
                 preloaded[key] = pd.DataFrame({
                     'year': df.iloc[3:28, 0].astype(int),
-                    'value_carb': df.iloc[3:28, 2].astype(float),
-                    'value_prot': df.iloc[3:28, 8].astype(float)
+                    'value_carb': df.iloc[3:28, 1].astype(float),  # Kolonne B (Indeks 1) = Norsk Karbohydrat
+                    'value_prot': df.iloc[3:28, 7].astype(float)   # Kolonne H (Indeks 7) = Norsk Protein
                 }).reset_index(drop=True)
 
+            elif method == 'excel_feed_raavarer_import':
+                df = pd.read_excel(filepath, sheet_name='Varegrupper')
+                preloaded[key] = pd.DataFrame({
+                    'year': df.iloc[3:28, 0].astype(int),
+                    'value_carb': df.iloc[3:28, 2].astype(float),  # Kolonne C (Indeks 2) = Importert Karbohydrat
+                    'value_prot': df.iloc[3:28, 8].astype(float)   # Kolonne I (Indeks 8) = Importert Protein
+                }).reset_index(drop=True)
+                
             elif method == 'excel_feed_totalkalkyle':
                 df = pd.read_excel(filepath, sheet_name='Sum innkjøpt kraftfôr ukorr.')
                 preloaded[key] = pd.DataFrame({
@@ -218,6 +233,12 @@ def load_all_data(selected_pools):
             elif method == 'csv_ef_fuel':
                 df = pd.read_csv(filepath)
                 preloaded[key] = df[['year', 'value']].copy()
+            elif method == 'excel_ssb_generic':
+                # Henter fane-navnet fra argumentene definert over
+                sheet_name = kwargs.get('sheet')
+                # Vi laster inn uten header for å beholde nøyaktig samme radindekser som i openpyxl
+                df = pd.read_excel(filepath, sheet_name=sheet_name, header=None)
+                preloaded[key] = df
 
         except Exception as e:
             print(f"[KRITISK FEIL] Kunne ikke laste {key}: {e}")
