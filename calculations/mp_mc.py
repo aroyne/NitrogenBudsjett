@@ -9,7 +9,8 @@ import numpy as np
 
 from calculations.utils import (
     EXPECTED_YEARS,
-    report_missing_years
+    report_missing_years,
+    process_generic_trade_flow
 )
 from calculations.shared_flow_calculations import (
     find_aquaculture_production,
@@ -60,12 +61,28 @@ def execute_calculations_mp(preloaded_data, current_params, dataset_noise, curre
     """
     results = []
     
+    years = list(range(1984, 2026))  # 1984..2025 inclusive
+    OP_out = pd.DataFrame({
+        'year': years,
+        'value': 0.0,               # float zeros; use 0 if you want ints
+        'entries': 0    # need to count the right number of entries that year if comment to be 'ok'
+    })
+    OP_out.set_index('year', inplace=True)
+
+    
     # Kaller den første delberegningen for såkorn og plantemateriale
     _add_seeds_and_planting_material_mc(results, preloaded_data, current_params, dataset_noise)
     _add_farm_animal_feed_mc(results, preloaded_data, current_params, dataset_noise)
     _add_food_industry_waste_mc(results, preloaded_data, current_params, dataset_noise)
     _add_food_industry_wastewater_mc(results, preloaded_data, current_params, dataset_noise)
     _add_food_products_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_fp_untreated_wastewater_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_aquaculture_feed_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_food_export_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise)
+    _add_feed_export_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise)
+    _add_ag_mineral_fertilizer_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_other_industry_waste_mc(results, preloaded_data, current_params, dataset_noise, OP_out)
+    _add_industrial_waste_fuels_mc(results, preloaded_data, current_params, dataset_noise)
     
     
     return results
@@ -322,26 +339,33 @@ def _add_food_industry_wastewater_mc(results, preloaded_data, current_params, da
     """
     MC-VERSJON: Beregner nitrogen i avløpsvann fra matindustrien (MP.FP-PR.WW-Food industry wastewater-Nmix).
     Bruker ferdiginnlastede data fra Miljødirektoratet og kategoriseringer.
+    STRIKT: Ignorerer og krever ingen data for år før 1989. Forventer utelukkende 'perc'-støy.
     """
     flow_code = 'MP.FP-PR.WW-Food industry wastewater-Nmix'
     collected_years = set()
     
-    # 1. Hent tabeller fra preloaded_data
+    # --- 1. DEFINE TARGET YEARS (Kun fra og med 1989) ---
+    target_years = {y for y in EXPECTED_YEARS if y >= 1989}
+    
+    # --- 2. HENT TABELLER FRA PRELOADED_DATA ---
     df_emissions_raw = preloaded_data.get('mildir_emissions')
     df_categories = preloaded_data.get('industry_categories')
     
     if df_emissions_raw is None or df_categories is None:
         raise ValueError(f"[KRITISK] Data ('mildir_emissions'/'industry_categories') mangler i preloaded_data for {flow_code}!")
         
-    # 2. Hent støy fra dataset_noise
+    # --- 3. HENT OG VERIFISER STØY (KUN PERC ER TILLATT) ---
     key_støy = 'norskeutslipp'
     if not dataset_noise or key_støy not in dataset_noise:
-        raise KeyError(f"[KRITISK] Støy-nøkkel '{key_støy}' mangler i dataset_noise for {flow_code}!")
+        raise KeyError(f"[KRITISK USIKKERHETSFEIL] Støy-nøkkel '{key_støy}' mangler i dataset_noise for {flow_code}!")
+        
+    støy_type = dataset_noise[key_støy]['type']
+    if støy_type != 'perc':
+        raise ValueError(f"[KRITISK KONFIGURASJONSFEIL] {flow_code} krever støytype 'perc', men fant '{støy_type}'!")
         
     noise_factor = float(dataset_noise[key_støy]['value'])
-    støy_type = dataset_noise[key_støy]['type']  # 'perc' eller 'abs'
 
-    # 3. Prosesser og filtrer data (Dette gjøres i RAM, lynraskt per iterasjon)
+    # --- 4. PROSESSER OG FILTRER DATA I RAM ---
     emissions = df_emissions_raw[df_emissions_raw['Komponent'] == 'nitrogen, totalt']
     
     categories_keep = df_categories[
@@ -352,24 +376,20 @@ def _add_food_industry_wastewater_mc(results, preloaded_data, current_params, da
     emissions_FP = emissions[emissions['AnleggNavn'].isin(categories_keep['Virksomhet'])]
     sum_by_year = emissions_FP.groupby(['År'])['Mengde'].sum().reset_index()
     
-    # 4. Loop over de aggregerte årene og legg på MC-støy
+    # --- 5. BEREGNINGSLØKKE MED MC-STØY ---
     for index, row in sum_by_year.iterrows():
         try:
             year = int(row['År'])
-            if year in EXPECTED_YEARS:
+            
+            # Prosesserer kun de årene som er >= 1989
+            if year in target_years:
                 collected_years.add(year)
                 
-                # Basisverdi (konverteres fra kg(?) til tonn/kt ved å dele på 1000)
+                # Basisverdi (konverteres fra kg til tonn/kt ved å dele på 1000)
                 base_value = float(row['Mengde']) / 1000.0
                 
-                # Håndtering av støytype (prosentvis vs absolutt)
-                if støy_type == 'perc':
-                    value_noisy = base_value * noise_factor
-                elif støy_type == 'abs':
-                    bound = dataset_noise[key_støy]['upper_bound'] if noise_factor >= 0 else dataset_noise[key_støy]['lower_bound']
-                    value_noisy = base_value + (noise_factor * bound)
-                else:
-                    raise ValueError(f"[KRITISK] Ukjent støytype '{støy_type}' for {flow_code}")
+                # Påfør synkron prosentvis støy (støyfaktoren svinger rundt 1.0)
+                value_noisy = base_value * noise_factor
 
                 results.append({
                     'flow_name': flow_code,
@@ -381,10 +401,10 @@ def _add_food_industry_wastewater_mc(results, preloaded_data, current_params, da
         except (ValueError, TypeError) as e:
             raise ValueError(f"[KRITISK DATAFEIL] Feil ved prosessering av år på rad {index} for {flow_code}: {e}")
 
-    # 5. Sluttkontroll på manglende år
-    missing_years = EXPECTED_YEARS - collected_years
+    # --- 6. SLUTTKONTROLL PÅ MANGLENDE ÅR (Sjekkes kun opp mot target_years) ---
+    missing_years = target_years - collected_years
     report_missing_years(flow_code, missing_years, results)
-    
+
     
 def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise):
     """
@@ -594,5 +614,330 @@ def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise
             })
             
     # Sluttkontroll
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+    
+    
+def _add_fp_untreated_wastewater_mc(results, preloaded_data, current_params, dataset_noise):
+    flow_code = 'MP.FP-HY.SW-Untreated wastewater-Nmix'
+    collected_years = set()
+    comment = 'ok'
+    
+    # --- 1. HENT FERDIG PRELOADET DATA FRA RAM ---
+    # Bruker de pre-loadede datarammene i stedet for å lese Excel på nytt hver iterasjon
+    emissions = preloaded_data['mildir_emissions']
+    categories = preloaded_data['industry_categories']
+    
+    # --- 2. HENT STØYFAKTOR FRA DATASET_NOISE ---
+    # Slår opp på 'norskeutslipp' i støy-ordboken din
+    noise_factor = float(dataset_noise['norskeutslipp']['value'])
+    
+    # Filterer utslipp og kategorier akkurat som i statisk versjon
+    emissions = emissions[emissions['Komponent'] == 'nitrogen, totalt']
+    
+    categories_keep = categories[
+        (categories['kategori'] == 'FP') 
+        & (categories['kommunalt nett?'].isin(['nei', 'ukjent']))
+    ]
+    
+    emissions_FP = emissions[emissions['AnleggNavn'].isin(categories_keep['Virksomhet'])]
+    sum_by_year = emissions_FP.groupby(['År'])['Mengde'].sum().reset_index()
+    
+    # --- 3. BEREGN VERDIER FOR 1994-2023 MED MC-STØY ---
+    mean_value = 0
+    for index, row in sum_by_year.iterrows():
+        year = int(row['År'])
+        # Mengde / 1000 for å konvertere enhet, ganget med årets støyfaktor
+        value = ((row['Mengde']) / 1000.0) * noise_factor
+        
+        if year in range(1994, 1999):
+            mean_value += value
+            
+        if year in range(1994, 2024):
+            collected_years.add(year)
+            results.append({
+                'flow_name': flow_code,
+                'year': year,
+                'value': max(0.0, value), # Sikrer mot negative utslipp
+                'comment': comment,
+                'data_sources': 'Miljødirektoratet',        
+                'uncertainty': dataset_noise.get('norskeutslipp', {}).get('low_bound', 0.0) # Tar med opprinnelig usikkerhet til metadata
+            })
+            
+    # --- 4. BEREGN EKSTRAPOLERTE ÅR (1990-1993) ---
+    # Siden mean_value er basert på de støyfargede verdiene fra 1994-1998,
+    # vil de ekstrapolerte årene arve den samme naturlige MC-variasjonen!
+    mean_value /= 5.0
+    
+    for year in range(1990, 1994):
+        value = mean_value
+        collected_years.add(year)
+        results.append({
+            'flow_name': flow_code,
+            'year': year,
+            'value': max(0.0, value),
+            'comment': comment,
+            'data_sources': 'extrapolated',        
+            'uncertainty': dataset_noise.get('norskeutslipp', {}).get('low_bound', 0.0)
+        })        
+        
+    # Sjekk mot expected_years (antatt definert globalt eller sendt med)
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+    
+    
+def _add_aquaculture_feed_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    MC-VERSJON: Innenlandsk produsert akvakulturfôr (Market Place til Havbruk).
+    Beregnet via felles produksjonsmatrise med påført MC-støy.
+    """
+    flow_code = 'MP.FP-HY.AC-Feed to coastal aquaculture-Nmix'
+    collected_years = set()
+    
+    # --- 1. SJEKK AT DATA ER TILGJENGELIG ---
+    df_modern = preloaded_data.get('aqua_modern')
+    df_old = preloaded_data.get('aqua_old')
+    if df_modern is None or df_old is None:
+        raise ValueError(f"[KRITISK] Havbruksdata ('aqua_modern'/'aqua_old') mangler i preloaded_data for {flow_code}!")
+
+    # --- 2. HENT FELLES PRODUKSJONSMATRISE ---
+    # Denne funksjonen påfører allerede Fiskeridirektoratets støyfaktor internt
+    aquaculture_production = find_aquaculture_production(df_modern, df_old, current_params, dataset_noise)
+
+    # --- 3. HENT GENERISKE PARAMETERE (STØYFARGET FRA MC-LOOPEN) ---
+    import_fraction = float(current_params.get("aquafeed_import_fraction"))
+    prot_ret = float(current_params.get("aquafeed_N_retention"))
+    feed_waste = float(current_params.get("aquafeed_waste_fraction"))
+
+    # --- 4. BEREGNINGSLØKKE ---
+    for year, fish_harvested_N in aquaculture_production.items():
+        if year not in EXPECTED_YEARS: 
+            continue
+        collected_years.add(year)
+        
+        # Sikkerhetsventil mot urealistiske parametere som vil gi ZeroDivision eller negative tall
+        if prot_ret <= 0 or feed_waste >= 1:
+            raise ValueError(f"[KRITISK PARAMETERFEIL] Ugyldige havbruksparametere for år {year} (retensjon: {prot_ret}, svinn: {feed_waste})!")
+            
+        # Beregn nitrogen i oppspist fôr og totalmengde fôr
+        eaten_feed_N = fish_harvested_N / prot_ret
+        total_feed_N = eaten_feed_N / (1 - feed_waste)
+        
+        # Isoler den innenlandske brøkdelen: (1 - import_fraction)
+        domestic_feed_N = total_feed_N * (1.0 - import_fraction)
+        domestic_feed_N = max(0.0, domestic_feed_N) # Sikrer mot negative tall
+            
+        results.append({
+            'flow_name': flow_code,
+            'year': year,
+            'value': float(domestic_feed_N),
+            'comment': 'ok (MC-støy beregnet via felles produksjonsmatrise)',
+            'data_sources': 'Fiskeridirektoratet'
+        })
+        
+    # Sjekk for manglende år mot det globale EXPECTED_YEARS-settet
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+    
+    
+def _add_food_export_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise):
+    """
+    MC-VERSJON: Eksport av matvarer (Market Place til Rest of World).
+    Gjenbruker den generiske kjernefunksjonen for handelsdata med fullstendig MC-støy.
+    """
+    flow_code = 'MP.FP-RW.RW-Food export-Nmix'
+    types_to_keep = ['korn/planter', 'kjøtt/fisk/meieri/egg', 'mat']
+    
+    # Vi sender med results direkte, slik at kjernefunksjonen gjør 
+    # både filtrering, støy-påføring, aggregering og append-logikk automatisk.
+    process_generic_trade_flow(
+        results=results,
+        preloaded_data=preloaded_data,
+        current_params=current_params,
+        current_trade_factors=current_trade_factors,
+        flow_code=flow_code,
+        target_types=types_to_keep,
+        is_import=False,  # <--- False betyr Eksport (impeks = 2)
+        dataset_noise=dataset_noise,
+        data_sources='SSB tab 08801'
+    )
+    
+    
+def _add_feed_export_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise):
+    """
+    MC-VERSJON: Eksport av fôrvarer (Market Place til Rest of World).
+    Gjenbruker den generiske kjernefunksjonen for handelsdata med fullstendig MC-støy.
+    """
+    flow_code = 'MP.FP-RW.RW-Feed export-Nmix'
+    types_to_keep = ['for', 'fiskefor', 'kjæledyrfor']
+    
+    # Kjernefunksjonen håndterer all støy på mengde (SSB 08801) og produkt-N-faktorer
+    process_generic_trade_flow(
+        results=results,
+        preloaded_data=preloaded_data,
+        current_params=current_params,
+        current_trade_factors=current_trade_factors,
+        flow_code=flow_code,
+        target_types=types_to_keep,
+        is_import=False,  # Eksport (impeks = 2)
+        dataset_noise=dataset_noise,
+        data_sources='SSB tab 08801'
+    )
+    
+def _add_ag_mineral_fertilizer_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    MC-VERSJON: Innenlandsk mineralgjødsel (Market Place til Agriculture Soil Management).
+    STRIKT: Henter forbruk fra faostat_fertilizer (11-21) og isolerer import fra fao_mineral_fertilizer (11-12-2).
+    Krasjer hardt ved datahull, negative verdier eller manglende støyfaktorer.
+    """
+    flow_code = 'MP.OP-AG.SM-Mineral fertilizer-Nmix'
+    collected_years = set()
+    comment = 'ok'
+    data_sources = 'FAOSTAT Fertilizer by nutrient (Agricultural Use - Import)'
+    
+    # --- 1. VERIFISER AT DATASETTENE EKSISTERER I MINNE ---
+    data_use = preloaded_data.get('faostat_fertilizer_use')       # Kun forbruksdata (11-21)
+    data_trade = preloaded_data.get('fao_mineral_fertilizer') # Import/Eksport-samlefil (11-12-2)
+    
+    if data_use is None or data_trade is None:
+        raise ValueError(f"[KRITISK] Gjødseldata ('faostat_fertilizer_use'/'fao_mineral_fertilizer') mangler fullstendig i preloaded_data!")
+
+    # --- 2. HENT STØYFAKTOR (KRASJER HVIS DEN MANGLER) ---
+    if 'Fertilizer by nutrient' not in dataset_noise:
+        raise KeyError(f"[KRITISK USIKKERHETSFEIL] Fant ikke støyfaktoren 'Fertilizer by nutrient' i dataset_noise for {flow_code}!")
+    
+    noise_factor = float(dataset_noise['Fertilizer by nutrient']['value'])
+
+    # --- 3. DEFINER GYLDIG TIDSROM BASERT PÅ KILDEDATA (Stopper i 2023) ---
+    available_use_years = set(data_use['Year'].unique())
+    available_trade_years = set(data_trade['Year'].unique())
+    target_years = EXPECTED_YEARS & available_use_years & available_trade_years
+
+    if not target_years:
+        raise ValueError(f"[KRITISK DATAMANGLER] Ingen overlappende år funnet mellom EXPECTED_YEARS og gjødseldataene!")
+
+    # --- 4. BEREGNINGSLØKKE ---
+    for year in target_years:
+        # Hent forbruk for året (11-21 har kun Agricultural Use, så vi trenger ikke filter her)
+        n_amount_use = data_use[data_use['Year'] == year]
+        
+        # Isoler 'Import quantity' fra handelsfilen (11-12-2) for dette året
+        df_year_trade = data_trade[data_trade['Year'] == year]
+        clean_element = df_year_trade['Element'].astype(str).str.replace('"', '').str.lower().str.strip()
+        n_amount_imp = df_year_trade[clean_element == 'import quantity']
+        
+        if n_amount_use.empty:
+            raise ValueError(f"[KRITISK DATAHULL] Fant ikke forbruksdata for det påkrevde året {year}!")
+        if n_amount_imp.empty:
+            raise ValueError(f"[KRITISK DATAHULL] Fant ikke importdata for det påkrevde året {year}!")
+            
+        # Summerer verdiene for året (Dette samler opp alle under-rader og er 100 % trygt)
+        raw_use_tonnes = float(n_amount_use['Value'].sum())
+        raw_imp_tonnes = float(n_amount_imp['Value'].sum())
+        
+        # Påfør synkron MC-støy
+        raw_use_perturbed = raw_use_tonnes * noise_factor
+        raw_imp_perturbed = raw_imp_tonnes * noise_factor
+        
+        # Beregn differansen (Netto innenlandsk rest i tonn N) og del på 1000 for å få kt N
+        value = (raw_use_perturbed - raw_imp_perturbed) / 1000.0
+        
+        # Strikt fysisk sjekk mot negative tall
+        if value < 0:
+            raise ValueError(f"[KRITISK MASSEBALANSEFEIL] År {year}: Generert import ({raw_imp_perturbed:.2f} t) overstiger forbruk ({raw_use_perturbed:.2f} t). Negativ strøm ({value:.4f} kt N) nektes!")
+        
+        collected_years.add(year)
+        results.append({
+             'flow_name': flow_code,
+             'year': year,
+             'value': float(value),
+             'comment': comment,
+             'data_sources': data_sources
+         })
+         
+    # --- 5. ENDELIG KONTROLL ---
+    missing_targets = target_years - collected_years
+    if missing_targets:
+        raise ValueError(f"[KRITISK DATAAVVIK] Følgende år ble ikke fullført i beregningen: {missing_targets}")
+        
+        
+def _add_industrial_waste_fuels_mc(results, preloaded_data, current_params, dataset_noise):
+    flow_code = 'MP.OP-EF.IC-Industrial waste fuels-Nmix'
+    collected_years = set()
+    
+    comment = 'ok'
+    data_sources = 'SSB'
+    
+    # Hent DataFrames fra den sentrale lasteren
+    df_bio_08205 = preloaded_data['ssb_bio_08205']
+    df_bio_hist = preloaded_data['ssb_bio_hist']
+    
+    # Kjør den MC-optimaliserte beregningen (returnerer nå kun year_values)
+    year_values = find_industrial_waste_fuels(
+        df_bio_08205, df_bio_hist, current_params, dataset_noise
+    )
+    
+    for year, value in year_values.items():
+        collected_years.add(year)
+        results.append({
+            'flow_name': flow_code,
+            'year': year,
+            'value': value, 
+            'comment': comment,
+            'data_sources': data_sources
+            # 'uncertainty' er fjernet herfra
+        })
+        
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+    
+
+def _add_other_industry_waste_mc(results, preloaded_data, current_params, dataset_noise, OP_out):
+    """
+    MC-VERSJON: Beregner nitrogenflyt for øvrig industriavfall (MP -> OP).
+    Krasjer umiddelbart hvis data eller støy mangler.
+    """
+    flow_code = 'MP.OP-PR.SO-Other industry waste-Nmix'
+    collected_years = set()
+    data_sources = 'SSB'
+    
+    # 1. Hent tabeller fra preloaded_data
+    df_05282 = preloaded_data.get('ssb_05282')
+    df_10514 = preloaded_data.get('ssb_10514')
+    df_hist_waste = preloaded_data.get('ssb_hist_industry_waste') # Antatt navn i RAM
+    
+    if df_05282 is None or df_10514 is None or df_hist_waste is None:
+        raise ValueError(f"[KRITISK] Datatabeller mangler i preloaded_data for {flow_code}!")
+        
+    # 2. Kjør kjerneberegningen
+    industry_waste, industry_waste_unc = find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params, dataset_noise)    
+    
+    # 3. Pakk ut til resultater og akkumuler i OP_out matrix
+    for year, value in industry_waste.items():
+        if year in EXPECTED_YEARS:
+            collected_years.add(year)   
+            
+            comment = 'extrapolated' if year < 1995 else 'ok'
+            
+            # Sikre at året faktisk eksisterer i den eksterne OP_out matrisen før vi adderer
+            if year not in OP_out.index:
+                raise KeyError(f"[KRITISK] År {year} mangler i OP_out-indeksen for {flow_code}!")
+                
+            OP_out.loc[year, 'value'] += value
+            OP_out.loc[year, 'entries'] += 1
+            
+            # Finn usikkerhets-metadata hvis tilgjengelig, ellers 0.0
+            støy_nøkkel = '05282' if year < 2012 else '10514'
+            low_bound = dataset_noise.get(støy_nøkkel, {}).get('low_bound', 0.0)
+            
+            results.append({
+                'flow_name': flow_code,
+                'year': int(year),
+                'value': max(0.0, value),
+                'comment': comment,
+                'data_sources': data_sources,
+                'uncertainty': low_bound        
+            })
+            
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)

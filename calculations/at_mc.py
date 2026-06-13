@@ -179,9 +179,9 @@ def _add_OP_N2_fixation_mc(results, preloaded_data, current_params, ammonia_impo
     data_sources = 'FAOSTAT Fertilizer by nutrient + SSB'
     
     # Hent ferdiglastet FAOSTAT-data – krasj hardt hvis de mangler
-    df_faostat = preloaded_data.get('faostat_fertilizer')
+    df_faostat = preloaded_data.get('faostat_fertilizer_production')
     if df_faostat is None:
-        raise ValueError(f"[KRITISK] Mangler 'faostat_fertilizer' i preloaded_data for {flow_code}!")
+        raise ValueError(f"[KRITISK] Mangler 'faostat_fertilizer_production' i preloaded_data for {flow_code}!")
 
     # Sjekk støydata for dette datasettet i denne runden og krasj hvis de mangler
     if not dataset_noise or dataset_key not in dataset_noise:

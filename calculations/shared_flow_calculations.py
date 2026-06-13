@@ -339,136 +339,134 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
     return year_values
 
 
-def find_household_waste(df_05282, df_10514, current_params, dataset_noise):
+def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params, dataset_noise):
     """
-    Beregner nitrogen i husholdningsavfall basert på SSB-tabeller.
-    Krasjer umiddelbart ved manglende data eller støyfaktorer.
+    MC-OPTIMALISERT: Beregner nitrogen i øvrig industriavfall ved hjelp av NumPy.
+    Ingen tause try-excepts. Krasjer hardt ved string/NaN-feil i SSB-tabellene.
     """
-    household_waste = {}
+    industry_waste = {}
+    industry_waste_unc = {}
     
-    # 1. Hent nitrogen-fraksjoner (stopper om de mangler)
-    paper_N   = float(current_params.waste_N_frac('paper'))
-    plastic_N = float(current_params.waste_N_frac('plastic'))
-    wood_N    = float(current_params.waste_N_frac('wood'))
-    textile_N = float(current_params.waste_N_frac('textiles'))
-    wet_N     = float(current_params.waste_N_frac('wet_organic'))
-    other_N   = float(current_params.waste_N_frac('other_materials'))
-    haz_N     = float(current_params.waste_N_frac('hazardous'))
-    contam_N  = float(current_params.waste_N_frac('contaminated_masses'))
-    mixed_N   = float(current_params.waste_N_frac('mixed_waste'))
-    park_N    = float(current_params.waste_N_frac('park_garden'))
+    # 1. Hent nitrogen-fraksjoner fra parameter-objektet ditt
+    paper_N     = float(current_params.waste_N_frac('paper'))
+    plastic_N   = float(current_params.waste_N_frac('plastic'))
+    wood_N      = float(current_params.waste_N_frac('wood'))
+    textiles_N  = float(current_params.waste_N_frac('textiles'))
+    wet_org_N   = float(current_params.waste_N_frac('wet_organic'))
+    other_mat_N = float(current_params.waste_N_frac('other_materials'))
+    hazardous_N = float(current_params.waste_N_frac('hazardous'))
+    mixed_N     = float(current_params.waste_N_frac('mixed_waste'))
     
-    # 2. Hent støyfaktorer direkte fra dataset_noise-ordboken uten fallback!
+    # 2. Hent støyfaktorer og metadata-usikkerheter strikt uten fallbacks
     try:
-        # Henter SSB-støy (håndterer både fullt navn og kun ID-nummer)
-        if 'ssb_waste_05282' in dataset_noise:
-            noise_05282 = float(dataset_noise['ssb_waste_05282']['value'])
-        elif '05282' in dataset_noise:
-            noise_05282 = float(dataset_noise['05282']['value'])
-        else:
-            raise KeyError('05282')
-            
-        if 'ssb_waste_10514' in dataset_noise:
-            noise_10514 = float(dataset_noise['ssb_waste_10514']['value'])
-        elif '10514' in dataset_noise:
-            noise_10514 = float(dataset_noise['10514']['value'])
-        else:
-            raise KeyError('10514')
-            
-        # NYHET: Hent trend-interpolering fra dataset_noise i stedet for current_params
-        if 'trend interpolation' in dataset_noise:
-            noise_trend = float(dataset_noise['trend interpolation']['value'])
-        elif 'trend_interpolation' in dataset_noise:
-            noise_trend = float(dataset_noise['trend_interpolation']['value'])
-        else:
-            raise KeyError('trend interpolation')
-            
+        noise_05282 = float(dataset_noise['05282']['value'] if '05282' in dataset_noise else dataset_noise['ssb_waste_05282']['value'])
+        noise_10514 = float(dataset_noise['10514']['value'] if '10514' in dataset_noise else dataset_noise['ssb_waste_10514']['value'])
+        noise_trend = float(dataset_noise['trend interpolation']['value'] if 'trend interpolation' in dataset_noise else dataset_noise['trend_interpolation']['value'])
+        
+        u_05282  = dataset_noise['05282']['low_bound'] if '05282' in dataset_noise else dataset_noise['ssb_waste_05282']['low_bound']
+        u_10514  = dataset_noise['10514']['low_bound'] if '10514' in dataset_noise else dataset_noise['ssb_waste_10514']['low_bound']
+        u_trend  = dataset_noise['trend interpolation']['low_bound'] if 'trend interpolation' in dataset_noise else dataset_noise['trend_interpolation']['low_bound']
     except KeyError as e:
-        missing_key = e.args[0]
-        print("\n" + "="*60)
-        print(f"[KRITISK STOPP] Mangler støyfaktor/nøkkel: '{missing_key}'")
-        print("Tilgjengelige nøkler i dataset_noise akkurat nå:")
-        for k in dataset_noise.keys():
-            print(f"  - '{k}'")
-        print("="*60 + "\n")
-        raise KeyError(f"Mangler '{missing_key}' i dataset_uncertainties-arket ditt.")    
-    value_1995 = 0.0
+        raise KeyError(f"[KRITISK] Mangler støy-/usikkerhetsnøkkel '{e.args[0]}' i dataset_noise for industriavfall!")
+
+    # Konverter til NumPy for hastighet
+    arr_05282 = df_05282.values
+    arr_10514 = df_10514.values
     
+    # Vi må lagre en RÅ base_value for 1995 (uten støy) til ekstrapoleringen
+    base_value_1995 = 0.0
+
     # --- DEL 1: ÅRENE 1995-2011 (Tabell 05282) ---
     for col in range(1, 169, 10):
-        year = int(df_05282.iloc[3, col])
-        value = 0.0
-        
-        for c in [4, 5, 6, 7, 9]:
-            value += float(df_05282.iloc[6, col + c]) * paper_N
-        for c in [5, 6, 9]:
-            value += float(df_05282.iloc[8, col + c]) * plastic_N
-        for c in [5, 6, 9]:
-            value += float(df_05282.iloc[11, col + c]) * wood_N
-        for c in [5, 6, 9]:
-            value += float(df_05282.iloc[12, col + c]) * textile_N
-        for c in [5, 6, 9]:
-            value += float(df_05282.iloc[13, col + c]) * wet_N
-        for c in [5, 6, 9]:
-            value += float(df_05282.iloc[16, col + c]) * other_N
-        for c in [5, 6, 9]:
-            value += float(df_05282.iloc[17, col + c]) * haz_N
-        for c in [5, 6, 9]:
-            value += float(df_05282.iloc[18, col + c]) * contam_N
+        try:
+            year = int(arr_05282[3, col])
+        except (ValueError, TypeError, IndexError) as e:
+            raise ValueError(f"[KRITISK] Klarte ikke lese årstall fra tabell 05282 i kolonne {col}: {e}")
+            
+        value_base = 0.0
+        try:
+            # Papir (Rad 7 -> indeks 6)
+            for c in [2, 3, 8]: value_base += float(arr_05282[6, col + c]) * paper_N
+            # Plast (Rad 9 -> indeks 8)
+            for c in [2, 3, 8]: value_base += float(arr_05282[8, col + c]) * plastic_N
+            # Treavfall (Rad 12 -> indeks 11)
+            for c in [2, 3, 8]: value_base += float(arr_05282[11, col + c]) * wood_N
+            # Tekstiler (Rad 13 -> indeks 12)
+            for c in [2, 3, 8]: value_base += float(arr_05282[12, col + c]) * textiles_N
+            # Våtorganisk (Rad 14 -> indeks 13) - Bare fra bergverk (c=2)
+            for c in [2]:       value_base += float(arr_05282[13, col + c]) * wet_org_N
+            # Andre materialer (Rad 17 -> indeks 16)
+            for c in [2, 3, 8]: value_base += float(arr_05282[16, col + c]) * other_mat_N
+            # Farlig avfall (Rad 18 -> indeks 17)
+            for c in [2, 3, 8]: value_base += float(arr_05282[17, col + c]) * hazardous_N
+        except (ValueError, TypeError) as e:
+            raise ValueError(f"[KRITISK DATAFEIL] Fant uventet tekst/NaN i tabell 05282 under kolonne {col} for år {year}: {e}")
 
         if year == 1995:
-            value_1995 = value
+            base_value_1995 = value_base
             
-        household_waste[year] = value * noise_05282
+        industry_waste[year] = value_base * noise_05282
+        industry_waste_unc[year] = u_05282
 
     # --- DEL 2: ÅRENE 2012-2023 (Tabell 10514) ---
     for col in range(1, 114, 10):
-        year = int(df_10514.iloc[3, col])
-        value = 0.0
-        
-        for c in [4, 5, 6, 7, 9]:
-            value += float(df_10514.iloc[6, col + c]) * wet_N
-        for c in [4, 5, 6, 7, 9]:
-            value += float(df_10514.iloc[7, col + c]) * park_N
-        for c in [4, 5, 6, 7, 9]:
-            value += float(df_10514.iloc[8, col + c]) * wood_N
-        for c in [4, 5, 6, 7, 9]:
-            value += float(df_10514.iloc[10, col + c]) * paper_N
-        for c in [4, 5, 6, 7, 9]:
-            value += float(df_10514.iloc[16, col + c]) * plastic_N
-        for c in [4, 5, 6, 7, 9]:
-            value += float(df_10514.iloc[18, col + c]) * textile_N
-        for c in [4, 5, 6, 7, 9]:
-            value += float(df_10514.iloc[23, col + c]) * other_N
-        for c in [4, 5, 6, 7, 9]:
-            value += float(df_10514.iloc[21, col + c]) * haz_N
-        for c in [4, 5, 6, 7, 9]:
-            value += float(df_10514.iloc[22, col + c]) * mixed_N
-        for c in [4, 5, 6, 7, 9]:
-            value += float(df_10514.iloc[24, col + c]) * contam_N
+        try:
+            year = int(arr_10514[3, col])
+        except (ValueError, TypeError, IndexError) as e:
+            raise ValueError(f"[KRITISK] Klarte ikke lese årstall fra tabell 10514 i kolonne {col}: {e}")
+            
+        value_base = 0.0
+        try:
+            # Våtorganisk (Rad 7 -> indeks 6)
+            for c in [2]:       value_base += float(arr_10514[6, col + c]) * wet_org_N
+            # Treavfall (Rad 9 -> indeks 8)
+            for c in [2, 3, 8]: value_base += float(arr_10514[8, col + c]) * wood_N
+            # Papir (Rad 11 -> indeks 10)
+            for c in [2, 3, 8]: value_base += float(arr_10514[10, col + c]) * paper_N
+            # Plast (Rad 17 -> indeks 16)
+            for c in [2, 3, 8]: value_base += float(arr_10514[16, col + c]) * plastic_N
+            # Tekstiler (Rad 19 -> indeks 18)
+            for c in [2, 3, 8]: value_base += float(arr_10514[18, col + c]) * textiles_N
+            # Andre materialer (Rad 24 -> indeks 23)
+            for c in [2, 3, 8]: value_base += float(arr_10514[23, col + c]) * other_mat_N
+            # Farlig avfall (Rad 22 -> indeks 21)
+            for c in [2, 3, 8]: value_base += float(arr_10514[21, col + c]) * hazardous_N
+            # Blandet avfall (Rad 23 -> indeks 22)
+            for c in [2, 3, 8]: value_base += float(arr_10514[22, col + c]) * mixed_N
+        except (ValueError, TypeError) as e:
+            raise ValueError(f"[KRITISK DATAFEIL] Fant uventet tekst/NaN i tabell 10514 under kolonne {col} for år {year}: {e}")
 
-        household_waste[year] = value * noise_10514
+        industry_waste[year] = value_base * noise_10514
+        industry_waste_unc[year] = u_10514
 
     # --- DEL 3: LINEÆR EKSTRAPOLERING TILBAKE TIL 1990 ---
-    inhabitants_1990 = 4233116
-    inhabitants_1995 = 4348410
-    waste_kg_person_1990 = 200
-    waste_kg_person_1995 = 289
-    
-    waste_kt_1990 = waste_kg_person_1990 * inhabitants_1990 * 1e-6
-    waste_kt_1995 = waste_kg_person_1995 * inhabitants_1995 * 1e-6
-    
-    N_frac = value_1995 / waste_kt_1995
-    value_1990 = waste_kt_1990 * N_frac
-    change_per_year = (value_1995 - value_1990) / 5
+    try:
+        # ENDRET: Rad 0 er 'næringsavfall'-headeren. Vi bruker rad 1 og 2!
+        waste_kt_1992 = float(df_hist_waste.iloc[1, 2])
+        waste_kt_1995 = float(df_hist_waste.iloc[2, 2])
+    except IndexError:
+        raise IndexError("[KRITISK] df_hist_waste har ikke nok rader/kolonner for indeks [1,2] eller [2,2]!")
+    except (ValueError, TypeError):
+        raise ValueError("[KRITISK] Historiske avfallsdata (df_hist_waste) inneholder ugyldige verdier (ikke-tall)!")
+
+    if waste_kt_1995 <= 0 or base_value_1995 <= 0:
+        raise ValueError(f"[KRITISK] Kan ikke ekstrapolere industriavfall! Sjekk rådata for 1995 (base_1995={base_value_1995}, hist_1995={waste_kt_1995})")
+
+    # Beregner basert på RÅDATA uten støy for å unngå dobbel støy-forvridning
+    N_frac = base_value_1995 / waste_kt_1995
+    base_value_1992 = waste_kt_1992 * N_frac
+    change_per_year = (base_value_1995 - base_value_1992) / 3
     
     step = 0
     for year in range(1990, 1995):
-        value = value_1990 + change_per_year * step
+        base_value_extrapolated = base_value_1992 + (change_per_year * step)
         step += 1
-        household_waste[year] = value * noise_05282 * noise_trend
-        
-    return household_waste
+        # Påfører støy lineært KUN én gang på slutten
+        industry_waste[year] = base_value_extrapolated * noise_05282 * noise_trend
+        industry_waste_unc[year] = u_trend
+
+    # ENDRET: Returnerer nå både verdi-ordboken og usikkerhets-ordboken
+    return industry_waste, industry_waste_unc
 
 
 def find_industrial_crop_products(df_gnb_sheet30, dataset_noise):
@@ -595,63 +593,96 @@ def find_industrial_round_wood(preloaded_data, current_params, dataset_noise):
             
     return year_values, None
 
-def find_industrial_waste_fuels(df_bio_08205, df_bio_hist, current_params):
-    """Beregner egentilvirket bioenergi med datasettstøy og ekstrapoleringsstøy."""
+def find_industrial_waste_fuels(df_bio_08205, df_bio_hist, current_params, dataset_noise):
+    """
+    MC-OPTIMALISERT: Beregner egentilvirket bioenergi med datasettstøy og ekstrapoleringsstøy.
+    Ingen usikkerhetsberegning. Krasjer hardt og umiddelbart ved ugyldige datatyper eller manglende støyfaktorer.
+    """
     year_values = {}
     
-    noise_08205 = float(current_params.get('08205'))
-    noise_trend = float(current_params.get('trend interpolation'))
+    # 1. Hent støyfaktorer strikt fra dataset_noise
+    try:
+        noise_08205 = float(dataset_noise['08205']['value'] if '08205' in dataset_noise else dataset_noise['ssb_waste_08205']['value'])
+        noise_trend = float(dataset_noise['trend interpolation']['value'] if 'trend interpolation' in dataset_noise else dataset_noise['trend_interpolation']['value'])
+    except KeyError as e:
+        raise KeyError(f"[KRITISK] Mangler støy-nøkkel '{e.args[0]}' i dataset_noise for bioenergi!")
+
+    # 2. Hent globale parametere som rene floats
+    NCV              = float(current_params.get('firewood_NCV'))
+    N_content        = float(current_params.get('firewood_N_frac'))
+    GWh_to_TJ_factor = float(current_params.get('GWh_to_TJ_factor'))    
     
-    # Parametere
-    NCV              = float(current_params['firewood_NCV'])
-    N_content        = float(current_params['firewood_N_frac'])
-    GWh_to_TJ_factor = float(current_params['GWh_to_TJ_factor'])
+    # Konverter til rå NumPy-matriser for loop-hastighet
+    arr_08205 = df_bio_08205.values
+    arr_hist = df_bio_hist.values
     
-    val = 0.0
+    # Vi samler RÅ verdier (uten støy) for årene under 2008 for å beregne et rent historisk snitt
+    raw_sum_pre_2008 = 0.0
     
     # --- DEL 1: SSB Tabell 08205 (Nyere data) ---
-    year_row = df_bio_08205.iloc[2]
-    value_row = df_bio_08205.iloc[9]
+    # Excel Rad 3 -> NumPy indeks 2 (Årstall). Excel Rad 10 -> NumPy indeks 9 (Verdier)
     
     for col in range(3, 25):
         try:
-            year_val = year_row.iloc[col]
-            value_val = value_row.iloc[col]
+            year_val = arr_08205[2, col]
+            value_val = arr_08205[9, col]
+        except IndexError:
+            raise IndexError(f"[KRITISK] Tabell 08205 har ikke kolonne-indeks {col} på rad 2 eller 9!")
             
-            if pd.notna(year_val) and pd.notna(value_val):
-                year = int(year_val)
-                value = float(value_val) / GWh_to_TJ_factor / NCV * N_content
-                year_values[year] = value * noise_08205
-                
-                if year < 2008:
-                    val += value * noise_08205
-        except Exception:
-            continue
+        if pd.isna(year_val) or pd.isna(value_val):
+            raise ValueError(f"[KRITISK DATAFEIL] Fant NaN-verdi i tabell 08205 ved kolonne-indeks {col}!")
+            
+        try:
+            year = int(year_val)
+            # Konvertering: GWh til TJ, del på NCV til kt brensel, gang med N_content til ktN
+            value_raw = float(value_val) / GWh_to_TJ_factor / NCV * N_content
+        except (ValueError, TypeError) as e:
+            raise ValueError(f"[KRITISK DATAFEIL] Klarte ikke konvertere verdier i tabell 08205 ved kolonne {col}: {e}")
+            
+        # Lagre støybelagt verdi i resultat-ordboken
+        year_values[year] = value_raw * noise_08205
+        
+        # Akkumuler RÅ verdi til gjennomsnittet hvis året er før 2008
+        if year < 2008:
+            raw_sum_pre_2008 += value_raw
 
-    # --- DEL 2: Historiske data 1998-2002 ---
+    # --- DEL 2: Historiske data 1998-2002 (df_bio_hist) ---
+    # Excel Rad 2..6 blir NumPy radindeks 1..5. Kolonne 1->0, 2->1, 3->2
     for r in range(1, 6):
         try:
-            year_val = df_bio_hist.iloc[r, 0]
-            val_col2 = df_bio_hist.iloc[r, 1]
-            val_col3 = df_bio_hist.iloc[r, 2]
+            year_val = arr_hist[r, 0]
+            val_col2 = arr_hist[r, 1]
+            val_col3 = arr_hist[r, 2]
+        except IndexError:
+            raise IndexError(f"[KRITISK] Historisk biotabell har ikke radindeks {r}!")
             
-            if pd.notna(year_val):
-                year = int(year_val)
-                value = (float(val_col2) + float(val_col3)) / GWh_to_TJ_factor / NCV * N_content
-                year_values[year] = value * noise_08205
-                
-                if year < 2008:
-                    val += value * noise_08205
-        except Exception:
-            continue
+        if pd.isna(year_val) or pd.isna(val_col2) or pd.isna(val_col3):
+            raise ValueError(f"[KRITISK DATAFEIL] Fant NaN-verdi i historisk biotabell på radindeks {r}!")
+            
+        try:
+            year = int(year_val)
+            value_raw = (float(val_col2) + float(val_col3)) / GWh_to_TJ_factor / NCV * N_content
+        except (ValueError, TypeError) as e:
+            raise ValueError(f"[KRITISK DATAFEIL] Klarte ikke konvertere verdier i historisk biotabell på rad {r}: {e}")
+            
+        year_values[year] = value_raw * noise_08205
+        
+        if year < 2008:
+            raw_sum_pre_2008 += value_raw
 
     # --- DEL 3: Gjennomsnitt for årene 1990-1997 (Ekstrapolering) ---
-    mean_value = val / 10.0 if val > 0 else 0.0
-    for year in range(1990, 1998):
-        # EKSTRAPOLERT: Her ganger vi det støybelagte gjennomsnittet med noise_trend!
-        year_values[year] = mean_value * noise_trend
+    if raw_sum_pre_2008 <= 0:
+        raise ValueError("[KRITISK] Grunnlag for ekstrapolering av bioenergi er 0 eller negativt! Sjekk rådata.")
         
+    # Beregn reelt gjennomsnitt av rådata (10 år totalt: 5 år fra 08205 + 5 år fra hist)
+    mean_value_raw = raw_sum_pre_2008 / 10.0
+    
+    for year in range(1990, 1998):
+        # Påfør ekstrapoleringsstøy på det rå gjennomsnittet
+        year_values[year] = mean_value_raw * noise_trend
+
     return year_values
+
 
 
 def find_landfill_emissions_to_water(df_uts, df_tilk, current_params):
@@ -836,120 +867,6 @@ def find_other_goods_import(prepared_trade_data, current_params, trade_params):
 
 
 
-def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params):
-    """
-    MC-OPTIMALISERT: Beregner nitrogen i øvrig industriavfall basert på SSB-tabeller.
-    Konverterer DataFrames til NumPy-matriser for ekstremt raske celleoppslag inni loopen.
-    """
-    industry_waste = {}
-    
-    # 1. Hent nitrogen-fraksjoner fra denne rundens parametersett
-    paper_N     = float(current_params['paper'])
-    plastic_N   = float(current_params['plastic'])
-    wood_N      = float(current_params['wood'])
-    textiles_N  = float(current_params['textiles'])
-    wet_org_N   = float(current_params['wet_organic'])
-    other_mat_N = float(current_params['other_materials'])
-    hazardous_N = float(current_params['hazardous'])
-    mixed_N     = float(current_params['mixed_waste'])
-    
-    # 2. Hent støyfaktorer for denne MC-runden
-    noise_05282 = float(current_params.get('05282'))
-    noise_10514 = float(current_params.get('10514'))
-    noise_trend = float(current_params.get('trend interpolation'))
-    
-    # --- HASTIGHETS-BOOST: Konverter til NumPy-matriser ---
-    arr_05282 = df_05282.values
-    arr_10514 = df_10514.values
-    
-    value_1995 = 0.0
-
-    # --- DEL 1: ÅRENE 1995-2011 (Tabell 05282) ---
-    for col in range(1, 169, 10):
-        try:
-            year = int(arr_05282[3, col])  # Mye raskere enn .iloc
-            value = 0.0
-            
-            # Papir (Rad 7 -> indeks 6)
-            for c in [2, 3, 8]: value += float(arr_05282[6, col + c]) * paper_N
-            # Plast (Rad 9 -> indeks 8)
-            for c in [2, 3, 8]: value += float(arr_05282[8, col + c]) * plastic_N
-            # Treavfall (Rad 12 -> indeks 11)
-            for c in [2, 3, 8]: value += float(arr_05282[11, col + c]) * wood_N
-            # Tekstiler (Rad 13 -> indeks 12)
-            for c in [2, 3, 8]: value += float(arr_05282[12, col + c]) * textiles_N
-            # Våtorganisk (Rad 14 -> indeks 13) - Bare fra bergverk (c=2)
-            for c in [2]:      value += float(arr_05282[13, col + c]) * wet_org_N
-            # Andre materialer (Rad 17 -> indeks 16)
-            for c in [2, 3, 8]: value += float(arr_05282[16, col + c]) * other_mat_N
-            # Farlig avfall (Rad 18 -> indeks 17)
-            for c in [2, 3, 8]: value += float(arr_05282[17, col + c]) * hazardous_N
-
-            if year == 1995:
-                value_1995 = value
-                
-            industry_waste[year] = value * noise_05282
-        except Exception:
-            continue
-
-    # --- DEL 2: ÅRENE 2012-2023 (Tabell 10514) ---
-    for col in range(1, 114, 10):
-        try:
-            year = int(arr_10514[3, col])
-            value = 0.0
-            
-            # Våtorganisk (Rad 7 -> indeks 6)
-            for c in [2]:      value += float(arr_10514[6, col + c]) * wet_org_N
-            # Treavfall (Rad 9 -> indeks 8)
-            for c in [2, 3, 8]: value += float(arr_10514[8, col + c]) * wood_N
-            # Papir (Rad 11 -> indeks 10)
-            for c in [2, 3, 8]: value += float(arr_10514[10, col + c]) * paper_N
-            # Plast (Rad 17 -> indeks 16)
-            for c in [2, 3, 8]: value += float(arr_10514[16, col + c]) * plastic_N
-            # Tekstiler (Rad 19 -> indeks 18)
-            for c in [2, 3, 8]: value += float(arr_10514[18, col + c]) * textiles_N
-            # Andre materialer (Rad 24 -> indeks 23)
-            for c in [2, 3, 8]: value += float(arr_10514[23, col + c]) * other_mat_N
-            # Farlig avfall (Rad 22 -> indeks 21)
-            for c in [2, 3, 8]: value += float(arr_10514[21, col + c]) * hazardous_N
-            # Blandet avfall (Rad 23 -> indeks 22)
-            for c in [2, 3, 8]: value += float(arr_10514[22, col + c]) * mixed_N
-
-            industry_waste[year] = value * noise_10514
-        except Exception:
-            continue
-
-    # --- DEL 3: LINEÆR EKSTRAPOLERING TILBAKE TIL 1990 ---
-    try:
-        waste_kt_1992 = float(df_hist_waste.iloc[0, 2])
-        waste_kt_1995 = float(df_hist_waste.iloc[1, 2])
-        
-        if value_1995 == 0.0:
-            col_1995 = 1
-            v_95 = 0.0
-            for c in [2, 3, 8]: v_95 += float(arr_05282[6, col_1995 + c]) * paper_N
-            for c in [2, 3, 8]: v_95 += float(arr_05282[8, col_1995 + c]) * plastic_N
-            for c in [2, 3, 8]: v_95 += float(arr_05282[11, col_1995 + c]) * wood_N
-            for c in [2, 3, 8]: v_95 += float(arr_05282[12, col_1995 + c]) * textiles_N
-            for c in [2]:      v_95 += float(arr_05282[13, col_1995 + c]) * wet_org_N
-            for c in [2, 3, 8]: v_95 += float(arr_05282[16, col_1995 + c]) * other_mat_N
-            for c in [2, 3, 8]: v_95 += float(arr_05282[17, col_1995 + c]) * hazardous_N
-            value_1995 = v_95
-
-        if waste_kt_1995 > 0 and value_1995 > 0:
-            N_frac = value_1995 / waste_kt_1995
-            value_1992 = waste_kt_1992 * N_frac
-            change_per_year = (value_1995 - value_1992) / 3
-            
-            idx = 0
-            for year in range(1990, 1995):
-                value = value_1992 + change_per_year * idx
-                idx += 1
-                industry_waste[year] = value * noise_05282 * noise_trend
-    except Exception:
-        pass
-
-    return industry_waste
 
     
 def find_other_industry_wastewater(prepared_wastewater_dict, current_params):

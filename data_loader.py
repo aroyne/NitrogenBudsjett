@@ -25,13 +25,14 @@ def load_all_data(selected_pools):
     # Format: 'preloaded_nøkkel': ( {relevante_pools}, 'filbane', 'lesemetode', {ekstra_arg} )
     DATA_MAP = {
         'atm_in_out': ({'at', 'rw'}, 'data_files/atm_in_out.xlsx', 'excel', {'sheet_name': 'Ark1', 'header': None}),
-        'faostat_fertilizer': ({'at'}, 'data_files/FAOSTAT_data_en_11-25-2025.csv', 'csv', {}),
+        'faostat_fertilizer_production': ({'at'}, 'data_files/FAOSTAT_data_en_11-25-2025.csv', 'csv', {}),
+        'faostat_fertilizer_use': ({'mp'}, 'data_files/FAOSTAT_data_en_11-21-2025.csv', 'csv', {}),
+        'fao_mineral_fertilizer': ({'rw', 'mp'}, 'data_files/FAOSTAT_data_en_11-12-2025-2.csv', 'csv', {}),
         'deposition_data': ({'at', 'ag'}, 'data_files/N_per_class_period_distributed_unallocated_long.csv', 'csv', {}),
         'feed_raavarer_norsk': ({'mp'}, 'data_files/Årlig råvareforbruk.xlsx', 'excel_feed_raavarer_norsk', {}),
         'feed_raavarer_import': ({'rw'}, 'data_files/Årlig råvareforbruk.xlsx', 'excel_feed_raavarer_import', {}),        'feed_totalkalkyle': ({'rw','mp'}, 'data_files/NibioStatistics-4.xlsx', 'excel_feed_totalkalkyle', {}),
-        'aqua_data': ({'hy', 'rw'}, 'data_files/A.06.002_20251111-140559.xlsx', 'excel_aquaculture', {}),
+        'aqua_data': ({'hy', 'rw', 'mp'}, 'data_files/A.06.002_20251111-140559.xlsx', 'excel_aquaculture', {}),
         'fao_live_animals_all': ({'ag', 'rw'}, 'data_files/FAOSTAT_data_en_11-12-2025.csv', 'csv_live_animals', {}),
-        'fao_mineral_fertilizer': ({'rw'}, 'data_files/FAOSTAT_data_en_11-12-2025-2.csv', 'csv_fertilizer_import', {}),
         'hy_kyst_tilforsel': ({'hy','fs','hs'}, 'data_files/Tilførsel av nitrogen til kystområdene fordelt på kilder.xlsx', 'excel', {'sheet_name': 'Data fra Miljødirektoratet'}),
         'hy_teotil3': ({'hy','fs','hs'}, 'data_files/teotil3_n_summary.xlsx', 'openpyxl_teotil', {}),
         'hy_art_raw': ({'hy'}, 'data_files/art.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Sheet 1'}),
@@ -73,6 +74,9 @@ def load_all_data(selected_pools):
         'ssb_10249': ({'mp'}, 'data_files/10249_20260129-155747.xlsx', 'excel_ssb_generic', {'sheet': '10249'}),
         'ssb_10514': ({'hs','mp'}, 'data_files/10514_20260211-094101.xlsx', 'openpyxl_single_sheet', {'sheet_name': '10514'}),
         'ssb_13695': ({'mp'}, 'data_files/13695_20260129-155515.xlsx', 'excel_ssb_generic', {'sheet': '13695'}),
+        'ssb_bio_08205': ({'mp'}, 'data_files/08205_20251104-141305.xlsx', 'excel_ssb_generic', {'sheet': 'Energibruk'}),
+        'ssb_bio_hist': ({'mp'}, 'data_files/egentilvirket_bioenergi_industri.xlsx', 'excel_ssb_generic', {'sheet': 'Ark1'}),
+        'ssb_hist_industry_waste': ({'mp'}, 'data_files/kommunalt_avfall_1985_1995.xlsx', 'excel_ssb_generic', {'sheet': 'avfallsmengder'}),
         }
 
     # =========================================================================
@@ -118,8 +122,11 @@ def load_all_data(selected_pools):
                     
             elif method == 'csv':
                 df = pd.read_csv(filepath, **kwargs)
-                preloaded[key] = df[['Year', 'Value']].copy() if key == 'faostat_fertilizer' else df
-
+                if key in ['faostat_fertilizer', 'fao_mineral_fertilizer', 'faostat_fertilizer_production']:
+                    # Vi tar vare på 'Element' slik at poolene kan skille mellom Import og Eksport selv
+                    preloaded[key] = df[['Year', 'Element', 'Value']].copy()
+                else:
+                    preloaded[key] = df                    
             elif method == 'text_lines':
                 with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                     preloaded[key] = f.readlines()
@@ -239,7 +246,7 @@ def load_all_data(selected_pools):
                 preloaded[key] = df[['year', 'value']].copy()
             elif method == 'excel_ssb_generic':
                 # Henter fane-navnet fra argumentene definert over
-                sheet_name = kwargs.get('sheet')
+                sheet_name = kwargs.get('sheet') if 'sheet' in kwargs else kwargs.get('sheet_name')
                 # Vi laster inn uten header for å beholde nøyaktig samme radindekser som i openpyxl
                 df = pd.read_excel(filepath, sheet_name=sheet_name, header=None)
                 preloaded[key] = df
