@@ -915,7 +915,7 @@ def _add_industrial_waste_fuels_mc(results, preloaded_data, current_params, data
     report_missing_years(flow_code, missing_years, results)
     
 
-def _add_other_industry_waste_mc(results, preloaded_data, current_params, dataset_noise, OP_out):
+def _add_other_industry_waste_mc(results, preloaded_data, current_params, dataset_noise):
     """
     MC-VERSJON: Beregner nitrogenflyt for øvrig industriavfall (MP -> OP).
     Krasjer umiddelbart hvis data eller støy mangler.
@@ -941,14 +941,7 @@ def _add_other_industry_waste_mc(results, preloaded_data, current_params, datase
             collected_years.add(year)   
             
             comment = 'extrapolated' if year < 1995 else 'ok'
-            
-            # Sikre at året faktisk eksisterer i den eksterne OP_out matrisen før vi adderer
-            if year not in OP_out.index:
-                raise KeyError(f"[KRITISK] År {year} mangler i OP_out-indeksen for {flow_code}!")
-                
-            OP_out.loc[year, 'value'] += value
-            OP_out.loc[year, 'entries'] += 1
-            
+                            
             # Finn usikkerhets-metadata hvis tilgjengelig, ellers 0.0
             støy_nøkkel = '05282' if year < 2012 else '10514'
             low_bound = dataset_noise.get(støy_nøkkel, {}).get('low_bound', 0.0)

@@ -15,11 +15,3 @@ This pool is divided into two operational sub-pools. Explore them using the side
 
 * [Forests (FS.FO)](subpool_forests.html)
 * [Other Land (FS.OL)](subpool_other_land.html)
-
----
-
-## Mass Balance Overview (1990-2023)
-
-The chart below illustrates the integrated nitrogen mass balance for **FS**. It includes total system inflows (positive stack), total outflows (negative stack), and the net balance line with estimated uncertainty bounds (±1σ).
-
-![Mass Balance FS](../output_files/plots/balance_FS.png)

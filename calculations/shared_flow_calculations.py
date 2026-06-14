@@ -1065,24 +1065,25 @@ def find_recycling(preloaded_data, current_params, dataset_noise,
     value_1995 = year_values.get(1995, 0.0)
 
     # =========================================================================
-    # 2. PARSING AV TABELL 10513 (2012-2023) - Posisjonsbasert (iloc)
+    # 2. PARSING AV TABELL 10513 (2012-2023)
     # =========================================================================
     df_10513 = preloaded_data.get('ssb_waste_10513')
-    
+    if df_10513 is None:
+        raise ValueError("[KRITISK] Data 'ssb_waste_10513' mangler i preloaded_data!")
+        
     col_to_year_10513 = {}
-    
-    # Rad 0 inneholder årstallene spredt utover (f.eks '2012' i kolonne 1, resten er None fram til 2013)
-    # Rad 2 inneholder behandlingsmetoden ('Levert til materiell gjenvinning')
-    for col_idx in range(1, df_10513.shape[1]):
-        # Sjekk om rad 0 oppdaterer årstallet
-        cell_year = str(df_10513.iloc[3, col_idx]).strip()
-        if cell_year.isdigit():
-            current_year = int(cell_year)
-            col_to_year_10513[col_idx] = current_year
-    # Gå gjennom radene fra rad 3 og nedover for å hente materialdata
+    for col in range(1, df_10513.shape[1], 9):  
+        cell_year = str(df_10513.iloc[3, col]).strip()
+        if cell_year.replace('.0', '').isdigit():
+            current_year = int(float(cell_year))
+            target_col = col + 1  # Kolonneindeksen for materialgjenvinning
+            if target_col < df_10513.shape[1]:
+                col_to_year_10513[target_col] = current_year
+
     for idx in range(5, 25):
         row_text = str(df_10513.iloc[idx, 0]).strip()
         n_frac = 0.0
+        
         if 'Papir' in row_text: n_frac = paper_N
         elif 'Plast' in row_text: n_frac = plastic_N
         elif 'Treavfall' in row_text: n_frac = wood_N
@@ -1091,13 +1092,13 @@ def find_recycling(preloaded_data, current_params, dataset_noise,
         elif 'Farlig avfall' in row_text: n_frac = haz_N
         elif 'Blandet avfall' in row_text: n_frac = mixed_N
         elif 'Andre materialer' in row_text: n_frac = other_N
-        elif 'Lettere forurensede masser' in row_text.lower(): n_frac = contam_N
+        elif 'Lett forurensede masser' in row_text.lower(): n_frac = contam_N
 
         if n_frac > 0:
             for col_idx, year in col_to_year_10513.items():
                 val_kt = float(df_10513.iloc[idx, col_idx])
                 year_values[year] += val_kt * n_frac * noise_10513
-
+                
     # =========================================================================
     # 3. HISTORISK MODELLERING (1990-1994)
     # =========================================================================

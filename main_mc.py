@@ -619,31 +619,10 @@ def main():
             from calculations.mp_mc import execute_calculations_mp  # Sjekk at funksjonsnavnet stemmer
             iteration_output['mp'] = execute_calculations_mp(preloaded_data, current_params, dataset_noise, current_trade_factors)
             
-        # (Her legger du inn de andre poolene etter hvert: if 'rw' in selected_pools... osv.)
-
-        # --- DIAGNOSTISK SJEKK FOR ITERASJON 0 (DETERMINISTISK) ---
-        # if i == 0 and 'at' in iteration_output:
-        #     print("\n" + "="*60)
-        #     print("DIAGNOSTISK SJEKK (Iterasjon 0 / Deterministisk):")
-        #     at_res = iteration_output['at']
+        if 'pr' in selected_pools:
+            from calculations.pr_mc import execute_calculations_pr  # Sjekk at funksjonsnavnet stemmer
+            iteration_output['pr'] = execute_calculations_pr(preloaded_data, current_params, dataset_noise, current_trade_factors)
             
-        #     flows_to_check = {
-        #         'AT.AT-RW.RW-Atmospheric outflow-RDN': 'RDN outflow for år 2020',
-        #         'AT.AT-RW.RW-Atmospheric outflow-OXN': 'OXN outflow for år 2020',
-        #         'AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2': 'Ammoniakksyntese for år 2020',
-        #         'AT.AT-AG.SM-Biological N2 fixation-N2': 'AG Biological N2 fixation for år 2020',
-        #         'AT.AT-FS.FO-N2 fixation-N2': 'FO N2 fixation for år 2020',
-        #         'AT.AT-FS.OL-N2 fixation-N2': 'OL N2 fixation for år 2020',
-        #         'AT.AT-HY.SW-N2 fixation-N2': 'SW N2 fixation for år 2020',
-        #         'AT.AT-AG.SM-Deposition-OXN': 'Deposition OXN (jordbruk) for år 2020',
-        #         'AT.AT-AG.SM-Deposition-RDN': 'Deposition RDN (jordbruk) for år 2020'
-        #     }
-            
-        #     for r in at_res:
-        #         if r['year'] == 2020 and r['flow_name'] in flows_to_check:
-        #             print(f"  {flows_to_check[r['flow_name']]}: {r['value']:.4f} kt N")
-        #     print("="*60 + "\n")
-
         # --- SAMLE OPP OG TAGGE DATA MED SIM_ID ---
         for pool_name, pool_results in iteration_output.items():
             for row in pool_results:
