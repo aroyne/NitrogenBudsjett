@@ -705,7 +705,285 @@ def process_energy_and_fuels_pool(ef_folder, plot_files, plot_dir, bib_filename)
             f.write(f"{description}\n\n" if description else f"*Flow details detected for file: `{filename}` (code: {exact_flow_code}).*\n\n")
             append_bibtex_references(f, bib_filename)
 
+def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename):
+    """Genererer hovedsiden, subpools og alle strømmer for Materials and products in industry (MP)."""
+    
+    # 1. GENERER HOVEDSIDE FOR POOLEN (pool_materials_and_products.md)
+    with open(os.path.join(mp_folder, "pool_materials_and_products.md"), 'w', encoding='utf-8') as f:
+        f.write("---\nlayout: default\ntitle: Materials and products (MP)\nnav_order: 6\nhas_children: true\n---\n\n")
+        f.write("# Pool: Materials and products in industry (MP)\n\n")
+        f.write("This pool covers chemical, processing, food, and manufacturing industries in Norway, split into two primary segments:\n\n")
+        f.write("* [Food and Feed Processing (MP.FP)](subpool_food_and_feed.html)\n")
+        f.write("* [Other Producing Industry (MP.OP)](subpool_other_industry.html)\n")
+        f.write(get_balance_image_markdown("MP", plot_files, plot_dir, relative_depth="../"))
 
+    # 2. SUBPOOL: FOOD AND FEED PROCESSING (MP.FP)
+    with open(os.path.join(mp_folder, "subpool_food_and_feed.md"), 'w', encoding='utf-8') as f:
+        f.write("---\nlayout: default\ntitle: Food and Feed Processing (MP.FP)\nparent: Materials and products (MP)\nnav_order: 1\nhas_children: true\n---\n\n")
+        f.write("# Subpool: Food and feed processing (MP.FP)\n\n")
+        f.write(get_balance_image_markdown("MP.FP", plot_files, plot_dir, relative_depth="../"))
+        f.write("\n### Flows that are zero or neglected:\n\n")
+        f.write("* **MP.FP-HY.AC-Feed to freshwater aquaculture-Nmix** is set to zero because it is assumed all (except a negligible amount) aquaculture takes place in coastal waters.\n")
+        f.write("* **MP.FP-PR.SO-Organic waste as biofuels substrate-Nmix** and **MP.FP-PR.SO-Organic waste for composting-Nmix** are not given as separate flows; instead they are included in the flow **MP.FP-PR.SO-Food industry waste-Nmix** because official statistics do not clearly indicate what origin waste flows end up in different end uses.\n")
+
+    # 3. SUBPOOL: OTHER PRODUCING INDUSTRY (MP.OP)
+    with open(os.path.join(mp_folder, "subpool_other_industry.md"), 'w', encoding='utf-8') as f:
+        f.write("---\nlayout: default\ntitle: Other Producing Industry (MP.OP)\nparent: Materials and products (MP)\nnav_order: 2\nhas_children: true\n---\n\n")
+        f.write("# Subpool: Other producing industry (MP.OP)\n\n")
+        f.write(get_balance_image_markdown("MP.OP", plot_files, plot_dir, relative_depth="../"))
+        f.write("\n### Flows that are zero or neglected:\n\n")
+        f.write("* **MP.OP-EF.TR-Ammonia as fuel-NH3** is set to zero because there is negligible use of ammonia as fuel today.\n")
+
+    mp_fp_counter, mp_op_counter = 1, 1
+
+    # 4. ITERER OVER ALLE FILER FOR Å IDENTIFISERE STRØMMER TILHØRENDE MP
+    for filename in plot_files:
+        if not (filename.upper().startswith("MP_FP_") or filename.upper().startswith("MP_OP_")):
+            continue
+
+        base_name = filename.rsplit('.', 1)[0]
+        flow_file_name = f"flow_{base_name}.md"
+        full_flow_path = os.path.join(mp_folder, flow_file_name)
+        norm = filename.lower().replace('-', '').replace('_', '').replace('.', '')
+
+        exact_flow_code = "MP-Unknown-Flow"
+        display_name = "Unknown Industrial Flow"
+        parent_subpool = ""
+        description = ""
+
+        # Sorter under mat og fôr (MP.FP)
+        if filename.upper().startswith("MP_FP_"):
+            parent_subpool = "Food and Feed Processing (MP.FP)"
+            
+            if "farm" in norm and "feed" in norm:
+                exact_flow_code = "MP.FP-AG.MM-Farm animal feed-Nmix"
+                display_name = "Farm Animal Feed"
+                description = (
+                    "**MP.FP-AG.MM-Farm animal feed-Nmix** is feed to farm animals. We have used data on domestic feed supply from Landbruksdirektoratet "
+                    "(Landbruksdirektoratet, 2025b) and used the detailed composition of animal feed given in (Eidem & Ruud, 2022) together with protein contents "
+                    "from (FAO, 2021) and specific Jones factors from (FAO, 2023) to get nitrogen contents.\n\n"
+                    "Based on the Landbruksdirektoratet data, the N content of the total amount of feed is 0.02 kgN/kg feed. NIBIO Totalkalkylen "
+                    "gives statistics for total amount of feed to Norwegian farm animals between 1959 and 2026. Table 6.10 in (Bruholt & Longva, 1994) "
+                    "gives the domestically produced fraction of farm animal feed between 1985 and 1994. We combine these data to find values before 2000, "
+                    "using an average import fraction for 1995-1999.\n\n"
+                    "(Hohmann-Marriott, 2025) found the domestic supply of animal feed in 2010 to be around 35 ktN, based on FAO statistics of production, "
+                    "export and import of seed cake, which is a dominant ingredient in farm animal feed. This is less than we found when combining domestic and imported animal feed. "
+                    "*(Note: This estimate might be too low, as it leads to a surplus here and a deficit in the AG.MM pool).*"
+                )
+            elif "seed" in norm or "planting" in norm:
+                exact_flow_code = "MP.FP-AG.SM-Seeds and planting material-Nmix"
+                display_name = "Seeds and Planting Material"
+                description = (
+                    "**MP.FP-AG.SM-Seeds and planting material-Nmix** is taken from Gross nutrient balance in the Eurostat database as advised by (Schäppi, 2025). "
+                    "There is data missing from 2017 to 2019; because there is a large reported increase between 2016 and 2020, we assume a constant increase in the "
+                    "missing time period and fill in data from this interpolation."
+                )
+            elif "food" in norm and "product" in norm and "export" not in norm:
+                exact_flow_code = "MP.FP-HS.HS-Food products-Nmix"
+                display_name = "Food Products to Consumers"
+                description = (
+                    "**MP.FP-HS.HS-Food products-Nmix** is food products consumed by private households including restaurants and pets. (Schäppi, 2025) "
+                    "advises using FAO statistics on food availability for human food consumption, but this only gives data back to 2009. The values in this statistic "
+                    "gives a bit more than 40 ktN per year. We have chosen to use data on food sales to consumers from SSB (table 13695: Næringsinnhald per dag frå "
+                    "selde mat- og drikkevarer 2018 – 2023, table 10249: Forbrukte mengder av mat- og drikkevarer per person per år, etter varegruppe (kg/liter) (avslutta serie) "
+                    "1999 – 2012 and table 06376: Forbrukte mengder av mat- og drikkevarer per person per år, etter varegruppe (kg/liter) (avslutta serie) 1958-1959 - 1996-1998). "
+                    "The latter series gives values for 3 year averages, and we have assigned the averages to each individual year.\n\n"
+                    "From 2018 the statistics are given in terms of protein content. Previous to this, the amounts of various food categories are given, and we have used "
+                    "protein contents found in Matvaretabellen (Mattilsynet, 2006) as this reflects common foods found in Norwegian retail. Population data are taken from SSB "
+                    "and we have used the Jones factor of 6.25 for nitrogen content in protein.\n\n"
+                    "For pet food, we have assumed (based on available statistics) that cats and dogs consume > 90 % of pet food. Horses are accounted for under the agriculture pool. "
+                    "The nitrogen intake per animal per year is taken from Table 19 in (Schäppi, 2025) and the number of cats and dogs between 1985 and 2025 is assumed using "
+                    "a trendline based on available statistics from a variety of sources."
+                )
+            elif "coastal" in norm or ("feed" in norm and "aquaculture" in norm):
+                exact_flow_code = "MP.FP-HY.AC-Feed to coastal aquaculture-Nmix"
+                display_name = "Feed to Coastal Aquaculture"
+                description = (
+                    "**MP.FP-HY.AC-Feed to coastal aquaculture-Nmix**: the amount of feed per ton of produced fish is found by assuming an "
+                    "average protein (N) retention of 35.37 % based on values from (Aas et al., 2022). The amount of produced fish is found by using data "
+                    "from Fiskeridirektoratet (Fiskeridirektoratet, 2025a) on sold farmed fish.\n\n"
+                    "(Hohmann-Marriott, 2025) found the nitrogen content in aquaculture feed in 2020 to be 124 ktN, which is very similar to our results."
+                )
+            elif "untreated" in norm and "fp" in norm:
+                exact_flow_code = "MP.FP-HY.SW-Untreated wastewater-Nmix"
+                display_name = "Untreated Wastewater (Food Industry)"
+                description = (
+                    "**MP.FP-HY.SW-Untreated wastewater-Nmix** is found using data from Miljødirektoratet (personal communication, 2026) on emissions to water "
+                    "from individual industries, where industries are categorized as belonging to OP or FP, and their connection status to the municipal wastewater, "
+                    "based on the information given in the statistic. If no information on connection status was given we have assigned the values to Untreated wastewater. "
+                    "The database does not distinguish between emissions to surface and coastal waters, so even though several large industries discharge their wastewater "
+                    "to the coast, we assign this entire flow to SW in order to avoid double counting.\n\n"
+                    "The values reported before for 1989-1992 are significantly lower than for later years. We therefore extrapolate back to 1990 using the mean value for 1994-1998."
+                )
+            elif "wastewater" in norm and "fp" in norm:
+                exact_flow_code = "MP.FP-PR.WW-Food industry wastewater-Nmix"
+                display_name = "Food Industry Wastewater"
+                description = (
+                    "**MP.FP-PR.WW-Food industry wastewater-Nmix** is found using data from Miljødirektoratet (personal communication, 2026) on emissions to water "
+                    "from individual industries, where industries are categorized as belonging to OP or FP, and their connection status to the municipal wastewater, "
+                    "based on the information given in the statistic. If no information on connection status was given we have assigned the values to Untreated wastewater. "
+                    "The database does not distinguish between emissions to surface and coastal waters, so even though several large industries discharge their wastewater "
+                    "to the coast, we assign this entire flow to SW in order to avoid double counting."
+                )
+            elif "waste" in norm and "fp" in norm:
+                exact_flow_code = "MP.FP-PR.SO-Food industry waste-Nmix"
+                display_name = "Food Industry Waste"
+                description = (
+                    "**MP.FP-PR.SO-Food industry waste-Nmix** is food waste from the food industry, including the primary sector (fisheries and slaughter houses). "
+                    "We use data from SSB table 05282 “Avfallsregnskap for Norge (1 000 tonn), etter materialtype, statistikkvariabel, år og kilde” (1995-2011) and 10514 "
+                    "«Avfallsregnskap for Norge, etter kilde og materialtype (1 000 tonn) 2012 – 2023» and the category “wet organic waste” with N content from (Schäppi, 2025). "
+                    "The statistic does not separate between food and other industry waste. According to (Chaudhary & Skjerpen, 2025) everything in the industry category "
+                    "“wet organic waste” is from the food industry.\n\n"
+                    "Prior to 2012, the category “wet organic waste” included park- and garden waste and some other mixed waste. The values reported from 1995 to 2011 "
+                    "are therefore significantly larger than from 2012. To compensate from this we make the assumption that the 2011 value should have been equal to that in 2012, "
+                    "and scale the values prior to 2011 by the ratio between the 2011 and 2012 value. For 1990-1994 we extrapolate using the mean value for years 1995-1999 (5 years)."
+                )
+            elif "feed" in norm and "export" in norm:
+                exact_flow_code = "MP.FP-RW.RW-Feed export-Nmix"
+                display_name = "Feed Export"
+                description = "Using trade data from SSB, table 08801."
+            elif "food" in norm and "export" in norm:
+                exact_flow_code = "MP.FP-RW.RW-Food export-Nmix"
+                display_name = "Food Export"
+                description = "Using trade data from SSB, table 08801."
+
+        # Sorter under øvrig industri (MP.OP)
+        elif filename.upper().startswith("MP_OP_"):
+            parent_subpool = "Other Producing Industry (MP.OP)"
+            
+            if "mineral" in norm and "fertilizer" in norm and "export" not in norm and "hs" not in norm:
+                exact_flow_code = "MP.OP-AG.SM-Mineral fertilizer-Nmix"
+                display_name = "Produced Mineral Fertilizer"
+                description = (
+                    "**MP.OP-AG.SM-Mineral fertilizer-Nmix** is domestically produced mineral fertilizer used in agriculture, found as "
+                    "(total domestic use) – (import), where both use and import are given in FAOSTAT Fertilizer by nutrient (FAO, 2025)."
+                )
+            elif "n2o" in norm:
+                exact_flow_code = "MP.OP-AT.AT-Emissions-N2O"
+                display_name = "Industrial Emissions (N2O)"
+                description = (
+                    "**MP.OP-AT.AT-Emissions-N2O** are taken from UNFCCC common reporting tables, Table 3 as advised by (Schäppi, 2025). "
+                    "Emissions are substantial, at least before 2009, and the main source of emissions is from nitric acid production."
+                )
+            elif "nh3" in norm:
+                exact_flow_code = "MP.OP-AT.AT-Emissions-NH3"
+                display_name = "Industrial Emissions (NH3)"
+                description = "We have used data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by (Schäppi, 2025), using the categories given in Table 20."
+            elif "nox" in norm:
+                exact_flow_code = "MP.OP-AT.AT-Emissions-NOx"
+                display_name = "Industrial Emissions (NOx)"
+                description = "We have used data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by (Schäppi, 2025), using the categories given in Table 20."
+            elif "fuel" in norm and "waste" in norm:
+                exact_flow_code = "MP.OP-EF.IC-Industrial waste fuels-Nmix"
+                display_name = "Industrial Waste Fuels"
+                description = (
+                    "**MP.OP-EF.IC-Industrial waste fuels-Nmix** is wood waste used as biofuel in the industries where the waste originates, reported as "
+                    "\"egentilvirket bioenergi\" in the SSB statistic (table 08205). Producers of wood and paper products obtain a significant fraction of their "
+                    "energy through this source. “Egentilvirket bioenergi” encompasses “black liquor” as well as wood waste. For lack of better compositional details "
+                    "we have assumed values for the entire flow corresponding to wood, although this brings significant uncertainty.\n\n"
+                    "The net caloric value of 15.6 for conversion is taken from table 1.2 in (Garg et al., 2006) and we assume a mean N content of 4.0 kg/t "
+                    "(between coniferous and non-coniferous wood; see FS.FO-MP.OP-Industrial round wood-Nmix).\n\n"
+                    "SSB has not reported data on this energy category before 1998, but the size of these industries was relatively constant through the period 1991-2001 "
+                    "(Spilde & Aasestad, 2004). For years 1990-1997 we have therefore used the average for the next 10 years (1998-2007)."
+                )
+            elif "forest" in norm or "fertilization" in norm:
+                exact_flow_code = "MP.OP-FS.FO-Mineral fertilizer-Nmix"
+                display_name = "Forest Fertilization Nitrogen"
+                description = (
+                    "**MP.OP-FS.FO-Mineral fertilizer-Nmix** is nitrogen for forest fertilization. This flow is not part of the guidelines but has been "
+                    "added because it is a significant flow in Norway, as was also done in the Swedish NNB (Moldan et al., 2025). We have used data from SSB on "
+                    "area of forest fertilized and assumed a standard value of 15 kgN/da (Dalen, 2017). Fertilized area before 1997 is taken from Figure 2 in "
+                    "(Landbruksdirektoratet, 2021)."
+                )
+            elif "consumer" in norm and "goods" in norm:
+                exact_flow_code = "MP.OP-HS.HS-Consumer goods-Nmix"
+                display_name = "Consumer Goods (Mass Balance)"
+                description = (
+                    "**MP.OP-HS.HS-Consumer goods-Nmix** is calculated by mass balance, assuming that all incoming flows to OP that are not accounted for "
+                    "in outgoing flows end up in domestic consumer goods. We have excluded N2 fixation for ammonia synthesis, and mineral fertilizer flows. "
+                    "We also exclude emissions to air from the balance because they result mainly from fertilizer production.\n\n"
+                    "**Incoming flows:**\n"
+                    "* AG.SM-MP.OP-Crop products for industrial use-Nmix\n"
+                    "* AG.MM-MP.OP-Non-edible animal products-Nmix\n"
+                    "* PR.SO-MP.OP-Recycling-Nmix\n"
+                    "* EF.EC-MP.OP-Fuel used as feedstock-Nmix\n"
+                    "* FS.FO-MP.OP-Industrial round wood-Nmix\n"
+                    "* RW.RW-MP.OP-Other goods import -Nmix\n\n"
+                    "**Outgoing flows:**\n"
+                    "* MP.OP-PR.SO-Other industry waste-Nmix\n"
+                    "* MP.OP-PR.WW-Other industry wastewater-Nmix\n"
+                    "* MP.OP-HY.SW-Untreated wastewater-Nmix\n"
+                    "* MP.OP-RW.RW-Other goods export-Nmix\n"
+                    "* MP.OP-EF.IC-Industrial waste fuels-Nmix\n\n"
+                    "For comparison, (Moldan et al., 2025) found flows from MP to HS of 15.9 ktN in the form of wood products (produced – export – waste) "
+                    "and 52.2 ktN in the form of chemical products, also found by mass balance, and identified as “plastics, deicing agents, glue, paint, tensides, etc.”, "
+                    "giving a total of 68.1 ktN which, given that the Swedish population is larger than that of Norway, agrees well with our findings."
+                )
+            elif "mineral" in norm and "fertilizer" in norm and "hs" in norm:
+                exact_flow_code = "MP.OP-HS.HS-Mineral fertilizer-Nmix"
+                display_name = "Non-Agricultural Mineral Fertilizer"
+                description = (
+                    "**MP.OP-HS.HS-Mineral fertilizer-Nmix**: as advised by (Schäppi, 2025), we assume a default value of 2% of total mineral "
+                    "fertilizer for non-agricultural use. Data for fertilizer use in agriculture are taken from FAOSTAT Fertilizer by nutrient (FAO, 2025)."
+                )
+            elif "untreated" in norm and "op" in norm:
+                exact_flow_code = "MP.OP-HY.SW-Untreated wastewater-Nmix"
+                display_name = "Untreated Wastewater (Other Industry)"
+                description = (
+                    "**MP.OP-HY.SW-Untreated wastewater-Nmix** is found using data from Miljødirektoratet (personal communication, 2026) on emissions to water "
+                    "from individual industries, where industries are categorized as belonging to OP or FP based on the information given in the statistic, and counting "
+                    "those that are not reported to be connected to municipal wastewater treatment. These emissions are also reported on (Miljødirektoratet, 2025), but "
+                    "as of February 2026 the publicly available data did not include information on connection to municipal wastewater. The database does not distinguish "
+                    "between emissions to surface and coastal waters, so even though several large industries discharge their wastewater to the coast, we assign this entire "
+                    "flow to SW in order to avoid double counting."
+                )
+            elif "waste" in norm and "op" in norm:
+                exact_flow_code = "MP.OP-PR.SO-Other industry waste-Nmix"
+                display_name = "Other Industry Waste"
+                description = (
+                    "**MP.OP-PR.SO-Other industry waste-Nmix**: we use data from SSB table 05282 “Avfallsregnskap for Norge (1 000 tonn), etter materialtype, "
+                    "statistikkvariabel, år og kilde” (1995-2011) and 10514 «Avfallsregnskap for Norge, etter kilde og materialtype (1 000 tonn) 2012 – 2023» "
+                    "with N contents taken from (Schäppi, 2025) and typical, assumed values are chosen if none are given. The statistic does not separate between food "
+                    "and other industry waste. We make the assumption that everything in the category “wet organic waste” is from the food industry, and all other waste "
+                    "is assigned to other producing industry. Here we also include all waste from “other industries” (annen eller uspesifisert næring). The category "
+                    "“contaminated waste” is very irregularly reported (placed in different sectors in different years) and has therefore been excluded.\n\n"
+                    "There is a change in categorization between the two tables, where the main difference is in the category “other waste” and “mixed waste”. To ensure "
+                    "continuity between the data series we chose a lower value for “other waste” than for “mixed waste”. Values between 1990 and 1994 are extrapolated "
+                    "from 1995 given the change in industry waste reported between 1992 and 1995 reported in (SSB, 1997)."
+                )
+            elif "wastewater" in norm and "op" in norm:
+                exact_flow_code = "MP.OP-PR.WW-Other industry wastewater-Nmix"
+                display_name = "Other Industry Wastewater"
+                description = (
+                    "**MP.OP-PR.WW-Other industry wastewater-Nmix** is found using data from Miljødirektoratet (personal communication, 2026) on emissions to "
+                    "water from individual industries, where industries are categorized as belonging to OP or FP based on the information given in the statistic, and counting "
+                    "those that are reported to be connected to municipal wastewater treatment. These emissions are also reported on (Miljødirektoratet, 2025), but as of "
+                    "February 2026 the publicly available data did not include information on connection to municipal wastewater."
+                )
+            elif "fertilizer" in norm and "export" in norm:
+                exact_flow_code = "MP.OP-RW.RW-Mineral fertilizer export-Nmix"
+                display_name = "Mineral Fertilizer Export"
+                description = "**MP.OP-RW.RW-Mineral fertilizer export-Nmix** is taken from FAOSTAT Fertilizer by nutrient (FAO, 2025)."
+            elif "other" in norm and "goods" in norm and "export" in norm:
+                exact_flow_code = "MP.OP-RW.RW-Other goods export-Nmix"
+                display_name = "Other Goods Export"
+                description = (
+                    "**MP.OP-RW.RW-Other goods export-Nmix** is taken from SSB trade data (table 08801) on goods that can be characterized as flowers, chemicals, "
+                    "soap, industrial protein, leather, wood and textiles. Ammonia export is also included in this flow."
+                )
+
+        # Skriv ut filen for den gjeldende strømmen
+        with open(full_flow_path, 'w', encoding='utf-8') as f:
+            f.write(f"---\nlayout: default\ntitle: {display_name}\nparent: {parent_subpool}\n")
+            if 'Food' in parent_subpool:
+                f.write(f"nav_order: {mp_fp_counter}\n---\n\n")
+                mp_fp_counter += 1
+            else:
+                f.write(f"nav_order: {mp_op_counter}\n---\n\n")
+                mp_op_counter += 1
+
+            f.write(f"# {display_name}\n\n![{exact_flow_code}](../{plot_dir}/{filename})\n\n### Flow Description\n{description}\n\n")
+            append_bibtex_references(f, bib_filename)
 
 # ==============================================================================
 # HOVEDFUNKSJON (ORKESTRATOR)
@@ -758,7 +1036,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
     os.makedirs(hy_folder, exist_ok=True)
     process_hydrosphere_pool(hy_folder, plot_files, plot_dir)
 
-    # 7. Humans and Settlements Pool (NY)
+    # 7. Humans and Settlements Pool
     hs_folder = "humans_and_settlements_pool"
     os.makedirs(hs_folder, exist_ok=True)
     process_humans_and_settlements_pool(hs_folder, plot_files, plot_dir, bib_filename)
@@ -767,5 +1045,10 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
     ef_folder = "energy_and_fuels_pool"
     os.makedirs(ef_folder, exist_ok=True)
     process_energy_and_fuels_pool(ef_folder, plot_files, plot_dir, bib_filename)
+    
+    # 6. Materials and Products Pool
+    mp_folder = "materials_and_products_pool"
+    os.makedirs(mp_folder, exist_ok=True)
+    process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename)
 
     print("[RAPPORT] Portalbygging fullført suksessfullt!")

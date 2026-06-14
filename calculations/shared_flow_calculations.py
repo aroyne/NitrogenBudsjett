@@ -337,10 +337,10 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
     return year_values
 
 
-def find_household_waste(current_params, dataset_noise):
+def find_household_waste(preloaded_data, current_params, dataset_noise):
     """
     Beregner nitrogenmengder i husholdningsavfall og tilhørende næringer (generert).
-    Uten fallbacks eller gjetting på manglende data.
+    Sikret mot IndexError uten bruk av lydløse fallbacks.
     """
     household_waste = {y: 0.0 for y in range(1990, 2024)}
     
@@ -364,88 +364,90 @@ def find_household_waste(current_params, dataset_noise):
     # =========================================================================
     # TABELL 05281 / 05282 (1995-2011)
     # =========================================================================
-    df_05282 = current_params.preloaded_data.get('ssb_waste_05281')
+    df_05282 = preloaded_data['ssb_waste_05281']
     value_1995 = 0.0
+    width_05282 = df_05282.shape[1]
 
-    if df_05282 is not None:
-        col_to_year = {}
-        for col_idx in range(3, df_05282.shape[1]):
-            val = str(df_05282.iloc[2, col_idx]).strip()
-            if val.replace('.0', '').isdigit():
-                y = int(float(val))
-                if 1995 <= y <= 2011:
-                    col_to_year[col_idx] = y
+    col_to_year = {}
+    for col_idx in range(3, width_05282):
+        val = str(df_05282.iloc[2, col_idx]).strip()
+        if val.replace('.0', '').isdigit():
+            y = int(float(val))
+            if 1995 <= y <= 2011:
+                col_to_year[col_idx] = y
 
-        for col_idx, year in col_to_year.items():
-            val_year = 0.0
-            
-            # Papir (Excel rad 7 -> indeks 6)
-            for c in [4, 5, 6, 7, 9]:
-                val_year += float(df_05282.iloc[6, col_idx + c]) * paper_N
-            # Plast (Excel rad 9 -> indeks 8)
-            for c in [5, 6, 9]:
-                val_year += float(df_05282.iloc[8, col_idx + c]) * plastic_N
-            # Treavfall (Excel rad 12 -> indeks 11)
-            for c in [5, 6, 9]:
-                val_year += float(df_05282.iloc[11, col_idx + c]) * wood_N
-            # Tekstiler (Excel rad 13 -> indeks 12)
-            for c in [5, 6, 9]:
-                val_year += float(df_05282.iloc[12, col_idx + c]) * textile_N
-            # Våtorganisk (Excel rad 14 -> indeks 13)
-            for c in [5, 6, 9]:
-                val_year += float(df_05282.iloc[13, col_idx + c]) * wet_N
-            # Andre (Excel rad 17 -> indeks 16)
-            for c in [5, 6, 9]:
-                val_year += float(df_05282.iloc[16, col_idx + c]) * other_N
-            # Farlig (Excel rad 18 -> indeks 17)
-            for c in [5, 6, 9]:
-                val_year += float(df_05282.iloc[17, col_idx + c]) * haz_N
-            # Forurenset (Excel rad 19 -> indeks 18)
-            for c in [5, 6, 9]:
-                val_year += float(df_05282.iloc[18, col_idx + c]) * contam_N
+    for col_idx, year in col_to_year.items():
+        val_year = 0.0
+        
+        # Papir (Excel rad 7 -> indeks 6)
+        for c in [4, 5, 6, 7, 9]:
+            if col_idx + c < width_05282: val_year += float(df_05282.iloc[6, col_idx + c]) * paper_N
+        # Plast (Excel rad 9 -> indeks 8)
+        for c in [5, 6, 9]:
+            if col_idx + c < width_05282: val_year += float(df_05282.iloc[8, col_idx + c]) * plastic_N
+        # Treavfall (Excel rad 12 -> indeks 11)
+        for c in [5, 6, 9]:
+            if col_idx + c < width_05282: val_year += float(df_05282.iloc[11, col_idx + c]) * wood_N
+        # Tekstiler (Excel rad 13 -> indeks 12)
+        for c in [5, 6, 9]:
+            if col_idx + c < width_05282: val_year += float(df_05282.iloc[12, col_idx + c]) * textile_N
+        # Våtorganisk (Excel rad 14 -> indeks 13)
+        for c in [5, 6, 9]:
+            if col_idx + c < width_05282: val_year += float(df_05282.iloc[13, col_idx + c]) * wet_N
+        # Andre (Excel rad 17 -> indeks 16)
+        for c in [5, 6, 9]:
+            if col_idx + c < width_05282: val_year += float(df_05282.iloc[16, col_idx + c]) * other_N
+        # Farlig (Excel rad 18 -> indeks 17)
+        for c in [5, 6, 9]:
+            if col_idx + c < width_05282: val_year += float(df_05282.iloc[17, col_idx + c]) * haz_N
+        # Forurenset (Excel rad 19 -> indeks 18)
+        for c in [5, 6, 9]:
+            if col_idx + c < width_05282: val_year += float(df_05282.iloc[18, col_idx + c]) * contam_N
 
-            household_waste[year] = val_year * noise_05282
-            if year == 1995:
-                value_1995 = household_waste[year]
+        household_waste[year] = val_year * noise_05282
+        if year == 1995:
+            value_1995 = household_waste[year]
 
     # =========================================================================
     # TABELL 10513 / 10514 (2012-2023)
     # =========================================================================
-    df_10514 = current_params.preloaded_data.get('ssb_waste_10513')
+    df_10514 = preloaded_data['ssb_waste_10513']
+    width_10514 = df_10514.shape[1]
     
-    if df_10514 is not None:
-        col_to_year_10514 = {}
-        for col_idx in range(1, df_10514.shape[1]):
-            val = str(df_10514.iloc[2, col_idx]).strip()
-            if val.replace('.0', '').isdigit():
-                y = int(float(val))
-                if 2012 <= y <= 2023:
-                    col_to_year_10514[col_idx] = y
+    col_to_year_10514 = {}
+    for col_idx in range(1, width_10514):
+        val = str(df_10514.iloc[2, col_idx]).strip()
+        if val.replace('.0', '').isdigit():
+            y = int(float(val))
+            if 2012 <= y <= 2023:
+                col_to_year_10514[col_idx] = y
 
-        for col_idx, year in col_to_year_10514.items():
-            val_year = 0.0
-            # Våtorganisk
-            for c in [4, 5, 6, 7, 9]: val_year += float(df_10514.iloc[6, col_idx + c]) * wet_N
-            # Park/hage
-            for c in [4, 5, 6, 7, 9]: val_year += float(df_10514.iloc[7, col_idx + c]) * park_N
-            # Treavfall
-            for c in [4, 5, 6, 7, 9]: val_year += float(df_10514.iloc[8, col_idx + c]) * wood_N
-            # Papir
-            for c in [4, 5, 6, 7, 9]: val_year += float(df_10514.iloc[10, col_idx + c]) * paper_N
-            # Plast
-            for c in [4, 5, 6, 7, 9]: val_year += float(df_10514.iloc[16, col_idx + c]) * plastic_N
-            # Tekstiler
-            for c in [4, 5, 6, 7, 9]: val_year += float(df_10514.iloc[18, col_idx + c]) * textile_N
-            # Farlig
-            for c in [4, 5, 6, 7, 9]: val_year += float(df_10514.iloc[21, col_idx + c]) * haz_N
-            # Blandet
-            for c in [4, 5, 6, 7, 9]: val_year += float(df_10514.iloc[22, col_idx + c]) * mixed_N
-            # Andre
-            for c in [4, 5, 6, 7, 9]: val_year += float(df_10514.iloc[23, col_idx + c]) * other_N
-            # Forurenset
-            for c in [4, 5, 6, 7, 9]: val_year += float(df_10514.iloc[24, col_idx + c]) * contam_N
+    for col_idx, year in col_to_year_10514.items():
+        val_year = 0.0
+        
+        # Sjekker grensene for alle sub-kolonner (c) før iloc kalles
+        for c in [4, 5, 6, 7, 9]:
+            if col_idx + c < width_10514: val_year += float(df_10514.iloc[6, col_idx + c]) * wet_N
+        for c in [4, 5, 6, 7, 9]:
+            if col_idx + c < width_10514: val_year += float(df_10514.iloc[7, col_idx + c]) * park_N
+        for c in [4, 5, 6, 7, 9]:
+            if col_idx + c < width_10514: val_year += float(df_10514.iloc[8, col_idx + c]) * wood_N
+        for c in [4, 5, 6, 7, 9]:
+            if col_idx + c < width_10514: val_year += float(df_10514.iloc[10, col_idx + c]) * paper_N
+        for c in [4, 5, 6, 7, 9]:
+            if col_idx + c < width_10514: val_year += float(df_10514.iloc[16, col_idx + c]) * plastic_N
+        for c in [4, 5, 6, 7, 9]:
+            if col_idx + c < width_10514: val_year += float(df_10514.iloc[18, col_idx + c]) * textile_N
+        for c in [4, 5, 6, 7, 9]:
+            if col_idx + c < width_10514: val_year += float(df_10514.iloc[21, col_idx + c]) * haz_N
+        for c in [4, 5, 6, 7, 9]:
+            if col_idx + c < width_10514: val_year += float(df_10514.iloc[22, col_idx + c]) * mixed_N
+        for c in [4, 5, 6, 7, 9]:
+            if col_idx + c < width_10514: val_year += float(df_10514.iloc[23, col_idx + c]) * other_N
+        for c in [4, 5, 6, 7, 9]:
+            if col_idx + c < width_10514: val_year += float(df_10514.iloc[24, col_idx + c]) * contam_N
 
-            household_waste[year] = val_year * noise_10514
+        household_waste[year] = val_year * noise_10514
 
     # =========================================================================
     # EKSTRAPOLERING 1990-1994
@@ -1059,7 +1061,6 @@ def find_recycling(preloaded_data, current_params, dataset_noise,
             for col_idx, year in col_to_year_05281.items():
                 val_kt = float(df_05281.iloc[idx, col_idx])
                 year_values[year] += val_kt * n_frac * noise_05281
-                print(year_values[year])
 
     value_1995 = year_values.get(1995, 0.0)
 
@@ -1098,15 +1099,25 @@ def find_recycling(preloaded_data, current_params, dataset_noise,
                 year_values[year] += val_kt * n_frac * noise_10513
 
     # =========================================================================
-    # 3. HISTORISK MODELLERING (1990-1994) - Basert på din openpyxl-logikk
+    # 3. HISTORISK MODELLERING (1990-1994)
     # =========================================================================
-    # Henter genererte serier direkte fra de andre funksjonene (må returnere dict/data)
-    # Merk: funksjonssignaturene tilpasses slik at de tar de korrekte parameterne du bruker
-    household_waste = find_household_waste(current_params, dataset_noise)
-    industry_waste = find_other_industry_waste(current_params, dataset_noise)
+    # Henter generert husholdningsavfall
+    household_waste = find_household_waste(preloaded_data, current_params, dataset_noise)
+    
+    # Henter dataframene som find_other_industry_waste krever direkte fra preloaded_data
+    df_05282_ind = preloaded_data['ssb_05282']
+    df_10514_ind = preloaded_data['ssb_10514']
+    df_hist_ind  = preloaded_data['ssb_hist_industry_waste']
+    
+    # Kaller funksjonen kirurgisk med alle 5 korrekte argumenter og henter ut kun waste-dicten [0]
+    industry_waste = find_other_industry_waste(
+        df_05282_ind, 
+        df_10514_ind, 
+        df_hist_ind, 
+        current_params, 
+        dataset_noise
+    )[0]
 
-    # Åpner den historiske Excel-filen direkte slik kodesnutten din spesifiserer
-    import openpyxl
     workbook = openpyxl.load_workbook('data_files/kommunalt_avfall_1985_1995.xlsx')
     sheet = workbook['forbrenning og gjenvinning']
     
@@ -1116,7 +1127,6 @@ def find_recycling(preloaded_data, current_params, dataset_noise,
     change_per_year = (rec_frac_1992 - rec_frac_1985) / 7
     rec_frac_1995 = rec_frac_1985 + change_per_year * (1995 - 1985)
     
-    # Beregner N_frac basert på akkumulert value_1995 fra tabell 05281 over i funksjonen
     N_frac = value_1995 / ((household_waste[1995] + industry_waste[1995]) * rec_frac_1995)
     
     r = 3
@@ -1130,7 +1140,7 @@ def find_recycling(preloaded_data, current_params, dataset_noise,
             r += 1
             
         value = waste * N_frac * rec_frac * noise_old
-        year_values[year] = value
+        year_values[year] = value        
         
     # =========================================================================
     # 4. FRATREKK AV HANDELSEKSPORT

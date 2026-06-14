@@ -1648,14 +1648,7 @@ def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trad
     )
     if temp_import_results: inflow_tracker['other_import'] = len(temp_import_results)
     for res in temp_import_results:
-        add_flow(res['year'], res['value'], inflow_totals, inflow_count)
-
-    # Print rapporten før vi går til balansen
-    print("\n--- STATUS FOR INNLØPS-STRØMMER (Antall år levert) ---")
-    for kilde, antall in inflow_tracker.items():
-        print(f"  {kilde}: {antall} år med data")
-    print("----------------------------------------------------\n")
-    
+        add_flow(res['year'], res['value'], inflow_totals, inflow_count)    
     
     # =========================================================================
     # --- OUTFLOWS (Hentes STRIKT fra resultater kjørt tidligere) -------------
@@ -1691,8 +1684,6 @@ def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trad
     # =========================================================================
     # --- NET CONSUMER GOODS PER YEAR (MED FEILSØKINGSPRINT) ------------------
     # =========================================================================
-    print(f"\n=== FEILSØKING FOR {flow_code} ===")
-    print(f"Mål: N_IN={N_IN} strømmer, N_OUT={N_OUT} strømmer")
     
     for year in sorted(list(target_years)):
         in_val = inflow_totals.get(year, 0.0)
@@ -1702,9 +1693,6 @@ def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trad
         n_out = outflow_count.get(year, 0)
 
         collected_years.add(year)
-
-        # Print status for hvert år så vi ser hvor det svikter
-        print(f"År {year}: Inputs={n_in}/{N_IN} ({in_val:.4f} kt N) | Outputs={n_out}/{N_OUT} ({out_val:.4f} kt N)")
 
         if n_in == N_IN and n_out == N_OUT:
             value = in_val - out_val
@@ -1724,8 +1712,6 @@ def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trad
             'comment': comment,
             'data_sources': data_sources
         })
-
-    print("=== FEILSØKING FERDIG ===\n")
 
     # Sluttkontroll mot mål-årene
     missing_years = target_years - collected_years
