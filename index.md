@@ -6,7 +6,7 @@ nav_order: 1
 
 # Nitrogen Budget for Norway
 
-**Last Updated:** June 13, 2026
+**Last Updated:** June 14, 2026
 
 {: .label .label-red }
 Work in Progress

@@ -158,8 +158,6 @@ def find_export_for_reuse(prepared_trade_data, current_params, trade_params):
     return year_values
 
 
-import pandas as pd
-
 def find_feedstock_fuel(preloaded_data, current_params, dataset_noise):
     """
     Beregner nitrogen i råstoff med kildestøy fra energibalansen (11561).
@@ -337,6 +335,137 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
         }
         
     return year_values
+
+
+def find_household_waste(current_params, dataset_noise):
+    """
+    Beregner nitrogenmengder i husholdningsavfall og tilhørende næringer (generert).
+    Uten fallbacks eller gjetting på manglende data.
+    """
+    household_waste = {y: 0.0 for y in range(1990, 2024)}
+    
+    # Hent støyfaktorer for simuleringen
+    noise_05282 = float(dataset_noise['05282']['value'])
+    noise_10514 = float(dataset_noise['10514']['value'])
+    noise_interp = float(dataset_noise['trend interpolation']['value'])
+
+    # Hent N-fraksjoner via current_params
+    paper_N   = float(current_params.waste_N_frac('paper'))
+    plastic_N = float(current_params.waste_N_frac('plastic'))
+    wood_N    = float(current_params.waste_N_frac('wood'))
+    textile_N = float(current_params.waste_N_frac('textiles'))
+    wet_N     = float(current_params.waste_N_frac('wet_organic'))
+    other_N   = float(current_params.waste_N_frac('other_materials'))
+    haz_N     = float(current_params.waste_N_frac('hazardous'))
+    contam_N  = float(current_params.waste_N_frac('contaminated_masses'))
+    park_N    = float(current_params.waste_N_frac('park_garden'))
+    mixed_N   = float(current_params.waste_N_frac('mixed_waste'))
+
+    # =========================================================================
+    # TABELL 05281 / 05282 (1995-2011)
+    # =========================================================================
+    df_05282 = current_params.preloaded_data.get('ssb_waste_05281')
+    value_1995 = 0.0
+
+    if df_05282 is not None:
+        col_to_year = {}
+        for col_idx in range(3, df_05282.shape[1]):
+            val = str(df_05282.iloc[2, col_idx]).strip()
+            if val.replace('.0', '').isdigit():
+                y = int(float(val))
+                if 1995 <= y <= 2011:
+                    col_to_year[col_idx] = y
+
+        for col_idx, year in col_to_year.items():
+            val_year = 0.0
+            
+            # Papir (Excel rad 7 -> indeks 6)
+            for c in [4, 5, 6, 7, 9]:
+                val_year += float(df_05282.iloc[6, col_idx + c]) * paper_N
+            # Plast (Excel rad 9 -> indeks 8)
+            for c in [5, 6, 9]:
+                val_year += float(df_05282.iloc[8, col_idx + c]) * plastic_N
+            # Treavfall (Excel rad 12 -> indeks 11)
+            for c in [5, 6, 9]:
+                val_year += float(df_05282.iloc[11, col_idx + c]) * wood_N
+            # Tekstiler (Excel rad 13 -> indeks 12)
+            for c in [5, 6, 9]:
+                val_year += float(df_05282.iloc[12, col_idx + c]) * textile_N
+            # Våtorganisk (Excel rad 14 -> indeks 13)
+            for c in [5, 6, 9]:
+                val_year += float(df_05282.iloc[13, col_idx + c]) * wet_N
+            # Andre (Excel rad 17 -> indeks 16)
+            for c in [5, 6, 9]:
+                val_year += float(df_05282.iloc[16, col_idx + c]) * other_N
+            # Farlig (Excel rad 18 -> indeks 17)
+            for c in [5, 6, 9]:
+                val_year += float(df_05282.iloc[17, col_idx + c]) * haz_N
+            # Forurenset (Excel rad 19 -> indeks 18)
+            for c in [5, 6, 9]:
+                val_year += float(df_05282.iloc[18, col_idx + c]) * contam_N
+
+            household_waste[year] = val_year * noise_05282
+            if year == 1995:
+                value_1995 = household_waste[year]
+
+    # =========================================================================
+    # TABELL 10513 / 10514 (2012-2023)
+    # =========================================================================
+    df_10514 = current_params.preloaded_data.get('ssb_waste_10513')
+    
+    if df_10514 is not None:
+        col_to_year_10514 = {}
+        for col_idx in range(1, df_10514.shape[1]):
+            val = str(df_10514.iloc[2, col_idx]).strip()
+            if val.replace('.0', '').isdigit():
+                y = int(float(val))
+                if 2012 <= y <= 2023:
+                    col_to_year_10514[col_idx] = y
+
+        for col_idx, year in col_to_year_10514.items():
+            val_year = 0.0
+            # Våtorganisk
+            for c in [4, 5, 6, 7, 9]: val_year += float(df_10514.iloc[6, col_idx + c]) * wet_N
+            # Park/hage
+            for c in [4, 5, 6, 7, 9]: val_year += float(df_10514.iloc[7, col_idx + c]) * park_N
+            # Treavfall
+            for c in [4, 5, 6, 7, 9]: val_year += float(df_10514.iloc[8, col_idx + c]) * wood_N
+            # Papir
+            for c in [4, 5, 6, 7, 9]: val_year += float(df_10514.iloc[10, col_idx + c]) * paper_N
+            # Plast
+            for c in [4, 5, 6, 7, 9]: val_year += float(df_10514.iloc[16, col_idx + c]) * plastic_N
+            # Tekstiler
+            for c in [4, 5, 6, 7, 9]: val_year += float(df_10514.iloc[18, col_idx + c]) * textile_N
+            # Farlig
+            for c in [4, 5, 6, 7, 9]: val_year += float(df_10514.iloc[21, col_idx + c]) * haz_N
+            # Blandet
+            for c in [4, 5, 6, 7, 9]: val_year += float(df_10514.iloc[22, col_idx + c]) * mixed_N
+            # Andre
+            for c in [4, 5, 6, 7, 9]: val_year += float(df_10514.iloc[23, col_idx + c]) * other_N
+            # Forurenset
+            for c in [4, 5, 6, 7, 9]: val_year += float(df_10514.iloc[24, col_idx + c]) * contam_N
+
+            household_waste[year] = val_year * noise_10514
+
+    # =========================================================================
+    # EKSTRAPOLERING 1990-1994
+    # =========================================================================
+    inhabitants_1990 = 4233116
+    inhabitants_1995 = 4348410
+    waste_kg_person_1990 = 200
+    waste_kg_person_1995 = 289
+    
+    waste_kt_1990 = waste_kg_person_1990 * inhabitants_1990 * 1e-6
+    waste_kt_1995 = waste_kg_person_1995 * inhabitants_1995 * 1e-6
+    
+    N_frac = value_1995 / waste_kt_1995
+    value_1990 = waste_kt_1990 * N_frac
+    change_per_year = (value_1995 - value_1990) / 5.0
+    
+    for idx, year in enumerate(range(1990, 1995)):
+        household_waste[year] = (value_1990 + change_per_year * idx) * noise_interp
+
+    return household_waste
 
 
 def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params, dataset_noise):
@@ -842,31 +971,6 @@ def find_other_goods_export(prepared_trade_data, current_params, trade_params):
     return year_values
 
 
-def find_other_goods_import(prepared_trade_data, current_params, trade_params):
-    """
-    ULTRA-OPTIMALISERT: Beregner nitrogen i import av andre handelsvarer.
-    Forventer forhåndssummerte data. Ingen tunge Pandas groupby-operasjoner inni loopen!
-    """
-    year_values = {}
-    noise_trade = float(current_params.get('08801', current_params.get('13136')))
-    
-    # 1. Hent N-faktorer
-    n_factor_dict = trade_params['value'].to_dict()
-    
-    # 2. Map faktorer og beregn N_amount (vektorisert)
-    v_factors = prepared_trade_data['konv'].map(n_factor_dict).fillna(0.0)
-    n_amounts = (prepared_trade_data['amount'] * v_factors / 1e6 * noise_trade).values
-    years = prepared_trade_data['year'].values
-    
-    # 3. Aggreger til ordbok
-    for idx in range(len(years)):
-        yr = int(years[idx])
-        year_values[yr] = year_values.get(yr, 0.0) + n_amounts[idx]
-        
-    return year_values
-
-
-
 
     
 def find_other_industry_wastewater(prepared_wastewater_dict, current_params):
@@ -903,90 +1007,150 @@ def find_op_untreated_wastewater(prepared_untreated_dict, current_params):
     return year_values
 
 
-def find_recycling(data_05281, data_10513, data_hist_rec, current_params, 
-                   household_waste, industry_waste, export_resirk, export_reuse):
+def find_recycling(preloaded_data, current_params, dataset_noise, 
+                   prepared_trade_recycling, prepared_trade_reuse, trade_params):
     """
-    MC-OPTIMALISERT: Beregner nitrogen til materialgjenvinning.
-    Bruker ferdigpreparerte vektorer og rundens støyfaktorer for ekstrem fart.
+    KORRIGERT VERSJON: Beregner nitrogen ved bruk av rå posisjons-indekser (iloc)
+    siden Pandas har lastet inn kolonnenavnene som rene heltall [0, 1, 2...].
     """
-    year_values = {}
+    year_values = {y: 0.0 for y in range(1990, 2024)}
     
-    # 1. Hent rundens støyfaktorer (avfallsfraksjoner og datasettmultiplikatorer)
-    paper_N   = float(current_params.get('paper'))
-    plastic_N = float(current_params.get('plastic'))
-    wood_N    = float(current_params.get('wood'))
-    textile_N = float(current_params.get('textiles'))
-    other_N   = float(current_params.get('other_materials'))
-    haz_N     = float(current_params.get('hazardous'))
-    contam_N  = float(current_params.get('contaminated_masses'))
-    rubber_N  = float(current_params.get('rubber'))
-    mixed_N   = float(current_params.get('mixed_waste'))
-    
-    u_05281 = float(current_params.get('05281'))
-    u_10513 = float(current_params.get('10513'))
+    # Hent tabellstøy
+    noise_05281 = float(dataset_noise.get('05281', {}).get('value', 1.0))
+    noise_10513 = float(dataset_noise.get('10513', {}).get('value', 1.0))
+    noise_old = float(dataset_noise.get('historical_waste', {}).get('value', noise_05281))
 
-    # 2. Beregn perioden 1995-2011 (vektorisert via NumPy)
-    vals_05281 = (
-        data_05281['paper'] * paper_N +
-        data_05281['plastic'] * plastic_N +
-        data_05281['wood'] * wood_N +
-        data_05281['textile'] * textile_N +
-        data_05281['other'] * other_N +
-        data_05281['haz'] * haz_N +
-        data_05281['contam'] * contam_N
-    ) * u_05281
-    
+    # N-fraksjoner
+    paper_N   = float(current_params.waste_N_frac('paper'))
+    plastic_N = float(current_params.waste_N_frac('plastic'))
+    wood_N    = float(current_params.waste_N_frac('wood'))
+    textile_N = float(current_params.waste_N_frac('textiles'))
+    other_N   = float(current_params.waste_N_frac('other_materials'))
+    haz_N     = float(current_params.waste_N_frac('hazardous'))
+    mixed_N   = float(current_params.waste_N_frac('mixed_waste'))
+    rubber_N  = float(current_params.waste_N_frac('rubber'))
+    contam_N  = float(current_params.waste_N_frac('contaminated_masses'))
+
+    # =========================================================================
+    # 1. PARSING AV TABELL 05281 (1995-2011) - Posisjonsbasert (iloc)
+    # =========================================================================
+    df_05281 = preloaded_data.get('ssb_waste_05281')
     value_1995 = 0.0
-    for idx, year in enumerate(data_05281['years']):
-        year_values[year] = float(vals_05281[idx])
-        if year == 1995:
-            value_1995 = float(vals_05281[idx])
-
-    # 3. Beregn perioden 2012-2023 (vektorisert via NumPy)
-    vals_10513 = (
-        data_10513['wood'] * wood_N +
-        data_10513['paper'] * paper_N +
-        data_10513['plastic'] * plastic_N +
-        data_10513['rubber'] * rubber_N +
-        data_10513['textile'] * textile_N +
-        data_10513['haz'] * haz_N +
-        data_10513['mixed'] * mixed_N +
-        data_10513['other'] * other_N +
-        data_10513['contam'] * contam_N
-    ) * u_10513
     
-    for idx, year in enumerate(data_10513['years']):
-        year_values[year] = float(vals_10513[idx])
+    # Rad 2 inneholder årstallene bortover (kolonne 3 er 1995, 4 er 1996 osv)
+    col_to_year_05281 = {}
+    for col_idx in range(3,20):
+        val = str(df_05281.iloc[2, col_idx]).strip()
+        col_to_year_05281[col_idx] = int(val)
 
-    # 4. Beregn den historiske perioden 1990-1994 basert på 1995-tallene
-    rec_frac_1985 = data_hist_rec['rec_frac_1985']
-    change_per_year = data_hist_rec['change_per_year']
+    # Loop gjennom alle rader for materialgjenvinning (excel-rad 18-31)
+    for idx in range(17, 30):
+        row_text = str(df_05281.iloc[idx, 2]).strip()
+        n_frac = 0.0
+        if 'Papir' in row_text: n_frac = paper_N
+        elif 'Plast' in row_text: n_frac = plastic_N
+        elif 'Treavfall' in row_text: n_frac = wood_N
+        elif 'Tekstiler' in row_text: n_frac = textile_N
+        elif 'Andre materialer' in row_text: n_frac = other_N
+        elif 'Farlig avfall' in row_text: n_frac = haz_N
+        elif 'Forurensede masser' in row_text: n_frac = contam_N
+
+        if n_frac > 0:
+            for col_idx, year in col_to_year_05281.items():
+                val_kt = float(df_05281.iloc[idx, col_idx])
+                year_values[year] += val_kt * n_frac * noise_05281
+                print(year_values[year])
+
+    value_1995 = year_values.get(1995, 0.0)
+
+    # =========================================================================
+    # 2. PARSING AV TABELL 10513 (2012-2023) - Posisjonsbasert (iloc)
+    # =========================================================================
+    df_10513 = preloaded_data.get('ssb_waste_10513')
     
+    col_to_year_10513 = {}
+    
+    # Rad 0 inneholder årstallene spredt utover (f.eks '2012' i kolonne 1, resten er None fram til 2013)
+    # Rad 2 inneholder behandlingsmetoden ('Levert til materiell gjenvinning')
+    for col_idx in range(1, df_10513.shape[1]):
+        # Sjekk om rad 0 oppdaterer årstallet
+        cell_year = str(df_10513.iloc[3, col_idx]).strip()
+        if cell_year.isdigit():
+            current_year = int(cell_year)
+            col_to_year_10513[col_idx] = current_year
+    # Gå gjennom radene fra rad 3 og nedover for å hente materialdata
+    for idx in range(5, 25):
+        row_text = str(df_10513.iloc[idx, 0]).strip()
+        n_frac = 0.0
+        if 'Papir' in row_text: n_frac = paper_N
+        elif 'Plast' in row_text: n_frac = plastic_N
+        elif 'Treavfall' in row_text: n_frac = wood_N
+        elif 'Gummi' in row_text: n_frac = rubber_N
+        elif 'Tekstiler' in row_text: n_frac = textile_N
+        elif 'Farlig avfall' in row_text: n_frac = haz_N
+        elif 'Blandet avfall' in row_text: n_frac = mixed_N
+        elif 'Andre materialer' in row_text: n_frac = other_N
+        elif 'Lettere forurensede masser' in row_text.lower(): n_frac = contam_N
+
+        if n_frac > 0:
+            for col_idx, year in col_to_year_10513.items():
+                val_kt = float(df_10513.iloc[idx, col_idx])
+                year_values[year] += val_kt * n_frac * noise_10513
+
+    # =========================================================================
+    # 3. HISTORISK MODELLERING (1990-1994) - Basert på din openpyxl-logikk
+    # =========================================================================
+    # Henter genererte serier direkte fra de andre funksjonene (må returnere dict/data)
+    # Merk: funksjonssignaturene tilpasses slik at de tar de korrekte parameterne du bruker
+    household_waste = find_household_waste(current_params, dataset_noise)
+    industry_waste = find_other_industry_waste(current_params, dataset_noise)
+
+    # Åpner den historiske Excel-filen direkte slik kodesnutten din spesifiserer
+    import openpyxl
+    workbook = openpyxl.load_workbook('data_files/kommunalt_avfall_1985_1995.xlsx')
+    sheet = workbook['forbrenning og gjenvinning']
+    
+    rec_frac_1985 = float(sheet.cell(row=2, column=2).value) / 100
+    rec_frac_1992 = float(sheet.cell(row=3, column=2).value) / 100
+    
+    change_per_year = (rec_frac_1992 - rec_frac_1985) / 7
     rec_frac_1995 = rec_frac_1985 + change_per_year * (1995 - 1985)
     
-    # Unngå ZeroDivisionError hvis summen i 1995 er 0
-    denom = (household_waste.get(1995, 0.0) + industry_waste.get(1995, 0.0)) * rec_frac_1995
-    N_frac = value_1995 / denom if denom != 0 else 0.0
+    # Beregner N_frac basert på akkumulert value_1995 fra tabell 05281 over i funksjonen
+    N_frac = value_1995 / ((household_waste[1995] + industry_waste[1995]) * rec_frac_1995)
     
-    # Loop over historiske år
-    for idx, year in enumerate(range(1990, 1995)):
-        waste = household_waste.get(year, 0.0) + industry_waste.get(year, 0.0)
+    r = 3
+    for year in range(1990, 1995):
+        waste = household_waste[year] + industry_waste[year]
+        
         if year < 1992:
             rec_frac = rec_frac_1985 + change_per_year * (year - 1985)
         else:
-            rec_frac = data_hist_rec['fractions_92_94'][year - 1992]
+            rec_frac = float(sheet.cell(row=r, column=2).value) / 100
+            r += 1
             
-        year_values[year] = waste * N_frac * rec_frac
+        value = waste * N_frac * rec_frac * noise_old
+        year_values[year] = value
+        
+    # =========================================================================
+    # 4. FRATREKK AV HANDELSEKSPORT
+    # =========================================================================
+    if prepared_trade_recycling is not None and hasattr(prepared_trade_recycling, 'iterrows'):
+        export_resirk = find_export_for_recycling(prepared_trade_recycling, current_params, trade_params)
+        for year, val in export_resirk.items():
+            if year in year_values: year_values[year] -= val
 
-    # 5. Trekk fra eksport for resirkulering og gjenbruk (som allerede er beregnet i loopen)
+    if prepared_trade_reuse is not None and hasattr(prepared_trade_reuse, 'iterrows'):
+        export_reuse = find_export_for_reuse(prepared_trade_reuse, current_params, trade_params)
+        for year, val in export_reuse.items():
+            if year in year_values: year_values[year] -= val
+
+    # Nullstill negative
     for year in year_values:
-        if year in export_resirk:
-            year_values[year] -= export_resirk[year]
-        if year in export_reuse:
-            year_values[year] -= export_reuse[year]
-            
-    return year_values
+        if year_values[year] < 0:
+            year_values[year] = 0.0
 
+    return year_values
 
 def find_sewage_sludge_biogas(prepared_biogas_data, current_params):
     """
@@ -1035,6 +1199,7 @@ def find_solid_waste_export(prepared_waste_data, current_params, trade_params):
             year_values[yr] = year_values.get(yr, 0.0) + n_amounts[idx]
             
     return year_values
+
 
 def find_treated_wastewater_discharge(df_05280, df_utslipp, current_params, dataset_noise=None, expected_years=None):
     """
