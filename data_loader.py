@@ -40,7 +40,7 @@ def load_all_data(selected_pools):
         'avlop_sewage': ({'hy', 'pr'}, 'data_files/05280_20251113-113329.xlsx', 'openpyxl_sewage', {}),
         'ag_gnb': ({'ag','mp'}, 'data_files/aei_pr_gnb__custom_18744910_spreadsheet.xlsx', 'openpyxl_gnb', {}),
         'ag_grovfor': ({'ag'}, 'grovfor_filer_samling', 'excel_grovfor', {}), # Spesialhåndtert
-        'ag_crltap_raw_lines': ({'ag','ef','mp'}, 'data_files/webdabData1863365.txt', 'text_lines', {}),
+        'ag_crltap_raw_lines': ({'ag','ef','mp','pr'}, 'data_files/webdabData1863365.txt', 'text_lines', {}),
         'unfccc_ark1_raw': ({'ag'}, 'data_files/N2O_NOx_AG.xlsx', 'openpyxl_single_sheet_df', {'sheet_name': 'Ark1'}),        
         'ag_leaching_csv': ({'ag'}, 'data_files/Nr_AG--HY.csv', 'csv', {}),
         'ag_faostat_production_all': ({'ag','mp'}, 'data_files/FAOSTAT_data_en_11-18-2025.csv', 'csv_faostat_production', {}),
@@ -54,6 +54,8 @@ def load_all_data(selected_pools):
         'fuel_for_transport': ({'ef'}, 'data_files/N_fuel_for_transport.csv', 'csv_ef_fuel', {}),
         'fuel_for_heating': ({'ef'}, 'data_files/N_fuel_for_heating.csv', 'csv_ef_fuel', {}),
         'n2o_ec_data': ({'ef'}, 'data_files/N2O_EC.csv', 'csv', {}),
+        'n2o_so_raw': ({'pr'}, 'data_files/N2O_SO.csv', 'csv', {}),
+        'n2o_ww_raw': ({'pr'}, 'data_files/N2O_WW.csv', 'csv', {}),
         'n2o_nox_op_raw': ({'mp'}, 'data_files/N2O_NOx_OP.csv', 'csv', {}),
         'trade_fuels_n_content': ({'ef'}, 'data_files/N_content_fuels.xlsx', 'excel', {}),
         'ssb_energy_balance_11561': ({'ef','mp'}, 'data_files/11561_20251113-154607.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'EnergibalansenGWh'}),

@@ -21,7 +21,7 @@ EXPECTED_YEARS = set(range(start_year, end_year + 1))
 
 def report_missing_years(flow_code, missing_years, results,
                          comment='not done', data_sources='no data',
-                         default_value='nan', uncertainty=20):
+                         default_value='nan'):
     """
     Append zero flows for missing_years to results.
 
@@ -33,7 +33,6 @@ def report_missing_years(flow_code, missing_years, results,
     comment : str
     data_sources : str
     default_value : float
-    uncertainty : float
     """
     for year in missing_years:
         results.append({
@@ -42,7 +41,6 @@ def report_missing_years(flow_code, missing_years, results,
             'value': default_value,
             'comment': comment,
             'data_sources': data_sources,
-            'uncertainty': uncertainty,
         })
 
 

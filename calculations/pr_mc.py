@@ -25,8 +25,14 @@ from calculations.utils import (
     combine_uncertainties_percent,
     get_uncertainty,
     read_trade_data,
-    # find_trade_data
+    load_crltap_emissions_to_N
 )
+
+PR_SO_CRLTAP_SECTORS = [
+    '1A1a', '5A', '5B1', '5B2', '5C1a', '5C1bi', 
+    '5C1bii', '5C1biii', '5C1biv', '5C1bv', '5C1bvi', '5E'
+]
+PR_WW_CRLTAP_SECTORS = ['5D1', '5D2', '5D3']
 
 def execute_calculations_pr(preloaded_data, current_params, dataset_noise, current_trade_factors):
     """
@@ -41,6 +47,11 @@ def execute_calculations_pr(preloaded_data, current_params, dataset_noise, curre
     _add_wastewater_from_landfills_mc(results, preloaded_data, current_params, dataset_noise)
     _add_hs_biologically_treated_organic_waste_mc(results, preloaded_data, current_params, dataset_noise)
     _add_biofuels_production_wastewater_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_so_NOx_emissions_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_so_NH3_emissions_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_so_N2O_emissions_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_ww_N2O_emissions_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_so_leaching_mc(results, preloaded_data, current_params, dataset_noise)
     
     return results
 
@@ -795,5 +806,324 @@ def _add_biofuels_production_wastewater_mc(results, preloaded_data, current_para
             'data_sources': 'SSB, Landbruksdirektoratet, Biogass Norge' if year >= 2012 else 'Ingen data før 2012'
         })
 
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+    
+def _add_so_NOx_emissions_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    MC-VERSJON: NOx-utslipp til atmosfære fra avfallsbehandling (PR.SO-AT.AT-Emissions-NOx).
+    Gjenbruker load_crltap_emissions_to_N med spesifikke avfallssektorer (CRLTAP).
+    """
+    flow_code = 'PR.SO-AT.AT-Emissions-NOx'
+    collected_years = set()
+    comment = 'ok (MC-støy lagt på)'
+    data_sources = 'CRLTAP Inventory Submissions'
+
+    # 1. Hent og valider global konverteringsfaktor (.get)
+    conv = float(current_params.get("NOx_to_N_factor"))
+    
+    # 2. Hent rådata fra RAM – krasj hardt hvis de mangler
+    raw_lines = preloaded_data.get('ag_crltap_raw_lines')
+    if raw_lines is None:
+        raise ValueError(f"[KRITISK] 'ag_crltap_raw_lines' mangler i preloaded_data for {flow_code}!")
+
+    # 3. Kall felles hjelpefunksjon med avfallssektorene
+    sums = load_crltap_emissions_to_N(
+        raw_lines=raw_lines,
+        categories=PR_SO_CRLTAP_SECTORS,
+        pollutant='NOx',
+        conv_to_N=conv,
+        dataset_noise=dataset_noise,
+        noise_key='CRLTAP'
+    )
+
+    # 4. Bygg resultatstrukturen
+    for year, value in sums.items():
+        if year not in EXPECTED_YEARS:
+            continue
+        collected_years.add(year)
+        
+        # Vask eventuelle negative verdier til 0.0, og håndter NaN
+        val_clean = float(value)
+        if val_clean < 0 or pd.isna(val_clean): 
+            val_clean = 0.0
+            
+        results.append({
+            'flow_name': flow_code, 
+            'year': year, 
+            'value': val_clean,
+            'comment': comment, 
+            'data_sources': data_sources
+        })
+
+    # 5. Verifisering av årstall
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+
+
+def _add_so_NH3_emissions_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    MC-VERSJON: NH3-utslipp til atmosfære fra avfallsbehandling (PR.SO-AT.AT-Emissions-NH3).
+    Gjenbruker load_crltap_emissions_to_N med spesifikke avfallssektorer (CRLTAP).
+    """
+    flow_code = 'PR.SO-AT.AT-Emissions-NH3'
+    collected_years = set()
+    comment = 'ok (MC-støy lagt på)'
+    data_sources = 'CRLTAP Inventory Submissions'
+
+    # 1. Hent og valider global konverteringsfaktor (.get)
+    conv = float(current_params.get("NH3_to_N_factor"))
+    
+    # 2. Hent rådata fra RAM
+    raw_lines = preloaded_data.get('ag_crltap_raw_lines')
+    if raw_lines is None:
+        raise ValueError(f"[KRITISK] 'ag_crltap_raw_lines' mangler i preloaded_data for {flow_code}!")
+
+    # 3. Kall felles hjelpefunksjon med avfallssektorene
+    sums = load_crltap_emissions_to_N(
+        raw_lines=raw_lines,
+        categories=PR_SO_CRLTAP_SECTORS,
+        pollutant='NH3',
+        conv_to_N=conv,
+        dataset_noise=dataset_noise,
+        noise_key='CRLTAP'
+    )
+
+    # 4. Bygg resultatstrukturen
+    for year, value in sums.items():
+        if year not in EXPECTED_YEARS:
+            continue
+        collected_years.add(year)
+        
+        # Vask eventuelle negative verdier til 0.0, og håndter NaN
+        val_clean = float(value)
+        if val_clean < 0 or pd.isna(val_clean): 
+            val_clean = 0.0
+            
+        results.append({
+            'flow_name': flow_code, 
+            'year': year, 
+            'value': val_clean,
+            'comment': comment, 
+            'data_sources': data_sources
+        })
+
+    # 5. Verifisering av årstall
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+    
+    
+def _add_so_N2O_emissions_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    MC-VERSJON: N2O-utslipp til atmosfære fra avfallsbehandling (PR.SO-AT.AT-Emissions-N2O).
+    Henter ferdiginnlastet CSV-data (N2O_SO.csv) fra RAM og påfører sentralt trukket datasettstøy.
+    """
+    flow_code = 'PR.SO-AT.AT-Emissions-N2O'
+    collected_years = set()
+    comment = 'ok (MC-støy lagt på)'
+    data_sources = 'UNFCCC CRT'
+
+    # 1. Hent og valider globale parametere
+    conv_N2O = float(current_params.get("N2O_to_N_factor"))
+    
+    # 2. Slå opp ferdig generert støy – krasj hvis nøkkelen mangler
+    key_n2o = 'UNFCCC_emissions'
+    if not dataset_noise or key_n2o not in dataset_noise:
+        raise KeyError(f"[KRITISK] Støy-nøkkel '{key_n2o}' mangler i dataset_noise for {flow_code}!")
+    
+    noise_val = dataset_noise[key_n2o]['value']
+    noise_type = dataset_noise[key_n2o]['type']
+
+    # 3. Hent ferdiglastet DataFrame fra RAM
+    df_so_emissions = preloaded_data.get('n2o_so_raw')
+    if df_so_emissions is None:
+        raise ValueError(f"[KRITISK] 'n2o_so_raw' mangler i preloaded_data for {flow_code}!")
+
+    # 4. Gå gjennom radene i den ferdiginnlastede CSV-filen
+    for index, row in df_so_emissions.iterrows():
+        try:
+            year_val = row['year']
+            n2o_val = row['value']  # Kolonnenavnet i csv er 'value'
+            
+            if pd.isna(year_val) or pd.isna(n2o_val):
+                continue
+                
+            year = int(year_val)
+            if year not in EXPECTED_YEARS:
+                continue
+                
+            collected_years.add(year)
+            
+            # Basisverdi konvertert til reell N-vekt
+            base_value = float(n2o_val) * conv_N2O
+
+            # Påfør støyen matematisk korrekt basert på støytype
+            if noise_type == 'perc':
+                value = base_value * noise_val
+            else:
+                bound = dataset_noise[key_n2o]['upp_bound'] if noise_val >= 0 else dataset_noise[key_n2o]['low_bound']
+                value = base_value + (noise_val * bound)
+
+            # Sikre at fysiske utslipp aldri blir negative
+            if value < 0: 
+                value = 0.0
+
+            results.append({
+                'flow_name': flow_code, 
+                'year': year, 
+                'value': float(value),
+                'comment': comment, 
+                'data_sources': data_sources
+            })
+            
+        except (KeyError, ValueError, TypeError) as e:
+            raise ValueError(f"[KRITISK DATAFEIL] Kunne ikke prosessere rad {index} i n2o_so_raw for {flow_code}: {e}")
+
+    # 5. Sjekk om alle forventede år ble samlet inn
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+
+
+def _add_so_leaching_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    MC-VERSJON: Sigevann (leaching) fra deponi til overflatevann (PR.SO-HY.SW-Leaching-Nmix).
+    Beregner historisk snitt (1990-2010) og reelle data (2011+) basert på preloaded deponidata,
+    og påfører sentralt trukket MC-støy for norskeutslipp.
+    """
+    flow_code = 'PR.SO-HY.SW-Leaching-Nmix'
+    collected_years = set()
+    comment = 'ok (MC-støy lagt på)'
+    
+    # 1. Slå opp ferdig generert støy – krasj hvis nøkkelen mangler
+    key_ns = 'norskeutslipp'
+    if not dataset_noise or key_ns not in dataset_noise:
+        raise KeyError(f"[KRITISK] Støy-nøkkel '{key_ns}' mangler i dataset_noise for {flow_code}!")
+        
+    noise_val = float(dataset_noise[key_ns]['value'])
+    noise_type = dataset_noise[key_ns]['type']
+
+    # 2. Hent ferdiglastet DataFrame fra RAM (Utslipp-sheeten fra Utslipp_deponi.xlsx)
+    df_deponi = preloaded_data.get('deponi_utslipp')
+    if df_deponi is None:
+        raise ValueError(f"[KRITISK] 'deponi_utslipp' mangler i preloaded_data for {flow_code}!")
+
+    # 3. Forbered data (vask kolonnenavn og tving til numerisk)
+    # Vi antar kolonnene heter "År" og "N_ikke" basert på opprinnelig kode
+    df_clean = df_deponi.copy()
+    df_clean['År'] = pd.to_numeric(df_clean['År'], errors='coerce')
+    df_clean['N_ikke'] = pd.to_numeric(df_clean['N_ikke'], errors='coerce').fillna(0.0)
+    
+    # Beregn historisk gjennomsnitt av "N_ikke" for ekstrapolering (i tN)
+    mean_unconnected = float(df_clean['N_ikke'].mean())
+
+    # 4. Generer tidsserie med støy påført
+    for year in sorted(EXPECTED_YEARS):
+        # Vi skipper år før 1990 hvis de ikke er i forventede år, men lar løkken styre det
+        if year < 1990:
+            continue
+            
+        collected_years.add(year)
+        
+        # Finn basisverdi i ktN (tN -> ktN via / 1000)
+        if year in range(1990, 2011):
+            base_value = mean_unconnected / 1000.0
+            data_sources = 'extrapolated'
+        else:
+            # Summer verdier for gjeldende år (2011 og nyere)
+            year_sum = df_clean.loc[df_clean['År'] == year, 'N_ikke'].sum()
+            base_value = float(year_sum) / 1000.0
+            data_sources = 'norskeutslipp.no'
+
+        # Påfør støyen matematisk korrekt basert på støytype
+        if noise_type == 'perc':
+            value = base_value * noise_val
+        else:
+            bound = dataset_noise[key_ns]['upp_bound'] if noise_val >= 0 else dataset_noise[key_ns]['low_bound']
+            value = base_value + (noise_val * bound)
+
+        # Sikre at fysiske utslipp aldri blir negative tall
+        if value < 0 or pd.isna(value): 
+            value = 0.0
+
+        results.append({
+            'flow_name': flow_code,
+            'year': year,
+            'value': float(value),
+            'comment': comment,
+            'data_sources': data_sources
+        })
+
+    # 5. Sjekk om alle forventede år ble samlet inn
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+    
+
+def _add_ww_N2O_emissions_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    MC-VERSJON: N2O-utslipp til atmosfære fra avløpshåndtering (PR.WW-AT.AT-Emissions-N2O).
+    Henter ferdiginnlastet CSV-data (N2O_SO.csv) fra RAM og påfører sentralt trukket datasettstøy.
+    """
+    flow_code = 'PR.WW-AT.AT-Emissions-N2O'
+    collected_years = set()
+    comment = 'ok (MC-støy lagt på)'
+    data_sources = 'UNFCCC CRT'
+
+    # 1. Hent og valider globale parametere
+    conv_N2O = float(current_params.get("N2O_to_N_factor"))
+    
+    # 2. Slå opp ferdig generert støy – krasj hvis nøkkelen mangler
+    key_n2o = 'UNFCCC_emissions'
+    if not dataset_noise or key_n2o not in dataset_noise:
+        raise KeyError(f"[KRITISK] Støy-nøkkel '{key_n2o}' mangler i dataset_noise for {flow_code}!")
+    
+    noise_val = dataset_noise[key_n2o]['value']
+    noise_type = dataset_noise[key_n2o]['type']
+
+    # 3. Hent ferdiglastet DataFrame fra RAM (bruker samme csv-grunnlag som SO)
+    df_ww_emissions = preloaded_data.get('n2o_ww_raw')
+    if df_ww_emissions is None:
+        raise ValueError(f"[KRITISK] 'n2o_ww_raw' mangler i preloaded_data for {flow_code}!")
+
+    # 4. Gå gjennom radene i den ferdiginnlastede CSV-filen
+    for index, row in df_ww_emissions.iterrows():
+        try:
+            year_val = row['year']
+            n2o_val = row['value']  # Kolonnenavnet i csv er 'value'
+            
+            if pd.isna(year_val) or pd.isna(n2o_val):
+                continue
+                
+            year = int(year_val)
+            if year not in EXPECTED_YEARS:
+                continue
+                
+            collected_years.add(year)
+            
+            # Basisverdi konvertert til reell N-vekt
+            base_value = float(n2o_val) * conv_N2O
+
+            # Påfør støyen matematisk korrekt basert på støytype
+            if noise_type == 'perc':
+                value = base_value * noise_val
+            else:
+                bound = dataset_noise[key_n2o]['upp_bound'] if noise_val >= 0 else dataset_noise[key_n2o]['low_bound']
+                value = base_value + (noise_val * bound)
+
+            # Sikre at fysiske utslipp aldri blir negative
+            if value < 0: 
+                value = 0.0
+
+            results.append({
+                'flow_name': flow_code, 
+                'year': year, 
+                'value': float(value),
+                'comment': comment, 
+                'data_sources': data_sources
+            })
+            
+        except (KeyError, ValueError, TypeError) as e:
+            raise ValueError(f"[KRITISK DATAFEIL] Kunne ikke prosessere rad {index} i n2o_so_raw for {flow_code}: {e}")
+
+    # 5. Sjekk om alle forventede år ble samlet inn
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
