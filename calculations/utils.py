@@ -21,7 +21,7 @@ EXPECTED_YEARS = set(range(start_year, end_year + 1))
 
 def report_missing_years(flow_code, missing_years, results,
                          comment='not done', data_sources='no data',
-                         default_value='nan'):
+                         default_value=np.nan):
     """
     Append zero flows for missing_years to results.
 

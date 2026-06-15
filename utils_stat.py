@@ -180,7 +180,7 @@ def process_and_export_mc_results(all_records):
         df_flow = df_all[df_all['flow_name'] == flow]
         
         yearly_sums = df_flow.groupby('year')['value'].sum()
-        years_with_data = yearly_sums[yearly_sums != 0].index.tolist()
+        years_with_data = df_flow[df_flow['value'].notna()]['year'].unique().tolist()
         
         if not years_with_data:
             print(f"  [INFO] Flow '{flow}' has no data in the entire period. Skipping.")
@@ -196,7 +196,7 @@ def process_and_export_mc_results(all_records):
             print(f"  [ALARM / ERROR] Flow '{flow}' has missing data gaps in years: {sorted(list(missing_years))}")
         
         df_trimmed = df_flow[(df_flow['year'] >= start_year) & (df_flow['year'] <= end_year)].copy()
-        df_trimmed['value'] = df_trimmed['value'].fillna(0.0)
+        # df_trimmed['value'] = df_trimmed['value'].fillna(0.0)
         
         trimmed_chunks.append(df_trimmed)
 

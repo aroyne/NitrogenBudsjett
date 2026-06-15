@@ -1530,9 +1530,6 @@ def _add_other_goods_export_mc(results, preloaded_data, current_params, current_
     )
     
     
-import pandas as pd
-import numpy as np
-
 def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise):
     """
     MC-VERSJON: Beregner massebalansen for forbruksvarer (MP.OP-HS.HS-Consumer goods-Nmix).

@@ -17,7 +17,8 @@ from calculations.utils import (
     find_trade_flow,
     find_trade_data,
     read_trade_data,
-    read_year_value_row
+    read_year_value_row, 
+    process_generic_trade_flow
 )
 
 params = NParameters("data_files/N_parameters.xlsx")
@@ -118,45 +119,42 @@ def find_aquaculture_production(df_aqua_modern, df_aqua_old, current_params, dat
     return aquaculture_production
 
 
-def find_export_for_recycling(prepared_trade_data, current_params, trade_params):
-    """Henter eksport for resirkulering med varehandelsstøy."""
-    year_values = {}
-    noise_trade = float(current_params.get('08801', current_params.get('13136')))
-    
-    aggregated_data, _ = find_trade_flow(
-        data_impeks=prepared_trade_data, 
-        trade_params=trade_params, 
-        dataset_unc=None, 
-        wide=False
+def find_export_for_recycling(results, preloaded_data, current_params, current_trade_factors, dataset_noise):
+    """
+    MC-VERSJON: Eksport til resirkulering (PR.SO-RW.RW-Export for recycling-Nmix).
+    Gjenbruker den generiske handelsløsningen for materiale sendt til gjenvinning ut av landet.
+    """
+    year_values = process_generic_trade_flow(
+        preloaded_data=preloaded_data, 
+        current_params=current_params,
+        current_trade_factors=current_trade_factors, 
+        flow_code='PR.SO-RW.RW-Export for recycling-Nmix',
+        target_types=['plastavfall', 'papiravfall', 'tekstilavfall'],
+        is_import=False,  # Eksport
+        dataset_noise=dataset_noise,
+        results=results, 
     )
     
-    if not aggregated_data.empty:
-        for index, row in aggregated_data.iterrows():
-            year = int(row['year'])
-            year_values[year] = float(row['N_amount']) * noise_trade
-            
     return year_values
 
 
-def find_export_for_reuse(prepared_trade_data, current_params, trade_params):
-    """Henter eksport for gjenbruk med varehandelsstøy."""
-    year_values = {}
-    noise_trade = float(current_params.get('08801', current_params.get('13136')))
-    
-    aggregated_data, _ = find_trade_flow(
-        data_impeks=prepared_trade_data, 
-        trade_params=trade_params, 
-        dataset_unc=None, 
-        wide=False
+def find_export_for_reuse(results, preloaded_data, current_params, current_trade_factors, dataset_noise):
+    """
+    MC-VERSJON: Eksport til gjenbruk (PR.SO-RW.RW-Export for reuse-Nmix).
+    Gjenbruker den generiske handelsløsningen for brukte produkter (f.eks. tekstiler) ut av landet.
+    """
+    year_values = process_generic_trade_flow(
+        preloaded_data=preloaded_data, 
+        current_params=current_params,
+        current_trade_factors=current_trade_factors, 
+        flow_code='PR.SO-RW.RW-Export for reuse-Nmix',
+        target_types=['tekstil_brukt'],
+        is_import=False,  # Eksport
+        dataset_noise=dataset_noise,
+        results=results, 
     )
     
-    if not aggregated_data.empty:
-        for index, row in aggregated_data.iterrows():
-            year = int(row['year'])
-            year_values[year] = float(row['N_amount']) * noise_trade
-            
     return year_values
-
 
 def find_feedstock_fuel(preloaded_data, current_params, dataset_noise):
     """
@@ -1009,7 +1007,7 @@ def find_op_untreated_wastewater(prepared_untreated_dict, current_params):
     return year_values
 
 
-def find_recycling(preloaded_data, current_params, dataset_noise, 
+def find_recycling(preloaded_data, current_params, current_trade_factors, dataset_noise, 
                    prepared_trade_recycling, prepared_trade_reuse, trade_params):
     """
     KORRIGERT VERSJON: Beregner nitrogen ved bruk av rå posisjons-indekser (iloc)
@@ -1146,15 +1144,13 @@ def find_recycling(preloaded_data, current_params, dataset_noise,
     # =========================================================================
     # 4. FRATREKK AV HANDELSEKSPORT
     # =========================================================================
-    if prepared_trade_recycling is not None and hasattr(prepared_trade_recycling, 'iterrows'):
-        export_resirk = find_export_for_recycling(prepared_trade_recycling, current_params, trade_params)
-        for year, val in export_resirk.items():
-            if year in year_values: year_values[year] -= val
+    export_resirk = find_export_for_recycling([], preloaded_data, current_params, current_trade_factors, dataset_noise)
+    for year, val in export_resirk.items():
+        if year in year_values: year_values[year] -= val
 
-    if prepared_trade_reuse is not None and hasattr(prepared_trade_reuse, 'iterrows'):
-        export_reuse = find_export_for_reuse(prepared_trade_reuse, current_params, trade_params)
-        for year, val in export_reuse.items():
-            if year in year_values: year_values[year] -= val
+    export_reuse = find_export_for_reuse([], preloaded_data, current_params, current_trade_factors, dataset_noise)
+    for year, val in export_reuse.items():
+        if year in year_values: year_values[year] -= val
 
     # Nullstill negative
     for year in year_values:
@@ -1162,6 +1158,7 @@ def find_recycling(preloaded_data, current_params, dataset_noise,
             year_values[year] = 0.0
 
     return year_values
+
 
 def find_sewage_sludge_biogas(prepared_biogas_data, current_params):
     """

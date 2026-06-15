@@ -25,7 +25,8 @@ from calculations.utils import (
     combine_uncertainties_percent,
     get_uncertainty,
     read_trade_data,
-    load_crltap_emissions_to_N
+    load_crltap_emissions_to_N,
+    process_generic_trade_flow,
 )
 
 PR_SO_CRLTAP_SECTORS = [
@@ -52,6 +53,9 @@ def execute_calculations_pr(preloaded_data, current_params, dataset_noise, curre
     _add_so_N2O_emissions_mc(results, preloaded_data, current_params, dataset_noise)
     _add_ww_N2O_emissions_mc(results, preloaded_data, current_params, dataset_noise)
     _add_so_leaching_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_export_for_recycling_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise)
+    _add_export_for_reuse_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise)
+    _add_solid_waste_export_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise)
     
     return results
 
@@ -266,6 +270,7 @@ def _add_recycling_mc(results, preloaded_data, current_params, dataset_noise, cu
     year_values = find_recycling(
         preloaded_data=preloaded_data,
         current_params=current_params,
+        current_trade_factors=current_trade_factors,
         dataset_noise=dataset_noise,
         prepared_trade_recycling=preloaded_data.get('trade_recycling'),
         prepared_trade_reuse=preloaded_data.get('trade_reuse'),
@@ -987,76 +992,198 @@ def _add_so_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
 def _add_so_leaching_mc(results, preloaded_data, current_params, dataset_noise):
     """
     MC-VERSJON: Sigevann (leaching) fra deponi til overflatevann (PR.SO-HY.SW-Leaching-Nmix).
-    Beregner historisk snitt (1990-2010) og reelle data (2011+) basert på preloaded deponidata,
-    og påfører sentralt trukket MC-støy for norskeutslipp.
+    Beregner deponiutslipp som IKKE er tilkoblet kommunalt avløp (invertert vekt).
+    Ekstrapolerer historisk snitt for årene 1990-2010 basert på posisjonsindeksert mapping fra RAM.
     """
     flow_code = 'PR.SO-HY.SW-Leaching-Nmix'
     collected_years = set()
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok (Robust posisjonsindeksert mapping og MC-støy)'
     
-    # 1. Slå opp ferdig generert støy – krasj hvis nøkkelen mangler
-    key_ns = 'norskeutslipp'
-    if not dataset_noise or key_ns not in dataset_noise:
-        raise KeyError(f"[KRITISK] Støy-nøkkel '{key_ns}' mangler i dataset_noise for {flow_code}!")
-        
-    noise_val = float(dataset_noise[key_ns]['value'])
-    noise_type = dataset_noise[key_ns]['type']
+    # =========================================================================
+    # STRIKT STØYHENTING
+    # =========================================================================
+    try:
+        noise_mildir = float(dataset_noise['norskeutslipp']['value'])
+    except KeyError as e:
+        raise KeyError(f"[KRITISK STOPP] Støy-ordboken mangler nødvendig MC-nøkkel: {e}")
 
-    # 2. Hent ferdiglastet DataFrame fra RAM (Utslipp-sheeten fra Utslipp_deponi.xlsx)
-    df_deponi = preloaded_data.get('deponi_utslipp')
-    if df_deponi is None:
-        raise ValueError(f"[KRITISK] 'deponi_utslipp' mangler i preloaded_data for {flow_code}!")
-
-    # 3. Forbered data (vask kolonnenavn og tving til numerisk)
-    # Vi antar kolonnene heter "År" og "N_ikke" basert på opprinnelig kode
-    df_clean = df_deponi.copy()
-    df_clean['År'] = pd.to_numeric(df_clean['År'], errors='coerce')
-    df_clean['N_ikke'] = pd.to_numeric(df_clean['N_ikke'], errors='coerce').fillna(0.0)
+    # Hent arkene fra preloaded_data
+    uts_raw = preloaded_data.get('deponi_utslipp')
+    tilk_raw = preloaded_data.get('deponi_tilkobling')
     
-    # Beregn historisk gjennomsnitt av "N_ikke" for ekstrapolering (i tN)
-    mean_unconnected = float(df_clean['N_ikke'].mean())
+    if uts_raw is None or tilk_raw is None:
+        raise ValueError("[KRITISK] Data for deponi_utslipp eller deponi_tilkobling mangler!")
 
-    # 4. Generer tidsserie med støy påført
-    for year in sorted(EXPECTED_YEARS):
-        # Vi skipper år før 1990 hvis de ikke er i forventede år, men lar løkken styre det
-        if year < 1990:
+    # 1. Bygg oppslags-sett for tilkoblingsstatus basert på posisjonsindeks (.iloc)
+    tilk_ja = set()
+    tilk_nei = set()
+    
+    for idx, row in tilk_raw.iterrows():
+        # Hopp over header-raden hvis den dukker opp som første datalinje
+        if idx == 0 and ("anlegg" in str(row.iloc[0]).lower() or "tilkoblet" in str(row.iloc[1]).lower()):
             continue
             
-        collected_years.add(year)
+        name_clean = str(row.iloc[0]).strip().lower() # Kolonne 0: anleggsnavn
+        status = str(row.iloc[1]).strip().lower()    # Kolonne 1: status
         
-        # Finn basisverdi i ktN (tN -> ktN via / 1000)
-        if year in range(1990, 2011):
-            base_value = mean_unconnected / 1000.0
-            data_sources = 'extrapolated'
-        else:
-            # Summer verdier for gjeldende år (2011 og nyere)
-            year_sum = df_clean.loc[df_clean['År'] == year, 'N_ikke'].sum()
-            base_value = float(year_sum) / 1000.0
-            data_sources = 'norskeutslipp.no'
+        if 'ja' in status:
+            tilk_ja.add(name_clean)
+        elif 'nei' in status:
+            tilk_nei.add(name_clean)
 
-        # Påfør støyen matematisk korrekt basert på støytype
-        if noise_type == 'perc':
-            value = base_value * noise_val
-        else:
-            bound = dataset_noise[key_ns]['upp_bound'] if noise_val >= 0 else dataset_noise[key_ns]['low_bound']
-            value = base_value + (noise_val * bound)
+    # 2. Loop over utslipp ved hjelp av .iloc posisjoner
+    real_years_data = {}
+    
+    for idx, row in uts_raw.iterrows():
+        # Hopp over header-raden hvis den dukker opp som første datalinje
+        if idx == 0 and "anlegg" in str(row.iloc[0]).lower():
+            continue
+            
+        try:
+            # Hent verdier basert på kolonneposisjon
+            year_val = str(row.iloc[3]).strip() # Kolonne 3: År
+            if not year_val.replace('.0', '').isdigit():
+                continue
+                
+            year = int(float(year_val))
+            
+            # Opprinnelig funksjon sjekker 2011 <= year <= 2025, og ekskluderer 2009/2010 via range
+            if 2011 <= year <= 2025:
+                anlegg_name = str(row.iloc[0]).strip().lower() # Kolonne 0: Anleggsnavn
+                raw_value = float(row.iloc[4])                 # Kolonne 4: Årlig utslipp til vann
+                
+                # INVERTERT VEKT: Vi skal ha tak i de som IKKE er tilkoblet avløp
+                weight = 0.5 # Default ukjent
+                
+                # Sjekk om navnet matcher helt eller delvis
+                if any(ja_name in anlegg_name or anlegg_name in ja_name for ja_name in tilk_ja):
+                    weight = 0.0  # Tilkoblet -> Skal IKKE regnes som sigevann direkte til natur
+                elif any(nei_name in anlegg_name or anlegg_name in nei_name for nei_name in tilk_nei):
+                    weight = 1.0  # Ikke tilkoblet -> Går 100% til natur (sigevann)
+                
+                # Beregn N-mengde som siver ut i naturen
+                n_leachate_tN = raw_value * weight
+                
+                if year not in real_years_data:
+                    real_years_data[year] = 0.0
+                    
+                # Akkumuler i ktN (tN / 1000.0) og legg på rundens MC-støy
+                real_years_data[year] += (n_leachate_tN / 1000.0) * noise_mildir
+                
+        except (ValueError, TypeError, IndexError):
+            continue
 
-        # Sikre at fysiske utslipp aldri blir negative tall
-        if value < 0 or pd.isna(value): 
-            value = 0.0
+    # =========================================================================
+    # DEL 3: BEREGN HISTORISK TREND (1990-2010)
+    # =========================================================================
+    valid_years = [y for y in real_years_data.keys() if 2011 <= y <= 2025]
+    
+    if valid_years:
+        mean_unconnected_kt = sum(real_years_data[y] for y in valid_years) / len(valid_years)
+    else:
+        raise ValueError("[KRITISK] Ingen gyldige utslippsdata for deponier i perioden 2011-2025!")
 
+    # Bygg endelig tidsrekke-ordbok
+    final_values = {}
+    
+    for year in range(1990, 2011):
+        final_values[year] = mean_unconnected_kt
+
+    for year in range(2011, 2026):
+        final_values[year] = real_years_data.get(year, 0.0)
+
+    for year in range(1984, 1990):
+        final_values[year] = 0.0
+
+    # =========================================================================
+    # GENERER REKORDS TIL RESULTS
+    # =========================================================================
+    for year in sorted(final_values.keys()):
+        collected_years.add(year)
+        val = final_values[year]
+        if val < 0 or pd.isna(val): 
+            val = 0.0
+        
         results.append({
             'flow_name': flow_code,
             'year': year,
-            'value': float(value),
+            'value': val,
             'comment': comment,
-            'data_sources': data_sources
+            'data_sources': 'Utslipp_deponi.xlsx (Mildir)' if year >= 2011 else 'extrapolated'
         })
 
-    # 5. Sjekk om alle forventede år ble samlet inn
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
     
+
+def _add_export_for_recycling_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise):
+    """
+    MC-VERSJON: Legger til eksport for resirkulering i resultatlisten.
+    Her sender vi inn resultatlisten direkte til find-funksjonen for full automatisering.
+    """
+    flow_code = 'PR.SO-RW.RW-Export for recycling-Nmix'
+    data_sources = 'SSB'
+    collected_years = set()
+    
+    # Vi lar find-funksjonen populere resultatlisten (results) direkte via den generiske motoren.
+    # Dette håndterer årstall, støy, kommentarer og fyller manglende år med NaN automatisk.
+    year_values = find_export_for_recycling(
+        results=results,
+        preloaded_data=preloaded_data,
+        current_params=current_params,
+        current_trade_factors=current_trade_factors,
+        dataset_noise=dataset_noise
+    )
+
+    for year, value in year_values.items():
+        collected_years.add(year)
+        
+        results.append({
+            'flow_name': flow_code,
+            'year': year,
+            'value': value,
+            'comment': 'ok (MC-støy integrert i datagrunnlag)',
+            'data_sources': data_sources
+        })
+
+    # Beholder rapporteringen av manglende år her også
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+
+
+def _add_export_for_reuse_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise):
+    """
+    MC-VERSJON: Legger til eksport for gjenbruk i resultatlisten.
+    """
+    flow_code = 'PR.SO-RW.RW-Export for reuse-Nmix'
+    data_sources = 'SSB'
+    collected_years = set()
+    
+    # Samme her: Vi videresender resultatlisten slik at kjernefunksjonen gjør hele jobben.
+    year_values = find_export_for_reuse(
+        results=results,
+        preloaded_data=preloaded_data,
+        current_params=current_params,
+        current_trade_factors=current_trade_factors,
+        dataset_noise=dataset_noise
+    )
+    
+    for year, value in year_values.items():
+        collected_years.add(year)
+        
+        results.append({
+            'flow_name': flow_code,
+            'year': year,
+            'value': value,
+            'comment': 'ok (MC-støy integrert i datagrunnlag)',
+            'data_sources': data_sources
+        })
+
+    # Beholder rapporteringen av manglende år her også
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+
+
 
 def _add_ww_N2O_emissions_mc(results, preloaded_data, current_params, dataset_noise):
     """
@@ -1125,5 +1252,66 @@ def _add_ww_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
             raise ValueError(f"[KRITISK DATAFEIL] Kunne ikke prosessere rad {index} i n2o_so_raw for {flow_code}: {e}")
 
     # 5. Sjekk om alle forventede år ble samlet inn
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+    
+    
+def _add_solid_waste_export_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise):
+    """
+    MC-VERSJON: Eksport av fast avfall (PR.SO-RW.RW-Solid waste export-Nmix).
+    Gjenbruker den generiske handelsløsningen for MC med spesifikke avfallskategorier,
+    og nullstiller årene før 2002 i tråd med opprinnelig historisk datagrunnlag.
+    """
+    flow_code = 'PR.SO-RW.RW-Solid waste export-Nmix'
+    collected_years = set()
+    comment = 'ok (Generisk handelsløsning med MC-støy)'
+    data_sources = 'SSB tab 08801'
+
+    # 1. Kjør den generiske handelsløsningen for å hente og beregne verdiene med støy
+    # target_types tilsvarer types_to_keep fra den gamle find_solid_waste_export
+    trade_results = []
+    process_generic_trade_flow(
+        results=trade_results, 
+        preloaded_data=preloaded_data, 
+        current_params=current_params,
+        current_trade_factors=current_trade_factors, 
+        flow_code=flow_code,
+        target_types=['kommunalt_avfall', 'farlig_avfall', 'annet_avfall'],
+        is_import=False,  # Eksport (tilsvarer impeks = 2)
+        dataset_noise=dataset_noise
+    )
+
+    # 2. Konverter handelsresultatene til en oppslagsordbok per år
+    trade_years_dict = {row['year']: row['value'] for row in trade_results}
+
+    # 3. Bygg den endelige tidsrekken og håndter de historiske null-årene (1988-2001)
+    for year in sorted(EXPECTED_YEARS):
+        # Vi forholder oss til tidslinjen fra opprinnelig funksjon (f.eks. fra 1988 og utover)
+        if year < 1988:
+            continue
+            
+        collected_years.add(year)
+
+        if 1988 <= year <= 2001:
+            value = 0.0
+            current_comment = comment
+        else:
+            # Hent den beregnede MC-verdien fra handelsfunksjonen (default til 0.0 hvis år mangler)
+            value = float(trade_years_dict.get(year, 0.0))
+            current_comment = comment
+
+        # Sikre mot eventuelle NaN-verdier eller negative avvik fra støyen
+        if value < 0 or pd.isna(value):
+            value = 0.0
+
+        results.append({
+            'flow_name': flow_code,
+            'year': year,
+            'value': value,
+            'comment': current_comment,
+            'data_sources': data_sources
+        })
+
+    # 4. Sjekk om alle forventede år ble samlet inn
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)

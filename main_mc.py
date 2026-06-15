@@ -629,7 +629,7 @@ def main():
                 row_copy = row.copy()
                 row_copy['sim_id'] = i
                 all_mc_records.append(row_copy)
-
+                
     elapsed_time = time.time() - start_time
     print(f"[SUKSESS] Simulering av {args.nsim} runder fullført på {elapsed_time:.4f} sekunder.")
 
