@@ -77,12 +77,18 @@ def load_all_data(selected_pools):
         'ssb_10249': ({'mp'}, 'data_files/10249_20260129-155747.xlsx', 'excel_ssb_generic', {'sheet': '10249'}),
         'ssb_waste_10513': ({'pr', 'mp'}, 'data_files/10513_20260212-104227.xlsx', 'openpyxl_single_sheet', {'sheet_name': '10513'}),
         'ssb_10514': ({'hs','mp','pr'}, 'data_files/10514_20260211-094101.xlsx', 'openpyxl_single_sheet', {'sheet_name': '10514'}),
+        'ssb_waste_12359': ({'pr'}, 'data_files/12359_20251211-153434.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Mengde'}),
         'ssb_13695': ({'mp'}, 'data_files/13695_20260129-155515.xlsx', 'excel_ssb_generic', {'sheet': '13695'}),
         'ssb_bio_08205': ({'mp'}, 'data_files/08205_20251104-141305.xlsx', 'excel_ssb_generic', {'sheet': 'Energibruk'}),
         'ssb_bio_hist': ({'mp'}, 'data_files/egentilvirket_bioenergi_industri.xlsx', 'excel_ssb_generic', {'sheet': 'Ark1'}),
         'ssb_hist_industry_waste': ({'mp','pr'}, 'data_files/kommunalt_avfall_1985_1995.xlsx', 'excel_ssb_generic', {'sheet': 'avfallsmengder'}),
         'skoggjoedsling_foer_1995_raw': ({'mp'}, 'data_files/skoggjødsling_før_1995.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Ark1'}),
         'waste_historical_fractions': ({'pr', 'mp'}, 'data_files/kommunalt_avfall_1985_1995.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'forbrenning og gjenvinning'}),
+        'biogass_tall': ({'pr'}, 'data_files/biogass_tall.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'biorest'}),
+        'ssb_waste_12818': ({'pr'}, 'data_files/12818_20260526-110921.xlsx', 'openpyxl_single_sheet', {'sheet_name': '12818'}),
+        'deponi_utslipp': ({'pr'}, 'data_files/Utslipp_deponi.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Utslipp'}),
+        'deponi_tilkobling': ({'pr'}, 'data_files/Utslipp_deponi.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'tilkobling'}),
+        'biogass_manure': ({'pr'}, 'data_files/Biogass.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Tabell'}),
         }
 
     # =========================================================================
