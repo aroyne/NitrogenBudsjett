@@ -250,6 +250,7 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
         raw_val = waste * inc_frac
         
         value = _apply_dataset_noise(raw_val, dataset_key_hist, dataset_noise, _add_waste_to_energy_mc)
+        value = _apply_dataset_noise(value, 'trend interpolation', dataset_noise, _add_waste_to_energy_mc)
 
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
@@ -300,7 +301,7 @@ def _add_ag_biologically_treated_organic_waste_mc(results, preloaded_data, curre
     # =========================================================================
     try:
         noise_biogass = float(dataset_noise['Biogass_Norge']['value'])
-        noise_12818   = float(dataset_noise['12818']['value'])
+        # noise_12818   = float(dataset_noise['12818']['value'])
         noise_10513   = float(dataset_noise['10513']['value'])
         noise_hist    = float(dataset_noise['historical_waste']['value'])
     except KeyError as e:
@@ -399,8 +400,14 @@ def _add_ag_biologically_treated_organic_waste_mc(results, preloaded_data, curre
     # Overstyr årene 2018-2020 til å bruke sin spesifikke tabellstøy (noise_12818) i stedet for noise_biogass
     for year in range(2018, 2021):
         if year in tonnes_modern_dict:
-            final_values[year] = tonnes_modern_dict[year] * noise_12818
-
+            raw_val = tonnes_modern_dict[year]
+            # Funksjonen håndterer nå automatisk om '12818' er oppgitt som 'perc' eller 'low_bound'/'upp_bound'
+            final_values[year] = _apply_dataset_noise(
+                base_value=raw_val, 
+                dataset_key='12818', 
+                dataset_noise=dataset_noise, 
+                caller_func=_add_ag_biologically_treated_organic_waste_mc
+            )
     # Nullut år før 1990 slik notatene dine spesifiserte ("extrapolate back to 1990")
     for year in range(1984, 1990):
         final_values[year] = 0.0
@@ -561,12 +568,6 @@ def _add_hs_biologically_treated_organic_waste_mc(results, preloaded_data, curre
     # =========================================================================
     # STRIKT STØYHENTING (Ingen fallbacks)
     # =========================================================================
-    try:
-        noise_12818 = float(dataset_noise['12818']['value'])
-        noise_10513 = float(dataset_noise['10513']['value'])
-        noise_hist  = float(dataset_noise['historical_waste']['value'])
-    except KeyError as e:
-        raise KeyError(f"[KRISK STOPP] Støy-ordboken mangler nødvendig MC-nøkkel for HS: {e}")
 
     # N-fraksjoner og tapsfaktorer via parametersystemet
     compost_old_N = float(current_params.waste_N_frac('compost_old'))
@@ -631,37 +632,58 @@ def _add_hs_biologically_treated_organic_waste_mc(results, preloaded_data, curre
     # =========================================================================
     # DEL 3: UTKØR BEREGNING VIA DEN FELLES MOTOREN
     # =========================================================================
-    # Skaleringsmotoren tar basis i år 2018 for begge tabeller
-    final_values = _calculate_scaled_waste_timeseries(
+    # 1. Kjør motoren flatt uten støy (støyfaktorer settes til 1.0)
+    clean_values = _calculate_scaled_waste_timeseries(
         tonnes_modern_dict = tonnes_modern_dict,
         tonnes_10513_dict  = tonnes_10513_dict,
         target_year_modern = 2018,
         target_year_10513  = 2018,
-        noise_modern       = noise_12818,
-        noise_10513        = noise_10513,
-        noise_hist         = noise_hist
+        noise_modern       = 1.0,
+        noise_10513        = 1.0,
+        noise_hist         = 1.0
     )
-
-    # =========================================================================
-    # GENERER REKORDS TIL RESULTS
-    # =========================================================================
-    for year in sorted(final_values.keys()):
+    
+    # 2. Påfør riktig type distribusjonsstøy basert på tidsperiode
+    for year in sorted(clean_values.keys()):
         collected_years.add(year)
-        val = final_values[year]
-        if val < 0: val = 0.0
+        raw_val = clean_values[year]
         
-        # Merk historiske rader før 1990 som 0 dersom prosjektrammen krever det, 
-        # men koden din spesifiserte "extrapolate 2012 value back to 1984"
-        if year < 1990:
-            comment_str = 'Ekstrapolert trend før 1990'
-            source_str  = 'extrapolated'
-        elif year < 2012:
+        # Bestem støy-nøkkel basert på årsepoken dataene opprinnelig kom fra
+        if year >= 2012:
+            current_key = '12818' if year >= 2018 else '10513'
+        else:
+            current_key = 'historical_waste'
+            
+        # Kjør gjennom den sentrale motoren
+        val = _apply_dataset_noise(
+            base_value=raw_val, 
+            dataset_key=current_key, 
+            dataset_noise=dataset_noise, 
+            caller_func=_add_hs_biologically_treated_organic_waste_mc
+        )
+        
+        # B) EKSTRA STØY FOR EKSTRAPOLERTE ÅR (Før 2012)
+        # Siden de historiske dataene er basert på en fremskrevet trend, påfører vi 
+        # 'trend interpolation'-støy på toppen av den vanlige basestøyen.
+        if year < 2012:
+            val = _apply_dataset_noise(
+                base_value=val,
+                dataset_key='trend interpolation',  # Krasjer hardt hvis denne mangler i Excel/dict
+                dataset_noise=dataset_noise,
+                caller_func=_add_hs_biologically_treated_organic_waste_mc
+            )
+        
+        if val < 0: 
+            val = 0.0
+            
+        # Bestem kommentar og kilde (likt som før)...
+        if year < 2012:
             comment_str = 'Ekstrapolert trend fra 2012'
             source_str  = 'extrapolated'
         else:
-            comment_str = 'ok (Felles skaleringsmotor)'
+            comment_str = f'ok (MC-støy {current_key} påført sentralt)'
             source_str  = 'SSB (Tabell 12818 / 10513)'
-
+    
         results.append({
             'flow_name': flow_code,
             'year': year,
@@ -669,7 +691,6 @@ def _add_hs_biologically_treated_organic_waste_mc(results, preloaded_data, curre
             'comment': comment_str,
             'data_sources': source_str
         })
-
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
     
@@ -1835,47 +1856,29 @@ def _add_treated_ww_discharge_mc(results, preloaded_data, current_params, datase
     df_modern = preloaded_data['hy_ssb_05280_raw']
     df_hist = preloaded_data['avlop_utslipp_historical']
     
-    # 1. Nyere data: 2002 til 2024 (Excel kolonne 4 til 27 -> kolonneindeks 3 til 26)
+    # 1. Nyere data: 2002 til 2024 (År i rad 2, Verdier i rad 3, fra kolonne 3 og utover)
     data_sources = 'SSB table 05280'
-    # === FEILSØKINGSBLOKK START ===
-    print(f"\n[DEBUG {flow_code}] --- Starter feilsøking av df_modern ---")
-    print(f"[DEBUG] Shape på df_modern: {df_modern.shape} (Rader: {df_modern.shape[0]}, Kolonner: {df_modern.shape[1]})")
+    max_col = min(26, df_modern.shape[1])
     
-    # Print de første 5 radene og de første 10 kolonnene så du ser strukturen i konsollen
-    print("[DEBUG] Utsnitt av df_modern (de første radene/kolonnene):")
-    print(df_modern.iloc[:min(6, df_modern.shape[0]), :min(10, df_modern.shape[1])].to_string())
-    
-    max_col_betingelse = min(26, len(df_modern.columns))
-    print(f"[DEBUG] Løkken vil kjøre col_idx fra 3 til {max_col_betingelse}")
-    
-    if max_col_betingelse <= 3:
-        print("[ALARM] Løkken kjører IKKE fordi antall kolonner i df_modern er for lavt!")
-    
-    data_sources = 'SSB table 05280'
-    for col_idx in range(3, max_col_betingelse):
-        # Sjekk om rad 2 og 3 i det hele tatt eksisterer i df
-        if df_modern.shape[0] <= 3:
-            print(f"[ALARM] df_modern har kun {df_modern.shape[0]} rader. Kan ikke lese radindeks 2 og 3!")
-            break
-            
+    for col_idx in range(3, max_col):
         year_val = df_modern.iloc[2, col_idx]
         raw_val = df_modern.iloc[3, col_idx]
         
-        print(f"  -> Sjekker kolonneindeks {col_idx}: Funnet år_val='{year_val}' (type: {type(year_val)}), verdi_val='{raw_val}' (type: {type(raw_val)})")
-        
-        if year_val is None or pd.isna(year_val):
-            print(f"     [SKIP] Hoppet over fordi årstall er NaN/None")
-            continue
-        year = int(year_val)
-        
-        if raw_val is None or pd.isna(raw_val):
-            print(f"     [SKIP] Hoppet over fordi verdi er NaN/None")
+        if pd.isna(year_val) or pd.isna(raw_val):
             continue
             
-        print(f"     [SUKSESS] Går gjennom! År: {year}, Råverdi: {raw_val}")
+        try:
+            year = int(float(str(year_val).strip()))
+            raw_tonnage = float(raw_val)
+        except (ValueError, TypeError):
+            # Krasjer hardt eller varsler hvis dataen er korrupt fremfor å late som ingenting
+            raise ValueError(f"[KRITISK FEIL] Klarte ikke å konvertere data i kolonne {col_idx}. År: {year_val}, Verdi: {raw_val}")
+            
         collected_years.add(year)
-        raw_tonnage = float(raw_val)
         perturbed_tonnage = _apply_dataset_noise(raw_tonnage, dataset_key, dataset_noise, _add_treated_ww_discharge_mc)
+        
+        # Siden SSB-tabellen oppgir verdien direkte i tonn (f.eks. 15654.8), 
+        # må vi dele på 1000 for å konvertere til ktN (kilotonn) som modellen din krever:
         value = perturbed_tonnage / 1000.0
         
         results.append({
@@ -1885,9 +1888,7 @@ def _add_treated_ww_discharge_mc(results, preloaded_data, current_params, datase
             'comment': comment,
             'data_sources': data_sources
         })
-    print(f"[DEBUG {flow_code}] --- Feilsøking ferdig. Antall år samlet inn: {len(collected_years)} ---\n")
-    # === FEILSØKINGSBLOKK SLUTT ===        
-   
+        
     # 2. Historiske data: 1997 til 2001 (Excel rad 2 til 7 -> radindeks 1 til 6)
     value_1997 = None
     for r in range(1, 6):
