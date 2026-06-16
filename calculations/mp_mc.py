@@ -60,15 +60,6 @@ def execute_calculations_mp(preloaded_data, current_params, dataset_noise, curre
     """
     results = []
     
-    years = list(range(1984, 2026))  # 1984..2025 inclusive
-    OP_out = pd.DataFrame({
-        'year': years,
-        'value': 0.0,               # float zeros; use 0 if you want ints
-        'entries': 0    # need to count the right number of entries that year if comment to be 'ok'
-    })
-    OP_out.set_index('year', inplace=True)
-
-    
     # Kaller den første delberegningen for såkorn og plantemateriale
     _add_seeds_and_planting_material_mc(results, preloaded_data, current_params, dataset_noise)
     _add_farm_animal_feed_mc(results, preloaded_data, current_params, dataset_noise)
@@ -80,7 +71,7 @@ def execute_calculations_mp(preloaded_data, current_params, dataset_noise, curre
     _add_food_export_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise)
     _add_feed_export_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise)
     _add_ag_mineral_fertilizer_mc(results, preloaded_data, current_params, dataset_noise)
-    _add_other_industry_waste_mc(results, preloaded_data, current_params, dataset_noise, OP_out)
+    _add_other_industry_waste_mc(results, preloaded_data, current_params, dataset_noise)
     _add_industrial_waste_fuels_mc(results, preloaded_data, current_params, dataset_noise)
     _add_other_industry_wastewater_mc(results, preloaded_data, current_params, dataset_noise)
     _add_hs_mineral_fertilizer_mc(results, preloaded_data, current_params, dataset_noise)
@@ -1554,7 +1545,7 @@ def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trad
         totals_dict[year] = totals_dict.get(year, 0.0) + float(val)
         count_dict[year] = count_dict.get(year, 0) + 1
 
-# =========================================================================
+    # =========================================================================
     # --- INFLOWS (MED SPORING AV ENKELTSTRØMMER) -----------------------------
     # =========================================================================
     inflow_tracker = {
@@ -1595,17 +1586,19 @@ def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trad
         for year, val in existing_flows[recycling_flow_code].items():
             add_flow(year, val, inflow_totals, inflow_count)
     else:
-        # Alternativ B: MP kjører før PR. Vi kjører den originale funksjonen lokalt.
-        t_params = current_params.get_trade_params() if hasattr(current_params, 'get_trade_params') else current_params
-        
+        # Alternativ B: MP kjører før PR. Vi kjører funksjonen med nøyaktig samme oppsett som fungerer sentralt
         local_recycling_dict = find_recycling(
             preloaded_data=preloaded_data,
             current_params=current_params,
+            current_trade_factors=current_trade_factors,  # <--- Lagt til (Viktig!)
             dataset_noise=dataset_noise,
-            prepared_trade_recycling=None,  # Fallback hvis varehandel ikke trengs lokalt
-            prepared_trade_reuse=None,
-            trade_params=t_params
+            prepared_trade_recycling=preloaded_data.get('trade_recycling'),  # <--- Hent ekte data i stedet for None
+            prepared_trade_reuse=preloaded_data.get('trade_reuse'),          # <--- Hent ekte data i stedet for None
+            trade_params=current_trade_factors
         )
+        
+        # (Spøkelses-kallet som krasjet er fjernet)
+        
         for year, val in local_recycling_dict.items():
             add_flow(year, val, inflow_totals, inflow_count)
             

@@ -64,11 +64,11 @@ def _add_mixed_household_waste_mc(results, preloaded_data, current_params, datas
     if 'ssb_05282' not in preloaded_data or 'ssb_10514' not in preloaded_data:
         raise ValueError(f"[KRITISK] Avfallsdata ('ssb_05282' eller 'ssb_10514') mangler i preloaded_data for {flow_code}!")
         
-    df_05282 = preloaded_data['ssb_05282']
-    df_10514 = preloaded_data['ssb_10514']
+    # df_05282 = preloaded_data['ssb_05282']
+    # df_10514 = preloaded_data['ssb_10514']
     
     # Kaller funksjonen med de korrekte posisjonelle argumentene
-    household_waste = find_household_waste(df_05282, df_10514, current_params, dataset_noise)
+    household_waste = find_household_waste(preloaded_data, current_params, dataset_noise)
 
     for year, value in household_waste.items():
         year = int(year)

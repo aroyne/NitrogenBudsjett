@@ -484,7 +484,7 @@ def main():
     
     pool_input = args.pool.lower().strip()
     if pool_input == 'all':
-        selected_pools = ['at', 'rw', 'mp', 'pr', 'fs', 'hs', 'hy']
+        selected_pools = ['ag','at','ef', 'fs', 'hs', 'hy', 'mp', 'pr', 'rw']
     else:
         selected_pools = [p.strip() for p in pool_input.split(',')]
 
