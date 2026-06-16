@@ -91,6 +91,9 @@ def load_all_data(selected_pools):
         'deponi_utslipp': ({'pr'}, 'data_files/Utslipp_deponi.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Utslipp'}),
         'deponi_tilkobling': ({'pr'}, 'data_files/Utslipp_deponi.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'tilkobling'}),
         'biogass_manure': ({'pr'}, 'data_files/Biogass.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Tabell'}),
+        'sewage_sludge_modern': ({'pr'}, 'data_files/05279_20260121-103739.xlsx', 'openpyxl_single_sheet_df', {'sheet_name': 'Slam'}),
+        'sewage_sludge_historical': ({'pr'}, 'data_files/slamdisponering.xlsx', 'openpyxl_single_sheet_df', {'sheet_name': 'Ark1'}),
+        'avlop_utslipp_historical': ({'pr'}, 'data_files/utslipp_avløp.xlsx', 'openpyxl_single_sheet_df', {'sheet_name': 'Ark1'}),
         }
 
     # =========================================================================

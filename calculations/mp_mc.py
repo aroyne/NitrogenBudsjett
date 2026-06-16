@@ -19,10 +19,7 @@ from calculations.shared_flow_calculations import (
     find_food_industry_waste,
     find_industrial_round_wood,
     find_industrial_waste_fuels,
-    find_other_goods_export,
     find_other_industry_waste,
-    find_other_industry_wastewater,
-    find_op_untreated_wastewater,
     find_recycling,
     find_industrial_crop_products,
     find_non_edible_animal_products
