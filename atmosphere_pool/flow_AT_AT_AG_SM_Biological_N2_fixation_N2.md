@@ -17,4 +17,4 @@ nav_order: 1
 
 * Bleken, M. A. & Bakken, L. R. (1997). *The {Nitrogen} {Cost} of {Food} {Production}: {Norwegian} {Society*. Ambio. [https://www.jstor.org/stable/4314571](https://www.jstor.org/stable/4314571)
 * Moldan, F., Stadmark, J., Jutterström, S., & Ljunggren, J. (2025). *Where does {Sweden}’s nitrogen go? {Building} a comprehensive national nitrogen budget*. Environmental Research Letters. [https://doi.org/10.1088/1748-9326/ae2697](https://doi.org/10.1088/1748-9326/ae2697)
-* Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.
+* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)

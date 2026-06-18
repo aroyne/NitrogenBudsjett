@@ -574,12 +574,28 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename):
         f.write("# Subpool: Manure management, storage and animal husbandry (AG.MM)\n\n")
         f.write(get_balance_image_markdown("AG.MM", plot_files, plot_dir, relative_depth="../"))
         f.write("\n### Flows that are zero or neglected:\n\n* **AG.MM-RW.RW-Manure export-Nmix** is assumed small and neglected.\\\\citep{schulte-uebbing_planetary_2022}\n")
+        f.write("\n\n* **AG.MM-PR.SO-Manure for biofuel production-Nmix** is neglected because the Eurostat data used to calculate manure "
+                "application to soil includes manure that has been processed for biogas. SSB table 12359 gives the amount of manure processed "
+                "for biogas or through composting. Composting values are negligible compared with biogas.  The nitrogen content of manure for "
+                "biogas production is found to rise from zero before 2012 to around 0.5 kt/year in 2023 (data from "
+                "\citet{landbruksdirektoratet_biogass_2025}, a value which is still negligible compared with the total amount of manure "
+                "application. We therefore do not introduce a correction for the amount of nitrogen lost through biogas processing.  ")
 
     with open(os.path.join(ag_folder, "subpool_soil_management.md"), 'w', encoding='utf-8') as f:
         f.write("---\nlayout: default\ntitle: Soil Management (AG.SM)\nparent: Agriculture (AG)\nnav_order: 2\nhas_children: true\n---\n\n")
         f.write("# Subpool: Soil management (AG.SM)\n\n")
         f.write(get_balance_image_markdown("AG.SM", plot_files, plot_dir, relative_depth="../"))
-        f.write("\n### Flows that are zero or neglected:\n\n* **AG.SM-HY.SW-Overland flow-Nmix** is not included because all runoff and leaching is included in Leaching.\n")
+        f.write("\n### Flows that are zero or neglected:\n\n* **AG.SM-HY.SW-Overland flow-Nmix**, **AG.SM-FS.OL-Overland flow-Nmix** "
+                "and **AG.SM-FS.WL-Overland flow-Nmix** are neglected as suggested by \\\\citet{schappi_annexes_2025}: "
+                "«In a first approximation it can be assumed that N losses to hydrosphere or forests and semi-natural vegetation occur "
+                "mainly via leaching. If no country specific data is available on fractions for overland flow of N, the overland flows can "
+                "be neglected for simplification purposes». is not included because all runoff and leaching is included in Leaching.\n"
+                "* **AG.SM-PR.SO-Farm crops substrate-Nmix** is farm crops substrate for biofuels production and composting. According "
+                "to data in SSB table 12359 «Biologisk behandling av avfall, etter materialtype (1 000 tonn) 2017 – 2023» for category "
+                "«Landbruksavfall, etande”, these values are small enough to be neglected. Since we only have values given for a few years, "
+                "we have chosen to neglect this flow.\n" 
+                "* **AG.SM-HY.SW-Overland flow-Nmix** is not included because all runoff and leaching is included in  **AG.SM-HY.SW-Leaching-Nmix**.\n"
+                )
 
     ag_mm_counter, ag_sm_counter = 1, 1
 
@@ -626,19 +642,66 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename):
             elif "nonedible" in norm or "wool" in norm or ("animal" in norm and "op" in norm):
                 exact_flow_code = "AG.MM-MP.OP-Non-edible animal products-Nmix"
                 display_name = "Non-edible Animal Products"
-                description = "\\\\citet{schappi_annexes_2025} advises using FAOSTAT Commodity Balances (non-food). For Norway this statistic only contains wool for 4 individual years and we therefore use data for wool from Landbruksdirektoratet \\\\citep{landbruksdirektoratet_leveransedata_2025} for 2005-2024; for earlier years, we use the number of sheep (SSB table 03710) and extrapolate from a linear regression found between sheep and wool for 2005-2024. In addition, we use numbers for raw hides and skins from FAOSTAT Crops and livestock products. N contents are taken from \\\\citet{schappi_annexes_2025}."
+                description = "\\\\citet{schappi_annexes_2025} advises using FAOSTAT Commodity Balances (non-food). For Norway this statistic "
+                "only contains wool for 4 individual years and we therefore use data for wool from Landbruksdirektoratet "
+                "\\\\citep{landbruksdirektoratet_leveransedata-slakt-2005-2012_2025} for 2005-2024; for earlier years, we use the number of "
+                "sheep (SSB table 03710) and extrapolate from a linear regression found between sheep and wool for 2005-2024. In addition, "
+                "we use numbers for raw hides and skins from FAOSTAT Crops and livestock products. N contents are taken from "
+                "\\\\citet{schappi_annexes_2025}."
             elif "export" in norm or "live" in norm:
                 exact_flow_code = "AG.MM-RW.RW-Live animal export-Nmix"
                 display_name = "Live Animal Export"
-                description = "Taken from FAOSTAT Crop and livestock products, assuming typical weights..."
+                description = "Taken from FAOSTAT Crop and livestock products, assuming typical weights of animals from various sources, average "
+                "16 % protein in whole animal based on typical values in \\\\citet{schappi_annexes_2025} and Jones factor 6.25 for nitrogen to "
+                "protein (standard) "
 
         elif filename.upper().startswith("AG_SM_"):
             parent_subpool = "Soil Management (AG.SM)"
             if "fodder" in norm or "grass" in norm:
                 exact_flow_code = "AG.SM-AG.MM-Fodder crops-Nmix"
                 display_name = "Fodder Crops Production"
-                description = "We have used data for grass and fodder production..."
-
+                description = "We have used data for grass and fodder production from SSB table 13648 «Avling i jordbruket (1000 tonn) og avling "
+                "per dekar (kg), etter ymse jordbruksvekstar (F) 2021 – 2024» and 05772 «Avling i jordbruket, etter ymse jordbruksvekstar (1 000 tonn) "
+                "(F) (avslutta serie) 2000 – 2020». Values prior to 2000 are found in the SSB Jordbruksstatistikk (Table 2.1/Table 20). The protein "
+                "content of grass and fodder is known to be highly variable. We have assumed a protein content of 15 % based on 2025 analyses of "
+                "13 000 grass samples from all over Norway by Tine/NorFor, and 15 % N in protein (FAO, 2003). \n\n"
+                "\citet{hohmann-marriott_nitrogen_2025} used similar data sources but arrived at a smaller N flow (40-45 ktN) using a protein content "
+                "of 8 % and N content in protein of 15 % (Table S2).  "
+            elif "emissionsn2" in norm:
+                exact_flow_code = "AG.SM-AT.AT-Emissions-N2"
+                display_name = "N2 emissions from denitrification"
+                description = "\\\\citet{schappi_annexes_2025} recommends using a value of 14 kgN/ha/year for denitrification if no other data are available. "
+                "Together with a total agricultural area of 1 132 693 ha (NIBIO, 2026) this gives around 16 ktN/year."
+            elif "emissionsn2o" in norm:
+                exact_flow_code = "AG.SM-AT.AT-Emissions-N2O"
+                display_name = "N2O emissions from denitrification"
+                description = "N2O emissions are taken from UNFCCC Common reporting tables, Table 3"
+            elif "emissionsnox" in norm:
+                exact_flow_code = "AG.SM-AT.AT-Emissions-NOx"
+                display_name = "NOx emissions from soil management"
+                description = "We have used data from CLRTAP Inventory Submissions \\citet{emep_officially_2025} as advised by \\\\citet{schappi_annexes_2025}, using the categories "
+                "given in Table 30. "
+            elif "emissionsnh3" in norm:
+                exact_flow_code = "AG.SM-AT.AT-Emissions-NH3"
+                display_name = "NH3 emissions"
+                description = "We have used data from CLRTAP Inventory Submissions \\citet{emep_officially_2025} as advised by \\\\citet{schappi_annexes_2025}, using the categories "
+                "given in Table 30. "
+            elif "leaching" in norm:
+                exact_flow_code = "AG.SM-HY.SW-Leaching-Nmix"
+                display_name = "Leaching from soil management"
+                description = "Leaching from soil management is taken from UNFCCC Common reporting tables, Table 3. The data agrees within the error "
+                "range with what is reported in the TEOTIL3 \\citet{model sample_kildefordelte_2024}"
+            elif "foodcrop" in norm:
+                exact_flow_code = "AG.SM-MP.FP-Food crop products-Nmix"
+                display_name = "Food crop products"
+                description = "Food crop products are  taken from EUROSTAT Gross nutrient balance as advised by \\\\citet{schappi_annexes_2025}: «Nutrient "
+                "removal by harvest of crops» minus «Industrial crops». «Ornamenal crops», which should also be removed, are negligible in Norway. "
+                "For years with missing data, we have filled in the average of all other years. "
+            elif "industrial" in norm:
+                exact_flow_code = "AG.SM-MP.OP-Crop products for industrial use-Nmix"
+                display_name = "Crop products for industrial use"
+                description = "Crop products for industrial use is taken from EUROSTAT Gross nutrient balance as advised by "
+                "\\\\citet{schappi_annexes_2025}. For years with missing data, we have filled in the average of all other years. "
         with open(full_flow_path, 'w', encoding='utf-8') as f:
             f.write(f"---\nlayout: default\ntitle: {display_name}\nparent: {parent_subpool}\n")
             if 'MM' in parent_subpool:

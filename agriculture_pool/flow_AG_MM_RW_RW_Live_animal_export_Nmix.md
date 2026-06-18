@@ -10,5 +10,5 @@ nav_order: 8
 ![AG.MM-RW.RW-Live animal export-Nmix](../output_files/plots/AG_MM_RW_RW_Live_animal_export_Nmix.png)
 
 ### Flow Description
-Taken from FAOSTAT Crop and livestock products, assuming typical weights...
+Taken from FAOSTAT Crop and livestock products, assuming typical weights of animals from various sources, average 
 
