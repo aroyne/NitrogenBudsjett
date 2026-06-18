@@ -12,7 +12,6 @@ nav_order: 4
 ### Flow Description
 Found in data supplied by NIVA, produced in the TEOTIL3 model (Sample, 2024). For the period 1990-2013, we have used TEOTIL data published by Miljødirektoratet for nitrogen from nitrogen flows that reach the coast, where we have found that values for leaching from forest in the period 2013-2023 are a fraction 0.59 of what is reported by Miljødirektoratet as «Bakgrunn», to within a 2% error.
 
-
 ### References
 
 * Sample, James Edward and Jackson-Blake, Leah and Vogelsang, Christian and Kaste, Øyvind (2024). *TEOTIL3}: {En} modell for beregning av kildebaserte tilførsler via elver og direktetilførsler til kyst*.

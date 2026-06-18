@@ -12,7 +12,6 @@ nav_order: 7
 ### Flow Description
 EF.EC-EF.TR-Fuel for transport-Nmix: As advised by Schäppi (2025)...
 
-
 ### References
 
 * Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

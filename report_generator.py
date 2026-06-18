@@ -15,7 +15,7 @@ DEPOSITION_TEXT = (
     "1988-1992, 1997-2001, 2002-2006, 2007-2011 and 2012-2016. For 2017-2021 we use "
     "total NILU data for that period and scale with the distribution across land classes "
     "for the previous period. Values after 2021 are extrapolated. To find deposition on "
-    "different land categories we use the map resource AR5 from NIBIO \\\\citep{nibio_ar5_2016}. "
+    "different land categories we use the map resource AR5 from NIBIO \\\\citet{nibio_ar5_2016}. "
     "We find the total value of atmospheric deposition to the Norwegian mainland is, "
     "as given by NILU, 142 ktN in 2012-2016.\n\n"
     "As noted, our value for agricultural soils is much larger than given by FAOSTAT. "
@@ -118,19 +118,17 @@ def append_bibtex_references(file_handle, bib_filename=None):
     for ref in formatted_refs:
         file_handle.write(f"{ref}\n")
     
-import os
-import re
-
 def fix_all_citations_in_folder(folder_path, bib_filename):
     """
     Går igjennom alle .md-filer i en mappe, leser bib-filen, og erstatter
-    \citep{key} med (Forfatter, År) og \citet{key} med Forfatter (År) direkte i filene.
+    \\citep{key} og \\citet{key} med pen tekst. Bygger også referanselisten
+    nederst med URL-er i henhold til APA7 hvis de finnes i .bib-filen.
     """
     if not os.path.exists(bib_filename):
         print(f"Bib-fil ikke funnet: {bib_filename}")
         return
 
-    # 1. Pars .bib-filen for å hente ut forfattere og årstall
+    # 1. Pars .bib-filen for å hente ut forfattere, årstall, titler og URL-er
     references_dict = {}
     current_entry = None
     
@@ -146,19 +144,25 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
             if current_entry and '=' in line_stripped:
                 key, val = line_stripped.split('=', 1)
                 key = key.strip().lower()
+                
+                # Fjern krøllparenteser, hermetegn og komma/tegn på slutten, men bevar URL-strukturen
                 val = re.sub(r'[{"},\s]+$', '', val.strip())
                 val = re.sub(r'^[{"\s]+', '', val)
-                if key in ['author', 'year']:
+                
+                # Vask bort eventuelle feilaktige tegn på slutten av URL-en (f.eks. tilfeldige ']')
+                if key == 'url':
+                    val = val.rstrip(']')
+                
+                if key in ['author', 'year', 'title', 'journal', 'booktitle', 'url']:
                     references_dict[current_entry][key] = val
 
-    # Interne hjelpefunksjoner for å gjøre selve erstatningen
+    # Interne hjelpefunksjoner for å gjøre tekst-erstatningen i avsnittene
     def citep_replacer(match):
         keys = [k.strip() for k in match.group(1).split(',')]
         parts = []
         for key in keys:
             if key in references_dict:
                 author = references_dict[key].get('author', 'Unknown')
-                # Hent kun etternavn/organisasjon før eventuelt komma
                 short_author = author.split(',')[0].strip()
                 year = references_dict[key].get('year', 'n.d.')
                 parts.append(f"{short_author}, {year}")
@@ -185,21 +189,60 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
             if filename.endswith(".md"):
                 file_path = os.path.join(root, filename)
                 
-                # Les innholdet i filen
                 with open(file_path, 'r', encoding='utf-8') as f:
                     content = f.read()
                 
-                # Sjekk om filen faktisk inneholder noen LaTeX-siteringer før vi gjør noe
+                # Sjekk om filen inneholder siteringer før vi gjør noe
                 if '\\citep' in content or '\\citet' in content:
-                    # Erstatt rå-tekst med pen tekst
+                    # Finn alle unike nøkler på denne spesifikke siden for å bygge referanselisten på nytt
+                    raw_keys = re.findall(r'\\+cite[pt]\{\s*([^}]+)\s*\}', content)
+                    cited_keys = set()
+                    for k_group in raw_keys:
+                        for k in k_group.split(','):
+                            cited_keys.add(k.strip())
+                    
+                    # Gjør om \citep og \citet i selve teksten til pen tekst
                     updated_content = re.sub(r'\\+citep\{\s*([^}]+)\s*\}', citep_replacer, content)
                     updated_content = re.sub(r'\\+citet\{\s*([^}]+)\s*\}', citet_replacer, updated_content)
                     
+                    # 3. Bygg en ny, ryddig referanseliste med URL-er helt nederst i filen
+                    # Vi splitter innholdet ved overskriften "### References" hvis den finnes fra før
+                    if "### References" in updated_content:
+                        base_content = updated_content.split("### References")[0].strip()
+                    else:
+                        base_content = updated_content.strip()
+                        
+                    ref_block = "\n\n### References\n\n"
+                    formatted_refs = []
+                    
+                    for key in sorted(cited_keys):
+                        if key in references_dict:
+                            entry = references_dict[key]
+                            author = entry.get('author', 'Unknown Author')
+                            year = entry.get('year', 'n.d.')
+                            title = entry.get('title', 'Untitled')
+                            source = entry.get('journal') or entry.get('booktitle') or ""
+                            url = entry.get('url', '')
+                            
+                            # Standard APA7 oppsett
+                            ref_str = f"* {author} ({year}). *{title}*."
+                            if source:
+                                ref_str += f" {source}."
+                            if url:
+                                # APA7 krever bare URL direkte (uten "Hentet fra") for nettressurser
+                                ref_str += f" {url}"
+                                
+                            formatted_refs.append(ref_str)
+                        else:
+                            formatted_refs.append(f"* Missing reference data for key: `{key}`")
+                            
+                    ref_block += "\n".join(formatted_refs) + "\n"
+                    final_content = base_content + ref_block
+                    
                     # Skriv det oppdaterte innholdet tilbake til filen
                     with open(file_path, 'w', encoding='utf-8') as f:
-                        f.write(updated_content)
-                    print(f"Oppdaterte referanser i filen: {filename}")
-                    
+                        f.write(final_content)
+                    print(f"Oppdaterte referanser og referanseliste med URL i filen: {filename}")                    
 # ==============================================================================
 # SPESIFIKKE FUNKSJONER FOR HVER ENKELT POOL
 # ==============================================================================

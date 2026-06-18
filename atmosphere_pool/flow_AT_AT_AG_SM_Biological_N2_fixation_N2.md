@@ -13,6 +13,7 @@ nav_order: 1
 **AT.AT-AG.SM-Biological N2 fixation-N2**
 
 Schäppi (2025) advises using data from the EUROSTAT Gross nutrient balance...
+
 ### References
 
 * Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

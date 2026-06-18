@@ -12,7 +12,6 @@ nav_order: 2
 ### Flow Description
 Is taken from FAOSTAT Crops and livestock products, assuming typical weights of animals from various sources, average 16% protein in whole animal and Jones factor 6.25 for nitrogen to protein (standard). The underlying drivers relating expanding dietary demand and trade to reactive nitrogen impacts are evaluated by Malik (2022).
 
-
 ### References
 
-* Malik, Arunima and Oita, Azusa and Shaw, Emily and Li, Mengyu and Ninpanit, Panittra and Nandel, Vibhuti and Lan, Jun and Lenzen, Manfred (2022). *Drivers of global nitrogen emissions*. Environmental Research Letters.
+* Malik, Arunima and Oita, Azusa and Shaw, Emily and Li, Mengyu and Ninpanit, Panittra and Nandel, Vibhuti and Lan, Jun and Lenzen, Manfred (2022). *Drivers of global nitrogen emissions*. Environmental Research Letters. https://doi.org/10.1088/1748-9326/ac413c

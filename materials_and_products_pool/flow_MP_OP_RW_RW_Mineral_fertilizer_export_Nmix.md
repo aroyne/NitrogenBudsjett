@@ -12,7 +12,6 @@ nav_order: 12
 ### Flow Description
 **MP.OP-RW.RW-Mineral fertilizer export-Nmix** is taken from FAOSTAT Fertilizer by nutrient (FAO, 2025).
 
-
 ### References
 
-* FAO (2025). *Fertilizer by nutrient*.
+* FAO (2025). *Fertilizer by nutrient*. https://www.fao.org/faostat/en/#data/RFN

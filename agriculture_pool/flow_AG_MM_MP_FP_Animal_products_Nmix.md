@@ -12,7 +12,6 @@ nav_order: 6
 ### Flow Description
 Taken from FAOSTAT Crops and livestock products, with N contents taken from Schäppi (2025).
 
-
 ### References
 
 * Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

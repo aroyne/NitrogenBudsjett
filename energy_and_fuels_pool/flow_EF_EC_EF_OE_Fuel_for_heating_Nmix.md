@@ -12,7 +12,6 @@ nav_order: 4
 ### Flow Description
 EF.EC-EF.OE-Fuel for heating-Nmix: As advised by Schäppi (2025)...
 
-
 ### References
 
 * Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

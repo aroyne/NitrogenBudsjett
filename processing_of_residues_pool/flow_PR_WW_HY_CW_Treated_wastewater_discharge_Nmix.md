@@ -12,7 +12,6 @@ nav_order: 5
 ### Flow Description
 **PR.WW-HY.CW-Treated wastewater discharge-Nmix** is taken from SSB table 05280 “Totale utslipp av fosfor og nitrogen fra avløpssektoren”. The critical necessity of mitigating coastal aquatic eutrophication from wastewater discharges is documented in (Staalstrøm, 2022) and (schulte_uebbing_planetary_2022). Due to lack of available data we set the values in 1990-1996 to be equal to that in 1997.
 
-
 ### References
 
 * Missing reference data for key: `schulte_uebbing_planetary_2022`

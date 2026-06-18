@@ -12,7 +12,6 @@ nav_order: 1
 ### Flow Description
 Calculated based on N2O emissions from UNFCCC Common reporting tables, Table 4 and assuming a mean N2:N2O ratio of 19.5 as discussed by Schäppi (2025).
 
-
 ### References
 
 * Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

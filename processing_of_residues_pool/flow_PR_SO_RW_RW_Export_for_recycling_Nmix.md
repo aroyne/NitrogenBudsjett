@@ -12,7 +12,6 @@ nav_order: 11
 ### Flow Description
 **PR.SO-RW.RW-Export for recycling-Nmix** is plastic, paper and textile waste which has been collected for recycling and exported to recycling facilities outside of Norway. Data taken from trade data, SSB table 08801. The footprint of non-food manufacturing trade shifts is discussed in (Hamilton, 2018).
 
-
 ### References
 
-* Hamilton, Helen A. and Ivanova, Diana and Stadler, Konstantin and Merciai, Stefano and Schmidt, Jannick and van Zelm, Rosalie and Moran, Daniel and Wood, Richard (2018). *Trade and the role of non-food commodities for global eutrophication*. Nature Sustainability.
+* Hamilton, Helen A. and Ivanova, Diana and Stadler, Konstantin and Merciai, Stefano and Schmidt, Jannick and van Zelm, Rosalie and Moran, Daniel and Wood, Richard (2018). *Trade and the role of non-food commodities for global eutrophication*. Nature Sustainability. http://www.nature.com/articles/s41893-018-0079-z

@@ -14,7 +14,6 @@ nav_order: 4
 
 Detailed data are not available prior to 1995, but trends in municipal and other waste are described by ssb_avfall_1997 (n.d.). Household waste per inhabitant increased from about 200 kg/person to 289 kg/person in 1995 \\citep[figure 4.1]{ssb_avfall_1997}, with an assumed linear increase in the years between. Based on this we assume a constant N content per unit mass and extrapolate from 1995 values back to 1990.
 
-
 ### References
 
 * Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

@@ -12,7 +12,6 @@ nav_order: 2
 ### Flow Description
 **MP.FP-AG.SM-Seeds and planting material-Nmix** is taken from Gross nutrient balance in the Eurostat database as advised by Schäppi (2025). There is data missing from 2017 to 2019; because there is a large reported increase between 2016 and 2020, we assume a constant increase in the missing time period and fill in data from this interpolation.
 
-
 ### References
 
 * Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

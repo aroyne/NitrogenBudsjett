@@ -12,7 +12,6 @@ nav_order: 1
 ### Flow Description
 Taken from EUROSTAT Gross nutrient balance as advised by Schäppi (2025). We interpolate the missing values between 2016 and 2020.
 
-
 ### References
 
 * Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

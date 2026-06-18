@@ -12,7 +12,6 @@ nav_order: 1
 ### Flow Description
 Calculated using data from NIBIO on organised grazing (nibio_organised_grazing_2025) together with estimated fodder intake for different animal groups...
 
-
 ### References
 
 * Missing reference data for key: `nibio_organised_grazing_2025`

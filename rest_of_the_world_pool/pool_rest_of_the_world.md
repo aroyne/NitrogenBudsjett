@@ -23,3 +23,7 @@ The chart below illustrates the integrated nitrogen mass balance for **RW**. It 
 * **RW.RW-MP.FP-Sea fish (landings)-Nmix** is set to zero because all wild fish catch is accounted for under HY.
 * **RW.RW-AG.SM-Manure import-Nmix** is assumed small and neglected based on regional boundary assumptions for agricultural surpluses (Schulte-Uebbing, 2022).
 * **RW.RW-HY.SW-Import of surface water-Nmix** are assumed negligible due to Norwegian topography.
+
+### References
+
+* Schulte-Uebbing, L. F. and Beusen, A. H. W. and Bouwman, A. F. and de Vries, W. (2022). *From planetary to regional boundaries for agricultural nitrogen pollution*. Nature. https://www.nature.com/articles/s41586-022-05158-2

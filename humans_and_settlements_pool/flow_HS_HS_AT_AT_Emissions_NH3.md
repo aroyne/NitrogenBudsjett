@@ -12,7 +12,6 @@ nav_order: 1
 ### Flow Description
 **HS.HS-AT.AT-Emissions-NH3** are ammonia emissions from the human body. We use population data from SSB together with SSB data on smoking (table 05307) and assume that daily smokers smoke 750 cigarettes per year, while occasional smokers smoke 100 per year. This data is used with equation 46 in Schäppi (2025), taken from sutton_2000 (n.d.), which relates ammonia emissions to age and cigarette smoking.
 
-
 ### References
 
 * Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

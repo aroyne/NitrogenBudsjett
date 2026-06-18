@@ -12,8 +12,7 @@ nav_order: 4
 ### Flow Description
 We have used data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by Schäppi (2025), using the categories given in Table 29.
 
-
 ### References
 
-* EMEP (2025). *Officially reported emission data*.
+* EMEP (2025). *Officially reported emission data*. https://www.ceip.at/webdab-emission-database/reported-emissiondata
 * Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

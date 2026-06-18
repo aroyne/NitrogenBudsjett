@@ -12,7 +12,6 @@ nav_order: 2
 ### Flow Description
 **MP.OP-AT.AT-Emissions-N2O** are taken from UNFCCC common reporting tables, Table 3 as advised by Schäppi (2025). Emissions are substantial, at least before 2009, and the main source of emissions is from nitric acid production.
 
-
 ### References
 
 * Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

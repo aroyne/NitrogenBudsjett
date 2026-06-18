@@ -12,7 +12,6 @@ nav_order: 3
 ### Flow Description
 EF.EC-EF.IC-Fuel for industry-Nmix: As advised by Schäppi (2025)...
 
-
 ### References
 
 * Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.
