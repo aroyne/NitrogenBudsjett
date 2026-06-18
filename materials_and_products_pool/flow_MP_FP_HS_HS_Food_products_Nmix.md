@@ -15,4 +15,5 @@ nav_order: 3
 
 ### References
 
-{% bibliography --cited %}
+* Mattilsynet (2006). *Matvaretabellen*.
+* Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

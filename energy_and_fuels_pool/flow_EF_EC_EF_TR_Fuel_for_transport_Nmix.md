@@ -15,4 +15,4 @@ EF.EC-EF.TR-Fuel for transport-Nmix: As advised by \\citet{schappi_annexes_2025}
 
 ### References
 
-{% bibliography --cited %}
+* Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

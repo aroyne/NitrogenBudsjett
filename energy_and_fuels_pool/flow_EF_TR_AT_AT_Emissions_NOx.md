@@ -12,7 +12,3 @@ nav_order: 3
 ### Flow Description
 EF.TR-AT.AT-Emissions-NOx denotes NOx emissions from fuel combustion...
 
-
-### References
-
-{% bibliography --cited %}

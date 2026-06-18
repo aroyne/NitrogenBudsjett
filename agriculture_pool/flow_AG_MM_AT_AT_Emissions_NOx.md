@@ -15,4 +15,5 @@ We have used data from CLRTAP Inventory Submissions \\citep{emep_officially_2025
 
 ### References
 
-{% bibliography --cited %}
+* EMEP (2025). *Officially reported emission data*.
+* Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

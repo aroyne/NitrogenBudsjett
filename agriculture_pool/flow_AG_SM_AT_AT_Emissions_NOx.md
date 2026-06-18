@@ -12,7 +12,3 @@ nav_order: 5
 ### Flow Description
 
 
-
-### References
-
-{% bibliography --cited %}

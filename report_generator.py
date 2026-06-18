@@ -1,8 +1,9 @@
 # report_generator.py
 import os
-import shutil
+# import shutil
+import re
 from datetime import datetime
-from pybtex.database import parse_file
+# from pybtex.database import parse_file
 
 # ==============================================================================
 # FELLES TEKSTBLOKKER OG HJELPEFUNKSJONER
@@ -40,13 +41,82 @@ def get_balance_image_markdown(pool_code, plot_files, plot_dir, relative_depth="
 
 
 def append_bibtex_references(file_handle, bib_filename=None):
-    """Legger til Jekyll-Scholar tag som genererer referanseliste for siterte kilder på gjeldende side."""
-    file_handle.write("\n### References\n\n")
-    # Denne taggen gjør at jekyll-scholar automatisk lager en APA-liste 
-    # over KUN de kildene som ble brukt på denne spesifikke undersiden.
-    file_handle.write("{% bibliography --cited %}\n")
+    """
+    Skanner filen for siteringer (\citep{key}), leser bib-filen,
+    og genererer en ren Markdown-referanseliste som fungerer på GitHub Pages.
+    """
+    if not bib_filename or not os.path.exists(bib_filename):
+        file_handle.write("\n### References\n\nNo bibliography file provided or found.\n")
+        return
 
-# ==============================================================================
+    # 1. Gå til starten av filen og les alt som er skrevet hittil for å finne siteringsnøkler
+    file_handle.flush()
+    try:
+        with open(file_handle.name, 'r', encoding='utf-8') as f_read:
+            content = f_read.read()
+    except Exception:
+        # Hvis filen ikke kan leses (f.eks. hvis den er låst/i skrivemodus),
+        # legger vi til en fallback-tagg eller melding
+        file_handle.write("\n### References\n\n(References dynamically generated via Python require file readability)\n")
+        return
+
+    # Finn alle nøkler inni \citep{nøkkel} eller \citet{nøkkel}
+    # Støtter også kommaseparerte lister, f.eks. \citep{key1,key2}
+    raw_keys = re.findall(r'\\cite[pt]\{\s*([^}]+)\s*\}', content)
+    cited_keys = set()
+    for k_group in raw_keys:
+        for k in k_group.split(','):
+            cited_keys.add(k.strip())
+
+    if not cited_keys:
+        return  # Ingen referanser ble brukt på denne siden, trenger ikke referanse-overskrift
+
+    # 2. Enkel parsing av .bib-filen for å hente ut forfatter, år og tittel
+    references_dict = {}
+    current_entry = None
+    
+    with open(bib_filename, 'r', encoding='utf-8') as bib_file:
+        for line in bib_file:
+            line_stripped = line.strip()
+            # Finn starten på en entry, f.eks. @article{malik_drivers_2022,
+            match_start = re.match(r'@\w+\{\s*([^,]+),', line_stripped)
+            if match_start:
+                current_entry = match_start.group(1).strip()
+                references_dict[current_entry] = {}
+                continue
+            
+            if current_entry and '=' in line_stripped:
+                key, val = line_stripped.split('=', 1)
+                key = key.strip().lower()
+                # Fjern krøllparenteser, hermetegn og komma på slutten
+                val = re.sub(r'[{"},\s]+$', '', val.strip())
+                val = re.sub(r'^[{"\s]+', '', val)
+                if key in ['author', 'title', 'year', 'journal', 'booktitle']:
+                    references_dict[current_entry][key] = val
+
+    # 3. Bygg referanselisten (i tilnærmet APA-stil) for akkurat de kildene som er brukt
+    file_handle.write("\n### References\n\n")
+    
+    formatted_refs = []
+    for key in sorted(cited_keys):
+        if key in references_dict:
+            entry = references_dict[key]
+            author = entry.get('author', 'Unknown Author')
+            year = entry.get('year', 'n.d.')
+            title = entry.get('title', 'Untitled')
+            source = entry.get('journal') or entry.get('booktitle') or ""
+            
+            ref_str = f"* {author} ({year}). *{title}*."
+            if source:
+                ref_str += f" {source}."
+            formatted_refs.append(ref_str)
+        else:
+            # Hvis nøkkelen ikke ble funnet i .bib-filen
+            formatted_refs.append(f"* Missing reference data for key: `{key}`")
+
+    # Skriv listen til filen
+    for ref in formatted_refs:
+        file_handle.write(f"{ref}\n")# ==============================================================================
 # SPESIFIKKE FUNKSJONER FOR HVER ENKELT POOL
 # ==============================================================================
 

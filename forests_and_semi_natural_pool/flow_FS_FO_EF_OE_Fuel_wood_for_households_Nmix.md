@@ -12,7 +12,3 @@ nav_order: 3
 ### Flow Description
 Taken from SSB table 09702 'Energibalansen. Vedforbruk i boliger og fritidsboliger 1990 – 2024' and we assume a mean N content of 4.0 kg/t (between coniferous and non-coniferous wood; see FS.FO-MP.OP-Industrial round wood-Nmix).
 
-
-### References
-
-{% bibliography --cited %}

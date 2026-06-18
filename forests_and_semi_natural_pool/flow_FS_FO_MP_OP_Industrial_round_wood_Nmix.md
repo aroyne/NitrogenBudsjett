@@ -12,7 +12,3 @@ nav_order: 5
 ### Flow Description
 Taken from FAOSTAT Forestry production and trade: industrial roundwood, which gives values under bark...
 
-
-### References
-
-{% bibliography --cited %}

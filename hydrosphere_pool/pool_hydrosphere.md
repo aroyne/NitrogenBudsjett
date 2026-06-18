@@ -25,4 +25,4 @@ The chart below illustrates the integrated nitrogen mass balance for **HY**. It 
 
 ### References
 
-{% bibliography --cited %}
+* Missing reference data for key: `kvaerno_2024`

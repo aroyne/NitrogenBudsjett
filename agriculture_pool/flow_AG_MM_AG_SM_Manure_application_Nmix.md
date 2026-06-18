@@ -15,4 +15,4 @@ Taken from EUROSTAT Gross nutrient balance as advised by \\citet{schappi_annexes
 
 ### References
 
-{% bibliography --cited %}
+* Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

@@ -15,4 +15,6 @@ nav_order: 4
 
 ### References
 
-{% bibliography --cited %}
+* Missing reference data for key: `aas_aquaculture_2022`
+* Missing reference data for key: `fiskeridirektoratet_statistikk_2025`
+* Missing reference data for key: `hohmann_marriott_2025`

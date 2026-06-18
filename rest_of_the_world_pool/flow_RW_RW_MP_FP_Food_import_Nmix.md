@@ -15,4 +15,4 @@ Is taken from trade data, SSB table 08801. The substantial amount of reactive ni
 
 ### References
 
-{% bibliography --cited %}
+* Oita, Azusa and Malik, Arunima and Kanemoto, Keiichiro and Geschke, Arne and Nishijima, Shota and Lenzen, Manfred (2016). *Substantial nitrogen pollution embedded in international trade*. Nature Geoscience.

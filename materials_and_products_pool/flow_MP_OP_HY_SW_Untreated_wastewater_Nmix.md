@@ -15,4 +15,4 @@ nav_order: 9
 
 ### References
 
-{% bibliography --cited %}
+* Miljødirektoratet (2025). *Norske utslipp - {Utslipp} til luft og vann og generert avfall, {Nitrogen} totalt*.

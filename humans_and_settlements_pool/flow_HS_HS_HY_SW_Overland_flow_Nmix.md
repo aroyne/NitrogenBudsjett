@@ -15,4 +15,5 @@ nav_order: 3
 
 ### References
 
-{% bibliography --cited %}
+* Sample, James Edward and Jackson-Blake, Leah and Vogelsang, Christian and Kaste, Øyvind (2024). *TEOTIL3}: {En} modell for beregning av kildebaserte tilførsler via elver og direktetilførsler til kyst*.
+* Missing reference data for key: `sample_teotil_data_2025`

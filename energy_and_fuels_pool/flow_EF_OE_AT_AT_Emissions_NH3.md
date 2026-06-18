@@ -12,7 +12,3 @@ nav_order: 2
 ### Flow Description
 EF.OE-AT.AT-Emissions-NH3 is ammonia emissions from fuel combustion...
 
-
-### References
-
-{% bibliography --cited %}

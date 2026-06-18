@@ -15,4 +15,4 @@ Is taken from trade data, SSB table 08801 for all fuel items for transport. The 
 
 ### References
 
-{% bibliography --cited %}
+* Malik, Arunima and Oita, Azusa and Shaw, Emily and Li, Mengyu and Ninpanit, Panittra and Nandel, Vibhuti and Lan, Jun and Lenzen, Manfred (2022). *Drivers of global nitrogen emissions*. Environmental Research Letters.

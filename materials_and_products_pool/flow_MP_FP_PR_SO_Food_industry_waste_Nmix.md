@@ -15,4 +15,5 @@ nav_order: 6
 
 ### References
 
-{% bibliography --cited %}
+* Missing reference data for key: `chaudhary_skjerpen_2025`
+* Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

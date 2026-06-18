@@ -23,4 +23,4 @@ For flows connected to the hydrosphere, and for land-relateds emissions and nitr
 This NNB is built using the guidelines from \citep{{winiwarter_inms_2025}}. Where flows are omitted or added to better fit the Norwegian nitrogen system, this is commented. 
 ### References
 
-{% bibliography --cited %}
+* Missing reference data for key: `{winiwarter_inms_2025`

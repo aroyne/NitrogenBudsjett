@@ -12,7 +12,3 @@ nav_order: 17
 ### Flow Description
 *Flow details for AT.AT-RW.RW-Atmospheric outflow-RDN*
 
-
-### References
-
-{% bibliography --cited %}

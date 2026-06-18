@@ -15,4 +15,5 @@ Is taken from trade data, SSB table 08801. The prospective environmental pressur
 
 ### References
 
-{% bibliography --cited %}
+* Bertagni, Matteo B. and Socolow, Robert H. and Martirez, John Mark P. and Carter, Emily A. and Greig, Chris and Ju, Yiguang and Lieuwen, Tim and Mueller, Michael E. and Sundaresan, Sankaran and Wang, Rui and Zondlo, Mark A. and Porporato, Amilcare (2023). *Minimizing the impacts of the ammonia economy on the nitrogen cycle and climate*. Proceedings of the National Academy of Sciences.
+* Chen, Mengli and Jiang, Shan and Han, Aiqin and Yang, Mengyao and Tkalich, Pavel and Liu, Ming (2024). *Bunkering for change: {Knowledge} preparedness on the environmental aspect of ammonia as a marine fuel*. Science of The Total Environment.

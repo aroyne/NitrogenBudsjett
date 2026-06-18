@@ -12,7 +12,3 @@ nav_order: 3
 ### Flow Description
 EF.IC-AT.AT-Emissions-NOx denotes NOx emissions from fuel combustion in industry...
 
-
-### References
-
-{% bibliography --cited %}

@@ -12,7 +12,3 @@ nav_order: 3
 ### Flow Description
 EF.OE-AT.AT-Emissions-NOx is NOx emissions from fuel combustion...
 
-
-### References
-
-{% bibliography --cited %}

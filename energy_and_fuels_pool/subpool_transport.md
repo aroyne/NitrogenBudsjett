@@ -16,7 +16,3 @@ has_children: true
 The chart below illustrates the integrated nitrogen mass balance for **EF.TR**. It includes total system inflows (positive stack), total outflows (negative stack), and the net balance line with estimated uncertainty bounds (±1σ).
 
 ![Mass Balance EF.TR](../output_files/plots/balance_EF_TR.png)
-
-### References
-
-{% bibliography --cited %}

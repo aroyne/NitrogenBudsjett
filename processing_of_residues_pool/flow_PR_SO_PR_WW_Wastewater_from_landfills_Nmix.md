@@ -15,4 +15,4 @@ nav_order: 10
 
 ### References
 
-{% bibliography --cited %}
+* Missing reference data for key: `{schulte_uebbing_planetary_2022`

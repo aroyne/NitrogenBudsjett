@@ -15,4 +15,5 @@ Is taken from trade data, SSB table 08801. We include imports of municipal waste
 
 ### References
 
-{% bibliography --cited %}
+* Hamilton, Helen A. and Ivanova, Diana and Stadler, Konstantin and Merciai, Stefano and Schmidt, Jannick and van Zelm, Rosalie and Moran, Daniel and Wood, Richard (2018). *Trade and the role of non-food commodities for global eutrophication*. Nature Sustainability.
+* Malik, Arunima and Oita, Azusa and Shaw, Emily and Li, Mengyu and Ninpanit, Panittra and Nandel, Vibhuti and Lan, Jun and Lenzen, Manfred (2022). *Drivers of global nitrogen emissions*. Environmental Research Letters.

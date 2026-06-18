@@ -15,4 +15,5 @@ nav_order: 7
 
 ### References
 
-{% bibliography --cited %}
+* Missing reference data for key: `landbruksdirektoratet_leveransedata_2025`
+* Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

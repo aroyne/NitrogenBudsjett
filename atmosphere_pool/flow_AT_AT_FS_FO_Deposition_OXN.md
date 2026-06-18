@@ -19,4 +19,6 @@ As noted, our value for agricultural soils is much larger than given by FAOSTAT.
 
 ### References
 
-{% bibliography --cited %}
+* Missing reference data for key: `blake_2023`
+* Missing reference data for key: `hohmann_marriott_2025`
+* NIBIO (2016). *AR5*.

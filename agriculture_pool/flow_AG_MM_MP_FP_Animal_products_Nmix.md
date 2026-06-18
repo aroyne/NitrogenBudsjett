@@ -15,4 +15,4 @@ Taken from FAOSTAT Crops and livestock products, with N contents taken from \\ci
 
 ### References
 
-{% bibliography --cited %}
+* Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

@@ -15,4 +15,4 @@ nav_order: 3
 
 ### References
 
-{% bibliography --cited %}
+* Bertagni, Matteo B. and Socolow, Robert H. and Martirez, John Mark P. and Carter, Emily A. and Greig, Chris and Ju, Yiguang and Lieuwen, Tim and Mueller, Michael E. and Sundaresan, Sankaran and Wang, Rui and Zondlo, Mark A. and Porporato, Amilcare (2023). *Minimizing the impacts of the ammonia economy on the nitrogen cycle and climate*. Proceedings of the National Academy of Sciences.

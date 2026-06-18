@@ -12,7 +12,3 @@ nav_order: 1
 ### Flow Description
 We have used data for grass and fodder production...
 
-
-### References
-
-{% bibliography --cited %}

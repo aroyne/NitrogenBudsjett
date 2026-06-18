@@ -15,4 +15,5 @@ nav_order: 1
 
 ### References
 
-{% bibliography --cited %}
+* Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.
+* Missing reference data for key: `sutton_2000`

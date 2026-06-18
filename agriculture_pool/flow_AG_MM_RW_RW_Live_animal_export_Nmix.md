@@ -12,7 +12,3 @@ nav_order: 8
 ### Flow Description
 Taken from FAOSTAT Crop and livestock products, assuming typical weights...
 
-
-### References
-
-{% bibliography --cited %}

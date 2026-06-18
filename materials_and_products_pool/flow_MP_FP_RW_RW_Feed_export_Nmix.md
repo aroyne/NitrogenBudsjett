@@ -12,7 +12,3 @@ nav_order: 8
 ### Flow Description
 Using trade data from SSB, table 08801.
 
-
-### References
-
-{% bibliography --cited %}

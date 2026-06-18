@@ -23,7 +23,3 @@ The chart below illustrates the integrated nitrogen mass balance for **HY.CW**. 
 * **HY.CW-AT.AT-Emissions-N2O** and **HY.CW-AT.AT-Emissions-NOx** are neglected as we lack a clearly defined area for coastal waters.
 * **HY.CW-PR.SO-Biomass for energy production-Nmix** is neglected because organic material from the processing of caught or farmed fish is assigned to the MP.FS subpool...
 * **Recreational fishing** is not included in the official guidelines, and we have also chosen to neglect it here...
-
-### References
-
-{% bibliography --cited %}

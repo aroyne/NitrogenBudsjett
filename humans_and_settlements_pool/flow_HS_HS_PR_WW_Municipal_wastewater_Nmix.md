@@ -15,4 +15,4 @@ nav_order: 5
 
 ### References
 
-{% bibliography --cited %}
+* Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

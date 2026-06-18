@@ -20,7 +20,3 @@ The chart below illustrates the integrated nitrogen mass balance for **PR.SO**. 
 ### Flows that are zero or neglected:
 
 * **PR.SO-AG.SM-Manure co-digestation-Nmix** is tracked under agricultural sub-allocations where applicable and excluded here to prevent double counting.
-
-### References
-
-{% bibliography --cited %}

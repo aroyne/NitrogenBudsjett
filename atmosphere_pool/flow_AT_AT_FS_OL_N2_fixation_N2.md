@@ -12,7 +12,3 @@ nav_order: 9
 ### Flow Description
 *Flow details for AT.AT-FS.OL-Biological N2 fixation-N2*
 
-
-### References
-
-{% bibliography --cited %}

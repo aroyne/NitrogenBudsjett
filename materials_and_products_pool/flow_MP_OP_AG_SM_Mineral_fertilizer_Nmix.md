@@ -15,4 +15,4 @@ nav_order: 1
 
 ### References
 
-{% bibliography --cited %}
+* FAO (2025). *Fertilizer by nutrient*.

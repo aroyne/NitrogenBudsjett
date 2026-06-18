@@ -12,7 +12,3 @@ nav_order: 2
 ### Flow Description
 **HS.HS-AT.AT-LUC emissions-N2O** is taken from UNFCCC Common reporting tables, Table 4.
 
-
-### References
-
-{% bibliography --cited %}

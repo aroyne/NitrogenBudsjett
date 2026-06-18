@@ -15,4 +15,4 @@ Calculated based on N2O emissions from UNFCCC Common reporting tables, Table 4 a
 
 ### References
 
-{% bibliography --cited %}
+* Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

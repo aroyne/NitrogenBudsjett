@@ -12,7 +12,3 @@ nav_order: 6
 ### Flow Description
 *Flow details for AT.AT-FS.FO-N2 fixation-N2*
 
-
-### References
-
-{% bibliography --cited %}

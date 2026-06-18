@@ -12,7 +12,3 @@ nav_order: 3
 ### Flow Description
 Taken from UNFCCC Common reporting tables, Table 4, where the only reported values are from wetlands.
 
-
-### References
-
-{% bibliography --cited %}

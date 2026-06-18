@@ -23,4 +23,4 @@ The chart below illustrates the integrated nitrogen mass balance for **PR.WW**. 
 
 ### References
 
-{% bibliography --cited %}
+* Missing reference data for key: `schulte_uebbing_planetary_2022`

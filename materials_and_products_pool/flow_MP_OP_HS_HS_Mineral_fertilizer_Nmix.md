@@ -15,4 +15,5 @@ nav_order: 8
 
 ### References
 
-{% bibliography --cited %}
+* FAO (2025). *Fertilizer by nutrient*.
+* Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

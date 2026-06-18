@@ -15,4 +15,5 @@ nav_order: 5
 
 ### References
 
-{% bibliography --cited %}
+* Missing reference data for key: `garg_ipcc_2006`
+* Missing reference data for key: `spilde_aasestad_2004`

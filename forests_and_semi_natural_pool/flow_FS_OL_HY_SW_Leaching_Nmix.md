@@ -15,4 +15,4 @@ Found in data supplied by NIVA, produced in the TEOTIL3 model \\citep{sample_teo
 
 ### References
 
-{% bibliography --cited %}
+* Sample, James Edward and Jackson-Blake, Leah and Vogelsang, Christian and Kaste, Øyvind (2024). *TEOTIL3}: {En} modell for beregning av kildebaserte tilførsler via elver og direktetilførsler til kyst*.

@@ -21,7 +21,3 @@ The chart below illustrates the integrated nitrogen mass balance for **HY.SW**. 
 
 * **HY.SW-AT.AT-Emissions-NOx** is assumed negligible.
 * **HY.SW-RW.RW-Export of surface water-Nmix** is assumed negligible due to Norwegian topography.
-
-### References
-
-{% bibliography --cited %}

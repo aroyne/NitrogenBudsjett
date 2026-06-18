@@ -20,7 +20,3 @@ The chart below illustrates the integrated nitrogen mass balance for **MP.OP**. 
 ### Flows that are zero or neglected:
 
 * **MP.OP-EF.TR-Ammonia as fuel-NH3** is set to zero because there is negligible use of ammonia as fuel today.
-
-### References
-
-{% bibliography --cited %}

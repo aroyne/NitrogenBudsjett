@@ -12,7 +12,3 @@ nav_order: 1
 ### Flow Description
 EF.EC-AT.AT-Emissions-N2O is taken from UNFCCC Common Reporting Tables...
 
-
-### References
-
-{% bibliography --cited %}

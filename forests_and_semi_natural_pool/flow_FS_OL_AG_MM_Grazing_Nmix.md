@@ -15,4 +15,4 @@ Calculated using data from NIBIO on organised grazing \\citep{nibio_organised_gr
 
 ### References
 
-{% bibliography --cited %}
+* Missing reference data for key: `nibio_organised_grazing_2025`

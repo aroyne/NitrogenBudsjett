@@ -15,4 +15,4 @@ nav_order: 1
 \citet{schappi_annexes_2025} advises using data from the EUROSTAT Gross nutrient balance...
 ### References
 
-{% bibliography --cited %}
+* Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

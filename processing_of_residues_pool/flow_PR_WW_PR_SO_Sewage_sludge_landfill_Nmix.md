@@ -15,4 +15,4 @@ nav_order: 6
 
 ### References
 
-{% bibliography --cited %}
+* Lassaletta, Luis and Billen, Gilles and Garnier, Josette and Bouwman, Lex and Velazquez, Eduardo and Mueller, Nathaniel D. and Gerber, James S. (2016). *Nitrogen use in the global food system: past trends and future trajectories of agronomic performance, pollution, trade, and dietary demand*. Environmental Research Letters.

@@ -15,4 +15,5 @@ nav_order: 1
 
 ### References
 
-{% bibliography --cited %}
+* Kaltenegger, Katrin and Bai, Zhaohai and Dragosits, Ulrike and Fan, Xiangwen and Greinert, Andrzej and Guéret, Samuel and Suchowska-Kisielewicz, Monika and Winiwarter, Wilfried and Zhang, Lin and Zhou, Feng (2023). *Urban nitrogen budgets: {Evaluating} and comparing the path of nitrogen through cities for improved management*. Science of The Total Environment.
+* Starck, Thomas and Fardet, Tanguy and Esculier, Fabien (2023). *Fate of nitrogen in {French} human excreta: current waste and agronomic opportunities for the future*.

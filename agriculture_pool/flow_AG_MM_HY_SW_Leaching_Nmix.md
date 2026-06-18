@@ -12,7 +12,3 @@ nav_order: 5
 ### Flow Description
 Taken from UNFCCC Common reporting tables, Table 3.
 
-
-### References
-
-{% bibliography --cited %}

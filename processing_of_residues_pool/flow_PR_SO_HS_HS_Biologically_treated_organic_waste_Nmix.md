@@ -15,4 +15,5 @@ nav_order: 6
 
 ### References
 
-{% bibliography --cited %}
+* Missing reference data for key: `{kaltenegger_urban_2023`
+* Missing reference data for key: `{starck_fate_2023`

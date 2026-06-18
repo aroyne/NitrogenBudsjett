@@ -12,7 +12,3 @@ nav_order: 2
 ### Flow Description
 EF.EC-AT.AT-Emissions-NOx: We have used data from CLRTAP Inventory Submissions...
 
-
-### References
-
-{% bibliography --cited %}

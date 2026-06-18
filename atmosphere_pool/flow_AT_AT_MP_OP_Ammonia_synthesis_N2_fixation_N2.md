@@ -12,7 +12,3 @@ nav_order: 15
 ### Flow Description
 *Flow details for AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2*
 
-
-### References
-
-{% bibliography --cited %}

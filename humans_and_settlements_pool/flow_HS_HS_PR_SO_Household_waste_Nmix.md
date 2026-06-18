@@ -17,4 +17,5 @@ Detailed data are not available prior to 1995, but trends in municipal and other
 
 ### References
 
-{% bibliography --cited %}
+* Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.
+* Missing reference data for key: `ssb_avfall_1997`

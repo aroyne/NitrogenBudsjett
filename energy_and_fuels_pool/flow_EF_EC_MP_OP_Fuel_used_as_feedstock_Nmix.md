@@ -12,7 +12,3 @@ nav_order: 6
 ### Flow Description
 EF.EC-MP.OP-Fuel used as feedstock-Nmix: We use SSB table 11561...
 
-
-### References
-
-{% bibliography --cited %}

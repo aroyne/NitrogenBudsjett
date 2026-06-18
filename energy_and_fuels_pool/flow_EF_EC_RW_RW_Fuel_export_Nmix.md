@@ -12,7 +12,3 @@ nav_order: 8
 ### Flow Description
 EF.EC-RW.RW-Fuel export-Nmix is the nitrogen content in exported fuels...
 
-
-### References
-
-{% bibliography --cited %}

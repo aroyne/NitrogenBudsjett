@@ -15,4 +15,5 @@ nav_order: 5
 
 ### References
 
-{% bibliography --cited %}
+* Missing reference data for key: `schulte_uebbing_planetary_2022`
+* Staalstrøm, André and Walday, Mats and Vogelsang, Christian and Frigstad, Helene and Borgersen, Gunhild and Albretsen, Jon and Naustvoll, Lars-Johan (2022). *Utredning av behovet for å redusere tilførslene av nitrogen til {Ytre} {Oslofjord*.

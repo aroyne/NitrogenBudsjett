@@ -15,4 +15,4 @@ nav_order: 8
 
 ### References
 
-{% bibliography --cited %}
+* Missing reference data for key: `{oita_substantial_2016`

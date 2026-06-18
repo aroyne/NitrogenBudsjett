@@ -15,4 +15,5 @@ We have used data from CLRTAP Inventory Submissions \\citep{emep_clrtap_2025} as
 
 ### References
 
-{% bibliography --cited %}
+* Missing reference data for key: `emep_clrtap_2025`
+* Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

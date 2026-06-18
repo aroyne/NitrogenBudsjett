@@ -15,4 +15,4 @@ Is taken from trade data, SSB table 08801. The critical role of non-food manufac
 
 ### References
 
-{% bibliography --cited %}
+* Hamilton, Helen A. and Ivanova, Diana and Stadler, Konstantin and Merciai, Stefano and Schmidt, Jannick and van Zelm, Rosalie and Moran, Daniel and Wood, Richard (2018). *Trade and the role of non-food commodities for global eutrophication*. Nature Sustainability.

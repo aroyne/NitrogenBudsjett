@@ -15,4 +15,9 @@ nav_order: 1
 
 ### References
 
-{% bibliography --cited %}
+* Missing reference data for key: `bruholt_longva_1994`
+* Missing reference data for key: `eidem_ruud_2022`
+* Missing reference data for key: `fao_feed_2021`
+* Missing reference data for key: `fao_jones_2023`
+* Missing reference data for key: `hohmann_marriott_2025`
+* Missing reference data for key: `landbruksdirektoratet_matkorn_2025`

@@ -15,4 +15,5 @@ Is found from source-receptor data from EMEP. Long-term trends in global atmosph
 
 ### References
 
-{% bibliography --cited %}
+* Ackerman, Daniel and Millet, Dylan B. and Chen, Xin (2019). *Global {Estimates} of {Inorganic} {Nitrogen} {Deposition} {Across} {Four} {Decades*. Global Biogeochemical Cycles.
+* Fowler, David and Coyle, Mhairi and Skiba, Ute and Sutton, Mark A. and Cape, J. Neil and Reis, Stefan and Sheppard, Lucy J. and Jenkins, Alan and Grizzetti, Bruna and Galloway, James N. and Vitousek, Peter and Leach, Allison and Bouwman, Alexander F. and Butterbach-Bahl, Klaus and Dentener, Frank and Stevenson, David and Amann, Marcus and Voss, Maren (2013). *The global nitrogen cycle in the twenty-first century*. Philosophical Transactions of the Royal Society B: Biological Sciences.

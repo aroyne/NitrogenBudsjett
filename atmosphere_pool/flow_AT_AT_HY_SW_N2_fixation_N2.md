@@ -12,7 +12,3 @@ nav_order: 14
 ### Flow Description
 *Flow details for AT.AT-HY.SW-N2 fixation-N2*
 
-
-### References
-
-{% bibliography --cited %}

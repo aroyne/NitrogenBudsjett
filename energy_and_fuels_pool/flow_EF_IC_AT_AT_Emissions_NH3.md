@@ -12,7 +12,3 @@ nav_order: 2
 ### Flow Description
 EF.IC-AT.AT-Emissions-NH3 denotes ammonia emissions from fuel combustion in industry...
 
-
-### References
-
-{% bibliography --cited %}
