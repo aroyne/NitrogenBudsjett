@@ -19,7 +19,7 @@ The chart below illustrates the integrated nitrogen mass balance for **PR.WW**. 
 
 ### Flows that are zero or neglected:
 
-* Direct industrial untreated sewer overflows are consolidated into total treated flows or omitted where minor regional boundaries apply \(schulte_uebbing_planetary_2022).
+* Direct industrial untreated sewer overflows are consolidated into total treated flows or omitted where minor regional boundaries apply (schulte_uebbing_planetary_2022).
 
 ### References
 

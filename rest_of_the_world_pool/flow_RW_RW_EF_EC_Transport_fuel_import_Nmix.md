@@ -10,7 +10,7 @@ nav_order: 7
 ![RW.RW-EF.TR-Import of transport fuel-Nmix](../output_files/plots/RW_RW_EF_EC_Transport_fuel_import_Nmix.png)
 
 ### Flow Description
-Is taken from trade data, SSB table 08801 for all fuel items for transport. The global nitrogen lifecycle footprint embedded within multi-regional transportation and consumption baskets is investigated by \Malik (2022).
+Is taken from trade data, SSB table 08801 for all fuel items for transport. The global nitrogen lifecycle footprint embedded within multi-regional transportation and consumption baskets is investigated by Malik (2022).
 
 
 ### References

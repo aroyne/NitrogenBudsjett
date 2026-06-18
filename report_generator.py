@@ -192,8 +192,8 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
                 # Sjekk om filen faktisk inneholder noen LaTeX-siteringer før vi gjør noe
                 if '\\citep' in content or '\\citet' in content:
                     # Erstatt rå-tekst med pen tekst
-                    updated_content = re.sub(r'\\citep\{\s*([^}]+)\s*\}', citep_replacer, content)
-                    updated_content = re.sub(r'\\citet\{\s*([^}]+)\s*\}', citet_replacer, updated_content)
+                    updated_content = re.sub(r'\\+citep\{\s*([^}]+)\s*\}', citep_replacer, content)
+                    updated_content = re.sub(r'\\+citet\{\s*([^}]+)\s*\}', citet_replacer, updated_content)
                     
                     # Skriv det oppdaterte innholdet tilbake til filen
                     with open(file_path, 'w', encoding='utf-8') as f:
@@ -226,7 +226,7 @@ def build_landing_page(output_filename, current_date_str, bib_filename):
                 "also include emissions from Norwegian economic activity on Svalbard (these are minor and mainly related to coal extraction, "
                 "which has now been discontinued). We also include emissions and N flows that originate in petroleum extraction on the Norwegian "
                 "continental shelf.\n"
-                "This NNB is built using the guidelines from \\citep{{winiwarter_inms_2025}}. Where flows are omitted or added to better fit "
+                "This NNB is built using the guidelines from \\citep{winiwarter_inms_2025}. Where flows are omitted or added to better fit "
                 "the Norwegian nitrogen system, this is commented. ")
         append_bibtex_references(f, bib_filename)
         

@@ -21,5 +21,5 @@ The chart below illustrates the integrated nitrogen mass balance for **RW**. It 
 ### Flows that are zero or neglected:
 
 * **RW.RW-MP.FP-Sea fish (landings)-Nmix** is set to zero because all wild fish catch is accounted for under HY.
-* **RW.RW-AG.SM-Manure import-Nmix** is assumed small and neglected based on regional boundary assumptions for agricultural surpluses \(Schulte-Uebbing, 2022).
+* **RW.RW-AG.SM-Manure import-Nmix** is assumed small and neglected based on regional boundary assumptions for agricultural surpluses (Schulte-Uebbing, 2022).
 * **RW.RW-HY.SW-Import of surface water-Nmix** are assumed negligible due to Norwegian topography.

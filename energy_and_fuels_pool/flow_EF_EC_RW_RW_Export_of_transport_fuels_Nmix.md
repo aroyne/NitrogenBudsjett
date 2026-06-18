@@ -10,7 +10,7 @@ nav_order: 7
 ![EF.EC-EF.TR-Fuel for transport-Nmix](../output_files/plots/EF_EC_RW_RW_Export_of_transport_fuels_Nmix.png)
 
 ### Flow Description
-EF.EC-EF.TR-Fuel for transport-Nmix: As advised by \Schäppi (2025)...
+EF.EC-EF.TR-Fuel for transport-Nmix: As advised by Schäppi (2025)...
 
 
 ### References

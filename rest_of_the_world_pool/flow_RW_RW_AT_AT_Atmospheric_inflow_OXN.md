@@ -10,7 +10,7 @@ nav_order: 4
 ![RW.RW-AT.AT-Atmospheric inflow-OXN](../output_files/plots/RW_RW_AT_AT_Atmospheric_inflow_OXN.png)
 
 ### Flow Description
-Is found from source-receptor data from EMEP. Global multi-decadal estimates of inorganic nitrogen deposition patterns, including the regional variances and declines over Europe, are thoroughly documented by \Ackerman (2019), while the broader atmospheric chemical transport of combustion emissions is detailed by \Fowler (2013). There is a change in methodology in the EMEP reporting between 2002 and 2003 data.
+Is found from source-receptor data from EMEP. Global multi-decadal estimates of inorganic nitrogen deposition patterns, including the regional variances and declines over Europe, are thoroughly documented by Ackerman (2019), while the broader atmospheric chemical transport of combustion emissions is detailed by Fowler (2013). There is a change in methodology in the EMEP reporting between 2002 and 2003 data.
 
 
 ### References
