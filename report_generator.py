@@ -19,8 +19,8 @@ DEPOSITION_TEXT = (
     "We find the total value of atmospheric deposition to the Norwegian mainland is, "
     "as given by NILU, 142 ktN in 2012-2016.\n\n"
     "As noted, our value for agricultural soils is much larger than given by FAOSTAT. "
-    "\\\\citet{hohmann_marriott_2025} used values from \\\\citet{blake_2023} to arrive at an average "
-    "N deposition rate of 80.85 ktN for the period 2017-2021. \\\\citet{hohmann_marriott_2025} "
+    "\\\\citet{hohmann-marriott_nitrogen_2025} used values from \\\\citet{blake_deposition_2023} to arrive at an average "
+    "N deposition rate of 80.85 ktN for the period 2017-2021. \\\\citet{hohmann-marriott_nitrogen_2025} "
     "also reported values of 74.7 and 33.5 ktN per year using two different methods "
     "for estimating biome-dependent N deposition rates."
 )
@@ -116,7 +116,91 @@ def append_bibtex_references(file_handle, bib_filename=None):
 
     # Skriv listen til filen
     for ref in formatted_refs:
-        file_handle.write(f"{ref}\n")# ==============================================================================
+        file_handle.write(f"{ref}\n")
+    
+import os
+import re
+
+def fix_all_citations_in_folder(folder_path, bib_filename):
+    """
+    Går igjennom alle .md-filer i en mappe, leser bib-filen, og erstatter
+    \citep{key} med (Forfatter, År) og \citet{key} med Forfatter (År) direkte i filene.
+    """
+    if not os.path.exists(bib_filename):
+        print(f"Bib-fil ikke funnet: {bib_filename}")
+        return
+
+    # 1. Pars .bib-filen for å hente ut forfattere og årstall
+    references_dict = {}
+    current_entry = None
+    
+    with open(bib_filename, 'r', encoding='utf-8') as bib_file:
+        for line in bib_file:
+            line_stripped = line.strip()
+            match_start = re.match(r'@\w+\{\s*([^,]+),', line_stripped)
+            if match_start:
+                current_entry = match_start.group(1).strip()
+                references_dict[current_entry] = {}
+                continue
+            
+            if current_entry and '=' in line_stripped:
+                key, val = line_stripped.split('=', 1)
+                key = key.strip().lower()
+                val = re.sub(r'[{"},\s]+$', '', val.strip())
+                val = re.sub(r'^[{"\s]+', '', val)
+                if key in ['author', 'year']:
+                    references_dict[current_entry][key] = val
+
+    # Interne hjelpefunksjoner for å gjøre selve erstatningen
+    def citep_replacer(match):
+        keys = [k.strip() for k in match.group(1).split(',')]
+        parts = []
+        for key in keys:
+            if key in references_dict:
+                author = references_dict[key].get('author', 'Unknown')
+                # Hent kun etternavn/organisasjon før eventuelt komma
+                short_author = author.split(',')[0].strip()
+                year = references_dict[key].get('year', 'n.d.')
+                parts.append(f"{short_author}, {year}")
+            else:
+                parts.append(key)
+        return f"({'; '.join(parts)})"
+
+    def citet_replacer(match):
+        keys = [k.strip() for k in match.group(1).split(',')]
+        parts = []
+        for key in keys:
+            if key in references_dict:
+                author = references_dict[key].get('author', 'Unknown')
+                short_author = author.split(',')[0].strip()
+                year = references_dict[key].get('year', 'n.d.')
+                parts.append(f"{short_author} ({year})")
+            else:
+                parts.append(f"{key} (n.d.)")
+        return ", ".join(parts)
+
+    # 2. Gå igjennom alle filer i mappen (og undermapper)
+    for root, dirs, files in os.walk(folder_path):
+        for filename in files:
+            if filename.endswith(".md"):
+                file_path = os.path.join(root, filename)
+                
+                # Les innholdet i filen
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                
+                # Sjekk om filen faktisk inneholder noen LaTeX-siteringer før vi gjør noe
+                if '\\citep' in content or '\\citet' in content:
+                    # Erstatt rå-tekst med pen tekst
+                    updated_content = re.sub(r'\\citep\{\s*([^}]+)\s*\}', citep_replacer, content)
+                    updated_content = re.sub(r'\\citet\{\s*([^}]+)\s*\}', citet_replacer, updated_content)
+                    
+                    # Skriv det oppdaterte innholdet tilbake til filen
+                    with open(file_path, 'w', encoding='utf-8') as f:
+                        f.write(updated_content)
+                    print(f"Oppdaterte referanser i filen: {filename}")
+                    
+# ==============================================================================
 # SPESIFIKKE FUNKSJONER FOR HVER ENKELT POOL
 # ==============================================================================
 
@@ -136,7 +220,7 @@ def build_landing_page(output_filename, current_date_str, bib_filename):
         f.write("This platform visualizes and centralizes the outputs from our Monte Carlo uncertainty analysis simulations.\n\n")
         f.write("Use the navigation menu on the left side to explore the individual nitrogen pools ")
         f.write("(e.g., Forests and Semi-natural Vegetation, Agriculture, Atmosphere, Hydrosphere, Rest of the World) ")
-        f.write("and access detailed statistical time-series graphs, methodological explanations, and parameterizations for each specific flow.\n")
+        f.write("and access detailed statistical time-series graphs, methodological explanations, and parameterizations for each specific flow.\n\n")
         f.write("For flows connected to the hydrosphere, and for land-relateds emissions and nitrogen deposition, "
                 "we only consider the Norwegian mainland. For emissions to air reported through the UNFCCC framework we "
                 "also include emissions from Norwegian economic activity on Svalbard (these are minor and mainly related to coal extraction, "
@@ -864,7 +948,7 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename):
                     "gives statistics for total amount of feed to Norwegian farm animals between 1959 and 2026. Table 6.10 in \\\\citet{bruholt_longva_1994} "
                     "gives the domestically produced fraction of farm animal feed between 1985 and 1994. We combine these data to find values before 2000, "
                     "using an average import fraction for 1995-1999.\\n\\n"
-                    "\\\\citet{hohmann_marriott_2025} found the domestic supply of animal feed in 2010 to be around 35 ktN, based on FAO statistics of production, "
+                    "\\\\citet{hohmann-marriott_nitrogen_2025} found the domestic supply of animal feed in 2010 to be around 35 ktN, based on FAO statistics of production, "
                     "export and import of seed cake, which is a dominant ingredient in farm animal feed. This is less than we found when combining domestic and imported animal feed. "
                     "*(Note: This estimate might be too low, as it leads to a surplus here and a deficit in the AG.MM pool).*"
                 )
@@ -900,7 +984,7 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename):
                     "**MP.FP-HY.AC-Feed to coastal aquaculture-Nmix**: the amount of feed per ton of produced fish is found by assuming an "
                     "average protein (N) retention of 35.37 % based on values from \\\\citet{aas_aquaculture_2022}. The amount of produced fish is found by using data "
                     "from Fiskeridirektoratet \\\\citep{fiskeridirektoratet_statistikk_2025} on sold farmed fish.\\n\\n"
-                    "\\\\citet{hohmann_marriott_2025} found the nitrogen content in aquaculture feed in 2020 to be 124 ktN, which is very similar to our results."
+                    "\\\\citet{hohmann-marriott_nitrogen_2025} found the nitrogen content in aquaculture feed in 2020 to be 124 ktN, which is very similar to our results."
                 )
             elif "untreated" in norm and "fp" in norm:
                 exact_flow_code = "MP.FP-HY.SW-Untreated wastewater-Nmix"
@@ -1301,69 +1385,80 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
 
     current_date_str = datetime.now().strftime("%B %d, %Y")
 
-    print("[RAPPORT] Sletter gamle midlertidige filer fra rotmappen for å unngå rot...")
+    # Liste over alle pool-mappene vi bruker
+    pool_folders = [
+        "atmosphere_pool",
+        "rest_of_the_world_pool",
+        "agriculture_pool",
+        "forests_and_semi_natural_pool",
+        "hydrosphere_pool",
+        "humans_and_settlements_pool",
+        "energy_and_fuels_pool",
+        "materials_and_products_pool",
+        "processing_of_residues_pool"
+    ]
+
+    print("[RAPPORT] Sletter gamle midlertidige filer fra pool-mappene for å unngå rot...")
+    # Slett gamle filer i rotmappen (f.eks. gamle index.md eller feilplasserte filer)
     for f_old in os.listdir('.'):
         if (f_old.startswith("flow_") or f_old.startswith("pool_") or f_old.startswith("subpool_")) and f_old.endswith(".md"):
             os.remove(f_old)
+            
+    # Slett gamle filer inni selve pool-mappene, slik at vi starter med blanke ark
+    for folder in pool_folders:
+        if os.path.exists(folder):
+            for f_old in os.listdir(folder):
+                if f_old.endswith(".md"):
+                    os.remove(os.path.join(folder, f_old))
 
     print("[RAPPORT] Bygger hierarkisk dokumentasjonsportal med egne pool-mapper...")
 
-    # 1. Hovedlandingsside
+    # 1. Hovedlandingsside (index.md legges i rotmappen)
     build_landing_page(output_filename, current_date_str, bib_filename)
 
     # 2. Atmosphere Pool
-    at_folder = "atmosphere_pool"
-    os.makedirs(at_folder, exist_ok=True)
-    process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename)
+    os.makedirs(pool_folders[0], exist_ok=True)
+    process_atmosphere_pool(pool_folders[0], plot_files, plot_dir, bib_filename)
 
     # 3. Rest of the World Pool
-    rw_folder = "rest_of_the_world_pool"
-    os.makedirs(rw_folder, exist_ok=True)
-    process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename)
+    os.makedirs(pool_folders[1], exist_ok=True)
+    process_rest_of_the_world_pool(pool_folders[1], plot_files, plot_dir, bib_filename)
 
     # 4. Agriculture Pool
-    ag_folder = "agriculture_pool"
-    os.makedirs(ag_folder, exist_ok=True)
-    process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename)
+    os.makedirs(pool_folders[2], exist_ok=True)
+    process_agriculture_pool(pool_folders[2], plot_files, plot_dir, bib_filename)
 
     # 5. Forests Pool
-    fs_folder = "forests_and_semi_natural_pool"
-    os.makedirs(fs_folder, exist_ok=True)
-    process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename)
+    os.makedirs(pool_folders[3], exist_ok=True)
+    process_forests_pool(pool_folders[3], plot_files, plot_dir, bib_filename)
 
     # 6. Hydrosphere Pool
-    hy_folder = "hydrosphere_pool"
-    os.makedirs(hy_folder, exist_ok=True)
-    process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename)
+    os.makedirs(pool_folders[4], exist_ok=True)
+    process_hydrosphere_pool(pool_folders[4], plot_files, plot_dir, bib_filename)
 
     # 7. Humans and Settlements Pool
-    hs_folder = "humans_and_settlements_pool"
-    os.makedirs(hs_folder, exist_ok=True)
-    process_humans_and_settlements_pool(hs_folder, plot_files, plot_dir, bib_filename)
+    os.makedirs(pool_folders[5], exist_ok=True)
+    process_humans_and_settlements_pool(pool_folders[5], plot_files, plot_dir, bib_filename)
 
     # 8. Energy and Fuels Pool
-    ef_folder = "energy_and_fuels_pool"
-    os.makedirs(ef_folder, exist_ok=True)
-    process_energy_and_fuels_pool(ef_folder, plot_files, plot_dir, bib_filename)
+    os.makedirs(pool_folders[6], exist_ok=True)
+    process_energy_and_fuels_pool(pool_folders[6], plot_files, plot_dir, bib_filename)
     
     # 9. Materials and Products Pool
-    mp_folder = "materials_and_products_pool"
-    os.makedirs(mp_folder, exist_ok=True)
-    process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename)
+    os.makedirs(pool_folders[7], exist_ok=True)
+    process_materials_pool(pool_folders[7], plot_files, plot_dir, bib_filename)
     
-    # 10. Materials and Products Pool
-    mp_folder = "materials_and_products_pool"
-    os.makedirs(mp_folder, exist_ok=True)
-    process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename)
-
-    # === NYTT TILLEGG: Processing of residues Pool ===
-    pr_folder = "processing_of_residues_pool"
-    os.makedirs(pr_folder, exist_ok=True)
-    process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_filename)
+    # 10. Processing of residues Pool
+    os.makedirs(pool_folders[8], exist_ok=True)
+    process_processing_of_residues_pool(pool_folders[8], plot_files, plot_dir, bib_filename)
+    
+    # 11. Fikse format på referanser i ALLE mapper automatisk
+    # Siden fix_all_citations_in_folder bruker os.walk(), vil "." (gjeldende mappe) 
+    # gjøre at den finkjemmer både rotmappen og alle undermappene vi nettopp lagde.
+    print("[RAPPORT] Konverterer LaTeX-siteringer til ren tekst...")
+    fix_all_citations_in_folder(".", bib_filename)
 
     print("[RAPPORT] Portalbygging fullført suksessfullt!")
-
-
 '''
 Du kan slå sammen og konvertere Markdown-filene dine til en ferdig PDF ved å kjøre følgende i terminalen:
 pandoc pool_rest_of_the_world.md flow_*.md \

@@ -19,4 +19,4 @@ The chart below illustrates the integrated nitrogen mass balance for **AG.MM**. 
 
 ### Flows that are zero or neglected:
 
-* **AG.MM-RW.RW-Manure export-Nmix** is assumed small and neglected.\\citep{schulte-uebbing_planetary_2022}
+* **AG.MM-RW.RW-Manure export-Nmix** is assumed small and neglected.\(Schulte-Uebbing, 2022)

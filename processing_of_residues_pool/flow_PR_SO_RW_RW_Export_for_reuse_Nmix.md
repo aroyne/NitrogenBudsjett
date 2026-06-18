@@ -10,7 +10,7 @@ nav_order: 12
 ![PR.SO-RW.RW-Export for reuse-Nmix](../output_files/plots/PR_SO_RW_RW_Export_for_reuse_Nmix.png)
 
 ### Flow Description
-**PR.SO-RW.RW-Export for reuse-Nmix** is exported used textiles. Data taken from trade data, SSB table 08801, and follows global non-food trade patterns described in \\citep{hamilton_trade_2018}.
+**PR.SO-RW.RW-Export for reuse-Nmix** is exported used textiles. Data taken from trade data, SSB table 08801, and follows global non-food trade patterns described in \(Hamilton, 2018).
 
 
 ### References

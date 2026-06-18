@@ -7,7 +7,7 @@ has_children: true
 
 # Pool: Hydrosphere (HY)
 
-We have chosen to not include the pool groundwater (GW) because N concentrations and dynamics in Norway are largely unknown \\citep{kvaerno_2024}.
+We have chosen to not include the pool groundwater (GW) because N concentrations and dynamics in Norway are largely unknown \(kvaerno_2024).
 
 The hydrosphere ecosystem is split into three operational modules. Explore them below:
 

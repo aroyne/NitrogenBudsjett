@@ -10,7 +10,7 @@ nav_order: 4
 ![PR.SO-AT.AT-Emissions-NOx](../output_files/plots/PR_SO_AT_AT_Emissions_NOx.png)
 
 ### Flow Description
-**PR.SO-AT.AT-Emissions-NOx**: We have used data from CLRTAP Inventory Submissions, using the categories given in Table 48 and 31 (emissions from category 1A1 Energy industries are all assigned to the EF pool). General atmospheric pathways of combustion emissions follow \\citep{fowler_global_2013}.
+**PR.SO-AT.AT-Emissions-NOx**: We have used data from CLRTAP Inventory Submissions, using the categories given in Table 48 and 31 (emissions from category 1A1 Energy industries are all assigned to the EF pool). General atmospheric pathways of combustion emissions follow \(Fowler, 2013).
 
 
 ### References

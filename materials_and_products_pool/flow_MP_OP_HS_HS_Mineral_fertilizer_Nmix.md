@@ -10,7 +10,7 @@ nav_order: 8
 ![MP.OP-HS.HS-Mineral fertilizer-Nmix](../output_files/plots/MP_OP_HS_HS_Mineral_fertilizer_Nmix.png)
 
 ### Flow Description
-**MP.OP-HS.HS-Mineral fertilizer-Nmix**: as advised by \\citet{schappi_annexes_2025}, we assume a default value of 2% of total mineral fertilizer for non-agricultural use. Data for fertilizer use in agriculture are taken from FAOSTAT Fertilizer by nutrient \\citep{fao_fertilizer_2025}.
+**MP.OP-HS.HS-Mineral fertilizer-Nmix**: as advised by \Schäppi (2025), we assume a default value of 2% of total mineral fertilizer for non-agricultural use. Data for fertilizer use in agriculture are taken from FAOSTAT Fertilizer by nutrient \(FAO, 2025).
 
 
 ### References

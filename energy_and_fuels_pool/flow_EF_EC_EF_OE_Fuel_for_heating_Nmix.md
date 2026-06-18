@@ -10,7 +10,7 @@ nav_order: 4
 ![EF.EC-EF.OE-Fuel for heating-Nmix](../output_files/plots/EF_EC_EF_OE_Fuel_for_heating_Nmix.png)
 
 ### Flow Description
-EF.EC-EF.OE-Fuel for heating-Nmix: As advised by \\citet{schappi_annexes_2025}...
+EF.EC-EF.OE-Fuel for heating-Nmix: As advised by \Schäppi (2025)...
 
 
 ### References

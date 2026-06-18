@@ -10,7 +10,7 @@ nav_order: 3
 ![PR.SO-AT.AT-Emissions-NH3](../output_files/plots/PR_SO_AT_AT_Emissions_NH3.png)
 
 ### Flow Description
-**PR.SO-AT.AT-Emissions-NH3**: We have used data from CLRTAP Inventory Submissions, using the categories given in Table 48 and 31 (emissions from category 1A1 Energy industries are all assigned to the EF pool). Dynamics of atmospheric deposition and chemically reduced forms are supported by \\citep{ackerman_global_2019}.
+**PR.SO-AT.AT-Emissions-NH3**: We have used data from CLRTAP Inventory Submissions, using the categories given in Table 48 and 31 (emissions from category 1A1 Energy industries are all assigned to the EF pool). Dynamics of atmospheric deposition and chemically reduced forms are supported by \(Ackerman, 2019).
 
 
 ### References
