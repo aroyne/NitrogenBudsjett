@@ -380,21 +380,22 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename):
 
             if exact_flow_code == "AT.AT-AG.SM-Biological N2 fixation-N2":
                 # Byttet ut [ukjent_nøkkel] med en narrativ LaTeX-sitatvariant \citet{}
-                f.write(f"**{exact_flow_code}**\n\n\\citet{{schappi_annexes_2025}} advises using data from the EUROSTAT Gross nutrient balance, but there "
-                        "is an error in this dataset for Norway which is currently being corrected (as of February 2026; personal correspondence, "
-                        "EUROSTAT). According to the EUROSTAT metadata, the BNF in this statistic is calculated based on the area of leguminous crops and "
-                        "fization coefficients. The production of leguminous crops (peas, beans etc) in Norway is very low and we assume that agricultural "
-                        "BNF is for the most part determined by leguminous crops such as clover grown on pastures and in fodder production. "
-                        "\\citet{{bleken_nitrogen_1997}} based their estimate for BNF from the sale of clover seeds: a sale of about 145 t seeds was "
-                        "estimated to be used to plant 95 000 ha of grass/clover mixtures (655 ha/t seeds). Together with a rate of BNF of 80 kgN/ha on "
-                        "this area, they found a total of 7.6 ktN per year and summed up to 8 ktN to account for BNF from free-living orghanisms and "
-                        "other sources. The rate of 80 kgN/ha agrees relatively well with later studies of agricultural BNF in Norway, where average "
-                        "values between 10 and 100 kgN/ha have been found; the highest values in particularly productive areas were up to 260 kgN/ha "
-                        "(https://orgprints.org/id/eprint/37546/1/NORSØK%20Rapport%20nr.%203%202020%20Engbelgvekster.pdf). Yearly statistics of clover " 
-                        "seed sales are not available, but according to NIBIO Totalkalkylen (NIBIO, 2025b), the area where grass/clover mixes may be "
-                        "sown for pasture and fodder production (fulldyrka eng) has remained constant to within about 3 % from 1995 up to today. Our "
-                        "best estimate for BNF, and for consistency with the previous study, is therefore to assume a constant value of 8 ktN/year. "
-                        "In Sweden \\cite{{moldan_where_2025}} the value was found to be 34 kT in 2015, which is more in line with the values found before 2000. ")
+                f.write(f"""**{exact_flow_code}**
+                    \\citet{{schappi_annexes_2025}} advises using data from the EUROSTAT Gross nutrient balance, but there \
+                    is an error in this dataset for Norway which is currently being corrected (as of February 2026; personal correspondence, \
+                    EUROSTAT). According to the EUROSTAT metadata, the BNF in this statistic is calculated based on the area of leguminous crops and \
+                    fization coefficients. The production of leguminous crops (peas, beans etc) in Norway is very low and we assume that agricultural \
+                    BNF is for the most part determined by leguminous crops such as clover grown on pastures and in fodder production. \
+                    \\citet{{bleken_nitrogen_1997}} based their estimate for BNF from the sale of clover seeds: a sale of about 145 t seeds was \
+                    estimated to be used to plant 95 000 ha of grass/clover mixtures (655 ha/t seeds). Together with a rate of BNF of 80 kgN/ha on \
+                    this area, they found a total of 7.6 ktN per year and summed up to 8 ktN to account for BNF from free-living orghanisms and \
+                    other sources. The rate of 80 kgN/ha agrees relatively well with later studies of agricultural BNF in Norway, where average \
+                    values between 10 and 100 kgN/ha have been found; the highest values in particularly productive areas were up to 260 kgN/ha \
+                    (https://orgprints.org/id/eprint/37546/1/NORSØK%20Rapport%20nr.%203%202020%20Engbelgvekster.pdf). Yearly statistics of clover \
+                    seed sales are not available, but according to NIBIO Totalkalkylen (NIBIO, 2025b), the area where grass/clover mixes may be \
+                    sown for pasture and fodder production (fulldyrka eng) has remained constant to within about 3 % from 1995 up to today. Our \
+                    best estimate for BNF, and for consistency with the previous study, is therefore to assume a constant value of 8 ktN/year. \
+                    In Sweden \\citep{{moldan_where_2025}} the value was found to be 34 kT in 2015, which is more in line with the values found before 2000.""")
             elif exact_flow_code in ["AT.AT-FS.FO-Deposition-OXN", "AT.AT-FS.FO-Deposition-RDN", "AT.AT-FS.OL-Deposition-OXN", "AT.AT-FS.OL-Deposition-RDN", "AT.AT-HS.HS-Deposition-OXN", "AT.AT-HS.HS-Deposition-RDN"]:
                 f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_TEXT + "\n\n")
             elif exact_flow_code in ["AT.AT-HY.SW-Deposition-RDN","AT.AT-HY.SW-Deposition-RDN"]:
@@ -407,11 +408,13 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename):
                         "N deposition rate of 80.85 ktN for the period 2017-2021. \\\\citet{hohmann-marriott_nitrogen_2025} "
                         "also reported values of 74.7 and 33.5 ktN per year using two different methods "
                         "for estimating biome-dependent N deposition rates.")
-            elif exact_flow_code == "AT.AT-FS.FO-N2 Fixation-N2":
-                f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_TEXT + "\n\nFollowing the Swedish NBB \\cite{{moldan_where_2025}}, we use an N-fixation "
+            elif exact_flow_code == "AT.AT-FS.FO-N2 fixation-N2":
+                f.write(f"**{exact_flow_code}**\n\n" + "\n\nFollowing the Swedish NBB \\cite{{moldan_where_2025}}, we use an N-fixation "
                         "rate of 1.5 kg/ha/year and a forested area of 12.0 mill ha as given by SSB for 2019-2023 (table 14368); we assume this value is "
                         "constant for our entire time period. This gives an annual N-fixation rate of 18.0 ktN. For comparison, the value for Sweden "
-                        "in 2015 was found to be 39.5 ktN \\cite{{moldan_where_2025}}.")
+                        "in 2015 was found to be 39.5 ktN \\cite{{moldan_where_2025}}. IN PROGRESS")
+            elif exact_flow_code == "AT.AT-FS.OL-N2 fixation-N2":
+                f.write(f"**{exact_flow_code}**\n\n" + "\n\nIN PROGRESS")
             elif exact_flow_code == "AT.AT-HY.SW-N2 Fixation-N2":
                 f.write(f"**{exact_flow_code}**\n\n" + "According to NIBIO, the surface water area is 20 457 km2 "
                         "https://arealbarometer.nibio.no/nb/norge/. According to  \\citep{{schappi_annexes_2025}}, the biological fixation rate can vary "
@@ -460,39 +463,34 @@ def process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename
             exact_flow_code = "RW.RW-HY.AC-Aquaculture feed import-Nmix"
             display_name = "Aquaculture Feed Import"
             description = (
-                "The flow **RW.RW-HY.AC-Aquaculture feed import-Nmix** has been added to account for the substantial "
-                "import of feed to aquaculture. We assume a constant import fraction of 0.92 for the year 2020. "
-                "The structural shifts allocating significant global crop and protein footprints directly into aquaculture or livestock "
-                "feed systems follow the international trajectories outlined by \\\\citet{lassaletta_nitrogen_2016}. "
-                "The amount of feed used is based on the amount of fish produced, calculated using data from "
-                "Fiskeridirektoratet on sold farmed fish, assuming average protein (N) retention of 35.75%, "
-                "2.8% nitrogen content in fish and shellfish, and 3% feed waste."
+                "We assume a constant import fraction of 0.92 as given by \\citet{aas_utilization_2022} for the year 2020. "
+                "The amount of feed used is based on the amount of fish produced, calculated using data from \\citet{fiskeridirektoratet_06002_2025}"
+                "on sold farmed fish, assuming average protein (N) retention of 35,75 % \\citep{aas_utilization_2022}, 2.8 % nitrogen content "
+                "in fish and shellfish  \\citet{schappi_annexes_2025}, p. 254) and 3% feed waste \citet{wang_chemical_2013}."
             )
         elif "feed" in norm and "animal" in norm:
             exact_flow_code = "RW.RW-AG.MM-Animal feed import-Nmix"
             display_name = "Animal Feed Import"
             description = (
                 "Data on imported animal feed is taken from Landbruksdirektoratet and we have used the detailed "
-                "composition of animal feed together with protein contents from FAO and specific Jones factors to get nitrogen contents. "
-                "This massive scale of routing vegetable and animal protein through trade loops to sustain livestock production is contextualized globally "
-                "by \\\\citet{lassaletta_nitrogen_2016}. Based on the Landbruksdirektoratet data, the N content of the total amount of feed is 0.02 kgN/kg feed. "
-                "NIBIO Totalkalkylen gives statistics for total amount of feed to Norwegian farm animals between 1959 and 2026, combined with historical "
-                "domestically produced fraction statistics to determine import dynamics prior to 2000."
+                "composition of animal feed together with protein contents from FAO and specific Jones factors to get nitrogen contents.\n\n "
+                "Based on the Landbruksdirektoratet data, the N content of the total amount of feed is 0.02 kgN/kg feed. "
+                "NIBIO Totalkalkylen gives statistics for total amount of feed to Norwegian farm animals between 1959 and 2026Table 6.10 in "
+                "\\citep{bruholt_jordbruksstatistikk_1994} gives the domestically produced fraction of farm animal feed between 1985 and 1994. "
+                "We combine these data to find values before 2000, using an average import fraction for 1995-1999"
             )
         elif "live" in norm and "animal" in norm:
             exact_flow_code = "RW.RW-AG.MM-Live animal import-Nmix"
             display_name = "Live Animal Import"
             description = (
                 "Is taken from FAOSTAT Crops and livestock products, assuming typical weights of animals from various sources, "
-                "average 16% protein in whole animal and Jones factor 6.25 for nitrogen to protein (standard). The underlying "
-                "drivers relating expanding dietary demand and trade to reactive nitrogen impacts are evaluated by \\\\citet{malik_drivers_2022}."
+                "average 16% protein in whole animal and Jones factor 6.25 for nitrogen to protein (standard)."
             )
         elif "mineral" in norm and "fertilizer" in norm:
             exact_flow_code = "RW.RW-AG.SM-Mineral fertilizer import-Nmix"
             display_name = "Mineral Fertilizer Import"
             description = (
-                "Is taken from FAOSTAT Fertilizer by nutrient. The global influx of synthetic inorganic fertilizers and its dominant "
-                "role in altering the biospheric cycle on a planetary scale is extensively analyzed by \\\\citet{smil_nitrogen_1999}. Because anhydrous "
+                "Is taken from FAOSTAT Fertilizer by nutrient \\citet{fao_fertilizer_2025}. Because anhydrous "
                 "ammonia is not used directly as fertilizer in Norway, it is not counted as a fertilizer in this particular FAO statistic. "
                 "We therefore include NH3 import in the flow **RW.RW-MP.OP-Other goods import-Nmix**."
             )
@@ -500,61 +498,51 @@ def process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename
             exact_flow_code = "RW.RW-AT.AT-Atmospheric inflow-OXN"
             display_name = "Atmospheric Inflow (Oxidized N)"
             description = (
-                "Is found from source-receptor data from EMEP. Global multi-decadal estimates of inorganic nitrogen deposition patterns, "
-                "including the regional variances and declines over Europe, are thoroughly documented by \\\\citet{ackerman_global_2019}, while the "
-                "broader atmospheric chemical transport of combustion emissions is detailed by \\\\citet{fowler_global_2013}. There is a change "
+                "Is found from source-receptor data from EMEP, as advised by \\citep{schappi_annexes_2025}. There is a change "
                 "in methodology in the EMEP reporting between 2002 and 2003 data."
             )
         elif "inflow" in norm and "rdn" in norm:
             exact_flow_code = "RW.RW-AT.AT-Atmospheric inflow-RDN"
             display_name = "Atmospheric Inflow (Reduced N)"
             description = (
-                "Is found from source-receptor data from EMEP. Long-term trends in global atmospheric inputs, specifically the balance "
-                "and transport of reduced reactive nitrogen forms (such as ammonia emissions from land), are evaluated by \\\\citet{fowler_global_2013} "
-                "and \\\\citet{ackerman_global_2019}. There is a change in methodology in the EMEP reporting between 2002 and 2003 data."
+                "Is found from source-receptor data from EMEP, as advised by \\citep{schappi_annexes_2025}. There is a change "
+                "in methodology in the EMEP reporting between 2002 and 2003 data."
             )
         elif "fuel" in norm and "import" in norm and "transport" not in norm:
             exact_flow_code = "RW.RW-EF.EC-Fuel import-Nmix"
             display_name = "Fuel Import"
             description = (
-                "Is taken from trade data, SSB table 08801 for all fuel items except those for transport. The broader perspective of how "
-                "industrial fuel combustion scales inter-sectoral dependencies and drives global nitrogen footprints is assessed via input-output analysis by \\\\citet{malik_drivers_2022}."
+                "Is taken from trade data, SSB table 08801 for all fuel items except those for transport."
             )
         elif "transport" in norm and "fuel" in norm:
             exact_flow_code = "RW.RW-EF.TR-Import of transport fuel-Nmix"
             display_name = "Transport Fuel Import"
-            description = "Is taken from trade data, SSB table 08801 for all fuel items for transport. The global nitrogen lifecycle footprint embedded within multi-regional transportation and consumption baskets is investigated by \\\\citet{malik_drivers_2022}."
+            description = "Is taken from trade data, SSB table 08801 for all fuel items for transport."
         elif "food" in norm and "import" in norm:
             exact_flow_code = "RW.RW-MP.FP-Food import-Nmix"
             display_name = "Food Import"
             description = (
-                "Is taken from trade data, SSB table 08801. The substantial amount of reactive nitrogen pollution embedded internationally "
-                "through commodity trade and dietary final demand consumption is heavily supported by \\\\citet{oita_substantial_2016}. "
-                "The HS codes and associated nitrogen contents used are found in the supplementary file."
+                "Is taken from trade data, SSB table 08801."
             )
         elif "ammonia" in norm and "import" in norm:
             exact_flow_code = "RW.RW-MP.OP-Ammonia import-Nmix"
             display_name = "Ammonia Import"
             description = (
-                "Is taken from trade data, SSB table 08801. The prospective environmental pressures and potential alterations to the global nitrogen cycle "
-                "induced by escalating international trade and the emerging ammonia energy sector are critically discussed by \\\\citet{chen_bunkering_2024} "
-                "and \\\\citet{bertagni_minimizing_2023}."
+                "Is taken from trade data, SSB table 08801."
             )
         elif "other" in norm and "goods" in norm:
             exact_flow_code = "RW.RW-MP.OP-Other goods import-Nmix"
             display_name = "Other Goods Import"
             description = (
-                "Is taken from trade data, SSB table 08801. The critical role of non-food manufacturing commodities, such as textiles, clothing, "
-                "and shelter materials, in driving global marine and freshwater eutrophication footprints via international trade agreements is modeled by \\\\citet{hamilton_trade_2018}. "
-                "Import of N2 is a large contributor but not included here because it does not contribute to the reactive nitrogen cycle."
+                "Is taken from trade data, SSB table 08801. Import of N2 is a large contributor but not included here because it "
+                "does not contribute to the reactive nitrogen cycle."
             )
         elif "solid" in norm and "waste" in norm:
             exact_flow_code = "RW.RW-PR.SO-Solid waste import-Nmix"
             display_name = "Solid Waste Import"
             description = (
                 "Is taken from trade data, SSB table 08801. We include imports of municipal waste, wastewater sludge, "
-                "hazardous waste, plastic, paper and textile waste. Cross-boundary waste trade footprints and their structural decomposition "
-                "relative to population and affluence are aligned with \\\\citet{malik_drivers_2022} and \\\\citet{hamilton_trade_2018}."
+                "hazardous waste, plastic, paper and textile waste."
             )
 
         with open(full_flow_path, 'w', encoding='utf-8') as f:
