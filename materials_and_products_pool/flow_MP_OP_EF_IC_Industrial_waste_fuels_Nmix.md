@@ -10,11 +10,7 @@ nav_order: 5
 ![MP.OP-EF.IC-Industrial waste fuels-Nmix](../output_files/plots/MP_OP_EF_IC_Industrial_waste_fuels_Nmix.png)
 
 ### Flow Description
-**MP.OP-EF.IC-Industrial waste fuels-Nmix** is wood waste used as biofuel in the industries where the waste originates, reported as "egentilvirket bioenergi" in the SSB statistic (table 08205). Producers of wood and paper products obtain a significant fraction of their energy through this source. “Egentilvirket bioenergi” encompasses “black liquor” as well as wood waste. For lack of better compositional details we have assumed values for the entire flow corresponding to wood, although this brings significant uncertainty.
-
-The net caloric value of 15.6 for conversion is taken from table 1.2 in (Garg et al., 2006) and we assume a mean N content of 4.0 kg/t (between coniferous and non-coniferous wood; see FS.FO-MP.OP-Industrial round wood-Nmix).
-
-SSB has not reported data on this energy category before 1998, but the size of these industries was relatively constant through the period 1991-2001 (Spilde & Aasestad, 2004). For years 1990-1997 we have therefore used the average for the next 10 years (1998-2007).
+**MP.OP-EF.IC-Industrial waste fuels-Nmix** is wood waste used as biofuel in the industries where the waste originates, reported as "egentilvirket bioenergi" in the SSB statistic (table 08205). Producers of wood and paper products obtain a significant fraction of their energy through this source. “Egentilvirket bioenergi” encompasses “black liquor” as well as wood waste. For lack of better compositional details we have assumed values for the entire flow corresponding to wood, although this brings significant uncertainty.\n\nThe net caloric value of 15.6 for conversion is taken from table 1.2 in \\citet{garg_ipcc_2006} and we assume a mean N content of 4.0 kg/t (between coniferous and non-coniferous wood; see FS.FO-MP.OP-Industrial round wood-Nmix).\n\nSSB has not reported data on this energy category before 1998, but the size of these industries was relatively constant through the period 1991-2001 \\citep{spilde_aasestad_2004}. For years 1990-1997 we have therefore used the average for the next 10 years (1998-2007).
 
 
 ### References

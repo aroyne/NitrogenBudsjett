@@ -20,3 +20,7 @@ The chart below illustrates the integrated nitrogen mass balance for **EF.EC**. 
 ### Flows that are zero or neglected:
 
 * **EF.EC-AT.AT-Emissions-NH3**: Data from CLRTAP Inventory Submissions...
+
+### References
+
+{% bibliography --cited %}

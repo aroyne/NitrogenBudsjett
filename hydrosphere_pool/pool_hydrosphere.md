@@ -7,7 +7,7 @@ has_children: true
 
 # Pool: Hydrosphere (HY)
 
-We have chosen to not include the pool groundwater (GW) because N concentrations and dynamics in Norway are largely unknown (Kværnø et al., 2024 [^kvaerno_2024]).
+We have chosen to not include the pool groundwater (GW) because N concentrations and dynamics in Norway are largely unknown \\citep{kvaerno_2024}.
 
 The hydrosphere ecosystem is split into three operational modules. Explore them below:
 
@@ -22,3 +22,7 @@ The hydrosphere ecosystem is split into three operational modules. Explore them 
 The chart below illustrates the integrated nitrogen mass balance for **HY**. It includes total system inflows (positive stack), total outflows (negative stack), and the net balance line with estimated uncertainty bounds (±1σ).
 
 ![Mass Balance HY](../output_files/plots/balance_HY.png)
+
+### References
+
+{% bibliography --cited %}

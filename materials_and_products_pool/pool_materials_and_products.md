@@ -19,3 +19,7 @@ This pool covers chemical, processing, food, and manufacturing industries in Nor
 The chart below illustrates the integrated nitrogen mass balance for **MP**. It includes total system inflows (positive stack), total outflows (negative stack), and the net balance line with estimated uncertainty bounds (±1σ).
 
 ![Mass Balance MP](../output_files/plots/balance_MP.png)
+
+### References
+
+{% bibliography --cited %}

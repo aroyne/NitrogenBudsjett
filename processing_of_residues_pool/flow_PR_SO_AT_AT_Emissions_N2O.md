@@ -10,7 +10,7 @@ nav_order: 2
 ![PR.SO-AT.AT-Emissions-N2O](../output_files/plots/PR_SO_AT_AT_Emissions_N2O.png)
 
 ### Flow Description
-**PR.SO-AT.AT-Emissions-N2O** is taken from UNFCCC Common reporting tables, where we have included emissions from landfills, waste incineration and biofuel production. Global trends of changing reactive nitrogen emissions are evaluated in [^malik_drivers_2022].
+**PR.SO-AT.AT-Emissions-N2O** is taken from UNFCCC Common reporting tables, where we have included emissions from landfills, waste incineration and biofuel production. Global trends of changing reactive nitrogen emissions are evaluated in \\citep{malik_drivers_2022}.
 
 
 ### References

@@ -21,3 +21,7 @@ The chart below illustrates the integrated nitrogen mass balance for **HY.AC**. 
 
 * **HY.AC-MP.FP-Freshwater fish and seafood-Nmix**, **HY.AC-HY.SW-Waste feed-Nmix** and **HY.AC-HY.SW-Excretia-Nmix** are set to zero...
 * **HY.AC-AT.AT-Emissions-NH3** is set to zero assuming negligible ammonia emissions from these coastal marine cages.
+
+### References
+
+{% bibliography --cited %}
