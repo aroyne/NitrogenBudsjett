@@ -16,4 +16,4 @@ nav_order: 4
 
 * Missing reference data for key: `aas_aquaculture_2022`
 * Missing reference data for key: `fiskeridirektoratet_statistikk_2025`
-* Hohmann-Marriott, Martin F. (2025). *A Nitrogen budget for Norway analysis of Nitrogen flows from societal and natural sources (1961–2020)*. PLOS ONE. [https://dx.plos.org/10.1371/journal.pone.0313598](https://dx.plos.org/10.1371/journal.pone.0313598)
+* Hohmann-Marriott, M. F. (2025). *A Nitrogen budget for Norway analysis of Nitrogen flows from societal and natural sources (1961–2020)*. PLOS ONE. [https://doi.org/10.1371/journal.pone.0313598](https://doi.org/10.1371/journal.pone.0313598)

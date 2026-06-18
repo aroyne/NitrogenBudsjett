@@ -14,4 +14,4 @@ Data on imported animal feed is taken from Landbruksdirektoratet and we have use
 
 ### References
 
-* Lassaletta, Luis and Billen, Gilles and Garnier, Josette and Bouwman, Lex and Velazquez, Eduardo and Mueller, Nathaniel D. and Gerber, James S. (2016). *Nitrogen use in the global food system: past trends and future trajectories of agronomic performance, pollution, trade, and dietary demand*. Environmental Research Letters. [https://doi.org/10.1088/1748-9326/11/9/095007](https://doi.org/10.1088/1748-9326/11/9/095007)
+* Lassaletta, L., Billen, G., Garnier, J., Bouwman, L., Velazquez, E., Mueller, N. D., & Gerber, J. S. (2016). *Nitrogen use in the global food system: past trends and future trajectories of agronomic performance, pollution, trade, and dietary demand*. Environmental Research Letters. [https://doi.org/10/gj2grh](https://doi.org/10/gj2grh)

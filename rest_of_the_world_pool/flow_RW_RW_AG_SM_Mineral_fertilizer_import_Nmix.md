@@ -14,4 +14,4 @@ Is taken from FAOSTAT Fertilizer by nutrient. The global influx of synthetic ino
 
 ### References
 
-* Smil, Vaclav (1999). *Nitrogen in crop production: {An} account of global flows*. Global Biogeochemical Cycles. [http://onlinelibrary.wiley.com/doi/abs/10.1029/1999GB900015](http://onlinelibrary.wiley.com/doi/abs/10.1029/1999GB900015)
+* Smil, V. (1999). *Nitrogen in crop production: {An} account of global flows*. Global Biogeochemical Cycles. [https://doi.org/10/d259xs](https://doi.org/10/d259xs)

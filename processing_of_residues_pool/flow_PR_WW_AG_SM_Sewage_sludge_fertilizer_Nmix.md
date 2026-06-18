@@ -14,5 +14,5 @@ nav_order: 1
 
 ### References
 
-* Kaltenegger, Katrin and Bai, Zhaohai and Dragosits, Ulrike and Fan, Xiangwen and Greinert, Andrzej and Guéret, Samuel and Suchowska-Kisielewicz, Monika and Winiwarter, Wilfried and Zhang, Lin and Zhou, Feng (2023). *Urban nitrogen budgets: {Evaluating} and comparing the path of nitrogen through cities for improved management*. Science of The Total Environment. [https://www.sciencedirect.com/science/article/pii/S0048969723054529](https://www.sciencedirect.com/science/article/pii/S0048969723054529)
-* Starck, Thomas and Fardet, Tanguy and Esculier, Fabien (2023). *Fate of nitrogen in {French} human excreta: current waste and agronomic opportunities for the future*. [http://arxiv.org/abs/2310.06880](http://arxiv.org/abs/2310.06880)
+* Kaltenegger, K., Bai, Z., Dragosits, U., Fan, X., Greinert, A., Guéret, S., Suchowska-Kisielewicz, M., Winiwarter, W., Zhang, L., & Zhou, F. (2023). *Urban nitrogen budgets: {Evaluating} and comparing the path of nitrogen through cities for improved management*. Science of The Total Environment. [https://doi.org/10.1016/j.scitotenv.2023.166827](https://doi.org/10.1016/j.scitotenv.2023.166827)
+* Starck, T., Fardet, T., & Esculier, F. (2023). *Fate of nitrogen in {French} human excreta: current waste and agronomic opportunities for the future*. arXiv. [http://arxiv.org/abs/2310.06880](http://arxiv.org/abs/2310.06880)

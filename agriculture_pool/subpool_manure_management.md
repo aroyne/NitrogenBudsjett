@@ -23,4 +23,4 @@ The chart below illustrates the integrated nitrogen mass balance for **AG.MM**. 
 
 ### References
 
-* Schulte-Uebbing, L. F. and Beusen, A. H. W. and Bouwman, A. F. and de Vries, W. (2022). *From planetary to regional boundaries for agricultural nitrogen pollution*. Nature. [https://www.nature.com/articles/s41586-022-05158-2](https://www.nature.com/articles/s41586-022-05158-2)
+* Schulte-Uebbing, L. F., Beusen, A. H. W., Bouwman, A. F., & de Vries, W. (2022). *From planetary to regional boundaries for agricultural nitrogen pollution*. Nature. [https://doi.org/10.1038/s41586-022-05158-2](https://doi.org/10.1038/s41586-022-05158-2)

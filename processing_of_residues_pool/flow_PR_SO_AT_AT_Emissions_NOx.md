@@ -14,4 +14,4 @@ nav_order: 4
 
 ### References
 
-* Fowler, David and Coyle, Mhairi and Skiba, Ute and Sutton, Mark A. and Cape, J. Neil and Reis, Stefan and Sheppard, Lucy J. and Jenkins, Alan and Grizzetti, Bruna and Galloway, James N. and Vitousek, Peter and Leach, Allison and Bouwman, Alexander F. and Butterbach-Bahl, Klaus and Dentener, Frank and Stevenson, David and Amann, Marcus and Voss, Maren (2013). *The global nitrogen cycle in the twenty-first century*. Philosophical Transactions of the Royal Society B: Biological Sciences. [https://royalsocietypublishing.org/doi/abs/10.1098/rstb.2013.0164](https://royalsocietypublishing.org/doi/abs/10.1098/rstb.2013.0164)
+* Fowler, D., Coyle, M., Skiba, U., Sutton, M. A., Cape, J. N., Reis, S., Sheppard, L. J., Jenkins, A., Grizzetti, B., Galloway, J. N., Vitousek, P., Leach, A., Bouwman, A. F., Butterbach-Bahl, K., Dentener, F., Stevenson, D., Amann, M., & Voss, M. (2013). *The global nitrogen cycle in the twenty-first century*. Philosophical Transactions of the Royal Society B: Biological Sciences. [https://doi.org/10.1098/rstb.2013.0164](https://doi.org/10.1098/rstb.2013.0164)

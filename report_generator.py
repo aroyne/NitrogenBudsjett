@@ -118,17 +118,59 @@ def append_bibtex_references(file_handle, bib_filename=None):
     for ref in formatted_refs:
         file_handle.write(f"{ref}\n")
     
+def format_apa_authors(author_str):
+    """
+    Tar en BibTeX author-streng (f.eks. 'Winiwarter, Wilfried and Hayashi, Kentaro')
+    og formaterer den til APA7: 'Winiwarter, W., Hayashi, K., & ...'
+    """
+    if not author_str or author_str == 'Unknown Author':
+        return 'Unknown Author'
+    
+    # BibTeX separerer forfattere med " and "
+    raw_authors = author_str.split(" and ")
+    formatted_names = []
+    
+    for auth in raw_authors:
+        auth = auth.strip()
+        if "," in auth:
+            # Format: Etternavn, Fornavn [Mellomnavn]
+            parts = auth.split(",", 1)
+            last_name = parts[0].strip()
+            first_names = parts[1].strip().split()
+            
+            # Gjør fornavn om til initialer (f.eks. Wilfried -> W.)
+            initials = []
+            for name in first_names:
+                # Sjekk om det allerede er en initial eller forkortelse
+                if name.endswith('.'):
+                    initials.append(name)
+                else:
+                    initials.append(f"{name[0]}.")
+            
+            initials_str = " ".join(initials)
+            formatted_names.append(f"{last_name}, {initials_str}")
+        else:
+            # Fallback hvis navnet ikke har komma (f.eks. organisasjoner som NIBIO)
+            formatted_names.append(auth)
+            
+    # Sett sammen navnene i henhold til APA7-regler for lister
+    num_authors = len(formatted_names)
+    if num_authors == 1:
+        return formatted_names[0]
+    elif num_authors == 2:
+        return f"{formatted_names[0]} & {formatted_names[1]}"
+    else:
+        # APA7 bruker komma før og-tegnet (&) ved 3 eller flere forfattere
+        all_but_last = ", ".join(formatted_names[:-1])
+        return f"{all_but_last}, & {formatted_names[-1]}"
+    
+
 def fix_all_citations_in_folder(folder_path, bib_filename):
-    """
-    Går igjennom alle .md-filer i en mappe, leser bib-filen, og erstatter
-    \\citep{key} og \\citet{key} med pen tekst. Bygger også referanselisten
-    nederst med URL-er i henhold til APA7 hvis de finnes i .bib-filen.
-    """
     if not os.path.exists(bib_filename):
         print(f"Bib-fil ikke funnet: {bib_filename}")
         return
 
-    # 1. Pars .bib-filen for å hente ut forfattere, årstall, titler og URL-er
+    # 1. Pars .bib-filen
     references_dict = {}
     current_entry = None
     
@@ -145,18 +187,16 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
                 key, val = line_stripped.split('=', 1)
                 key = key.strip().lower()
                 
-                # Fjern krøllparenteser, hermetegn og komma/tegn på slutten, men bevar URL-strukturen
                 val = re.sub(r'[{"},\s]+$', '', val.strip())
                 val = re.sub(r'^[{"\s]+', '', val)
                 
-                # Vask bort eventuelle feilaktige tegn på slutten av URL-en (f.eks. tilfeldige ']')
-                if key == 'url':
+                if key in ['url', 'doi']:
                     val = val.rstrip(']')
                 
-                if key in ['author', 'year', 'title', 'journal', 'booktitle', 'url']:
+                if key in ['author', 'year', 'title', 'journal', 'booktitle', 'publisher', 'url', 'doi']:
                     references_dict[current_entry][key] = val
 
-    # Interne hjelpefunksjoner for å gjøre tekst-erstatningen i avsnittene
+    # Interne hjelpefunksjoner for siteringer i teksten (\citep og \citet)
     def citep_replacer(match):
         keys = [k.strip() for k in match.group(1).split(',')]
         parts = []
@@ -183,7 +223,7 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
                 parts.append(f"{key} (n.d.)")
         return ", ".join(parts)
 
-    # 2. Gå igjennom alle filer i mappen (og undermapper)
+    # 2. Gå igjennom alle filer
     for root, dirs, files in os.walk(folder_path):
         for filename in files:
             if filename.endswith(".md"):
@@ -192,21 +232,16 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
                 with open(file_path, 'r', encoding='utf-8') as f:
                     content = f.read()
                 
-                # Sjekk om filen inneholder siteringer før vi gjør noe
                 if '\\citep' in content or '\\citet' in content:
-                    # Finn alle unike nøkler på denne spesifikke siden for å bygge referanselisten på nytt
                     raw_keys = re.findall(r'\\+cite[pt]\{\s*([^}]+)\s*\}', content)
                     cited_keys = set()
                     for k_group in raw_keys:
                         for k in k_group.split(','):
                             cited_keys.add(k.strip())
                     
-                    # Gjør om \citep og \citet i selve teksten til pen tekst
                     updated_content = re.sub(r'\\+citep\{\s*([^}]+)\s*\}', citep_replacer, content)
                     updated_content = re.sub(r'\\+citet\{\s*([^}]+)\s*\}', citet_replacer, updated_content)
                     
-                    # 3. Bygg en ny, ryddig referanseliste med URL-er helt nederst i filen
-                    # Vi splitter innholdet ved overskriften "### References" hvis den finnes fra før
                     if "### References" in updated_content:
                         base_content = updated_content.split("### References")[0].strip()
                     else:
@@ -218,26 +253,39 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
                     for key in sorted(cited_keys):
                         if key in references_dict:
                             entry = references_dict[key]
-                            author = entry.get('author', 'Unknown Author')
+                            
+                            # Formater forfattere etter APA7-regler
+                            raw_author = entry.get('author', 'Unknown Author')
+                            author = format_apa_authors(raw_author)
+                            
                             year = entry.get('year', 'n.d.')
                             title = entry.get('title', 'Untitled')
+                            
+                            # Hent kilde/utgiver
                             source = entry.get('journal') or entry.get('booktitle') or entry.get('publisher') or ""
+                            
+                            doi = entry.get('doi', '')
                             url = entry.get('url', '')
                             
-                            # APA7-formatering:
                             # 1. Forfatter (År).
                             ref_str = f"* {author} ({year})."
                             
-                            # 2. Tittel skal være i kursiv *Tittel*.
+                            # 2. Tittel i kursiv
                             ref_str += f" *{title}*."
                             
-                            # 3. Hvis det finnes en utgiver/kilde (f.eks. NIBIO eller et tidsskrift), legg det til
-                            if source and source.lower() != author.lower():
-                                ref_str += f" {source}."
+                            # 3. Kilde/Utgiver (hvis den ikke er identisk med forfatteren, f.eks. NIBIO)
+                            if source and source.lower() != raw_author.lower():
+                                # Fjern eventuelle backslasher BibTeX legger til før tegn (f.eks. \& -> &)
+                                source_clean = source.replace(r'\&', '&')
+                                ref_str += f" {source_clean}."
                                 
-                            # 4. Legg til URL-en direkte på slutten som en klikkbar Markdown-lenke eller ren tekst
-                            if url:
-                                # Vi gjør den til en klikkbar lenke i Markdown: [URL](URL)
+                            # 4. Lenke-håndtering i APA7: Prioriter alltid DOI over URL
+                            if doi:
+                                # Standardiser DOI-lenken slik at den alltid blir en gyldig https://doi.org/...
+                                doi_clean = doi.lower().replace("doi.org/", "").replace("https://", "").replace("http://", "")
+                                doi_url = f"https://doi.org/{doi_clean}"
+                                ref_str += f" [{doi_url}]({doi_url})"
+                            elif url:
                                 ref_str += f" [{url}]({url})"
                                 
                             formatted_refs.append(ref_str)
@@ -247,10 +295,11 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
                     ref_block += "\n".join(formatted_refs) + "\n"
                     final_content = base_content + ref_block
                     
-                    # Skriv det oppdaterte innholdet tilbake til filen
                     with open(file_path, 'w', encoding='utf-8') as f:
                         f.write(final_content)
-                    print(f"Oppdaterte referanser og referanseliste med URL i filen: {filename}")                    
+                    print(f"Oppdaterte referanser (APA7-vask) i filen: {filename}")
+
+                    
 # ==============================================================================
 # SPESIFIKKE FUNKSJONER FOR HVER ENKELT POOL
 # ==============================================================================
@@ -290,6 +339,15 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename):
         f.write("---\nlayout: default\ntitle: Atmosphere (AT)\nnav_order: 2\nhas_children: true\n---\n\n")
         f.write("# Pool: Atmosphere (AT)\n\nThis section contains all documented nitrogen flows leaving the Atmosphere pool.\n")
         f.write(get_balance_image_markdown("AT", plot_files, plot_dir, relative_depth="../"))
+        f.write("\n### Flows that are zero or neglected:\n\n")
+        f.write("* **AT.AT-EF.EC-Combustion N2 fixation-N2**, **AT.AT-EF.IC-Combustion N2 fixation-N2** and **AT.AT-EF.OE-Combustion N2 fixation-N2** "
+                "are neglected because we have chosen to ignore nitrogen fixation in combustion processes. In fuel combustion, some bound N is "
+                "converted to NOx, and some atmospheric N2 is also converted to N2. The amount of resulting NOx depends on the combustion conditions "
+                "and on the use of catalytic converters. It is possible to estimate an N2 fixation rate based on mass balance, but we have chosen not "
+                "to do so because it does not add useful understanding of the flows of reactive N in the NNB.\n")
+        f.write("* **AT.AT-HY.CW-Deposition-OXN**, **AT.AT-HY.CW-Deposition-RDN** and **AT.AT-HY.CW-N2 fixation-N2** are neglected because we lack an "
+                "accurate area for coastal waters and do not attempt to make a mass balance for CW. \n")
+
 
     menu_counter = 1
     for filename in plot_files:

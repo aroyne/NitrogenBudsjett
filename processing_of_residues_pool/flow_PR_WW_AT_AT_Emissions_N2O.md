@@ -14,4 +14,4 @@ nav_order: 3
 
 ### References
 
-* Bertagni, Matteo B. and Socolow, Robert H. and Martirez, John Mark P. and Carter, Emily A. and Greig, Chris and Ju, Yiguang and Lieuwen, Tim and Mueller, Michael E. and Sundaresan, Sankaran and Wang, Rui and Zondlo, Mark A. and Porporato, Amilcare (2023). *Minimizing the impacts of the ammonia economy on the nitrogen cycle and climate*. Proceedings of the National Academy of Sciences. [https://www.pnas.org/doi/full/10.1073/pnas.2311728120](https://www.pnas.org/doi/full/10.1073/pnas.2311728120)
+* Bertagni, M. B., Socolow, R. H., Martirez, J. M. P., Carter, E. A., Greig, C., Ju, Y., Lieuwen, T., Mueller, M. E., Sundaresan, S., Wang, R., Zondlo, M. A., & Porporato, A. (2023). *Minimizing the impacts of the ammonia economy on the nitrogen cycle and climate*. Proceedings of the National Academy of Sciences. [https://doi.org/10.1073/pnas.2311728120](https://doi.org/10.1073/pnas.2311728120)
