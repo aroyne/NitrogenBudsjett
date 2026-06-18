@@ -323,7 +323,8 @@ def _add_live_animal_import_mc(results, preloaded_data, current_params, dataset_
 
 def _add_mineral_fertilizer_import_mc(results, preloaded_data, current_params, dataset_noise):
     """
-    MC-VERSJON: Mineralgjødsel fra FAOSTAT. Krasjer hvis data eller støy mangler.
+    MC-VERSJON: Mineralgjødsel-import fra FAOSTAT.
+    Filtrerer strengt på 'Import quantity' for å unngå at eksport legges til.
     """
     flow_code = 'RW.RW-AG.SM-Mineral fertilizer import-Nmix'
     collected_years = set()
@@ -337,7 +338,14 @@ def _add_mineral_fertilizer_import_mc(results, preloaded_data, current_params, d
         raise KeyError(f"[KRITISK] Støy-nøkkel '{key_fert}' mangler i dataset_noise for {flow_code}!")
     noise_fert = dataset_noise[key_fert]['value']
     
-    total_fert_per_year = final_data.groupby('Year')['Value'].sum().to_dict()
+    # --- STRUKTURELL FIX: Strip kolonnenavn for å fjerne whitespace, og filtrer på Import ---
+    final_data.columns = [col.strip() for col in final_data.columns]
+    
+    # Sikre at vi KUN summerer importmengder
+    import_data = final_data[final_data['Element'].str.strip() == 'Import quantity']
+    
+    # Grupper de filtrerte dataene per år
+    total_fert_per_year = import_data.groupby('Year')['Value'].sum().to_dict()
     
     for year in sorted(EXPECTED_YEARS):
         if year in total_fert_per_year:
@@ -349,6 +357,7 @@ def _add_mineral_fertilizer_import_mc(results, preloaded_data, current_params, d
             else:
                 raise ValueError(f"[KRITISK] Forventet støytype 'perc' for {key_fert}, fikk '{dataset_noise[key_fert]['type']}'")
             
+            # Konverterer fra tonn (t) til kilotonn (ktN)
             value_kt = max(0.0, perturbed_value / 1000.0)
                 
             results.append({
@@ -358,7 +367,7 @@ def _add_mineral_fertilizer_import_mc(results, preloaded_data, current_params, d
             
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
-
+    
 
 # =============================================================================
 # ATMOSFÆRISKE STRØMMER (Innsig fra EMEP)
