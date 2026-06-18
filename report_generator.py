@@ -18,11 +18,6 @@ DEPOSITION_TEXT = (
     "different land categories we use the map resource AR5 from NIBIO \\\\citet{nibio_ar5_2016}. "
     "We find the total value of atmospheric deposition to the Norwegian mainland is, "
     "as given by NILU, 142 ktN in 2012-2016.\n\n"
-    "As noted, our value for agricultural soils is much larger than given by FAOSTAT. "
-    "\\\\citet{hohmann-marriott_nitrogen_2025} used values from \\\\citet{blake_deposition_2023} to arrive at an average "
-    "N deposition rate of 80.85 ktN for the period 2017-2021. \\\\citet{hohmann-marriott_nitrogen_2025} "
-    "also reported values of 74.7 and 33.5 ktN per year using two different methods "
-    "for estimating biome-dependent N deposition rates."
 )
 
 def get_balance_image_markdown(pool_code, plot_files, plot_dir, relative_depth=""):
@@ -385,11 +380,52 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename):
 
             if exact_flow_code == "AT.AT-AG.SM-Biological N2 fixation-N2":
                 # Byttet ut [ukjent_nøkkel] med en narrativ LaTeX-sitatvariant \citet{}
-                f.write(f"**{exact_flow_code}**\n\n\\citet{{schappi_annexes_2025}} advises using data from the EUROSTAT Gross nutrient balance...")
-            elif exact_flow_code in ["AT.AT-AG.SM-Deposition-OXN", "AT.AT-AG.SM-Deposition-RDN", "AT.AT-FS.FO-Deposition-OXN", "AT.AT-FS.FO-Deposition-RDN", "AT.AT-FS.OL-Deposition-OXN", "AT.AT-FS.OL-Deposition-RDN", "AT.AT-HS.HS-Deposition-OXN", "AT.AT-HS.HS-Deposition-RDN", "AT.AT-HY.SW-Deposition-RDN"]:
+                f.write(f"**{exact_flow_code}**\n\n\\citet{{schappi_annexes_2025}} advises using data from the EUROSTAT Gross nutrient balance, but there "
+                        "is an error in this dataset for Norway which is currently being corrected (as of February 2026; personal correspondence, "
+                        "EUROSTAT). According to the EUROSTAT metadata, the BNF in this statistic is calculated based on the area of leguminous crops and "
+                        "fization coefficients. The production of leguminous crops (peas, beans etc) in Norway is very low and we assume that agricultural "
+                        "BNF is for the most part determined by leguminous crops such as clover grown on pastures and in fodder production. "
+                        "\\citet{{bleken_nitrogen_1997}} based their estimate for BNF from the sale of clover seeds: a sale of about 145 t seeds was "
+                        "estimated to be used to plant 95 000 ha of grass/clover mixtures (655 ha/t seeds). Together with a rate of BNF of 80 kgN/ha on "
+                        "this area, they found a total of 7.6 ktN per year and summed up to 8 ktN to account for BNF from free-living orghanisms and "
+                        "other sources. The rate of 80 kgN/ha agrees relatively well with later studies of agricultural BNF in Norway, where average "
+                        "values between 10 and 100 kgN/ha have been found; the highest values in particularly productive areas were up to 260 kgN/ha "
+                        "(https://orgprints.org/id/eprint/37546/1/NORSØK%20Rapport%20nr.%203%202020%20Engbelgvekster.pdf). Yearly statistics of clover " 
+                        "seed sales are not available, but according to NIBIO Totalkalkylen (NIBIO, 2025b), the area where grass/clover mixes may be "
+                        "sown for pasture and fodder production (fulldyrka eng) has remained constant to within about 3 % from 1995 up to today. Our "
+                        "best estimate for BNF, and for consistency with the previous study, is therefore to assume a constant value of 8 ktN/year. "
+                        "In Sweden \\cite{{moldan_where_2025}} the value was found to be 34 kT in 2015, which is more in line with the values found before 2000. ")
+            elif exact_flow_code in ["AT.AT-FS.FO-Deposition-OXN", "AT.AT-FS.FO-Deposition-RDN", "AT.AT-FS.OL-Deposition-OXN", "AT.AT-FS.OL-Deposition-RDN", "AT.AT-HS.HS-Deposition-OXN", "AT.AT-HS.HS-Deposition-RDN"]:
                 f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_TEXT + "\n\n")
-            elif exact_flow_code == "AT.AT-HY.SW-Deposition-OXN":
-                f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_TEXT + "\n\nFor comparison, the data used in the TEOTIL model...")
+            elif exact_flow_code in ["AT.AT-HY.SW-Deposition-RDN","AT.AT-HY.SW-Deposition-RDN"]:
+                f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_TEXT + "For comparison, the data used in the TEOTIL model gives 3.5 ktN in 2013 and "
+                        "3.0 ktN in 2023. These comparable but slightly lower values are the results of different datasets used and different data "
+                        "treatment. ")
+            elif exact_flow_code in ["AT.AT-AG.SM-Deposition-OXN", "AT.AT-AG.SM-Deposition-RDN"]:
+                f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_TEXT + "\n\nAs noted, our value for agricultural soils is much larger than given by ""FAOSTAT. "
+                        "\\\\citet{hohmann-marriott_nitrogen_2025} used values from \\\\citet{blake_deposition_2023} to arrive at an average "
+                        "N deposition rate of 80.85 ktN for the period 2017-2021. \\\\citet{hohmann-marriott_nitrogen_2025} "
+                        "also reported values of 74.7 and 33.5 ktN per year using two different methods "
+                        "for estimating biome-dependent N deposition rates.")
+            elif exact_flow_code == "AT.AT-FS.FO-N2 Fixation-N2":
+                f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_TEXT + "\n\nFollowing the Swedish NBB \\cite{{moldan_where_2025}}, we use an N-fixation "
+                        "rate of 1.5 kg/ha/year and a forested area of 12.0 mill ha as given by SSB for 2019-2023 (table 14368); we assume this value is "
+                        "constant for our entire time period. This gives an annual N-fixation rate of 18.0 ktN. For comparison, the value for Sweden "
+                        "in 2015 was found to be 39.5 ktN \\cite{{moldan_where_2025}}.")
+            elif exact_flow_code == "AT.AT-HY.SW-N2 Fixation-N2":
+                f.write(f"**{exact_flow_code}**\n\n" + "According to NIBIO, the surface water area is 20 457 km2 "
+                        "https://arealbarometer.nibio.no/nb/norge/. According to  \\citep{{schappi_annexes_2025}}, the biological fixation rate can vary "
+                        "between < 0.1 tN/km2 in ologotrophic and mesotrophic lakes to up to 10 tN/km2 in eutrophic lakes. Most lakes in Norway are not "
+                        "eutrophic and we use a low value of 0.1 tN/km2, which gives 2 ktN/year.")
+            elif exact_flow_code == "AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2":
+                f.write(f"**{exact_flow_code}**\n\n" + "is found through mass balance where we use data from FAOSTAT Fertilizer by nutrient, domestic "
+                        "fertilizer production, and subtracted the amount of ammonia imported from SSB trade data (table 08801). The result is a very "
+                        "variable curve which probably does not reflect year to year production well and could be a result of how trade statistics are "
+                        "reported.")
+            elif exact_flow_code == "AT.AT-RW.RW-Atmospheric outflow-OXN":
+                f.write(f"**{exact_flow_code}**\n\n" + "is found using source-receptor data from \\citep{{emep_sr_2024}}, as advised by \\citep{{schappi_annexes_2025}}.")
+            elif exact_flow_code == "AT.AT-RW.RW-Atmospheric outflow-RDN":
+                f.write(f"**{exact_flow_code}**\n\n" + "is found using source-receptor data from \\citep{{emep_sr_2024}}, as advised by \\citep{{schappi_annexes_2025}}.")
             else:
                 f.write(f"*Flow details for {exact_flow_code}*\n\n")
 
