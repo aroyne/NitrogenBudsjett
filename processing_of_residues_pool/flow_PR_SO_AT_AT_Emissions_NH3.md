@@ -14,4 +14,4 @@ nav_order: 3
 
 ### References
 
-* Ackerman, Daniel and Millet, Dylan B. and Chen, Xin (2019). *Global {Estimates} of {Inorganic} {Nitrogen} {Deposition} {Across} {Four} {Decades*. Global Biogeochemical Cycles. https://onlinelibrary.wiley.com/doi/abs/10.1029/2018GB005990
+* Ackerman, Daniel and Millet, Dylan B. and Chen, Xin (2019). *Global {Estimates} of {Inorganic} {Nitrogen} {Deposition} {Across} {Four} {Decades*. Global Biogeochemical Cycles. [https://onlinelibrary.wiley.com/doi/abs/10.1029/2018GB005990](https://onlinelibrary.wiley.com/doi/abs/10.1029/2018GB005990)

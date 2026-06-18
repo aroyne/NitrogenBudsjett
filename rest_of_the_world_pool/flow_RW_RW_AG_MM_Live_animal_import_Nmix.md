@@ -14,4 +14,4 @@ Is taken from FAOSTAT Crops and livestock products, assuming typical weights of 
 
 ### References
 
-* Malik, Arunima and Oita, Azusa and Shaw, Emily and Li, Mengyu and Ninpanit, Panittra and Nandel, Vibhuti and Lan, Jun and Lenzen, Manfred (2022). *Drivers of global nitrogen emissions*. Environmental Research Letters. https://doi.org/10.1088/1748-9326/ac413c
+* Malik, Arunima and Oita, Azusa and Shaw, Emily and Li, Mengyu and Ninpanit, Panittra and Nandel, Vibhuti and Lan, Jun and Lenzen, Manfred (2022). *Drivers of global nitrogen emissions*. Environmental Research Letters. [https://doi.org/10.1088/1748-9326/ac413c](https://doi.org/10.1088/1748-9326/ac413c)

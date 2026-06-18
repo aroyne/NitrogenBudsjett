@@ -14,5 +14,5 @@ We have used data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by S
 
 ### References
 
-* EMEP (2025). *Officially reported emission data*. https://www.ceip.at/webdab-emission-database/reported-emissiondata
+* EMEP (2025). *Officially reported emission data*. [https://www.ceip.at/webdab-emission-database/reported-emissiondata](https://www.ceip.at/webdab-emission-database/reported-emissiondata)
 * Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

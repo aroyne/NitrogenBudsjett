@@ -14,5 +14,5 @@ nav_order: 3
 
 ### References
 
-* Mattilsynet (2006). *Matvaretabellen*. https://www.matvaretabellen.no
+* Mattilsynet (2006). *Matvaretabellen*. [https://www.matvaretabellen.no](https://www.matvaretabellen.no)
 * Schäppi (2025). *Annexes to the {Guidance} {Document} on {NNB*.

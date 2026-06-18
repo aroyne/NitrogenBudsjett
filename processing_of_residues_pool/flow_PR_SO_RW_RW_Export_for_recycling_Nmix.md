@@ -14,4 +14,4 @@ nav_order: 11
 
 ### References
 
-* Hamilton, Helen A. and Ivanova, Diana and Stadler, Konstantin and Merciai, Stefano and Schmidt, Jannick and van Zelm, Rosalie and Moran, Daniel and Wood, Richard (2018). *Trade and the role of non-food commodities for global eutrophication*. Nature Sustainability. http://www.nature.com/articles/s41893-018-0079-z
+* Hamilton, Helen A. and Ivanova, Diana and Stadler, Konstantin and Merciai, Stefano and Schmidt, Jannick and van Zelm, Rosalie and Moran, Daniel and Wood, Richard (2018). *Trade and the role of non-food commodities for global eutrophication*. Nature Sustainability. [http://www.nature.com/articles/s41893-018-0079-z](http://www.nature.com/articles/s41893-018-0079-z)

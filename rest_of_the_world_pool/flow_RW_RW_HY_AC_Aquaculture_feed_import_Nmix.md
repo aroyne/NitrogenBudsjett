@@ -14,4 +14,4 @@ The flow **RW.RW-HY.AC-Aquaculture feed import-Nmix** has been added to account 
 
 ### References
 
-* Lassaletta, Luis and Billen, Gilles and Garnier, Josette and Bouwman, Lex and Velazquez, Eduardo and Mueller, Nathaniel D. and Gerber, James S. (2016). *Nitrogen use in the global food system: past trends and future trajectories of agronomic performance, pollution, trade, and dietary demand*. Environmental Research Letters. https://doi.org/10.1088/1748-9326/11/9/095007
+* Lassaletta, Luis and Billen, Gilles and Garnier, Josette and Bouwman, Lex and Velazquez, Eduardo and Mueller, Nathaniel D. and Gerber, James S. (2016). *Nitrogen use in the global food system: past trends and future trajectories of agronomic performance, pollution, trade, and dietary demand*. Environmental Research Letters. [https://doi.org/10.1088/1748-9326/11/9/095007](https://doi.org/10.1088/1748-9326/11/9/095007)

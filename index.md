@@ -25,4 +25,4 @@ This NNB is built using the guidelines from (Winiwarter, 2025). Where flows are 
 
 ### References
 
-* Winiwarter, Wilfried and Hayashi, Kentaro and Geupel, Markus and Gu, Baojing and Zhang, Xin and Sutton, Mark A. and Schlegel, Martha and Baron, Jill and van Grinsven, Hans JM (2025). *INMS} {Guidance} {Document} on {National} {Nitrogen} {Budgets*. https://zenodo.org/doi/10.5281/zenodo.15632929
+* Winiwarter, Wilfried and Hayashi, Kentaro and Geupel, Markus and Gu, Baojing and Zhang, Xin and Sutton, Mark A. and Schlegel, Martha and Baron, Jill and van Grinsven, Hans JM (2025). *INMS} {Guidance} {Document} on {National} {Nitrogen} {Budgets*. [https://zenodo.org/doi/10.5281/zenodo.15632929](https://zenodo.org/doi/10.5281/zenodo.15632929)

@@ -221,16 +221,24 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
                             author = entry.get('author', 'Unknown Author')
                             year = entry.get('year', 'n.d.')
                             title = entry.get('title', 'Untitled')
-                            source = entry.get('journal') or entry.get('booktitle') or ""
+                            source = entry.get('journal') or entry.get('booktitle') or entry.get('publisher') or ""
                             url = entry.get('url', '')
                             
-                            # Standard APA7 oppsett
-                            ref_str = f"* {author} ({year}). *{title}*."
-                            if source:
+                            # APA7-formatering:
+                            # 1. Forfatter (År).
+                            ref_str = f"* {author} ({year})."
+                            
+                            # 2. Tittel skal være i kursiv *Tittel*.
+                            ref_str += f" *{title}*."
+                            
+                            # 3. Hvis det finnes en utgiver/kilde (f.eks. NIBIO eller et tidsskrift), legg det til
+                            if source and source.lower() != author.lower():
                                 ref_str += f" {source}."
+                                
+                            # 4. Legg til URL-en direkte på slutten som en klikkbar Markdown-lenke eller ren tekst
                             if url:
-                                # APA7 krever bare URL direkte (uten "Hentet fra") for nettressurser
-                                ref_str += f" {url}"
+                                # Vi gjør den til en klikkbar lenke i Markdown: [URL](URL)
+                                ref_str += f" [{url}]({url})"
                                 
                             formatted_refs.append(ref_str)
                         else:
