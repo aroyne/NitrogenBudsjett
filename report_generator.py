@@ -871,7 +871,9 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename):
         base_name = filename.rsplit('.', 1)[0]
         flow_file_name = f"flow_{base_name}.md"
         full_flow_path = os.path.join(hy_folder, flow_file_name)
+        print(full_flow_path)
         norm = filename.lower().replace('-', '').replace('_', '').replace('.', '')
+        print(norm)
 
         exact_flow_code = "HY-Unknown-Flow"
         display_name = "Unknown Hydrosphere Flow"
@@ -915,6 +917,7 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename):
         else:
             parent_subpool = "Aquaculture (HY.AC)"
             if "excretia" in norm:
+                print('hei')
                 exact_flow_code = "HY.AC-HY.CW-Excretia-Nmix"
                 display_name = "Excretia"
                 description = "Found through mass balance by assuming N that does not become fish or waste feed is excreted."
