@@ -14,16 +14,15 @@ DEPOSITION_TEXT = (
     "1988-1992, 1997-2001, 2002-2006, 2007-2011 and 2012-2016. For 2017-2021 we use "
     "total NILU data for that period and scale with the distribution across land classes "
     "for the previous period. Values after 2021 are extrapolated. To find deposition on "
-    "different land categories we use the map resource AR5 from NIBIO [^nibio_ar5_2016]. "
+    "different land categories we use the map resource AR5 from NIBIO \\\\citep{nibio_ar5_2016}. "
     "We find the total value of atmospheric deposition to the Norwegian mainland is, "
     "as given by NILU, 142 ktN in 2012-2016.\n\n"
     "As noted, our value for agricultural soils is much larger than given by FAOSTAT. "
-    "Hohmann-Marriott (2025) used values from Blake et al. (2023) to arrive at an average "
-    "N deposition rate of 80.85 ktN for the period 2017-2021. Hohmann-Marriott (2025) "
+    "\\\\citet{hohmann_marriott_2025} used values from \\\\citet{blake_2023} to arrive at an average "
+    "N deposition rate of 80.85 ktN for the period 2017-2021. \\\\citet{hohmann_marriott_2025} "
     "also reported values of 74.7 and 33.5 ktN per year using two different methods "
     "for estimating biome-dependent N deposition rates."
 )
-
 
 def get_balance_image_markdown(pool_code, plot_files, plot_dir, relative_depth=""):
     """Returnerer bilde-markdown hvis balanseplottet eksisterer, ellers tom streng."""
@@ -40,32 +39,12 @@ def get_balance_image_markdown(pool_code, plot_files, plot_dir, relative_depth="
     return ""
 
 
-def append_bibtex_references(file_handle, bib_filename):
-    """Parser BibTeX-filen og legger til formaterte referanser i bunnen av en fil."""
+def append_bibtex_references(file_handle, bib_filename=None):
+    """Legger til Jekyll-Scholar tag som genererer referanseliste for siterte kilder på gjeldende side."""
     file_handle.write("\n### References\n\n")
-    if os.path.exists(bib_filename):
-        try:
-            bib_data = parse_file(bib_filename)
-            for key, entry in bib_data.entries.items():
-                authors = entry.persons.get('author', [])
-                author_str = ", ".join([str(a) for a in authors]) if authors else "Unknown Author"
-                
-                year = entry.fields.get('year', 'n.d.')
-                title = entry.fields.get('title', 'No title').replace('{', '').replace('}', '')
-                journal = entry.fields.get('journal', entry.fields.get('publisher', entry.fields.get('booktitle', '')))
-                volume = entry.fields.get('volume', '')
-                pages = entry.fields.get('pages', '')
-                
-                pub_details = f" *{journal}*" if journal else ""
-                if volume: pub_details += f" {volume}"
-                if pages: pub_details += f", pp. {pages}"
-                
-                file_handle.write(f"[^{key}]: {author_str} ({year}). *{title}*.{pub_details}.\n")
-        except Exception as e:
-            file_handle.write(f"*Error parsing BibTeX file:* `{str(e)}`\n")
-    else:
-        file_handle.write(f"*Reference file '{bib_filename}' not found in root directory.*\n")
-
+    # Denne taggen gjør at jekyll-scholar automatisk lager en APA-liste 
+    # over KUN de kildene som ble brukt på denne spesifikke undersiden.
+    file_handle.write("{% bibliography --cited %}\n")
 
 # ==============================================================================
 # SPESIFIKKE FUNKSJONER FOR HVER ENKELT POOL
@@ -91,7 +70,7 @@ def build_landing_page(output_filename, current_date_str):
 
 
 def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename):
-    """Genererer alle sider knyttet til Atmosphere (AT) poolen."""
+    """Genererer alle sider knyttet til Atmosphere (AT) poolen med ren LaTeX-siteringssyntaks."""
     with open(os.path.join(at_folder, "pool_atmosphere.md"), 'w', encoding='utf-8') as f:
         f.write("---\nlayout: default\ntitle: Atmosphere (AT)\nnav_order: 2\nhas_children: true\n---\n\n")
         f.write("# Pool: Atmosphere (AT)\n\nThis section contains all documented nitrogen flows leaving the Atmosphere pool.\n")
@@ -132,16 +111,17 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename):
             f.write(f"# {display_name}\n\n![{exact_flow_code}](../{plot_dir}/{filename})\n\n### Flow Description\n")
 
             if exact_flow_code == "AT.AT-AG.SM-Biological N2 fixation-N2":
-                f.write("**AT.AT-AG.SM-Biological N2 fixation-N2**\n\n[^schappi_annexes_2025] advises using data from the EUROSTAT Gross nutrient balance...")
+                # Byttet ut [ukjent_nøkkel] med en narrativ LaTeX-sitatvariant \citet{}
+                f.write(f"**{exact_flow_code}**\n\n\\citet{{schappi_annexes_2025}} advises using data from the EUROSTAT Gross nutrient balance...")
             elif exact_flow_code in ["AT.AT-AG.SM-Deposition-OXN", "AT.AT-AG.SM-Deposition-RDN", "AT.AT-FS.FO-Deposition-OXN", "AT.AT-FS.FO-Deposition-RDN", "AT.AT-FS.OL-Deposition-OXN", "AT.AT-FS.OL-Deposition-RDN", "AT.AT-HS.HS-Deposition-OXN", "AT.AT-HS.HS-Deposition-RDN", "AT.AT-HY.SW-Deposition-RDN"]:
                 f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_TEXT + "\n\n")
             elif exact_flow_code == "AT.AT-HY.SW-Deposition-OXN":
-                f.write("**AT.AT-HY.SW-Deposition-OXN**\n\n" + DEPOSITION_TEXT + "\n\nFor comparison, the data used in the TEOTIL model...")
+                f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_TEXT + "\n\nFor comparison, the data used in the TEOTIL model...")
             else:
                 f.write(f"*Flow details for {exact_flow_code}*\n\n")
 
+            # Kaller din oppdaterte versjon som kun skriver ut `{% bibliography --cited %}`
             append_bibtex_references(f, bib_filename)
-
 
 def process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename):
     """Genererer alle sider knyttet til Rest of the World (RW) poolen med oppdaterte [^nøkkel] referanser."""
@@ -1278,4 +1258,13 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
 
     print("[RAPPORT] Portalbygging fullført suksessfullt!")
 
-    print("[RAPPORT] Portalbygging fullført suksessfullt!")
+
+'''
+Du kan slå sammen og konvertere Markdown-filene dine til en ferdig PDF ved å kjøre følgende i terminalen:
+pandoc pool_rest_of_the_world.md flow_*.md \
+  --citeproc \
+  --bibliography=references.bib \
+  --csl=apa.csl \
+  -V geometry:margin=1in \
+  -o nitrogen_rapport.pdf
+'''

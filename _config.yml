@@ -8,3 +8,15 @@ nav_sort: case_insensitive
 # Ekskluderer index.md fra selve menylisten (den blir i stedet til den store "Hovedknappen" øverst til venstre)
 nav_exclude:
   - /index.md
+  
+plugins:
+  - jekyll-scholar
+
+scholar:
+  style: apa
+  locale: en
+  source: ./
+  bibliography: library.bib
+  type: :latex              # <--- Viktig! Tolker \cite, \citet, \citep i Markdown
+  references_section: 
+      title: References
