@@ -63,7 +63,7 @@ def _add_fo_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
 
     N2O_to_N = float(current_params.get("N2O_to_N_factor"))
     
-    for row in range(5, 38):  
+    for row in range(4, 38):  
         year = int(df_unfccc.iloc[row, 0])
         collected_years.add(year)
         
@@ -95,7 +95,7 @@ def _add_fo_N2_emissions_mc(results, preloaded_data, current_params, dataset_noi
     N2O_to_N = float(current_params.get("N2O_to_N_factor"))
     ratio = float(current_params.get("forest_N2_to_N2O_ratio"))
 
-    for row in range(5, 38):
+    for row in range(4, 38):
         year = int(df_unfccc.iloc[row, 0])
         collected_years.add(year)
         
@@ -128,7 +128,7 @@ def _add_fo_leaching_mc(results, preloaded_data, current_params, dataset_noise):
     frac = float(current_params.get("FO_leaching_bg_fraction"))
     
     # Historiske år (Kysttilførsel)
-    for r in range(1, 24):
+    for r in range(0, 24):
         year = int(df_kyst.iloc[r, 0]) 
         collected_years.add(year)
         

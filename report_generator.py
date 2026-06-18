@@ -723,7 +723,7 @@ def process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename):
         f.write("# Pool: Forests and semi-natural vegetation (FS)\n\nBecause of limited data on OL and because data on leaching are combined for WL and OL, ")
         f.write("we have chosen to combine WL and OL into the OL subpool in this study.\n\n")
         f.write("We have considered including meat from hunting of wild animals in flows from this subpool, but chosen not to. ")
-        f.write("According to \\\\citet{steinset_2021}, the amount of wild game caught in 2019 was around 6000 tonnes, ")
+        f.write("According to \\\\citet{steinset_verdi_2021}, the amount of wild game caught in 2019 was around 6000 tonnes, ")
         f.write("which gives around 0.2 ktN and thus smaller than any of the included flows.\n\n")
         f.write("This pool is divided into two operational sub-pools. Explore them using the side menu or links below:\n\n")
         f.write("* [Forests (FS.FO)](subpool_forests.html)\n* [Other Land (FS.OL)](subpool_other_land.html)\n")
@@ -737,7 +737,7 @@ def process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename):
         f.write("* **FS.FO-AT.AT-Emissions-NOx** is neglected because no values are reported in the CRLTAP/WebDab categories 4A1 and 4A2 (forest soils).\n")
         f.write("* **FS.FO-EF.EC-Fuel wood for co-fired power plants-Nmix** is set to zero because we assume such facilities do not exist in Norway.\n")
         f.write("* **FS.FO-EF.IC-Fuel wood for industry-Nmix** is ignored because wood is typically not harvested specifically to be used for fuel in industry in Norway. The use of wood waste in the producing industry is reported as self-produced bioenergy in the SSB statistic, but this is a flow that goes from MP.OP to EF.IC.\n")
-        f.write("* Because the N-flow in forest fertilization is not large, we have chosen to ignore the associated N2O emissions that were included in the Swedish NBB \\\\citep{moldan_2025}.\n")
+        f.write("* Because the N-flow in forest fertilization is not large, we have chosen to ignore the associated N2O emissions that were included in the Swedish NBB \\\\citep{moldan_where_2025}.\n")
 
     with open(os.path.join(fs_folder, "subpool_other_land.md"), 'w', encoding='utf-8') as f:
         f.write("---\nlayout: default\ntitle: Other Land (FS.OL)\nparent: Forests and semi-natural vegetation (FS)\nnav_order: 2\nhas_children: true\n---\n\n")
@@ -774,7 +774,7 @@ def process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename):
             elif "households" in norm or "fuelwood" in norm:
                 exact_flow_code = "FS.FO-EF.OE-Fuel wood for households-Nmix"
                 display_name = "Fuel Wood for Households"
-                description = "Taken from SSB table 09702 'Energibalansen. Vedforbruk i boliger og fritidsboliger 1990 – 2024' and we assume a mean N content of 4.0 kg/t (between coniferous and non-coniferous wood; see FS.FO-MP.OP-Industrial round wood-Nmix)."
+                description = "Taken from SSB table 09702 'Energibalansen. Vedforbruk i boliger og fritidsboliger 1990 – 2024' and we assume a mean N content of 4.0 kg/t (between coniferous and non-coniferous wood; see **FS.FO-MP.OP-Industrial round wood-Nmix**)."
             elif "leaching" in norm:
                 exact_flow_code = "FS.FO-HY.SW-Leaching-Nmix"
                 display_name = "Forest Leaching"
@@ -782,18 +782,26 @@ def process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename):
             elif "roundwood" in norm or "industrial" in norm:
                 exact_flow_code = "FS.FO-MP.OP-Industrial round wood-Nmix"
                 display_name = "Industrial Round Wood"
-                description = "Taken from FAOSTAT Forestry production and trade: industrial roundwood, which gives values under bark..."
+                description = "Taken from FAOSTAT Forestry production and trade: industrial roundwood, which gives values under bark."
+                "The values given here are very close to those reported in SSB table 08979 “Avvirkning for salg (1 000 m³) 1996 – 2024”. "
+                "We have also compared with data in Eurostat, which gives total amount of round removed (over or under bark) including use for "
+                "firewood in households and industry. Following the Swedish NBB \\citep{moldan_where_2025}, we use an average wood density "
+                "of 0.45 t/m3 for all wood categories, and N-contents of 3.4 kg/t for coniferous and 4.3 kg/t for non-coniferous trees. "
+                "ktN/mill m3 wood harvested. IN PROGRESS"
 
         elif filename.upper().startswith("FS_OL_"):
             parent_subpool = "Other Land (FS.OL)"
             if "grazing" in norm:
                 exact_flow_code = "FS.OL-AG.MM-Grazing-Nmix"
                 display_name = "Organised Grazing"
-                description = "Calculated using data from NIBIO on organised grazing \\\\citep{nibio_organised_grazing_2025} together with estimated fodder intake for different animal groups..."
+                description = "Calculated using data from NIBIO on organised grazing \\\\citep{nibio_beitestatistikk_2025} together with "
+                "estimated fodder intake for different animal groups taken from Table 1.2 in \\citep{hegrenes_verdi_2006}, "
+                "assuming an average protein content of 150 g pr FEm and the standard Jones factor for the nitrogen content of protein. "
             elif "emissionsn2" in norm and "n2o" not in norm:
                 exact_flow_code = "FS.OL-AT.AT-Emissions-N2"
                 display_name = "Other Land Emissions (N2)"
-                description = "Calculated from N2O emissions from UNFCCC Common reporting tables, Table 4, assuming a mean N2:N2O ratio of 19.5..."
+                description = "Calculated from N2O emissions from UNFCCC Common reporting tables, Table 4, assuming a mean N2:N2O ratio of 19.5 "
+                "as has been calculated from studies of forest ecosystems, as discussed in \\\\citet{schappi_annexes_2025}. IN PROGRESS"
             elif "emissionsn2o" in norm:
                 exact_flow_code = "FS.OL-AT.AT-Emissions-N2O"
                 display_name = "Other Land Emissions (N2O)"
@@ -801,7 +809,11 @@ def process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename):
             elif "leaching" in norm:
                 exact_flow_code = "FS.OL-HY.SW-Leaching-Nmix"
                 display_name = "Other Land Leaching"
-                description = "Found in data supplied by NIVA, produced in the TEOTIL3 model \\\\citep{sample_teotil3_2024}..."
+                description = "Found in data supplied by NIVA, produced in the TEOTIL3 model \\\\citep{sample_teotil3_2024}, "
+                "where it is aggregated with the value for WL. For the period 1990-2013, we have used TEOTIL data published by "
+                "Miljødirektoratet for nitrogen from nitrogen flows that reach the coast, where we have found that values for leaching "
+                "from forest in the period 2013-2023 are a fraction 0.42 of what is reported by Miljødirektoratet as «Bakgrunn», "
+                "to within a to within a 3 % error. "
 
         with open(full_flow_path, 'w', encoding='utf-8') as f:
             f.write(f"---\nlayout: default\ntitle: {display_name}\nparent: {parent_subpool}\n")
