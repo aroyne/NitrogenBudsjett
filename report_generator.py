@@ -50,7 +50,7 @@ def append_bibtex_references(file_handle, bib_filename=None):
 # SPESIFIKKE FUNKSJONER FOR HVER ENKELT POOL
 # ==============================================================================
 
-def build_landing_page(output_filename, current_date_str):
+def build_landing_page(output_filename, current_date_str, bib_filename):
     """Genererer hovedlandingssiden (index.md) med kritisk advarsel."""
     with open(output_filename, 'w', encoding='utf-8') as f:
         f.write("---\nlayout: default\ntitle: Home\nnav_order: 1\n---\n\n")
@@ -67,6 +67,16 @@ def build_landing_page(output_filename, current_date_str):
         f.write("Use the navigation menu on the left side to explore the individual nitrogen pools ")
         f.write("(e.g., Forests and Semi-natural Vegetation, Agriculture, Atmosphere, Hydrosphere, Rest of the World) ")
         f.write("and access detailed statistical time-series graphs, methodological explanations, and parameterizations for each specific flow.\n")
+        f.write("For flows connected to the hydrosphere, and for land-relateds emissions and nitrogen deposition, "
+                "we only consider the Norwegian mainland. For emissions to air reported through the UNFCCC framework we "
+                "also include emissions from Norwegian economic activity on Svalbard (these are minor and mainly related to coal extraction, "
+                "which has now been discontinued). We also include emissions and N flows that originate in petroleum extraction on the Norwegian "
+                "continental shelf.\n"
+                "This NNB is built using the guidelines from \\citep{{winiwarter_inms_2025}}. Where flows are omitted or added to better fit "
+                "the Norwegian nitrogen system, this is commented. ")
+        append_bibtex_references(f, bib_filename)
+        
+        
 
 
 def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename):
@@ -1229,7 +1239,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
     print("[RAPPORT] Bygger hierarkisk dokumentasjonsportal med egne pool-mapper...")
 
     # 1. Hovedlandingsside
-    build_landing_page(output_filename, current_date_str)
+    build_landing_page(output_filename, current_date_str, bib_filename)
 
     # 2. Atmosphere Pool
     at_folder = "atmosphere_pool"
