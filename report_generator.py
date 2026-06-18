@@ -862,6 +862,76 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename):
         f.write("\n### Flows that are zero or neglected:\n\n* **HY.AC-MP.FP-Freshwater fish and seafood-Nmix**, **HY.AC-HY.SW-Waste feed-Nmix** and **HY.AC-HY.SW-Excretia-Nmix** are set to zero...\n* **HY.AC-AT.AT-Emissions-NH3** is set to zero assuming negligible ammonia emissions from these coastal marine cages.\n")
         append_bibtex_references(f, bib_filename)
         
+    hy_sw_counter, hy_cw_counter, hy_ac_counter = 1, 1, 1
+
+    for filename in plot_files:
+        if not (filename.upper().startswith("HY_SW_") or filename.upper().startswith("HY_CW_") or filename.upper().startswith("HY_AC_")):
+            continue
+
+        base_name = filename.rsplit('.', 1)[0]
+        flow_file_name = f"flow_{base_name}.md"
+        full_flow_path = os.path.join(hy_folder, flow_file_name)
+        norm = filename.lower().replace('-', '').replace('_', '').replace('.', '')
+
+        exact_flow_code = "HY-Unknown-Flow"
+        display_name = "Unknown Hydrosphere Flow"
+        parent_subpool = ""
+        description = ""
+
+        if filename.upper().startswith("HY.SW_"):
+            parent_subpool = "Surface water (HY.SW)"
+            if "emissionsn2" in norm and "n2o" not in norm:
+                exact_flow_code = "HY.SW-AT.AT-Emissions-N2"
+                display_name = "N2 emissions from denitrification in surface waters"
+                description = "N2 is taken from data on N retention in surface waters supplied by NIVA, produced in the TEOTIL3 model "
+                "\\citet{sample_teotil3_2024}, by assuming that all N retained in SW is lost to denitrification, with an assumed fraction "
+                "1 % as N2O and the rest as N2. For years prior to 2013, we have used a retention rate of 7 % which is the typical "
+                "value from the NIVA data and calculated the denitrification amount as 0.07/(1-0.07)* **HY.SW-HY.CW-Inflow to coastal waters-Nmix**."
+            elif "emissionsn2o" in norm:
+                exact_flow_code = "HY.SW-AT.AT-Emissions-N2O"
+                display_name = "Surface water N2O emissions"
+                description = "Uses data on N retention in surface waters supplied by NIVA, produced in the TEOTIL3 model \\citet{sample_teotil3_2024}, "
+                "and assuming that all N retained in SW is lost to denitrification, with an assumed fraction 1 % as N2O and the rest as N2."
+            elif "inflow" in norm:
+                exact_flow_code = "HY.SW-HY.CW-Inflow to coastal waters-Nmix"
+                display_name = "Inflow to coastal waters"
+                description = "Found from data supplied by NIVA, produced in the TEOTIL3 model \\citet{sample_teotil3_2024}. Before 2013 we have "
+                "used values from table 7.2 in \\citet{sample_kildefordelte_2025}. These values includes wastewater discharge, so to avoid double "
+                "counting we subtract the flow *PR.WW-HY.CW-Treated wastewater discharge-Nmix* where we have already assigned all treated "
+                "wastewater discharge to CW. "
+        elif filename.upper().startswith("HY.CW_"):
+            parent_subpool = "Coastal Water (HY.CW)"
+            if "wildcatch" in norm:
+                exact_flow_code = "HY.CW-MP.FP-Fish (wild catch)-Nmix "
+                display_name = "Wild fish catch"
+                description = "found using data from \\citet{fiskeridirektoratet_fangst_2025} on total wild fish catch. According to "
+                "\\\\citet{schappi_annexes_2025}, p254: N content in fish and shellfish: 2.8% according to UNECE Guidance, Annex 6 Table 12. "
+                "Our results are very close to those of \\citet{hohmann-marriott_nitrogen_2025} (also when looking at shellfish and aquaculture). "
+            elif "shellfish" in norm:
+                exact_flow_code = "HY.CW-MP.FP-Shellfish-Nmix"
+                display_name = "Shellfish"
+                description = "We use data from \\citet{fiskeridirektoratet_fangst_2025} on total wild fish catch. According to "
+                "\\\\citet{schappi_annexes_2025}, p254: N content in fish and shellfish: 2.8% according to UNECE Guidance, Annex 6 Table 12. "
+                
+    with open(full_flow_path, 'w', encoding='utf-8') as f:
+        f.write(f"---\nlayout: default\ntitle: {display_name}\nparent: {parent_subpool}\n")
+        if 'SW' in parent_subpool:
+            f.write(f"nav_order: {hy_sw_counter}\n---\n\n")
+            hy_sw_counter += 1
+        elif 'CW' in parent_subpool:
+            f.write(f"nav_order: {hy_cw_counter}\n---\n\n")
+            hy_cw_counter += 1
+        else:
+            f.write(f"nav_order: {hy_ac_counter}\n---\n\n")
+            hy_ac_counter += 1
+
+        f.write(f"# {display_name}\n\n![{exact_flow_code}](../{plot_dir}/{filename})\n\n### Flow Description\n{description}\n\n")
+        
+        # Legger til bibliografitaggen {% bibliography --cited %}
+        append_bibtex_references(f, bib_filename)
+
+
+        
         
 def process_humans_and_settlements_pool(hs_folder, plot_files, plot_dir, bib_filename):
     """Genererer hovedsiden og alle understrømmer for Humans and settlements (HS) poolen med oppdatert LaTeX-syntaks."""
