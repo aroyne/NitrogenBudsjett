@@ -11,7 +11,7 @@ nav_order: 13
 
 ### Flow Description
 
-**PR.SO-RW.RW-Solid waste export-Nmix** is taken from trade data, SSB table 08801 with N contents taken from Table 50 in [^schappi_2025] for municipal waste, sewage sludge, hazardous and other waste. No export in these categories is reported before 2002, so we set all previous years to zero. The increase seen from 2022 to 2023 is in the category municipal waste.
+**PR.SO-RW.RW-Solid waste export-Nmix** is taken from trade data, SSB table 08801. The impact of escalating international commodity trade on domestic vs. rest-of-world nitrogen footprints is quantified in [^malik_drivers_2022] and [^lassaletta_nitrogen_2016]. No export in these categories is reported before 2002, so we set all previous years to zero.
 
 
 ### References

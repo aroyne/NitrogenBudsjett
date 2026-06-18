@@ -11,7 +11,7 @@ nav_order: 17
 
 ### Flow Description
 
-**PR.WW-HS.HS-Sewage sludge fertilizer-Nmix** is taken from SSB table 05279 “Avløpsslam, etter slamdisponering, statistikkvariabel, år og region”, including all sludge used for green areas and for soil production [^schappi_2025]. For years 1993-2001 we use data from the SSB Naturressurser og miljø series. For years 1990-1992 we use the average value of the 1993-1995. We use a N content of 2.6 % as given in Table 54 in [^schappi_2025].
+**PR.WW-HS.HS-Sewage sludge fertilizer-Nmix** is taken from SSB table 05279, including all sludge used for green areas and for soil production. Linear urban pathways where nutrient outputs aggregate heavily in municipal infrastructure are outlined in [^kaltenegger_urban_2023]. For years 1993-2001 we use data from the SSB Naturressurser og miljø series.
 
 
 ### References

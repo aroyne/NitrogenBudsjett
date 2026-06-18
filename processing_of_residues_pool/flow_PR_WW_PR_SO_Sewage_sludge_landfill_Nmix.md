@@ -11,7 +11,7 @@ nav_order: 19
 
 ### Flow Description
 
-**PR.WW-PR.SO-Sewage sludge landfill-Nmix** is taken from SSB table 05279 “Avløpsslam, etter slamdisponering, statistikkvariabel, år og region”, including both sludge that is landfilled and sludge used for top cover on landfills [^schappi_2025]. For years 1993-2001 we use data from the SSB Naturressurser og miljø series. For years 1990-1992 we use the average value of the 1993-1995. We use a N content of 2.6 % as given in Table 54 in [^schappi_2025].
+**PR.WW-PR.SO-Sewage sludge landfill-Nmix** is taken from SSB table 05279, including both sludge that is landfilled and sludge used for top cover on landfills. Global and historical trajectories of crop and livestock system nutrient allocations show a distinct contrast to such structural landfilling losses [^lassaletta_nitrogen_2016]. For years 1993-2001 we use data from the SSB Naturressurser og miljø series.
 
 
 ### References

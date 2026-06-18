@@ -11,7 +11,7 @@ nav_order: 15
 
 ### Flow Description
 
-**PR.WW-AT.AT-Emissions-N2** is found by using data on N emissions and removal rates from the six wastewater treatment plants that were equipped with nitrogen removal up to 2025. Where specific data on nitrogen removal fraction were missing we assumed a default 70 %, and we extrapolated or interpolated between existing data where reported emission data were missing. The amount of N released as N2 was calculated as N_released*removal_rate/(1-removal_rate).
+**PR.WW-AT.AT-Emissions-N2** is found by using data on N emissions and removal rates from wastewater treatment plants equipped with nitrogen removal. The dynamics of losing significant shares of excreted nitrogen as inert N2 via WWTP denitrification are detailed in [^starck_fate_2023] and [^fowler_global_2013]. Where specific data were missing we assumed a default 70 % removal rate.
 
 
 ### References
