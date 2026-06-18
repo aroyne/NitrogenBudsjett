@@ -878,7 +878,7 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename):
         parent_subpool = ""
         description = ""
 
-        if filename.upper().startswith("HY.SW_"):
+        if filename.upper().startswith("HY_SW_"):
             parent_subpool = "Surface water (HY.SW)"
             if "emissionsn2" in norm and "n2o" not in norm:
                 exact_flow_code = "HY.SW-AT.AT-Emissions-N2"
@@ -899,10 +899,10 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename):
                 "used values from table 7.2 in \\citet{sample_kildefordelte_2025}. These values includes wastewater discharge, so to avoid double "
                 "counting we subtract the flow *PR.WW-HY.CW-Treated wastewater discharge-Nmix* where we have already assigned all treated "
                 "wastewater discharge to CW. "
-        elif filename.upper().startswith("HY.CW_"):
+        elif filename.upper().startswith("HY_CW_"):
             parent_subpool = "Coastal Water (HY.CW)"
             if "wildcatch" in norm:
-                exact_flow_code = "HY.CW-MP.FP-Fish (wild catch)-Nmix "
+                exact_flow_code = "HY.CW-MP.FP-Fish (wild catch)-Nmix"
                 display_name = "Wild fish catch"
                 description = "found using data from \\citet{fiskeridirektoratet_fangst_2025} on total wild fish catch. According to "
                 "\\\\citet{schappi_annexes_2025}, p254: N content in fish and shellfish: 2.8% according to UNECE Guidance, Annex 6 Table 12. "
@@ -912,23 +912,42 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename):
                 display_name = "Shellfish"
                 description = "We use data from \\citet{fiskeridirektoratet_fangst_2025} on total wild fish catch. According to "
                 "\\\\citet{schappi_annexes_2025}, p254: N content in fish and shellfish: 2.8% according to UNECE Guidance, Annex 6 Table 12. "
-                
-    with open(full_flow_path, 'w', encoding='utf-8') as f:
-        f.write(f"---\nlayout: default\ntitle: {display_name}\nparent: {parent_subpool}\n")
-        if 'SW' in parent_subpool:
-            f.write(f"nav_order: {hy_sw_counter}\n---\n\n")
-            hy_sw_counter += 1
-        elif 'CW' in parent_subpool:
-            f.write(f"nav_order: {hy_cw_counter}\n---\n\n")
-            hy_cw_counter += 1
         else:
-            f.write(f"nav_order: {hy_ac_counter}\n---\n\n")
-            hy_ac_counter += 1
-
-        f.write(f"# {display_name}\n\n![{exact_flow_code}](../{plot_dir}/{filename})\n\n### Flow Description\n{description}\n\n")
-        
-        # Legger til bibliografitaggen {% bibliography --cited %}
-        append_bibtex_references(f, bib_filename)
+            parent_subpool = "Aquaculture (HY.AC)"
+            if "excretia" in norm:
+                exact_flow_code = "HY.AC-HY.CW-Excretia-Nmix"
+                display_name = "Excretia"
+                description = "Found through mass balance by assuming N that does not become fish or waste feed is excreted."
+            elif "wastefeed" in norm:
+                exact_flow_code = "HY.AC-HY.CW-Waste feed-Nmix"
+                display_name = "Waste feed"
+                description = "Calculated using data from \\citet{fiskeridirektoratet_06002_2025} on sold farmed fish, assuming average "
+                "protein (N) retention of 35,75 % \\citet{aas_utilization_2022}, 2.8 % nitrogen content in fish and shellfish "
+                "(\\\\citet{schappi_annexes_2025}, p. 254) and 3% feed waste \\citet{wang_chemical_2013}."
+            elif "coastalfish" in norm:
+                exact_flow_code = "HY.AC-MP.FP-Coastal fish and seafood-Nmix"
+                display_name = "Aquaculture production"
+                description = "Calculated using data from \\citet{fiskeridirektoratet_06002_2025} on sold farmed fish, assuming average "
+                "protein (N) retention of 35,75 % \\citet{aas_utilization_2022}, 2.8 % nitrogen content in fish and shellfish "
+                "(\\\\citet{schappi_annexes_2025}, p. 254) and 3% feed waste \\citet{wang_chemical_2013}."
+            
+                
+        with open(full_flow_path, 'w', encoding='utf-8') as f:
+            f.write(f"---\nlayout: default\ntitle: {display_name}\nparent: {parent_subpool}\n")
+            if 'SW' in parent_subpool:
+                f.write(f"nav_order: {hy_sw_counter}\n---\n\n")
+                hy_sw_counter += 1
+            elif 'CW' in parent_subpool:
+                f.write(f"nav_order: {hy_cw_counter}\n---\n\n")
+                hy_cw_counter += 1
+            else:
+                f.write(f"nav_order: {hy_ac_counter}\n---\n\n")
+                hy_ac_counter += 1
+    
+            f.write(f"# {display_name}\n\n![{exact_flow_code}](../{plot_dir}/{filename})\n\n### Flow Description\n{description}\n\n")
+            
+            # Legger til bibliografitaggen {% bibliography --cited %}
+            append_bibtex_references(f, bib_filename)
 
 
         

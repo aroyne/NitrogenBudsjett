@@ -1,14 +1,17 @@
 ---
 layout: default
-title: Unknown Hydrosphere Flow
-parent: 
-nav_order: 1
+title: Inflow to coastal waters
+parent: Surface water (HY.SW)
+nav_order: 3
 ---
 
-# Unknown Hydrosphere Flow
+# Inflow to coastal waters
 
-![HY-Unknown-Flow](../output_files/plots/balance_RW_RW.png)
+![HY.SW-HY.CW-Inflow to coastal waters-Nmix](../output_files/plots/HY_SW_HY_CW_Inflow_to_coastal_waters_Nmix.png)
 
 ### Flow Description
+Found from data supplied by NIVA, produced in the TEOTIL3 model Sample (2024). Before 2013 we have
 
+### References
 
+* Sample, J. E., Jackson-Blake, L., Vogelsang, C., & Kaste, Ø. (2024). *TEOTIL3}: {En} modell for beregning av kildebaserte tilførsler via elver og direktetilførsler til kyst*.
