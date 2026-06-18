@@ -1046,7 +1046,11 @@ def process_energy_and_fuels_pool(ef_folder, plot_files, plot_dir, bib_filename)
     """Genererer hovedsiden, subpools og alle strømmer for Energy and Fuels (EF) med oppdatert LaTeX-syntaks."""
     with open(os.path.join(ef_folder, "pool_energy_and_fuels.md"), 'w', encoding='utf-8') as f:
         f.write("---\nlayout: default\ntitle: Energy and fuels (EF)\nnav_order: 7\nhas_children: true\n---\n\n")
-        f.write("# Pool: Energy and fuels (EF)\n\nIn the guidelines, there are N2 flows assigned to and from EF sectors associated with nitrogen conversions in the combustion process...\n")
+        f.write("# Pool: Energy and fuels (EF)\n\nIn the guidelines, there are N2 flows assigned to and from EF sectors associated with nitrogen "
+                "conversions in the combustion process. We have chosen to ignore these here because they can only be found by mass balance but by "
+                "doing so, they may hide other imbalances that could be significant. They also do not make any significant contributions to the flows "
+                "of reactive N. Note on subpools: it is not always clear where flows end up. For example, industrial waste fuels from MP.OP is assigned "
+                "to manufacturing industries EC.IC, meaning that waste for fuel is kept within the industrial sector. This is not necessarily the case. \n\n")
         f.write("This pool is divided into four operational sub-pools. Explore them using the side menu or links below:\n\n")
         f.write("* [Energy conversion (EF.EC)](subpool_energy_conversion.html)\n* [Manufacturing industries and construction (EF.IC)](subpool_industry.html)\n* [Transportation (EF.TR)](subpool_transport.html)\n* [Other energy and fuels (EF.OE)](subpool_other_energy.html)\n\n")
         f.write(get_balance_image_markdown("EF", plot_files, plot_dir, relative_depth="../"))
@@ -1056,7 +1060,10 @@ def process_energy_and_fuels_pool(ef_folder, plot_files, plot_dir, bib_filename)
     with open(os.path.join(ef_folder, "subpool_energy_conversion.md"), 'w', encoding='utf-8') as f:
         f.write("---\nlayout: default\ntitle: Energy conversion (EF.EC)\nparent: Energy and fuels (EF)\nnav_order: 1\nhas_children: true\n---\n\n# Subpool: Energy conversion (EF.EC)\n\n")
         f.write(get_balance_image_markdown("EF.EC", plot_files, plot_dir, relative_depth="../"))
-        f.write("\n### Flows that are zero or neglected:\n\n* **EF.EC-AT.AT-Emissions-NH3**: Data from CLRTAP Inventory Submissions...\n")
+        f.write("This subpool includes extraction of fossil fuels from geological sources, which is a large sector in Norway. Because of this there is no mass balance "
+                "for EF.EC; nitrogen bound to extracted fuels arise in the sector, and outflows are therefore significantly larger than inflows. \n\n")
+        f.write("\n### Flows that are zero or neglected:\n\n* **EF.EC-AT.AT-Emissions-NH3**: : Data from CLRTAP Inventory Submissions \\citet{emep_officially_2025} as "
+                "advised by \\\\citet{schappi_annexes_2025}, using the categories given in Table 11, give values that are consistently below 0.001 ktN/year, which is negligible in this context.\n")
         append_bibtex_references(f, bib_filename)
 
     with open(os.path.join(ef_folder, "subpool_industry.md"), 'w', encoding='utf-8') as f:
@@ -1096,11 +1103,13 @@ def process_energy_and_fuels_pool(ef_folder, plot_files, plot_dir, bib_filename)
             if "emissions" in norm and "nox" in norm:
                 exact_flow_code = "EF.EC-AT.AT-Emissions-NOx"
                 display_name = "Energy conversion emissions (NOx)"
-                description = "EF.EC-AT.AT-Emissions-NOx: We have used data from CLRTAP Inventory Submissions..."
+                description = "EF.EC-AT.AT-Emissions-NOx: We have used data from CLRTAP Inventory Submissions \\citet{emep_officially_2025} as advised by "
+                "\\\\citet{schappi_annexes_2025}, using the categories given in Table 11"
             elif "emissions" in norm and "n2o" in norm:
                 exact_flow_code = "EF.EC-AT.AT-Emissions-N2O"
                 display_name = "Energy conversion emissions (N2O)"
-                description = "EF.EC-AT.AT-Emissions-N2O is taken from UNFCCC Common Reporting Tables..."
+                description = "EF.EC-AT.AT-Emissions-N2O is taken from UNFCCC Common Reporting Tables, Table 1 using the categories give in "
+                "Table 11 by \\\\citet{schappi_annexes_2025}."
             elif "fuel" in norm and "industry" in norm:
                 exact_flow_code = "EF.EC-EF.IC-Fuel for industry-Nmix"
                 display_name = "Fuel for industry"
