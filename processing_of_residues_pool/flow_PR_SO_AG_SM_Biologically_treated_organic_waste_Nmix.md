@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Biologically treated organic waste to Ag
-parent: Processing of residues (PR)
+parent: Solid Waste (PR.SO)
 nav_order: 1
 ---
 
@@ -10,7 +10,6 @@ nav_order: 1
 ![PR.SO-AG.SM-Biologically treated organic waste-Nmix](../output_files/plots/PR_SO_AG_SM_Biologically_treated_organic_waste_Nmix.png)
 
 ### Flow Description
-
 **PR.SO-AG.SM-Biologically treated organic waste-Nmix** includes all forms of organic waste except sewage sludge that is organically treated and used in agricultural soils. Biological treatment of organic waste includes both composting and biogas production, but in Norway, most of the waste composted in the municipal waste sector is used on the private sector, not in agriculture. We therefore only include biogas digestate in this flow.
 
 According to Biogass Norge, biogas digestate is produced from sewage sludge, manure, fish waste and sludge, and food waste. General frameworks for urban and regional nitrogen recycling from waste management are detailed in [^kaltenegger_urban_2023]. From 2018 to 2020, we use data on the disposal of biologically produced waste from SSB table 12818 where we find the N content of what is used in agriculture by scaling the N content of the amount used in 2021.

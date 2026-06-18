@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Biologically treated organic waste to HS
-parent: Processing of residues (PR)
+parent: Solid Waste (PR.SO)
 nav_order: 6
 ---
 
@@ -10,7 +10,6 @@ nav_order: 6
 ![PR.SO-HS.HS-Biologically treated organic waste-Nmix](../output_files/plots/PR_SO_HS_HS_Biologically_treated_organic_waste_Nmix.png)
 
 ### Flow Description
-
 **PR.SO-HS.HS-Biologically treated organic waste-Nmix** includes all forms of organic waste except sewage sludge that is organically treated and used in agricultural soils. Biological treatment of organic waste includes both composting and biogas production, but in Norway, most of the waste composted in the municipal waste sector is used on the private sector, not in agriculture.
 
 SSB statistics on composted organic waste also includes some composted wastewater sludge, but there is no exact statistics on the amount. Opportunities and limitations regarding the agronomic use of human excreta and urban compost are reviewed in [^starck_fate_2023] and [^kaltenegger_urban_2023].
