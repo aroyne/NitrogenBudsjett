@@ -317,7 +317,6 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
                     
                     with open(file_path, 'w', encoding='utf-8') as f:
                         f.write(final_content)
-                    print(f"Oppdaterte referanser (APA7-vask) i filen: {filename}")
 
                     
 # ==============================================================================
@@ -405,13 +404,12 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename):
 
             if exact_flow_code == "AT.AT-AG.SM-Biological N2 fixation-N2":
                 # Byttet ut [ukjent_nøkkel] med en narrativ LaTeX-sitatvariant \citet{}
-                f.write("""
-                    \\citet{{schappi_annexes_2025}} advises using data from the EUROSTAT Gross nutrient balance, but there \
+                f.write("\\citet{schappi_annexes_2025} advises using data from the EUROSTAT Gross nutrient balance, but there \
                     is an error in this dataset for Norway which is currently being corrected (as of February 2026; personal correspondence, \
                     EUROSTAT). According to the EUROSTAT metadata, the BNF in this statistic is calculated based on the area of leguminous crops and \
                     fization coefficients. The production of leguminous crops (peas, beans etc) in Norway is very low and we assume that agricultural \
                     BNF is for the most part determined by leguminous crops such as clover grown on pastures and in fodder production. \
-                    \\citet{{bleken_nitrogen_1997}} based their estimate for BNF from the sale of clover seeds: a sale of about 145 t seeds was \
+                    \\citet{bleken_nitrogen_1997} based their estimate for BNF from the sale of clover seeds: a sale of about 145 t seeds was \
                     estimated to be used to plant 95 000 ha of grass/clover mixtures (655 ha/t seeds). Together with a rate of BNF of 80 kgN/ha on \
                     this area, they found a total of 7.6 ktN per year and summed up to 8 ktN to account for BNF from free-living orghanisms and \
                     other sources. The rate of 80 kgN/ha agrees relatively well with later studies of agricultural BNF in Norway, where average \
@@ -420,10 +418,10 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename):
                     seed sales are not available, but according to NIBIO Totalkalkylen (NIBIO, 2025b), the area where grass/clover mixes may be \
                     sown for pasture and fodder production (fulldyrka eng) has remained constant to within about 3 % from 1995 up to today. Our \
                     best estimate for BNF, and for consistency with the previous study, is therefore to assume a constant value of 8 ktN/year. \
-                    In Sweden \\citep{{moldan_where_2025}} the value was found to be 34 kT in 2015, which is more in line with the values found before 2000.""")
+                    In Sweden \\citep{moldan_where_2025} the value was found to be 34 kT in 2015, which is more in line with the values found before 2000.""")
             elif exact_flow_code in ["AT.AT-FS.FO-Deposition-OXN", "AT.AT-FS.FO-Deposition-RDN", "AT.AT-FS.OL-Deposition-OXN", "AT.AT-FS.OL-Deposition-RDN", "AT.AT-HS.HS-Deposition-OXN", "AT.AT-HS.HS-Deposition-RDN"]:
                 f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_TEXT + "\n\n")
-            elif exact_flow_code in ["AT.AT-HY.SW-Deposition-RDN","AT.AT-HY.SW-Deposition-RDN"]:
+            elif exact_flow_code in ["AT.AT-HY.SW-Deposition-OXN","AT.AT-HY.SW-Deposition-RDN"]:
                 f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_TEXT + "For comparison, the data used in the TEOTIL model gives 3.5 ktN in 2013 and "
                         "3.0 ktN in 2023. These comparable but slightly lower values are the results of different datasets used and different data "
                         "treatment. ")
@@ -434,10 +432,10 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename):
                         "also reported values of 74.7 and 33.5 ktN per year using two different methods "
                         "for estimating biome-dependent N deposition rates.")
             elif exact_flow_code == "AT.AT-FS.FO-N2 fixation-N2":
-                f.write("Following the Swedish NBB \\cite{{moldan_where_2025}}, we use an N-fixation "
+                f.write("Following the Swedish NBB \\citet{moldan_where_2025}, we use an N-fixation "
                         "rate of 1.5 kg/ha/year and a forested area of 12.0 mill ha as given by SSB for 2019-2023 (table 14368); we assume this value is "
                         "constant for our entire time period. This gives an annual N-fixation rate of 18.0 ktN. For comparison, the value for Sweden "
-                        "in 2015 was found to be 39.5 ktN \cite{moldan_where_2025}.")
+                        "in 2015 was found to be 39.5 ktN \\cite{moldan_where_2025}.")
             elif exact_flow_code == "AT.AT-FS.OL-N2 fixation-N2":
                 f.write("We use N2 fixation rates from Table 62 in \\citet{schappi_annexes_2025} together with land type areas calculated from the CORINE land cover "
                         " inventory \\citet{european_environment_agency_corine_2019}. "
@@ -453,9 +451,9 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename):
                         "variable curve which probably does not reflect year to year production well and could be a result of how trade statistics are "
                         "reported.")
             elif exact_flow_code == "AT.AT-RW.RW-Atmospheric outflow-OXN":
-                f.write(f"**{exact_flow_code}**\n\n" + "is found using source-receptor data from \\citep{{emep_sr_2024}}, as advised by \\citep{{schappi_annexes_2025}}.")
+                f.write(f"**{exact_flow_code}**\n\n" + "is found using source-receptor data from \\citep{emep_sr_2024}, as advised by \\citep{schappi_annexes_2025}.")
             elif exact_flow_code == "AT.AT-RW.RW-Atmospheric outflow-RDN":
-                f.write(f"**{exact_flow_code}**\n\n" + "is found using source-receptor data from \\citep{{emep_sr_2024}}, as advised by \\citep{{schappi_annexes_2025}}.")
+                f.write(f"**{exact_flow_code}**\n\n" + "is found using source-receptor data from \\citep{emep_sr_2024}, as advised by \\citep{schappi_annexes_2025}.")
             else:
                 f.write(f"*Flow details for {exact_flow_code}*\n\n")
 
@@ -687,13 +685,13 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename):
             if "fodder" in norm or "grass" in norm:
                 exact_flow_code = "AG.SM-AG.MM-Fodder crops-Nmix"
                 display_name = "Fodder Crops Production"
-                description = "We have used data for grass and fodder production from SSB table 13648 «Avling i jordbruket (1000 tonn) og avling "
-                "per dekar (kg), etter ymse jordbruksvekstar (F) 2021 – 2024» and 05772 «Avling i jordbruket, etter ymse jordbruksvekstar (1 000 tonn) "
-                "(F) (avslutta serie) 2000 – 2020». Values prior to 2000 are found in the SSB Jordbruksstatistikk (Table 2.1/Table 20). The protein "
-                "content of grass and fodder is known to be highly variable. We have assumed a protein content of 15 % based on 2025 analyses of "
-                "13 000 grass samples from all over Norway by Tine/NorFor, and 15 % N in protein (FAO, 2003). \n\n"
-                "\citet{hohmann-marriott_nitrogen_2025} used similar data sources but arrived at a smaller N flow (40-45 ktN) using a protein content "
-                "of 8 % and N content in protein of 15 % (Table S2).  "
+                description = ("We have used data for grass and fodder production from SSB table 13648 «Avling i jordbruket (1000 tonn) og avling "
+                    "per dekar (kg), etter ymse jordbruksvekstar (F) 2021 – 2024» and 05772 «Avling i jordbruket, etter ymse jordbruksvekstar (1 000 tonn) "
+                    "(F) (avslutta serie) 2000 – 2020». Values prior to 2000 are found in the SSB Jordbruksstatistikk (Table 2.1/Table 20). The protein "
+                    "content of grass and fodder is known to be highly variable. We have assumed a protein content of 15 % based on 2025 analyses of "
+                    "13 000 grass samples from all over Norway by Tine/NorFor, and 15 % N in protein (FAO, 2003). \n\n"
+                    "\citet{hohmann-marriott_nitrogen_2025} used similar data sources but arrived at a smaller N flow (40-45 ktN) using a protein content "
+                    "of 8 % and N content in protein of 15 % (Table S2).  ")
             elif "emissionsn2" in norm:
                 exact_flow_code = "AG.SM-AT.AT-Emissions-N2"
                 display_name = "N2 emissions from denitrification"
@@ -721,14 +719,14 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename):
             elif "foodcrop" in norm:
                 exact_flow_code = "AG.SM-MP.FP-Food crop products-Nmix"
                 display_name = "Food crop products"
-                description = "Food crop products are  taken from EUROSTAT Gross nutrient balance as advised by \\\\citet{schappi_annexes_2025}: «Nutrient "
-                "removal by harvest of crops» minus «Industrial crops». «Ornamenal crops», which should also be removed, are negligible in Norway. "
-                "For years with missing data, we have filled in the average of all other years. "
+                description = ("Food crop products are  taken from EUROSTAT Gross nutrient balance as advised by \\\\citet{schappi_annexes_2025}: «Nutrient "
+                    "removal by harvest of crops» minus «Industrial crops». «Ornamenal crops», which should also be removed, are negligible in Norway. "
+                    "For years with missing data, we have filled in the average of all other years. ")
             elif "industrial" in norm:
                 exact_flow_code = "AG.SM-MP.OP-Crop products for industrial use-Nmix"
                 display_name = "Crop products for industrial use"
-                description = "Crop products for industrial use is taken from EUROSTAT Gross nutrient balance as advised by "
-                "\\\\citet{schappi_annexes_2025}. For years with missing data, we have filled in the average of all other years. "
+                description = ("Crop products for industrial use is taken from EUROSTAT Gross nutrient balance as advised by "
+                    "\\\\citet{schappi_annexes_2025}. For years with missing data, we have filled in the average of all other years. ")
         with open(full_flow_path, 'w', encoding='utf-8') as f:
             f.write(f"---\nlayout: default\ntitle: {display_name}\nparent: {parent_subpool}\n")
             if 'MM' in parent_subpool:
@@ -809,26 +807,26 @@ def process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename):
             elif "roundwood" in norm or "industrial" in norm:
                 exact_flow_code = "FS.FO-MP.OP-Industrial round wood-Nmix"
                 display_name = "Industrial Round Wood"
-                description = "Taken from FAOSTAT Forestry production and trade: industrial roundwood, which gives values under bark."
-                "The values given here are very close to those reported in SSB table 08979 “Avvirkning for salg (1 000 m³) 1996 – 2024”. "
-                "We have also compared with data in Eurostat, which gives total amount of round removed (over or under bark) including use for "
-                "firewood in households and industry. Following the Swedish NBB \\citep{moldan_where_2025}, we use an average wood density "
-                "of 0.45 t/m3 for all wood categories, and N-contents of 3.4 kg/t for coniferous and 4.3 kg/t for non-coniferous trees. "
-                "ktN/mill m3 wood harvested. IN PROGRESS"
+                description = ("Taken from FAOSTAT Forestry production and trade: industrial roundwood, which gives values under bark."
+                    "The values given here are very close to those reported in SSB table 08979 “Avvirkning for salg (1 000 m³) 1996 – 2024”. "
+                    "We have also compared with data in Eurostat, which gives total amount of round removed (over or under bark) including use for "
+                    "firewood in households and industry. Following the Swedish NBB \\citep{moldan_where_2025}, we use an average wood density "
+                    "of 0.45 t/m3 for all wood categories, and N-contents of 3.4 kg/t for coniferous and 4.3 kg/t for non-coniferous trees. "
+                    "ktN/mill m3 wood harvested. IN PROGRESS")
 
         elif filename.upper().startswith("FS_OL_"):
             parent_subpool = "Other Land (FS.OL)"
             if "grazing" in norm:
                 exact_flow_code = "FS.OL-AG.MM-Grazing-Nmix"
                 display_name = "Organised Grazing"
-                description = "Calculated using data from NIBIO on organised grazing \\\\citep{nibio_beitestatistikk_2025} together with "
-                "estimated fodder intake for different animal groups taken from Table 1.2 in \\citep{hegrenes_verdi_2006}, "
-                "assuming an average protein content of 150 g pr FEm and the standard Jones factor for the nitrogen content of protein. "
+                description = ("Calculated using data from NIBIO on organised grazing \\\\citep{nibio_beitestatistikk_2025} together with "
+                    "estimated fodder intake for different animal groups taken from Table 1.2 in \\citep{hegrenes_verdi_2006}, "
+                    "assuming an average protein content of 150 g pr FEm and the standard Jones factor for the nitrogen content of protein. ")
             elif "emissionsn2" in norm and "n2o" not in norm:
                 exact_flow_code = "FS.OL-AT.AT-Emissions-N2"
                 display_name = "Other Land Emissions (N2)"
-                description = "Calculated from N2O emissions from UNFCCC Common reporting tables, Table 4, assuming a mean N2:N2O ratio of 19.5 "
-                "as has been calculated from studies of forest ecosystems, as discussed in \\\\citet{schappi_annexes_2025}. IN PROGRESS"
+                description = ("Calculated from N2O emissions from UNFCCC Common reporting tables, Table 4, assuming a mean N2:N2O ratio of 19.5 "
+                    "as has been calculated from studies of forest ecosystems, as discussed in \\\\citet{schappi_annexes_2025}. IN PROGRESS")
             elif "emissionsn2o" in norm:
                 exact_flow_code = "FS.OL-AT.AT-Emissions-N2O"
                 display_name = "Other Land Emissions (N2O)"
@@ -836,11 +834,11 @@ def process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename):
             elif "leaching" in norm:
                 exact_flow_code = "FS.OL-HY.SW-Leaching-Nmix"
                 display_name = "Other Land Leaching"
-                description = "Found in data supplied by NIVA, produced in the TEOTIL3 model \\\\citep{sample_teotil3_2024}, "
-                "where it is aggregated with the value for WL. For the period 1990-2013, we have used TEOTIL data published by "
-                "Miljødirektoratet for nitrogen from nitrogen flows that reach the coast, where we have found that values for leaching "
-                "from forest in the period 2013-2023 are a fraction 0.42 of what is reported by Miljødirektoratet as «Bakgrunn», "
-                "to within a to within a 3 % error. "
+                description = ("Found in data supplied by NIVA, produced in the TEOTIL3 model \\\\citep{sample_teotil3_2024}, "
+                    "where it is aggregated with the value for WL. For the period 1990-2013, we have used TEOTIL data published by "
+                    "Miljødirektoratet for nitrogen from nitrogen flows that reach the coast, where we have found that values for leaching "
+                    "from forest in the period 2013-2023 are a fraction 0.42 of what is reported by Miljødirektoratet as «Bakgrunn», "
+                    "to within a to within a 3 % error. ")
 
         with open(full_flow_path, 'w', encoding='utf-8') as f:
             f.write(f"---\nlayout: default\ntitle: {display_name}\nparent: {parent_subpool}\n")
@@ -898,9 +896,7 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename):
         base_name = filename.rsplit('.', 1)[0]
         flow_file_name = f"flow_{base_name}.md"
         full_flow_path = os.path.join(hy_folder, flow_file_name)
-        print(full_flow_path)
         norm = filename.lower().replace('-', '').replace('_', '').replace('.', '')
-        print(norm)
 
         exact_flow_code = "HY-Unknown-Flow"
         display_name = "Unknown Hydrosphere Flow"
@@ -912,35 +908,35 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename):
             if "emissionsn2" in norm and "n2o" not in norm:
                 exact_flow_code = "HY.SW-AT.AT-Emissions-N2"
                 display_name = "N2 emissions from denitrification in surface waters"
-                description = "N2 is taken from data on N retention in surface waters supplied by NIVA, produced in the TEOTIL3 model "
-                "\\citet{sample_teotil3_2024}, by assuming that all N retained in SW is lost to denitrification, with an assumed fraction "
-                "1 % as N2O and the rest as N2. For years prior to 2013, we have used a retention rate of 7 % which is the typical "
-                "value from the NIVA data and calculated the denitrification amount as 0.07/(1-0.07)* **HY.SW-HY.CW-Inflow to coastal waters-Nmix**."
+                description = ("N2 is taken from data on N retention in surface waters supplied by NIVA, produced in the TEOTIL3 model "
+                    "\\citet{sample_teotil3_2024}, by assuming that all N retained in SW is lost to denitrification, with an assumed fraction "
+                    "1 % as N2O and the rest as N2. For years prior to 2013, we have used a retention rate of 7 % which is the typical "
+                    "value from the NIVA data and calculated the denitrification amount as 0.07/(1-0.07)* **HY.SW-HY.CW-Inflow to coastal waters-Nmix**.")
             elif "emissionsn2o" in norm:
                 exact_flow_code = "HY.SW-AT.AT-Emissions-N2O"
                 display_name = "Surface water N2O emissions"
-                description = "Uses data on N retention in surface waters supplied by NIVA, produced in the TEOTIL3 model \\citet{sample_teotil3_2024}, "
-                "and assuming that all N retained in SW is lost to denitrification, with an assumed fraction 1 % as N2O and the rest as N2."
+                description = ("Uses data on N retention in surface waters supplied by NIVA, produced in the TEOTIL3 model \\citet{sample_teotil3_2024}, "
+                               "and assuming that all N retained in SW is lost to denitrification, with an assumed fraction 1 % as N2O and the rest as N2.")
             elif "inflow" in norm:
                 exact_flow_code = "HY.SW-HY.CW-Inflow to coastal waters-Nmix"
                 display_name = "Inflow to coastal waters"
-                description = "Found from data supplied by NIVA, produced in the TEOTIL3 model \\citet{sample_teotil3_2024}. Before 2013 we have "
-                "used values from table 7.2 in \\citet{sample_kildefordelte_2025}. These values includes wastewater discharge, so to avoid double "
-                "counting we subtract the flow *PR.WW-HY.CW-Treated wastewater discharge-Nmix* where we have already assigned all treated "
-                "wastewater discharge to CW. "
+                description = ("Found from data supplied by NIVA, produced in the TEOTIL3 model \\citet{sample_teotil3_2024}. Before 2013 we have "
+                    "used values from table 7.2 in \\citet{sample_kildefordelte_2025}. These values includes wastewater discharge, so to avoid double "
+                    "counting we subtract the flow *PR.WW-HY.CW-Treated wastewater discharge-Nmix* where we have already assigned all treated "
+                    "wastewater discharge to CW. ")
         elif filename.upper().startswith("HY_CW_"):
             parent_subpool = "Coastal Water (HY.CW)"
             if "wildcatch" in norm:
                 exact_flow_code = "HY.CW-MP.FP-Fish (wild catch)-Nmix"
                 display_name = "Wild fish catch"
-                description = "found using data from \\citet{fiskeridirektoratet_fangst_2025} on total wild fish catch. According to "
-                "\\\\citet{schappi_annexes_2025}, p254: N content in fish and shellfish: 2.8% according to UNECE Guidance, Annex 6 Table 12. "
-                "Our results are very close to those of \\citet{hohmann-marriott_nitrogen_2025} (also when looking at shellfish and aquaculture). "
+                description = ("found using data from \\citet{fiskeridirektoratet_fangst_2025} on total wild fish catch. According to "
+                    "\\\\citet{schappi_annexes_2025}, p254: N content in fish and shellfish: 2.8% according to UNECE Guidance, Annex 6 Table 12. "
+                    "Our results are very close to those of \\citet{hohmann-marriott_nitrogen_2025} (also when looking at shellfish and aquaculture). ")
             elif "shellfish" in norm:
                 exact_flow_code = "HY.CW-MP.FP-Shellfish-Nmix"
                 display_name = "Shellfish"
-                description = "We use data from \\citet{fiskeridirektoratet_fangst_2025} on total wild fish catch. According to "
-                "\\\\citet{schappi_annexes_2025}, p254: N content in fish and shellfish: 2.8% according to UNECE Guidance, Annex 6 Table 12. "
+                description = ("We use data from \\citet{fiskeridirektoratet_fangst_2025} on total wild fish catch. According to "
+                    "\\\\citet{schappi_annexes_2025}, p254: N content in fish and shellfish: 2.8% according to UNECE Guidance, Annex 6 Table 12. ")
         else:
             parent_subpool = "Aquaculture (HY.AC)"
             if "excretia" in norm:
@@ -951,15 +947,15 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename):
             elif "wastefeed" in norm:
                 exact_flow_code = "HY.AC-HY.CW-Waste feed-Nmix"
                 display_name = "Waste feed"
-                description = "Calculated using data from \\citet{fiskeridirektoratet_06002_2025} on sold farmed fish, assuming average "
-                "protein (N) retention of 35,75 % \\citet{aas_utilization_2022}, 2.8 % nitrogen content in fish and shellfish "
-                "(\\\\citet{schappi_annexes_2025}, p. 254) and 3% feed waste \\citet{wang_chemical_2013}."
+                description = ("Calculated using data from \\citet{fiskeridirektoratet_06002_2025} on sold farmed fish, assuming average "
+                    "protein (N) retention of 35,75 % \\citet{aas_utilization_2022}, 2.8 % nitrogen content in fish and shellfish "
+                    "(\\\\citet{schappi_annexes_2025}, p. 254) and 3% feed waste \\citet{wang_chemical_2013}.")
             elif "coastalfish" in norm:
                 exact_flow_code = "HY.AC-MP.FP-Coastal fish and seafood-Nmix"
                 display_name = "Aquaculture production"
-                description = "Calculated using data from \\citet{fiskeridirektoratet_06002_2025} on sold farmed fish, assuming average "
-                "protein (N) retention of 35,75 % \\citet{aas_utilization_2022}, 2.8 % nitrogen content in fish and shellfish "
-                "(\\\\citet{schappi_annexes_2025}, p. 254) and 3% feed waste \\citet{wang_chemical_2013}."
+                description = ("Calculated using data from \\citet{fiskeridirektoratet_06002_2025} on sold farmed fish, assuming average "
+                    "protein (N) retention of 35,75 % \\citet{aas_utilization_2022}, 2.8 % nitrogen content in fish and shellfish "
+                    "(\\\\citet{schappi_annexes_2025}, p. 254) and 3% feed waste \\citet{wang_chemical_2013}.")
             
                 
         with open(full_flow_path, 'w', encoding='utf-8') as f:
@@ -1135,8 +1131,8 @@ def process_energy_and_fuels_pool(ef_folder, plot_files, plot_dir, bib_filename)
             elif "emissions" in norm and "n2o" in norm:
                 exact_flow_code = "EF.EC-AT.AT-Emissions-N2O"
                 display_name = "Energy conversion emissions (N2O)"
-                description = "EF.EC-AT.AT-Emissions-N2O is taken from UNFCCC Common Reporting Tables, Table 1 using the categories give in "
-                "Table 11 by \\\\citet{schappi_annexes_2025}."
+                description = ("EF.EC-AT.AT-Emissions-N2O is taken from UNFCCC Common Reporting Tables, Table 1 using the categories give in "
+                    "Table 11 by \\\\citet{schappi_annexes_2025}.")
             elif "fuel" in norm and "industry" in norm:
                 exact_flow_code = "EF.EC-EF.IC-Fuel for industry-Nmix"
                 display_name = "Fuel for industry"
@@ -1685,9 +1681,9 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
             elif "rwrw" in norm and "solid" in norm:
                 exact_flow_code = "PR.SO-RW.RW-Solid waste export-Nmix"
                 display_name = "Solid Waste Export"
-                flow_description = "**{exact_flow_code}** is taken from trade data, SSB table 08801 with N contents taken from Table 50 in "
-                "\\citet{schappi_annexes_2025} for municipal waste, sewage sludge, hazardous and other waste. No export in these categories is "
-                "reported before 2002, so we set all previous years to zero. The increase seen from 2022 to 2023 is in the category municipal waste."
+                flow_description = ("Taken from trade data, SSB table 08801 with N contents taken from Table 50 in "
+                    "\\citet{schappi_annexes_2025} for municipal waste, sewage sludge, hazardous and other waste. No export in these categories is "
+                    "reported before 2002, so we set all previous years to zero. The increase seen from 2022 to 2023 is in the category municipal waste.")
 
         # --- Wastewater (PR.WW) Subpool ---
         elif filename.startswith("PR_WW_"):
@@ -1696,16 +1692,16 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
             if "agsm" in norm:
                 exact_flow_code = "PR.WW-AG.SM-Sewage sludge fertilizer-Nmix"
                 display_name = "Sewage Sludge Fertilizer to Ag"
-                flow_description = "**{exact_flow_code}** is taken from SSB table 05279 “Avløpsslam, etter slamdisponering, statistikkvariabel, år og "
-                "region”. We use a N content of 2.6 %  as given in Table 54 in \\citet{schappi_annexes_2025}. For years 1993-2001 we use data from the "
-                "SSB Naturressurser og miljø series. For years 1990-1992 we use the average value of the 1993-1995."
+                flow_description = ("Taken from SSB table 05279 “Avløpsslam, etter slamdisponering, statistikkvariabel, år og "
+                    "region”. We use a N content of 2.6 %  as given in Table 54 in \\citet{schappi_annexes_2025}. For years 1993-2001 we use data from the "
+                    "SSB Naturressurser og miljø series. For years 1990-1992 we use the average value of the 1993-1995.")
             elif "atat" in norm and "n2" in norm and not "n2o" in norm:
                 exact_flow_code = "PR.WW-AT.AT-Emissions-N2"
                 display_name = "N2 Emissions (Wastewater)"
-                flow_description = "**{exact_flow_code}** is found by using data on N emissions and removal rates from the six wastewater treatment "
-                "plants that were equipped with nitrogen removal up to 2025. Where specific data on nitrogen removal fraction were missing we assumed "
-                "a default 70 %, and we extrapolated or interpolated between existing data where reported emission data were missing. The amount of "
-                "N released as N2 was calculated as N_released*removal_rate/(1-removal_rate). "
+                flow_description = ("Found by using data on N emissions and removal rates from the six wastewater treatment "
+                    "plants that were equipped with nitrogen removal up to 2025. Where specific data on nitrogen removal fraction were missing we assumed "
+                    "a default 70 %, and we extrapolated or interpolated between existing data where reported emission data were missing. The amount of "
+                    "N released as N2 was calculated as N_released*removal_rate/(1-removal_rate). ")
             elif "atat" in norm and "n2o" in norm:
                 exact_flow_code = "PR.WW-AT.AT-Emissions-N2O"
                 display_name = "N2O Emissions (Wastewater)"
@@ -1713,23 +1709,23 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
             elif "hshs" in norm:
                 exact_flow_code = "PR.WW-HS.HS-Sewage sludge fertilizer-Nmix"
                 display_name = "Sewage Sludge Fertilizer to HS"
-                flow_description = "Taken from SSB table 05279 *Avløpsslam, etter slamdisponering, statistikkvariabel, år og region*, "
-                "including all sludge used for green areas and for soil production \\citet{schappi_annexes_2025}. For years 1993-2001 we use data from the "
-                "SSB *Naturressurser og miljø series*. For years 1990-1992 we use the average value of the 1993-1995. We use a N content of 2.6 %  as given in "
-                "Table 54 in \\citet{schappi_annexes_2025}."
+                flow_description = ("Taken from SSB table 05279 *Avløpsslam, etter slamdisponering, statistikkvariabel, år og region*, "
+                    "including all sludge used for green areas and for soil production \\citet{schappi_annexes_2025}. For years 1993-2001 we use data from the "
+                    "SSB *Naturressurser og miljø series*. For years 1990-1992 we use the average value of the 1993-1995. We use a N content of 2.6 %  as given in "
+                    "Table 54 in \\citet{schappi_annexes_2025}.")
             elif "hycw" in norm:
                 exact_flow_code = "PR.WW-HY.CW-Treated wastewater discharge-Nmix"
                 display_name = "Treated Wastewater Discharge to CW"
-                flow_description = f"**{exact_flow_code}** is taken from SSB table 05280 *Totale utslipp av fosfor og nitrogen fra avløpssektoren*. Data back "
-                "to 1997 are found in the series SSB Naturressurser og miljø. Due to lack of available data we set the values in 1990-1996 to be equal to that "
-                "in 1997. "
+                flow_description = f("**{exact_flow_code}** is taken from SSB table 05280 *Totale utslipp av fosfor og nitrogen fra avløpssektoren*. Data back "
+                    "to 1997 are found in the series SSB Naturressurser og miljø. Due to lack of available data we set the values in 1990-1996 to be equal to that "
+                    "in 1997. ")
             elif "prso" in norm and "landfill" in norm:
                 exact_flow_code = "PR.WW-PR.SO-Sewage sludge landfill-Nmix"
                 display_name = "Sewage Sludge to Landfill"
-                flow_description = "Taken from SSB table 05279 *Avløpsslam, etter slamdisponering, statistikkvariabel, år og region*, "
-                "including both sludge that is landfilled and sludge used for top cover on landfills \\citet{schappi_annexes_2025}. For years 1993-2001 we "
-                "use data from the SSB Naturressurser og miljø series. For years 1990-1992 we use the average value of the 1993-1995. We use a N content of 2.6 % "
-                "as given in Table 54 in \\citet{schappi_annexes_2025}."
+                flow_description = ("Taken from SSB table 05279 *Avløpsslam, etter slamdisponering, statistikkvariabel, år og region*, "
+                    "including both sludge that is landfilled and sludge used for top cover on landfills \\citet{schappi_annexes_2025}. For years 1993-2001 we "
+                    "use data from the SSB Naturressurser og miljø series. For years 1990-1992 we use the average value of the 1993-1995. We use a N content of 2.6 % "
+                    "as given in Table 54 in \\citet{schappi_annexes_2025}.")
 
         # Skriv ut filen med riktig forelder og nav_order-teller
         with open(full_flow_path, 'w', encoding='utf-8') as f:
