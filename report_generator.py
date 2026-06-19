@@ -1120,88 +1120,92 @@ def process_energy_and_fuels_pool(ef_folder, plot_files, plot_dir, bib_filename)
         display_name = "Unknown Energy and fuels Flow"
         parent_subpool = ""
         description = ""
+        description_fuels = ("EF.EC-EF.IC-Fuel for industry-Nmix: As advised by \\\\citet{schappi_annexes_2025}, "
+            "we have found this in the UNFCCC Common reporting tables (Table 1) which gives "
+            "amount of energy consumed in TJ, together with net caloric values from Table 1.2 "
+            "in \\citet{garg_chapter_2006} and nitrogen contents from Table 15 in \\\\citet{schappi_annexes_2025}.")
 
         if upper.startswith("EF_EC_"):
             parent_subpool = "Energy conversion (EF.EC)"
             if "emissions" in norm and "nox" in norm:
                 exact_flow_code = "EF.EC-AT.AT-Emissions-NOx"
                 display_name = "Energy conversion emissions (NOx)"
-                description = "EF.EC-AT.AT-Emissions-NOx: We have used data from CLRTAP Inventory Submissions \\citet{emep_officially_2025} as advised by "
-                "\\\\citet{schappi_annexes_2025}, using the categories given in Table 11"
+                description = ("EF.EC-AT.AT-Emissions-NOx: We have used data from CLRTAP Inventory Submissions \\citet{emep_officially_2025} as advised by "
+                    "\\\\citet{schappi_annexes_2025}, using the categories given in Table 11")
             elif "emissions" in norm and "n2o" in norm:
                 exact_flow_code = "EF.EC-AT.AT-Emissions-N2O"
                 display_name = "Energy conversion emissions (N2O)"
-                description = ("EF.EC-AT.AT-Emissions-N2O is taken from UNFCCC Common Reporting Tables, Table 1 using the categories give in "
+                description = ("EF.EC-AT.AT-Emissions-N2O is taken from UNFCCC Common Reporting Tables, Table 1 using the categories given in "
                     "Table 11 by \\\\citet{schappi_annexes_2025}.")
             elif "fuel" in norm and "industry" in norm:
                 exact_flow_code = "EF.EC-EF.IC-Fuel for industry-Nmix"
                 display_name = "Fuel for industry"
-                description = "EF.EC-EF.IC-Fuel for industry-Nmix: As advised by \\\\citet{schappi_annexes_2025}..."
+                description = description_fuels
             elif "fuel" in norm and "heating" in norm:
                 exact_flow_code = "EF.EC-EF.OE-Fuel for heating-Nmix"
                 display_name = "Fuel for heating"
-                description = "EF.EC-EF.OE-Fuel for heating-Nmix: As advised by \\\\citet{schappi_annexes_2025}..."
+                description = description_fuels
             elif "fuel" in norm and "transport" in norm:
                 exact_flow_code = "EF.EC-EF.TR-Fuel for transport-Nmix"
                 display_name = "Fuel for transport"
-                description = "EF.EC-EF.TR-Fuel for transport-Nmix: As advised by \\\\citet{schappi_annexes_2025}..."
+                description = description_fuels
             elif "feedstock" in norm:
                 exact_flow_code = "EF.EC-MP.OP-Fuel used as feedstock-Nmix"
                 display_name = "Fuel used as feedstock"
-                description = "EF.EC-MP.OP-Fuel used as feedstock-Nmix: We use SSB table 11561..."
+                description = description_fuels + "Other minor feedstock categories listed in the guidelines are neglected as advised by \\citet{schappi_annexes_2025}.  "
             elif "export" in norm and "transport" not in norm:
                 exact_flow_code = "EF.EC-RW.RW-Fuel export-Nmix"
                 display_name = "Fuel export"
-                description = "EF.EC-RW.RW-Fuel export-Nmix is the nitrogen content in exported fuels..."
+                description = "EF.EC-RW.RW-Fuel export-Nmix is the nitrogen content in exported fuels. We use trade data in SSB table 08801 to account for all petroleum products excluding those assumed to be used in the transport sector. "
 
         elif upper.startswith("EF_IC_"):
             parent_subpool = "Manufacturing industries and construction (EF.IC)"
             if "emissions" in norm and "n2o" in norm:
                 exact_flow_code = "EF.IC-AT.AT-Emissions-N2O"
                 display_name = "Industrial emissions (N2O)"
-                description = "EF.IC-AT.AT-Emissions-N2O is taken from UNFCCC Common Reporting Tables..."
+                description = "EF.IC-AT.AT-Emissions-N2O is taken from UNFCCC Common Reporting Tables, Table 1 using the categories give in Table 12 by \\citet{schappi_annexes_2025}. "
             elif "emissions" in norm and "nh3" in norm:
                 exact_flow_code = "EF.IC-AT.AT-Emissions-NH3"
                 display_name = "Industrial emissions (NH3)"
-                description = "EF.IC-AT.AT-Emissions-NH3 denotes ammonia emissions from fuel combustion in industry..."
+                description = "EF.IC-AT.AT-Emissions-NH3 denotes ammonia emissions from fuel combustion in industry. We have used data from CLRTAP Inventory Submissions \\citet{emep_official_2025} as advised by \\citet{schappi_annexes_2025}, using the categories given in Table 12.  "
             elif "emissions" in norm and "nox" in norm:
                 exact_flow_code = "EF.IC-AT.AT-Emissions-NOx"
                 display_name = "Industrial emissions (NOx)"
-                description = "EF.IC-AT.AT-Emissions-NOx denotes NOx emissions from fuel combustion in industry..."
+                description = "EF.IC-AT.AT-Emissions-NOxdenotes NOx emissions from fuel combustion in industry. We have used data from CLRTAP Inventory Submissions \\citet{emep_official_2025} as advised by \\citet{schappi_annexes_2025}, using the categories given in Table 12.  "
 
         elif upper.startswith("EF_TR_"):
             parent_subpool = "Transportation (EF.TR)"
             if "emissions" in norm and "n2o" in norm:
                 exact_flow_code = "EF.TR-AT.AT-Emissions-N2O"
                 display_name = "Transport emissions (N2O)"
-                description = "EF.TR-AT.AT-Emissions-N2O is taken from UNFCCC Common Reporting Tables..."
+                description = "EF.TR-AT.AT-Emissions-N2O is taken from UNFCCC Common Reporting Tables, Table 1 using the categories give in Table 13 by \\citet{schappi_annexes_2025}."
             elif "emissions" in norm and "nh3" in norm:
                 exact_flow_code = "EF.TR-AT.AT-Emissions-NH3"
                 display_name = "Transport emissions (NH3)"
-                description = "EF.TR-AT.AT-Emissions-NH3 denotes ammonia emissions from fuel combustion..."
+                description = "EF.TR-AT.AT-Emissions-NH3 denotes ammonia emissions from fuel combustion. We have used data from CLRTAP Inventory Submissions \\citet{emep_official_2025}} as advised by \\citet{schappi_annexes_2025}, using the categories given in Table 13. "
             elif "emissions" in norm and "nox" in norm:
                 exact_flow_code = "EF.TR-AT.AT-Emissions-NOx"
                 display_name = "Transport emissions (NOx)"
-                description = "EF.TR-AT.AT-Emissions-NOx denotes NOx emissions from fuel combustion..."
+                description = "EF.TR-AT.AT-Emissions-NOx denotes NOx emissions from fuel combustion. We have used data from CLRTAP Inventory Submissions \\citet{emep_official_2025}} as advised by \\citet{schappi_annexes_2025}, using the categories given in Table 13. "
             elif "export" in norm or "transportfuel" in norm:
                 exact_flow_code = "EF.TR-RW.RW-Export of transport fuels-Nmix"
                 display_name = "Export of transport fuels"
-                description = "EF.TR-RW.RW-Export of transport fuels-Nmix is export of fuels for transport..."
+                description = "EF.TR-RW.RW-Export of transport fuels-Nmix is export of fuels for transport. We use trade data in SSB table 08801 to account for all petroleum products assumed to be used in the transport sector.."
 
         elif upper.startswith("EF_OE_"):
             parent_subpool = "Other energy and fuels (EF.OE)"
             if "emissions" in norm and "n2o" in norm:
                 exact_flow_code = "EF.OE-AT.AT-Emissions-N2O"
                 display_name = "Other energy emissions (N2O)"
-                description = "EF.OE-AT.AT-Emissions-N2O is taken from UNFCCC Common Reporting Tables..."
+                description = "EF.OE-AT.AT-Emissions-N2O is taken from UNFCCC Common Reporting Tables, Table 1 using the categories give in Table 14 by \\citet{schappi_annexes_2025}."
             elif "emissions" in norm and "nh3" in norm:
                 exact_flow_code = "EF.OE-AT.AT-Emissions-NH3"
                 display_name = "Other energy emissions (NH3)"
-                description = "EF.OE-AT.AT-Emissions-NH3 is ammonia emissions from fuel combustion..."
+                description = "EF.OE-AT.AT-Emissions-NH3 is ammonia emissions from fuel combustion in residential, commercial and other sectors that are not already covered. We have used data from CLRTAP Inventory Submissions \\citet{emep_official_2025}} as advised by \\citet{schappi_annexes_2025}, using the categories given in Table 14. "
             elif "emissions" in norm and "nox" in norm:
                 exact_flow_code = "EF.OE-AT.AT-Emissions-NOx"
                 display_name = "Other energy emissions (NOx)"
-                description = "EF.OE-AT.AT-Emissions-NOx is NOx emissions from fuel combustion..."
+                description = "EF.OE-AT.AT-Emissions-NOx is NOx emissions from fuel combustion in residential, commercial and other sectors that are not already covered. We have used data from CLRTAP Inventory Submissions \\citet{emep_official_2025}} as advised by \\citet{schappi_annexes_2025}, using the categories given in Table 14. "
 
         with open(full_flow_path, 'w', encoding='utf-8') as f:
             f.write(f"---\nlayout: default\ntitle: {display_name}\nparent: {parent_subpool}\n")
@@ -1605,18 +1609,18 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
             elif "atat" in norm and "n2o" in norm:
                 exact_flow_code = "PR.SO-AT.AT-Emissions-N2O"
                 display_name = "N2O Emissions (Solid Waste)"
-                flow_description = f"**{exact_flow_code}** is taken from UNFCCC Common reporting tables, where we have included emissions from "
-                "landfills, waste incineration and biofuel production. "
+                flow_description = (f"**{exact_flow_code}** is taken from UNFCCC Common reporting tables, where we have included emissions from "
+                        "landfills, waste incineration and biofuel production. ")
             elif "atat" in norm and "nh3" in norm:
                 exact_flow_code = "PR.SO-AT.AT-Emissions-NH3"
                 display_name = "NH3 Emissions (Solid Waste)"
-                flow_description = f"**{exact_flow_code}**: We have used data from CLRTAP Inventory Submissions, using the categories given in "
-                "Table 48 and 31 (emissions from category 1A1 Energy industries are all assigned to the EF pool). "
+                flow_description = (f"**{exact_flow_code}**: We have used data from CLRTAP Inventory Submissions, using the categories given in "
+                        "Table 48 and 31 (emissions from category 1A1 Energy industries are all assigned to the EF pool). ")
             elif "atat" in norm and "nox" in norm:
                 exact_flow_code = "PR.SO-AT.AT-Emissions-NOx"
                 display_name = "NOx Emissions (Solid Waste)"
-                flow_description = f"**{exact_flow_code}**: We have used data from CLRTAP Inventory Submissions, using the categories given "
-                "in Table 48 and 31 (emissions from category 1A1 Energy industries are all assigned to the EF pool). "
+                flow_description = (f"**{exact_flow_code}**: We have used data from CLRTAP Inventory Submissions, using the categories given "
+                        "in Table 48 and 31 (emissions from category 1A1 Energy industries are all assigned to the EF pool). ")
             elif "hshs" in norm and "biologically" in norm:
                 exact_flow_code = "PR.SO-HS.HS-Biologically treated organic waste-Nmix"
                 display_name = "Biologically treated organic waste to HS"
@@ -1716,7 +1720,7 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
             elif "hycw" in norm:
                 exact_flow_code = "PR.WW-HY.CW-Treated wastewater discharge-Nmix"
                 display_name = "Treated Wastewater Discharge to CW"
-                flow_description = f("**{exact_flow_code}** is taken from SSB table 05280 *Totale utslipp av fosfor og nitrogen fra avløpssektoren*. Data back "
+                flow_description = ("Taken from SSB table 05280 *Totale utslipp av fosfor og nitrogen fra avløpssektoren*. Data back "
                     "to 1997 are found in the series SSB Naturressurser og miljø. Due to lack of available data we set the values in 1990-1996 to be equal to that "
                     "in 1997. ")
             elif "prso" in norm and "landfill" in norm:
