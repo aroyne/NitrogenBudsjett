@@ -10,8 +10,5 @@ nav_order: 2
 ![PR.SO-AT.AT-Emissions-N2O](../output_files/plots/PR_SO_AT_AT_Emissions_N2O.png)
 
 ### Flow Description
-**PR.SO-AT.AT-Emissions-N2O** is taken from UNFCCC Common reporting tables, where we have included emissions from landfills, waste incineration and biofuel production. Global trends of changing reactive nitrogen emissions are evaluated in (Malik, 2022).
+**PR.SO-AT.AT-Emissions-N2O** is taken from UNFCCC Common reporting tables, where we have included emissions from 
 
-### References
-
-* Malik, A., Oita, A., Shaw, E., Li, M., Ninpanit, P., Nandel, V., Lan, J., & Lenzen, M. (2022). *Drivers of global nitrogen emissions*. Environmental Research Letters. [https://doi.org/10/gpf2kf](https://doi.org/10/gpf2kf)

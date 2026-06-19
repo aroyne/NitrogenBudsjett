@@ -988,8 +988,8 @@ def process_humans_and_settlements_pool(hs_folder, plot_files, plot_dir, bib_fil
             description = (
                 "**HS.HS-AT.AT-Emissions-NH3** are ammonia emissions from the human body. We use population data from SSB "
                 "together with SSB data on smoking (table 05307) and assume that daily smokers smoke 750 cigarettes per year, "
-                "while occasional smokers smoke 100 per year. This data is used with equation 46 in \\\\citet{schappi_annexes_2025}, taken from "
-                "\\\\citet{sutton_2000}, which relates ammonia emissions to age and cigarette smoking."
+                "while occasional smokers smoke 100 per year. This data is used with equation 46 in \\\\citet{schappi_annexes_2025}, taken from Sutton (2000), "
+                "which relates ammonia emissions to age and cigarette smoking."
             )
         elif "luc" in norm and "n2o" in norm:
             exact_flow_code = "HS.HS-AT.AT-LUC emissions-N2O"
@@ -1002,7 +1002,7 @@ def process_humans_and_settlements_pool(hs_folder, plot_files, plot_dir, bib_fil
                 "**HS.HS-HY.SW-Overland flow-Nmix** is a flow that has been added to account for runoff from urban areas. "
                 "Some of this may actually end up directly in CW, but we have not been able to separate the two. "
                 "Data are supplied by NIVA, produced in the TEOTIL3 model \\\\citep{sample_teotil3_2024}. For the period 1990-2013, "
-                "we have used TEOTIL data \\\\citep{sample_teotil_data_2025} for nitrogen from urban areas that reach the coast, and used a "
+                "we have used TEOTIL data \\\\citep{sample_kildefordelte_2025} for nitrogen from urban areas that reach the coast, and used a "
                 "retention rate of 5% which is consistent (with a 7% standard deviation) with the TEOTIL3 data from NIVA. "
                 "The constant values for 1990-2012 is what is reported by Miljødirektoratet."
             )
@@ -1017,8 +1017,8 @@ def process_humans_and_settlements_pool(hs_folder, plot_files, plot_dir, bib_fil
                 "with N contents taken from \\\\citet{schappi_annexes_2025} and typical, assumed values are chosen if none are given. We include "
                 "households, services (tjenesteytende næringer), construction (Bygge- og anleggsvirksomhet), municipal services "
                 "(power and water), and waste management.\n\n"
-                "Detailed data are not available prior to 1995, but trends in municipal and other waste are described by \\\\citet{ssb_avfall_1997}. "
-                "Household waste per inhabitant increased from about 200 kg/person to 289 kg/person in 1995 \\\\citep[figure 4.1]{ssb_avfall_1997}, "
+                "Detailed data are not available prior to 1995, but trends in municipal and other waste are described by \\\\citet{ssb_naturressurser_1997}. "
+                "Household waste per inhabitant increased from about 200 kg/person to 289 kg/person in 1995 \\\\citep[figure 4.1]{ssb_naturressurser_1997}, "
                 "with an assumed linear increase in the years between. Based on this we assume a constant N content per unit mass "
                 "and extrapolate from 1995 values back to 1990."
             )
@@ -1494,8 +1494,19 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
         f.write("---\nlayout: default\ntitle: Solid Waste (PR.SO)\nparent: Processing of residues (PR)\nnav_order: 1\nhas_children: true\n---\n\n")
         f.write("# Subpool: Solid Waste (PR.SO)\n\n")
         f.write(get_balance_image_markdown("PR.SO", plot_files, plot_dir, relative_depth="../"))
+        f.write("We have added the flow *PR.SO-EF.EC-Waste to energy-Nmix* to better account for the Norwegian waste management system and statistics. "
+                "This accounts for all waste incineration. Although the SSB data does separate between incineration with and without energy recovery for use, "
+                "the fraction for energy reuse has consistently been around or above 80% since 1995, and we therefore for simplicity assign the entire waste "
+                "incineration process to the EF.EC sector.\n\n "
+                "It is expected that there should be a surplus for all years because landfilled waste stays in the PR sector and thus does not represent an "
+                "outflow. The fraction of waste to landfill has been decreasing. ")
         f.write("\n### Flows that are zero or neglected:\n\n")
-        f.write("* **PR.SO-AG.SM-Manure co-digestation-Nmix** is tracked under agricultural sub-allocations where applicable and excluded here to prevent double counting.\n")
+        f.write("* **PR.SO-EF.IC-Biofuels-Nmix**, **PR.SO-EF.TR-Biofuels-Nmix** and **PR.SO-EF.OE-Biofuels-Nmix** are neglected because diesel and biogas "
+                "contain very little nitrogen. We assume the N in waste to be processed is lost as emissions or retained in digestates from the biofuel "
+                "production process. \n")
+        f.write("* The guidelines recommends assigning separate flows for compost and biofuel digestate used on the AG and HS pools. However, the SSB "
+                "statistics for treatment and use of organic waste does not separate between different treatment methods when it comes to end use. We have "
+                "therefore decided to combine these flows to one called “biologically treated waste” to agriculture, and one to HS. ")
         append_bibtex_references(f, bib_filename)
 
     # 3. Generer subpool-side for Wastewater (PR.WW)
@@ -1503,8 +1514,18 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
         f.write("---\nlayout: default\ntitle: Wastewater (PR.WW)\nparent: Processing of residues (PR)\nnav_order: 2\nhas_children: true\n---\n\n")
         f.write("# Subpool: Wastewater (PR.WW)\n\n")
         f.write(get_balance_image_markdown("PR.WW", plot_files, plot_dir, relative_depth="../"))
+        f.write("We considered added a flow *PR.WW-PR.SO-Sewage sludge to biogas-Nmix* to account for sewage sludge used in biogas production. "
+                "However, the digestate from these biogas plants is counted together with other sewage sludge when SSB reports end uses. In order to avoid "
+                "double counting we have neglected this flow. ")
         f.write("\n### Flows that are zero or neglected:\n\n")
-        f.write("* Direct industrial untreated sewer overflows are consolidated into total treated flows or omitted where minor regional boundaries apply \\\\citep{schulte_uebbing_planetary_2022}.\n")
+        f.write("* **PR.WW-HY.SW-Treated wastewater discharge-Nmix** is neglected because we lack information on what wastewater treatment "
+                "plants discharge their wastewater to SW or CW, and have therefore assigned the entire flow to CW. \n")
+        f.write("* **PR.WW-AT.AT-Emissions-NH3** and **PR.WW-AT.AT-Emissions-NOx** are reported as zero in the CLRTAP Inventory Submissions \citet{emep_officially_2025}.\n")
+        f.write("* **PR.WW-PR.SO-Sewage sludge incineration-Nmix** is sporadically reported in SSB table 05279, ranging between zero and a "
+                "maximum of 4.5 % of the total amount of sewage sludge. Because the reporting is so sporadic and numbers are small we have chosen "
+                "to ignore this flow. \n")
+        f.write("Note on sewage sludge: SSB table 05279 reports significant amounts of sewage sludge as “other use” or “unknown use”. "
+                "This has not been assigned to any flows and would account for some of the missing outflow. \n")
         append_bibtex_references(f, bib_filename)
 
     pr_so_counter, pr_ww_counter = 1, 1
@@ -1535,7 +1556,7 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
                     f"**{exact_flow_code}** is found from SSB tables 05281 “Avfallsregnskap for Norge (1 000 tonn), "
                     "etter statistikkvariabel, behandlingsmåte, materialtype og år “ (1995-2011) and 10513 “Avfallsregnskap "
                     "for Norge (1 000 tonn), etter materialtype, statistikkvariabel, år og behandlingsmåte” (2012-2023), "
-                    "using N content values from global waste and incineration estimates \\\\citep{{smil_nitrogen_1999}}.\\n\\n"
+                    "using N content values from \\citet{schappi_annexes_2025}.\n\\n"
                     "For years prior to 1995, we use the overall fraction of waste to incineration given in historical "
                     "records and assume that the overall N content of the waste is equal to the 1995 value. For years with missing data, "
                     "we interpolate."
@@ -1544,32 +1565,35 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
                 exact_flow_code = "PR.SO-AG.SM-Biologically treated organic waste-Nmix"
                 display_name = "Biologically treated organic waste to Ag"
                 flow_description = (
-                    f"**{exact_flow_code}** includes all forms of organic waste except sewage sludge that is organically treated "
-                    "and used in agricultural soils. Biological treatment of organic waste includes both composting and biogas production, "
-                    "but in Norway, most of the waste composted in the municipal waste sector is used on the private sector, not in agriculture. "
-                    "We therefore only include biogas digestate in this flow.\\n\\n"
-                    "According to Biogass Norge, biogas digestate is produced from sewage sludge, manure, fish waste and sludge, and food waste. "
-                    "General frameworks for urban and regional nitrogen recycling from waste management are detailed in \\\\citep{{kaltenegger_urban_2023}}. "
-                    "From 2018 to 2020, we use data on the disposal of biologically produced waste from SSB table 12818 where we find the N "
-                    "content of what is used in agriculture by scaling the N content of the amount used in 2021.\\n\\n"
-                    "From 2012 to 2017, we use data on biogas treatment of different waste categories from SSB table 10513 “Avfallsregnskap "
-                    "for Norge (1 000 tonn), etter materialtype, statistikkvariabel, år og behandlingsmåte” assuming that 85 % of this is "
-                    "used in agriculture with a loss of 10 % N during biological treatment.\\n\\n"
-                    "According to SSB, there were 8 biogas plants in 2011 and 35 in 2017. We therefore assume values before 2012 to be "
-                    "negligible and set those flows to zero."
+                    f"**{exact_flow_code}** includes all forms of organic waste except sewage sludge that is organically treaded and used in "
+                    "agriultural soils. Biological treatment of organic waste includes both composting and biogas production, but in Norway, "
+                    "most of the waste composted in the municipal waste sector is used on the private sector, not in agriculture.\n\n"
+                    "SSB statistics on composted organic waste also includes some composted wastewater sludge, but there is no exact statistics "
+                    "on the amount. Reports indicate that this is a minor (less than 15 %) of sludge) and decreasing fraction of sewage sludge, "
+                    "which is already included in the flows from PR.WW. There is therefore some double counting which serves to make this flow "
+                    "(PR.SO-HS.HS) artificially large. \n"
+                    "From 2018, we use data on the disposal of biologically produced waste from SSB table 12818 assuming a typical N content of "
+                    "compost, although a smaller fraction is also biogas digestate. \n"
+                    "For 2012-2017, we use data on composted organic waste from SSB table 10513  “Avfallsregnskap for Norge (1 000 tonn) and scale "
+                    "the nitrogen value in 2018 with that found from table 12818 for consistency. \n"
+                    "There are no official data prior to 2012, but we know that there was organic waste composted and used in the private sector. "
+                    "In lack of other data we extrapolate the 2012 value back to 1990. \n\n"
                 )
             elif "atat" in norm and "n2o" in norm:
                 exact_flow_code = "PR.SO-AT.AT-Emissions-N2O"
                 display_name = "N2O Emissions (Solid Waste)"
-                flow_description = f"**{exact_flow_code}** is taken from UNFCCC Common reporting tables, where we have included emissions from landfills, waste incineration and biofuel production. Global trends of changing reactive nitrogen emissions are evaluated in \\\\citep{{malik_drivers_2022}}."
+                flow_description = f"**{exact_flow_code}** is taken from UNFCCC Common reporting tables, where we have included emissions from "
+                "landfills, waste incineration and biofuel production. "
             elif "atat" in norm and "nh3" in norm:
                 exact_flow_code = "PR.SO-AT.AT-Emissions-NH3"
                 display_name = "NH3 Emissions (Solid Waste)"
-                flow_description = f"**{exact_flow_code}**: We have used data from CLRTAP Inventory Submissions, using the categories given in Table 48 and 31 (emissions from category 1A1 Energy industries are all assigned to the EF pool). Dynamics of atmospheric deposition and chemically reduced forms are supported by \\\\citep{{ackerman_global_2019}}."
+                flow_description = f"**{exact_flow_code}**: We have used data from CLRTAP Inventory Submissions, using the categories given in "
+                "Table 48 and 31 (emissions from category 1A1 Energy industries are all assigned to the EF pool). "
             elif "atat" in norm and "nox" in norm:
                 exact_flow_code = "PR.SO-AT.AT-Emissions-NOx"
                 display_name = "NOx Emissions (Solid Waste)"
-                flow_description = f"**{exact_flow_code}**: We have used data from CLRTAP Inventory Submissions, using the categories given in Table 48 and 31 (emissions from category 1A1 Energy industries are all assigned to the EF pool). General atmospheric pathways of combustion emissions follow \\\\citep{{fowler_global_2013}}."
+                flow_description = f"**{exact_flow_code}**: We have used data from CLRTAP Inventory Submissions, using the categories given "
+                "in Table 48 and 31 (emissions from category 1A1 Energy industries are all assigned to the EF pool). "
             elif "hshs" in norm and "biologically" in norm:
                 exact_flow_code = "PR.SO-HS.HS-Biologically treated organic waste-Nmix"
                 display_name = "Biologically treated organic waste to HS"
@@ -1590,27 +1614,27 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
                 exact_flow_code = "PR.SO-HY.SW-Leaching-Nmix"
                 display_name = "Leaching from Landfills"
                 flow_description = (
-                    f"**{exact_flow_code}** is taken from emissions data to water from landfills, where we have "
-                    "categorized landfills as being connected to municipal wastewater or not based on publicly available data. "
-                    "The environmental pressure of such nutrient surpluses on aquatic ecosystems is contextualized within planetary and regional boundaries by \\\\citep{{schulte_uebbing_planetary_2022}}. "
-                    "Where the categorization was not possible, the resulting emissions have been split evenly between the leaching and wastewater "
-                    "flows from landfills. As no data are available before 2009 we have extrapolated using the average value."
+                    "**{exact_flow_code}** Nmix is taken from \\citet{miljodirektoratet_norske_2026}, emissions to water from landfills, where we "
+                    "have categorized landfills as being connected to municipal wastewater or not based on publicly available data. Where the categorization "
+                    "was not possible, the resulting emissions have been split evenly between the leaching and wastewater flows from landfills. As no data are "
+                    "available before 2009 we have extrapolated using the average value. This probably underestimates the real value because landfilling was "
+                    "more prevalent in previous years. "
                 )
-            elif "prww" in norm and "wastewater" in norm:
+            elif "prww" in norm and "landfills" in norm:
                 exact_flow_code = "PR.SO-PR.WW-Wastewater from landfills-Nmix"
                 display_name = "Wastewater from Landfills"
                 flow_description = (
-                    f"**{exact_flow_code}** is taken from landfill emissions data, where we have "
-                    "categorized landfills as being connected to municipal wastewater or not based on publicly available data. "
-                    "Regional limits for non-agricultural nitrogen loads into sewage systems are detailed in \\\\citep{{schulte_uebbing_planetary_2022}}. "
-                    "Where the categorization was not possible, the resulting emissions have been split evenly. As no data are available before 2009 we have extrapolated using the average value."
+                    "**{exact_flow_code}** is taken from \\citet{miljodirektoratet_norske_2026}, emissions to water from landfills, where we have categorized "
+                    "landfills as being connected to municipal wastewater or not based on publicly available data. Where the categorization was not possible, "
+                    "the resulting emissions have been split evenly between the leaching and wastewater flows from landfills. As no data are available before 2009 "
+                    "we have extrapolated using the average value. This probably underestimates the real value because landfilling was more prevalent in previous years."
                 )
             elif "prww" in norm and "biofuels" in norm:
                 exact_flow_code = "PR.SO-PR.WW-Biofuels production wastewater-Nmix"
                 display_name = "Biofuels Production Wastewater"
                 flow_description = (
                     f"**{exact_flow_code}** is found by assuming that the incoming N to biofuel production not retained in digestate ends "
-                    "up in the wastewater. For details see PR.SO-HS.HS-Digestate fertilizer-Nmix. Value baselines before 2012 are set to zero."
+                    "up in the wastewater. Values before 2012 are set to zero. IN PROGRESS"
                 )
             elif "mpop" in norm and "recycling" in norm:
                 exact_flow_code = "PR.SO-MP.OP-Recycling-Nmix"
@@ -1618,22 +1642,25 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
                 flow_description = (
                     f"**{exact_flow_code}** is found from SSB tables 05281 “Avfallsregnskap for Norge (1 000 tonn), etter statistikkvariabel, "
                     "behandlingsmåte, materialtype og år “ (1995-2011) and 10513 “Avfallsregnskap for Norge (1 000 tonn), etter materialtype, "
-                    "statistikkvariabel, år og behandlingsmåte” (2012-2023). The international background of embedding nitrogen in commodity and trade loops "
-                    "is outlined in \\\\citep{{oita_substantial_2016}}. We have not included the categories sludge, garden waste and wet organic material reported as being assigned to material recycling, "
-                    "because this use is rather for soil production or fertilizer and does not belong in the MP.OP subpool."
+                    "statistikkvariabel, år og behandlingsmåte” (2012-2023)), using N content values from in \/citet{schappi_annexes_2025}. "
+                    "We have not included the categories sludge, garden waste and wet organic material reported as being assigned to material "
+                    "recycling, because this use is rather for soild production or fertilizer and does not belong in the MP.OP subpool. "
                 )
             elif "rwrw" in norm and "recycling" in norm:
                 exact_flow_code = "PR.SO-RW.RW-Export for recycling-Nmix"
                 display_name = "Export for Recycling"
-                flow_description = f"**{exact_flow_code}** is plastic, paper and textile waste which has been collected for recycling and exported to recycling facilities outside of Norway. Data taken from trade data, SSB table 08801. The footprint of non-food manufacturing trade shifts is discussed in \\\\citep{{hamilton_trade_2018}}."
+                flow_description = f"**{exact_flow_code}** is plastic, paper and textile waste which has been collected for recycling and "
+                "exported to recycling facilities outside of Norway. Data taken from trade data, SSB table 08801."
             elif "rwrw" in norm and "reuse" in norm:
                 exact_flow_code = "PR.SO-RW.RW-Export for reuse-Nmix"
                 display_name = "Export for Reuse"
-                flow_description = f"**{exact_flow_code}** is exported used textiles. Data taken from trade data, SSB table 08801, and follows global non-food trade patterns described in \\\\citep{{hamilton_trade_2018}}."
+                flow_description = f"**{exact_flow_code}** is exported used textiles. Data taken from trade data, SSB table 08801."
             elif "rwrw" in norm and "solid" in norm:
                 exact_flow_code = "PR.SO-RW.RW-Solid waste export-Nmix"
                 display_name = "Solid Waste Export"
-                flow_description = f"**{exact_flow_code}** is taken from trade data, SSB table 08801. The impact of escalating international commodity trade on domestic vs. rest-of-world nitrogen footprints is quantified in \\\\citep{{malik_drivers_2022}} and \\\\citep{{lassaletta_nitrogen_2016}}. No export in these categories is reported before 2002, so we set all previous years to zero."
+                flow_description = "**{exact_flow_code}** is taken from trade data, SSB table 08801 with N contents taken from Table 50 in "
+                "\\citet{schappi_annexes_2025} for municipal waste, sewage sludge, hazardous and other waste. No export in these categories is "
+                "reported before 2002, so we set all previous years to zero. The increase seen from 2022 to 2023 is in the category municipal waste."
 
         # --- Wastewater (PR.WW) Subpool ---
         elif filename.startswith("PR_WW_"):
@@ -1642,27 +1669,40 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
             if "agsm" in norm:
                 exact_flow_code = "PR.WW-AG.SM-Sewage sludge fertilizer-Nmix"
                 display_name = "Sewage Sludge Fertilizer to Ag"
-                flow_description = f"**{exact_flow_code}** is taken from SSB table 05279 “Avløpsslam, etter slamdisponering, statistikkvariabel, år og region”. Mass balance studies of sewage sludge allocation to crops highlight a major opportunity to shift towards synthetic fertilizer substitution \\\\citep{{starck_fate_2023}}\\\\citep{{kaltenegger_urban_2023}}. For years 1993-2001 we use data from the SSB Naturressurser og miljø series."
+                flow_description = "**{exact_flow_code}** is taken from SSB table 05279 “Avløpsslam, etter slamdisponering, statistikkvariabel, år og "
+                "region”. We use a N content of 2.6 %  as given in Table 54 in \\citet{schappi_annexes_2025}. For years 1993-2001 we use data from the "
+                "SSB Naturressurser og miljø series. For years 1990-1992 we use the average value of the 1993-1995."
             elif "atat" in norm and "n2" in norm and not "n2o" in norm:
                 exact_flow_code = "PR.WW-AT.AT-Emissions-N2"
                 display_name = "N2 Emissions (Wastewater)"
-                flow_description = f"**{exact_flow_code}** is found by using data on N emissions and removal rates from wastewater treatment plants equipped with nitrogen removal. The dynamics of losing significant shares of excreted nitrogen as inert N2 via WWTP denitrification are detailed in \\\\citep{{starck_fate_2023}} and \\\\citep{{fowler_global_2013}}. Where specific data were missing we assumed a default 70 % removal rate."
+                flow_description = "**{exact_flow_code}** is found by using data on N emissions and removal rates from the six wastewater treatment "
+                "plants that were equipped with nitrogen removal up to 2025. Where specific data on nitrogen removal fraction were missing we assumed "
+                "a default 70 %, and we extrapolated or interpolated between existing data where reported emission data were missing. The amount of "
+                "N released as N2 was calculated as N_released*removal_rate/(1-removal_rate). "
             elif "atat" in norm and "n2o" in norm:
                 exact_flow_code = "PR.WW-AT.AT-Emissions-N2O"
                 display_name = "N2O Emissions (Wastewater)"
-                flow_description = f"**{exact_flow_code}** are taken from UNFCCC Common reporting tables, Table 5. The risk of unintended greenhouse gas footprints from major reactive nitrogen value chains is examined in \\\\citep{{bertagni_minimizing_2023}}."
+                flow_description = f"**{exact_flow_code}** are taken from UNFCCC Common reporting tables, Table 5."
             elif "hshs" in norm:
                 exact_flow_code = "PR.WW-HS.HS-Sewage sludge fertilizer-Nmix"
                 display_name = "Sewage Sludge Fertilizer to HS"
-                flow_description = f"**{exact_flow_code}** is taken from SSB table 05279, including all sludge used for green areas and for soil production. Linear urban pathways where nutrient outputs aggregate heavily in municipal infrastructure are outlined in \\\\citep{{kaltenegger_urban_2023}}. For years 1993-2001 we use data from the SSB Naturressurser og miljø series."
+                flow_description = "**{exact_flow_code}** is taken from SSB table 05279 *Avløpsslam, etter slamdisponering, statistikkvariabel, år og region*, "
+                "including all sludge used for green areas and for soil production \\citet{schappi_annexes_2025}. For years 1993-2001 we use data from the "
+                "SSB *Naturressurser og miljø series*. For years 1990-1992 we use the average value of the 1993-1995. We use a N content of 2.6 %  as given in "
+                "Table 54 in \\citet{schappi_annexes_2025}."
             elif "hycw" in norm:
                 exact_flow_code = "PR.WW-HY.CW-Treated wastewater discharge-Nmix"
                 display_name = "Treated Wastewater Discharge to CW"
-                flow_description = f"**{exact_flow_code}** is taken from SSB table 05280 “Totale utslipp av fosfor og nitrogen fra avløpssektoren”. The critical necessity of mitigating coastal aquatic eutrophication from wastewater discharges is documented in \\\\citep{{staalstrom_utredning_2022}} and \\\\citep{{schulte_uebbing_planetary_2022}}. Due to lack of available data we set the values in 1990-1996 to be equal to that in 1997."
+                flow_description = f"**{exact_flow_code}** is taken from SSB table 05280 *Totale utslipp av fosfor og nitrogen fra avløpssektoren*. Data back "
+                "to 1997 are found in the series SSB Naturressurser og miljø. Due to lack of available data we set the values in 1990-1996 to be equal to that "
+                "in 1997. "
             elif "prso" in norm and "landfill" in norm:
                 exact_flow_code = "PR.WW-PR.SO-Sewage sludge landfill-Nmix"
                 display_name = "Sewage Sludge to Landfill"
-                flow_description = f"**{exact_flow_code}** is taken from SSB table 05279, including both sludge that is landfilled and sludge used for top cover on landfills. Global and historical trajectories of crop and livestock system nutrient allocations show a distinct contrast to such structural landfilling losses \\\\citep{{lassaletta_nitrogen_2016}}. For years 1993-2001 we use data from the SSB Naturressurser og miljø series."
+                flow_description = "**{exact_flow_code}** is taken from SSB table 05279 *Avløpsslam, etter slamdisponering, statistikkvariabel, år og region*, "
+                "including both sludge that is landfilled and sludge used for top cover on landfills \\citet{schappi_annexes_2025}. For years 1993-2001 we "
+                "use data from the SSB Naturressurser og miljø series. For years 1990-1992 we use the average value of the 1993-1995. We use a N content of 2.6 % "
+                "as given in Table 54 in \\citet{schappi_annexes_2025}."
 
         # Skriv ut filen med riktig forelder og nav_order-teller
         with open(full_flow_path, 'w', encoding='utf-8') as f:

@@ -10,8 +10,5 @@ nav_order: 4
 ![PR.WW-HS.HS-Sewage sludge fertilizer-Nmix](../output_files/plots/PR_WW_HS_HS_Sewage_sludge_fertilizer_Nmix.png)
 
 ### Flow Description
-**PR.WW-HS.HS-Sewage sludge fertilizer-Nmix** is taken from SSB table 05279, including all sludge used for green areas and for soil production. Linear urban pathways where nutrient outputs aggregate heavily in municipal infrastructure are outlined in (Kaltenegger, 2023). For years 1993-2001 we use data from the SSB Naturressurser og miljø series.
+**{exact_flow_code}** is taken from SSB table 05279 *Avløpsslam, etter slamdisponering, statistikkvariabel, år og region*, 
 
-### References
-
-* Kaltenegger, K., Bai, Z., Dragosits, U., Fan, X., Greinert, A., Guéret, S., Suchowska-Kisielewicz, M., Winiwarter, W., Zhang, L., & Zhou, F. (2023). *Urban nitrogen budgets: {Evaluating} and comparing the path of nitrogen through cities for improved management*. Science of The Total Environment. [https://doi.org/10.1016/j.scitotenv.2023.166827](https://doi.org/10.1016/j.scitotenv.2023.166827)

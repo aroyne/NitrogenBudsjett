@@ -1,17 +1,14 @@
 ---
 layout: default
-title: Wastewater from Landfills
+title: Biofuels Production Wastewater
 parent: Solid Waste (PR.SO)
 nav_order: 9
 ---
 
-# Wastewater from Landfills
+# Biofuels Production Wastewater
 
-![PR.SO-PR.WW-Wastewater from landfills-Nmix](../output_files/plots/PR_SO_PR_WW_Biofuels_production_wastewater_Nmix.png)
+![PR.SO-PR.WW-Biofuels production wastewater-Nmix](../output_files/plots/PR_SO_PR_WW_Biofuels_production_wastewater_Nmix.png)
 
 ### Flow Description
-**PR.SO-PR.WW-Wastewater from landfills-Nmix** is taken from landfill emissions data, where we have categorized landfills as being connected to municipal wastewater or not based on publicly available data. Regional limits for non-agricultural nitrogen loads into sewage systems are detailed in ({schulte_uebbing_planetary_2022)}. Where the categorization was not possible, the resulting emissions have been split evenly. As no data are available before 2009 we have extrapolated using the average value.
+**PR.SO-PR.WW-Biofuels production wastewater-Nmix** is found by assuming that the incoming N to biofuel production not retained in digestate ends up in the wastewater. Values before 2012 are set to zero. IN PROGRESS
 
-### References
-
-* Missing reference data for key: `{schulte_uebbing_planetary_2022`

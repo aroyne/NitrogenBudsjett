@@ -10,8 +10,12 @@ nav_order: 1
 ![PR.SO-AG.SM-Biologically treated organic waste-Nmix](../output_files/plots/PR_SO_AG_SM_Biologically_treated_organic_waste_Nmix.png)
 
 ### Flow Description
-**PR.SO-AG.SM-Biologically treated organic waste-Nmix** includes all forms of organic waste except sewage sludge that is organically treated and used in agricultural soils. Biological treatment of organic waste includes both composting and biogas production, but in Norway, most of the waste composted in the municipal waste sector is used on the private sector, not in agriculture. We therefore only include biogas digestate in this flow.\n\nAccording to Biogass Norge, biogas digestate is produced from sewage sludge, manure, fish waste and sludge, and food waste. General frameworks for urban and regional nitrogen recycling from waste management are detailed in ({kaltenegger_urban_2023)}. From 2018 to 2020, we use data on the disposal of biologically produced waste from SSB table 12818 where we find the N content of what is used in agriculture by scaling the N content of the amount used in 2021.\n\nFrom 2012 to 2017, we use data on biogas treatment of different waste categories from SSB table 10513 “Avfallsregnskap for Norge (1 000 tonn), etter materialtype, statistikkvariabel, år og behandlingsmåte” assuming that 85 % of this is used in agriculture with a loss of 10 % N during biological treatment.\n\nAccording to SSB, there were 8 biogas plants in 2011 and 35 in 2017. We therefore assume values before 2012 to be negligible and set those flows to zero.
+**PR.SO-AG.SM-Biologically treated organic waste-Nmix** includes all forms of organic waste except sewage sludge that is organically treaded and used in agriultural soils. Biological treatment of organic waste includes both composting and biogas production, but in Norway, most of the waste composted in the municipal waste sector is used on the private sector, not in agriculture.
 
-### References
+SSB statistics on composted organic waste also includes some composted wastewater sludge, but there is no exact statistics on the amount. Reports indicate that this is a minor (less than 15 %) of sludge) and decreasing fraction of sewage sludge, which is already included in the flows from PR.WW. There is therefore some double counting which serves to make this flow (PR.SO-HS.HS) artificially large. 
+From 2018, we use data on the disposal of biologically produced waste from SSB table 12818 assuming a typical N content of compost, although a smaller fraction is also biogas digestate. 
+For 2012-2017, we use data on composted organic waste from SSB table 10513  “Avfallsregnskap for Norge (1 000 tonn) and scale the nitrogen value in 2018 with that found from table 12818 for consistency. 
+There are no official data prior to 2012, but we know that there was organic waste composted and used in the private sector. In lack of other data we extrapolate the 2012 value back to 1990. 
 
-* Missing reference data for key: `{kaltenegger_urban_2023`
+
+
