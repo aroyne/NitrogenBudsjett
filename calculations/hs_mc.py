@@ -33,26 +33,6 @@ def execute_calculations_hs(preloaded_data, current_params, dataset_noise, curre
     return results
 
 
-def _apply_dataset_noise(base_value, dataset_key, dataset_noise, caller_func):
-    """
-    Legger støy på verdi. Krasjer hardt med en KeyError dersom støy-nøkkel mangler.
-    """
-    if not dataset_noise or dataset_key not in dataset_noise:
-        raise KeyError(
-            f"[KRITISK FEIL] Støy-nøkkel '{dataset_key}' mangler i dataset_noise under kallet fra {caller_func.__name__}! "
-            f"Kan ikke kjøre usikkerhetsanalyse deterministisk."
-        )
-
-    noise_info = dataset_noise[dataset_key]
-    noise_val = noise_info['value']
-    
-    if noise_info['type'] == 'perc':
-        return base_value * noise_val
-    else:
-        bound = noise_info['upp_bound'] if noise_val >= 0 else noise_info['low_bound']
-        return base_value + (noise_val * bound)
-
-
 # =========================================================================
 # 1. HUSHOLDNINGSAVFALL
 # =========================================================================
@@ -94,6 +74,7 @@ def _add_municipal_wastewater_mc(results, preloaded_data, current_params, datase
     flow_code = 'HS.HS-PR.WW-Municipal wastewater-Nmix'
     collected_years = set()
     dataset_key = '06913'
+    noise_val = dataset_noise[dataset_key]
     
     val_param = current_params.get("per_capita_WW_N_load_kg")
     if val_param is None:
@@ -118,7 +99,7 @@ def _add_municipal_wastewater_mc(results, preloaded_data, current_params, datase
                 continue
             collected_years.add(year)
             
-            perturbed_pop = _apply_dataset_noise(float(pop_val), dataset_key, dataset_noise, _add_municipal_wastewater_mc)
+            perturbed_pop = float(pop_val)*noise_val
             value = perturbed_pop * N_amount * 1e-6
             if value < 0: 
                 value = 0.0
@@ -167,20 +148,22 @@ def _add_nh3_human_emissions_mc(results, preloaded_data, current_params, dataset
     
     merged = population.merge(df_smoke[['Year', 'Daily', 'Occ']], on='Year', how='inner')
     
+    noise_07459 = dataset_noise['07459'] # population
+    noise_05307 = dataset_noise['05307'] # smoking
+    
     for _, row in merged.iterrows():
         year = int(row['Year'])
         if year not in EXPECTED_YEARS:
             continue
         collected_years.add(year)
         
-        tot_p = _apply_dataset_noise(float(row['Total']), '07459', dataset_noise, _add_nh3_human_emissions_mc)
-        age0_p = _apply_dataset_noise(float(row['Age0']), '07459', dataset_noise, _add_nh3_human_emissions_mc)
-        age13_p = _apply_dataset_noise(float(row['Age1-3']), '07459', dataset_noise, _add_nh3_human_emissions_mc)
+        tot_p = float(row['Total'])*noise_07459
+        age0_p = float(row['Age0'])*noise_07459
+        age13_p = float(row['Age1-3'])*noise_07459
         
-        smoke_modifier = _apply_dataset_noise(1.0, '05307', dataset_noise, _add_nh3_human_emissions_mc)
-        total_smoked = ((float(row['Daily']) * cig_daily + float(row['Occ']) * cig_occ) / 100.0) * tot_p * smoke_modifier
+        total_smoked = ((float(row['Daily']) * cig_daily + float(row['Occ']) * cig_occ) / 100.0) * tot_p * noise_05307
         
-        emissions_tN = (c_total * tot_p + c_age0 * age0_p + c_age1_3 * age13_p + c_smoke * total_smoked)
+        emissions_tN = c_total * tot_p + c_age0 * age0_p + c_age1_3 * age13_p + c_smoke * total_smoked
         value = emissions_tN / 1000.0
         if value < 0: 
             value = 0.0
@@ -200,7 +183,7 @@ def _add_luc_N2O_emissions_mc(results, preloaded_data, current_params, dataset_n
     flow_code = 'HS.HS-AT.AT-LUC emissions-N2O'
     collected_years = set()
     dataset_key = 'UNFCCC_emissions'
-    
+    noise_val = dataset_noise[dataset_key]
     conv = float(current_params.get("N2O_to_N_factor"))
     df_n2o = preloaded_data.get('hs_unfccc_n2o_raw')
     if df_n2o is None: 
@@ -217,7 +200,7 @@ def _add_luc_N2O_emissions_mc(results, preloaded_data, current_params, dataset_n
         collected_years.add(year)
         raw_val = float(row_data.iloc[1])
         
-        value = _apply_dataset_noise(raw_val, dataset_key, dataset_noise, _add_luc_N2O_emissions_mc)
+        value = raw_val * noise_val
         value = value * conv
         if value < 0: 
             value = 0.0
@@ -240,6 +223,8 @@ def _add_overland_flow_urban_mc(results, preloaded_data, current_params, dataset
     collected_years = set()
     dataset_key = 'TEOTIL'
     ret = float(current_params.get("HS_urban_retention_fraction"))
+    noise_data = dataset_noise[dataset_key]
+    noise_interp = dataset_noise['trend interpolation']
     
     # 1. Hent historisk data og TEOTIL3
     df_kyst = preloaded_data.get('hy_kyst_tilforsel')
@@ -265,8 +250,7 @@ def _add_overland_flow_urban_mc(results, preloaded_data, current_params, dataset
                 
                 if pd.notna(raw_val) and year in EXPECTED_YEARS:
                     collected_years.add(year)
-                    val_p = _apply_dataset_noise(float(raw_val), dataset_key, dataset_noise, _add_overland_flow_urban_mc)
-                    val_p = _apply_dataset_noise(val_p, 'trend interpolation', dataset_noise, _add_overland_flow_urban_mc)
+                    val_p = float(raw_val)*noise_data*noise_interp
                     value = (val_p / 1000.0) * (1.0 - ret)
                     results.append({
                         'flow_name': flow_code, 'year': year, 'value': max(0.0, value),
@@ -301,7 +285,7 @@ def _add_overland_flow_urban_mc(results, preloaded_data, current_params, dataset
                         results[:] = [x for x in results if not (x['flow_name'] == flow_code and x['year'] == year)]
                     
                     collected_years.add(year)
-                    val_p = _apply_dataset_noise(float(raw_val), dataset_key, dataset_noise, _add_overland_flow_urban_mc)
+                    val_p = float(raw_val)*noise_data
                     value = (val_p / 1000.0) * (1.0 - ret)
                     
                     results.append({

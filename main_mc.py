@@ -93,7 +93,7 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_animal_p
             if isinstance(df_trade_local[df_trade_local.columns[0]].iloc[0], str):
                 pid_col = df_trade_local.columns[0]
 
-# --- DETERMINISTISK GREN (Runde i=0) ---
+    # --- DETERMINISTISK GREN (Runde i=0) ---
     if is_deterministic:
         static_trade = {}
         if df_trade_local is not None and pid_col is not None:
@@ -186,7 +186,7 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_animal_p
     elif hasattr(base_params, 'tables') and 'global_parameters' in base_params.tables:
         base_params.tables['global_parameters'] = df_perturbed
 
- # --- STEG 1.5: PERTURBERING AV WASTE_FRACTIONS ---
+    # --- STEG 1.5: PERTURBERING AV WASTE_FRACTIONS ---
     df_waste = base_params.get_table('waste_fractions')
     for idx, row in df_waste.iterrows():
         cat_id = str(row['waste_category']).strip()
@@ -230,37 +230,35 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_animal_p
     dataset_noise_dict = {}
     for _, row in df_datasets.iterrows():
         ds_id = str(row['dataset_name']).strip()
-        # FJERNET fallbacks til 0.0 og standard distribusjoner
         low_b = float(row['lower_bound'])
         upp_b = float(row['upper_bound'])
         unc_type = str(row['uncertainty_type']).lower().strip()
         dist_type = str(row['distribution_type']).lower().strip()
         
-        if unc_type == 'perc':
-            base_val = 1.0
-            abs_min = base_val * (1 - low_b / 100.0)
-            abs_max = base_val * (1 + upp_b / 100.0)
-            std_dev = ((low_b + upp_b) / 2.0 / 100.0) * base_val
-            if 'pert' in dist_type:
-                noise_val = draw_from_pert(abs_min, base_val, abs_max)
-            elif 'log' in dist_type:
-                cv = std_dev / base_val
-                sigma_log = np.sqrt(np.log(1 + cv**2))
-                mu_log = np.log(base_val) - (sigma_log ** 2) / 2
-                noise_val = np.random.lognormal(mu_log, sigma_log)
-            else:
-                noise_val = np.random.normal(base_val, std_dev)
-        else:
-            base_val = 0.0
-            abs_min = -1.0
-            abs_max = 1.0
-            std_dev = 1.0 / 1.96
-            if 'pert' in dist_type:
-                noise_val = draw_from_pert(abs_min, base_val, abs_max)
-            else:
-                noise_val = np.random.normal(base_val, std_dev)
+        base_val = 1.0
+        abs_min = base_val * (1 - low_b / 100.0)
+        abs_max = base_val * (1 + upp_b / 100.0)
         
-        dataset_noise_dict[ds_id] = {'value': noise_val, 'type': unc_type, 'low_bound': low_b, 'upp_bound': upp_b}
+        # Sjekker distribusjonstype fra Excel-arket
+        if 'pert' in dist_type:
+            noise_val = draw_from_pert(abs_min, base_val, abs_max)
+        elif 'log' in dist_type:
+            std_dev = ((low_b + upp_b) / 2.0 / 100.0) * base_val
+            cv = std_dev / base_val
+            sigma_log = np.sqrt(np.log(1 + cv**2))
+            mu_log = np.log(base_val) - (sigma_log ** 2) / 2
+            noise_val = np.random.lognormal(mu_log, sigma_log)
+        else:
+            # Fallback til normalfordeling hvis ingenting annet er oppgitt
+            std_dev = ((low_b + upp_b) / 2.0 / 100.0) * base_val
+            noise_val = np.random.normal(base_val, std_dev)
+            
+        # Sørg for at en multiplikativ faktor ikke blir negativ (f.eks. ved ekstrem normalfordeling)
+        if noise_val < 0:
+            noise_val = 0.0
+            
+        # Lagre tallet DIREKTE (Forenklet, ingen indre dict!)
+        dataset_noise_dict[ds_id] = float(noise_val)     
         
     # --- 3. PERTURBERING AV TRADE_PARAMETERS ---
     trade_noise_dict = {}
@@ -522,19 +520,6 @@ def main():
         elif 'ssb_trade' in preloaded_data:
             preloaded_data['prepared_trade_all'] = preloaded_data['ssb_trade']
             
-    # # --- MIDLERTIDIG FEILSØKING FOR Å SJEKKE KOLONNER ---
-    # df_trade_params = preloaded_data.get('trade_params')
-    # if df_trade_params is not None:
-    #     print("\n" + "="*60)
-    #     print("[DEBUG] Sjekker trade_parameters fra data_loader:")
-    #     print("Kolonnenavn (headers):", df_trade_params.columns.tolist())
-    #     print("Indeks-navn (row index):", df_trade_params.index.name)
-    #     print("Første rad med data:\n", df_trade_params.head(1).to_string())
-    #     print("="*60 + "\n")
-        
-    #     # Framprovoser en kontrollert stopp så du slipper å kjøre hele MC
-    #     import sys; sys.exit("[DEBUG STOPP] Kolonner er printet, avbryter kjøring.")
-
     all_mc_records = []
     
     print(f"\n[INFO] Starter simuleringsløkke: Kjører {args.nsim} iterasjoner...")
@@ -565,12 +550,7 @@ def main():
             dataset_noise = {}
             for _, row in df_dataset_uncertainties.iterrows():
                 ds_id = str(row['dataset_name']).strip()
-                dataset_noise[ds_id] = {
-                    'value': 1.0,
-                    'type': 'perc',
-                    'low_bound': 0.0,
-                    'upp_bound': 0.0
-                }            
+                dataset_noise[ds_id] = 1.0
 
         else:
             # Følgende runder: Generer stokastisk støy

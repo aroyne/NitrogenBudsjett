@@ -45,7 +45,8 @@ def execute_calculations_at(preloaded_data, current_params, dataset_noise, curre
         current_params=current_params,
         current_trade_factors=current_trade_factors,
         target_types='NH3',  
-        is_import=True      
+        is_import=True,
+        dataset_noise=dataset_noise
     )    
             
     # Kjør fikseringsberegningen din
@@ -120,13 +121,8 @@ def _deposition_flow_mc(results, flow_code, class4, poll, preloaded_data, curren
             data_sources = 'NILU and geodata.no'
             
             # --- STØYLOGIKK FOR 'Deposition' ---
-            noise_info = dataset_noise[key_dep]
-            noise_val = noise_info['value']
-            if noise_info['type'] == 'perc':
-                value = base_value * noise_val
-            else:
-                bound = noise_info['upp_bound'] if noise_val >= 0 else noise_info['low_bound']
-                value = base_value + (noise_val * bound)
+            noise_val = dataset_noise[key_dep]
+            value = base_value * noise_val
                 
             if year == 2016:
                 value_2016 = value
@@ -150,13 +146,8 @@ def _deposition_flow_mc(results, flow_code, class4, poll, preloaded_data, curren
             data_sources = 'extrapolated'
             
             # --- STØYLOGIKK FOR 'trend interpolation' ---
-            noise_info = dataset_noise[key_interp]
-            noise_val = noise_info['value']
-            if noise_info['type'] == 'perc':
-                value = base_value * noise_val
-            else:
-                bound = noise_info['upp_bound'] if noise_val >= 0 else noise_info['low_bound']
-                value = base_value + (noise_val * bound)
+            noise_val = dataset_noise[key_interp]
+            value = base_value * noise_val
 
         # Fysisk sperre
         if value < 0:
@@ -198,15 +189,8 @@ def _add_OP_N2_fixation_mc(results, preloaded_data, current_params, ammonia_impo
             base_faostat = float(row['Value']) / 1000 
             
             # --- STØYLOGIKK FOR 'Fertilizer by nutrient' ---
-            noise_info = dataset_noise[dataset_key]
-            noise_val = noise_info['value']
-            unc_type = noise_info['type']
-            
-            if unc_type == 'perc':
-                perturbed_faostat = base_faostat * noise_val
-            else:
-                bound = noise_info['upp_bound'] if noise_val >= 0 else noise_info['low_bound']
-                perturbed_faostat = base_faostat + (noise_val * bound)
+            noise_val = dataset_noise[dataset_key]
+            perturbed_faostat = base_faostat * noise_val
             
             if perturbed_faostat < 0:
                 perturbed_faostat = 0.0
@@ -258,11 +242,10 @@ def _add_FO_N2_fixation_mc(results, current_params):
     comment = 'ok (MC-støy lagt på)'
     data_sources = 'Moldan (2025) and SSB'
     
-    val_param = current_params.get("FO_biological_fixation_N2")
-    if val_param is None:
-        raise KeyError(f"[KRITISK] Parameter 'FO_biological_fixation_N2' mangler i current_params for {flow_code}!")
+    fixation_rate = float(current_params.get("FO_biological_fixation_N2"))
+    forested_area = float(current_params.get("forested_area"))
         
-    value = float(val_param)
+    value = fixation_rate*forested_area
     
     for year in EXPECTED_YEARS:
         results.append({
@@ -279,11 +262,14 @@ def _add_OL_N2_fixation_mc(results, current_params):
     comment = 'ok (MC-støy lagt på)'
     data_sources = 'CORINE land cover inventory and REddy & DeLaune (2008)'
     
-    val_param = current_params.get("OL_biological_fixation_N2")
-    if val_param is None:
-        raise KeyError(f"[KRITISK] Parameter 'OL_biological_fixation_N2' mangler i current_params for {flow_code}!")
+    fixation_marshes = float(current_params.get("N2_fixation_freshwater_marshes"))
+    fixation_peat = float(current_params.get("N2_fixation_peat_bog"))
+    fixation_wetl = float(current_params.get("N2_fixation_coastal_wetlands"))
+    marshes_area = float(current_params.get("inland_marshes_area"))
+    peat_area = float(current_params.get("peat_bog_area"))
+    intertidal_area = float(current_params.get("intertidal_flats_area"))
         
-    value = float(val_param)
+    value = (fixation_marshes*marshes_area + fixation_peat*peat_area + fixation_wetl*intertidal_area)*1e-6 # kg -> kt
     
     for year in EXPECTED_YEARS:
         results.append({
@@ -300,11 +286,10 @@ def _add_SW_N2_fixation_mc(results, current_params):
     comment = 'ok (MC-støy lagt på)'
     data_sources = 'NIBIO and Reddy & DeLaune (2008)'
     
-    val_param = current_params.get("SW_biological_fixation_N2")
-    if val_param is None:
-        raise KeyError(f"[KRITISK] Parameter 'SW_biological_fixation_N2' mangler i current_params for {flow_code}!")
-        
-    value = float(val_param)
+    fixation_SW = float(current_params.get("N2_fixation_SW"))
+    area_SW = float(current_params.get("surface_water_area"))
+    
+    value = fixation_SW*area_SW*1e-3 # tN -> ktN
     
     for year in EXPECTED_YEARS:
         results.append({
@@ -346,15 +331,8 @@ def _add_atmospheric_outflow_oxn_mc(results, df_atm, current_params, dataset_noi
         if not dataset_noise or dataset_key not in dataset_noise:
             raise KeyError(f"[KRITISK] Støy-nøkkel '{dataset_key}' mangler i dataset_noise for {flow_code}!")
             
-        noise_info = dataset_noise[dataset_key]
-        noise_val = noise_info['value']
-        unc_type = noise_info['type']
-        
-        if unc_type == 'perc':
-            value = base_value * noise_val
-        else:
-            bound = noise_info['upp_bound'] if noise_val >= 0 else noise_info['low_bound']
-            value = base_value + (noise_val * bound)
+        noise_val = dataset_noise[dataset_key]
+        value = base_value * noise_val
             
         if value < 0:
             value = 0.0
@@ -401,15 +379,8 @@ def _add_atmospheric_outflow_rdn_mc(results, df_atm, current_params, dataset_noi
         if not dataset_noise or dataset_key not in dataset_noise:
             raise KeyError(f"[KRITISK] Støy-nøkkel '{dataset_key}' mangler i dataset_noise for {flow_code}!")
             
-        noise_info = dataset_noise[dataset_key]
-        noise_val = noise_info['value']
-        unc_type = noise_info['type']
-        
-        if unc_type == 'perc':
-            value = base_value * noise_val
-        else:
-            bound = noise_info['upp_bound'] if noise_val >= 0 else noise_info['low_bound']
-            value = base_value + (noise_val * bound)
+        noise_val = dataset_noise[dataset_key]
+        value = base_value * noise_val
             
         if value < 0:
             value = 0.0

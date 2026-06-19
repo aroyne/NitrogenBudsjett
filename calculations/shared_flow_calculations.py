@@ -71,17 +71,7 @@ def find_aquaculture_production(df_aqua_modern, df_aqua_old, current_params, dat
     # 2. Hent simulert aktivitetsstøy for Fiskeridirektoratet (dataset-støy)
     # Vi sjekker om den ligger i 'dataset_noise' først, med fallback til 'current_params'
     key_fisk = 'Fiskeridirektoratet'
-    noise_aqua = 1.0
-    
-    if dataset_noise and key_fisk in dataset_noise:
-        noise_info = dataset_noise[key_fisk]
-        if noise_info['type'] == 'perc':
-            noise_aqua = float(noise_info['value'])
-        # Hvis det skulle være 'abs' støy, må det håndteres i løkka, 
-        # men for aktivitetsdata fra Fiskeridirektoratet er det nesten alltid prosentvis (perc).
-    else:
-        # Fallback til din gamle logg dersom nøkkelen ble dyttet flatt inn i current_params
-        noise_aqua = float(current_params.get('Fiskeridirekt', current_params.get('Fiskeridirektoratet')))
+    noise_aqua = dataset_noise[key_fisk]
 
     # --- DEL 1: Moderne data (fra 1994 og utover) ---
     for col in df_aqua_modern.columns:
@@ -164,7 +154,7 @@ def find_feedstock_fuel(preloaded_data, current_params, dataset_noise):
     year_values = {}
     
     # Hent støy for energibalansen (Tabell 11561) 
-    noise_energy = float(dataset_noise['11561']['value'])
+    noise_energy = float(dataset_noise['11561'])
     
     # Hent parametere trygt fra current_params (støtter både dict og NParameters)
     GWh_to_TJ_factor = float(current_params.get('GWh_to_TJ_factor'))
@@ -241,9 +231,9 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
         missing = [k for k in required_noise_keys if not dataset_noise or k not in dataset_noise]
         raise KeyError(f"[KRITISK] Støy-nøkler mangler i dataset_noise for matindustriavfall: {missing}")
         
-    noise_05282 = float(dataset_noise['05282']['value'])
-    noise_10514 = float(dataset_noise['10514']['value'])
-    noise_trend = float(dataset_noise['trend interpolation']['value'])
+    noise_05282 = float(dataset_noise['05282'])
+    noise_10514 = float(dataset_noise['10514'])
+    noise_trend = float(dataset_noise['trend interpolation'])
     
     value_2012_base = 0.0
 
@@ -343,9 +333,9 @@ def find_household_waste(preloaded_data, current_params, dataset_noise):
     household_waste = {y: 0.0 for y in range(1990, 2024)}
     
     # Hent støyfaktorer for simuleringen
-    noise_05282 = float(dataset_noise['05282']['value'])
-    noise_10514 = float(dataset_noise['10514']['value'])
-    noise_interp = float(dataset_noise['trend interpolation']['value'])
+    noise_05282 = float(dataset_noise['05282'])
+    noise_10514 = float(dataset_noise['10514'])
+    noise_interp = float(dataset_noise['trend interpolation'])
 
     # Hent N-fraksjoner via current_params
     paper_N   = float(current_params.waste_N_frac('paper'))
@@ -362,13 +352,13 @@ def find_household_waste(preloaded_data, current_params, dataset_noise):
     # =========================================================================
     # TABELL 05281 / 05282 (1995-2011)
     # =========================================================================
-    df_05282 = preloaded_data['ssb_waste_05281']
+    df_05282 = preloaded_data['ssb_05282']
     value_1995 = 0.0
     width_05282 = df_05282.shape[1]
 
     col_to_year = {}
-    for col_idx in range(3, width_05282):
-        val = str(df_05282.iloc[2, col_idx]).strip()
+    for col_idx in range(1, width_05282):
+        val = str(df_05282.iloc[3, col_idx]).strip()
         if val.replace('.0', '').isdigit():
             y = int(float(val))
             if 1995 <= y <= 2011:
@@ -378,7 +368,7 @@ def find_household_waste(preloaded_data, current_params, dataset_noise):
         val_year = 0.0
         
         # Papir (Excel rad 7 -> indeks 6)
-        for c in [4, 5, 6, 7, 9]:
+        for c in [5, 6, 9]:
             if col_idx + c < width_05282: val_year += float(df_05282.iloc[6, col_idx + c]) * paper_N
         # Plast (Excel rad 9 -> indeks 8)
         for c in [5, 6, 9]:
@@ -409,12 +399,12 @@ def find_household_waste(preloaded_data, current_params, dataset_noise):
     # =========================================================================
     # TABELL 10513 / 10514 (2012-2023)
     # =========================================================================
-    df_10514 = preloaded_data['ssb_waste_10513']
+    df_10514 = preloaded_data['ssb_10514']
     width_10514 = df_10514.shape[1]
     
     col_to_year_10514 = {}
     for col_idx in range(1, width_10514):
-        val = str(df_10514.iloc[2, col_idx]).strip()
+        val = str(df_10514.iloc[3, col_idx]).strip()
         if val.replace('.0', '').isdigit():
             y = int(float(val))
             if 2012 <= y <= 2023:
@@ -474,7 +464,6 @@ def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params,
     Ingen tause try-excepts. Krasjer hardt ved string/NaN-feil i SSB-tabellene.
     """
     industry_waste = {}
-    industry_waste_unc = {}
     
     # 1. Hent nitrogen-fraksjoner fra parameter-objektet ditt
     paper_N     = float(current_params.waste_N_frac('paper'))
@@ -487,16 +476,9 @@ def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params,
     mixed_N     = float(current_params.waste_N_frac('mixed_waste'))
     
     # 2. Hent støyfaktorer og metadata-usikkerheter strikt uten fallbacks
-    try:
-        noise_05282 = float(dataset_noise['05282']['value'] if '05282' in dataset_noise else dataset_noise['ssb_waste_05282']['value'])
-        noise_10514 = float(dataset_noise['10514']['value'] if '10514' in dataset_noise else dataset_noise['ssb_waste_10514']['value'])
-        noise_trend = float(dataset_noise['trend interpolation']['value'] if 'trend interpolation' in dataset_noise else dataset_noise['trend_interpolation']['value'])
-        
-        u_05282  = dataset_noise['05282']['low_bound'] if '05282' in dataset_noise else dataset_noise['ssb_waste_05282']['low_bound']
-        u_10514  = dataset_noise['10514']['low_bound'] if '10514' in dataset_noise else dataset_noise['ssb_waste_10514']['low_bound']
-        u_trend  = dataset_noise['trend interpolation']['low_bound'] if 'trend interpolation' in dataset_noise else dataset_noise['trend_interpolation']['low_bound']
-    except KeyError as e:
-        raise KeyError(f"[KRITISK] Mangler støy-/usikkerhetsnøkkel '{e.args[0]}' i dataset_noise for industriavfall!")
+    noise_05282 = float(dataset_noise['05282'])
+    noise_10514 = float(dataset_noise['10514'])
+    noise_trend = float(dataset_noise['trend interpolation'])        
 
     # Konverter til NumPy for hastighet
     arr_05282 = df_05282.values
@@ -535,7 +517,6 @@ def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params,
             base_value_1995 = value_base
             
         industry_waste[year] = value_base * noise_05282
-        industry_waste_unc[year] = u_05282
 
     # --- DEL 2: ÅRENE 2012-2023 (Tabell 10514) ---
     for col in range(1, 114, 10):
@@ -566,7 +547,6 @@ def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params,
             raise ValueError(f"[KRITISK DATAFEIL] Fant uventet tekst/NaN i tabell 10514 under kolonne {col} for år {year}: {e}")
 
         industry_waste[year] = value_base * noise_10514
-        industry_waste_unc[year] = u_10514
 
     # --- DEL 3: LINEÆR EKSTRAPOLERING TILBAKE TIL 1990 ---
     try:
@@ -592,10 +572,8 @@ def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params,
         step += 1
         # Påfører støy lineært KUN én gang på slutten
         industry_waste[year] = base_value_extrapolated * noise_05282 * noise_trend
-        industry_waste_unc[year] = u_trend
 
-    # ENDRET: Returnerer nå både verdi-ordboken og usikkerhets-ordboken
-    return industry_waste, industry_waste_unc
+    return industry_waste
 
 
 def find_industrial_crop_products(df_gnb_sheet30, dataset_noise):
@@ -607,15 +585,12 @@ def find_industrial_crop_products(df_gnb_sheet30, dataset_noise):
     
     # --- 1. Sjekk og klargjør støy for Gross nutrient balance ---
     key_gnb = 'Gross nutrient balance'
-    has_noise_gnb = dataset_noise and key_gnb in dataset_noise
-    noise_gnb_val = dataset_noise[key_gnb]['value'] if has_noise_gnb else 1.0
-    noise_gnb_type = dataset_noise[key_gnb]['type'] if has_noise_gnb else 'perc'
+    noise_gnb_val = dataset_noise[key_gnb]
+    noise_gnb_type = dataset_noise[key_gnb]
     
     # --- 2. Sjekk og klargjør støy for trendinterpolering ---
     key_interp = 'trend interpolation'
-    has_noise_interp = dataset_noise and key_interp in dataset_noise
-    noise_interp_val = dataset_noise[key_interp]['value'] if has_noise_interp else 1.0
-    noise_interp_type = dataset_noise[key_interp]['type'] if has_noise_interp else 'perc'
+    noise_interp_val = dataset_noise[key_interp]
     
     # Hent radene direkte basert på posisjon (rad 9 og rad 11 i Excel)
     year_row = df_gnb_sheet30.iloc[8]
@@ -630,15 +605,7 @@ def find_industrial_crop_products(df_gnb_sheet30, dataset_noise):
             try:
                 year = int(year_val)
                 base_value = float(val_val) * 1.0e-3  # kg -> kt
-                
-                if has_noise_gnb:
-                    if noise_gnb_type == 'perc':
-                        value = base_value * noise_gnb_val
-                    else:
-                        bound = dataset_noise[key_gnb]['upp_bound'] if noise_gnb_val >= 0 else dataset_noise[key_gnb]['low_bound']
-                        value = base_value + (noise_gnb_val * bound)
-                else:
-                    value = base_value
+                value = base_value * noise_gnb_val
                 
                 if value < 0:
                     value = 0.0
@@ -652,14 +619,7 @@ def find_industrial_crop_products(df_gnb_sheet30, dataset_noise):
         mean_value = float(np.mean(list(year_values.values())))
         
         for year in range(2017, 2020):
-            if has_noise_interp:
-                if noise_interp_type == 'perc':
-                    value_interp = mean_value * noise_interp_val
-                else:
-                    bound = dataset_noise[key_interp]['upp_bound'] if noise_interp_val >= 0 else dataset_noise[key_interp]['low_bound']
-                    value_interp = mean_value + (noise_interp_val * bound)
-            else:
-                value_interp = mean_value
+            value_interp = mean_value * noise_interp_val
                 
             if value_interp < 0:
                 value_interp = 0.0
@@ -676,7 +636,7 @@ def find_industrial_round_wood(preloaded_data, current_params, dataset_noise):
     year_values = {}
     
     # 1. Hent modellparametere og kildestøy fra current_params (NParameters)
-    noise_faostat = dataset_noise['Forestry production and trade']['value']
+    noise_faostat = dataset_noise['Forestry production and trade']
     wood_density  = float(current_params.get('wood_density'))
     conifer_N     = float(current_params.get('conifer_N_frac'))
     nonconifer_N   = float(current_params.get('nonconifer_N_frac'))
@@ -730,11 +690,8 @@ def find_industrial_waste_fuels(df_bio_08205, df_bio_hist, current_params, datas
     year_values = {}
     
     # 1. Hent støyfaktorer strikt fra dataset_noise
-    try:
-        noise_08205 = float(dataset_noise['08205']['value'] if '08205' in dataset_noise else dataset_noise['ssb_waste_08205']['value'])
-        noise_trend = float(dataset_noise['trend interpolation']['value'] if 'trend interpolation' in dataset_noise else dataset_noise['trend_interpolation']['value'])
-    except KeyError as e:
-        raise KeyError(f"[KRITISK] Mangler støy-nøkkel '{e.args[0]}' i dataset_noise for bioenergi!")
+    noise_08205 = float(dataset_noise['08205'])
+    noise_trend = float(dataset_noise['trend interpolation'])
 
     # 2. Hent globale parametere som rene floats
     NCV              = float(current_params.get('firewood_NCV'))
@@ -891,14 +848,13 @@ def find_non_edible_animal_products(df_hides_clean, df_wool, df_sheep, current_p
     year_values = {}
     
     # 1. Hent ut den asymmetriske datasettstøyen fra denne MC-runden (hvis den finnes, ellers 1.0)
-    noise_faostat = dataset_noise['Crops and livestock products']['value']
+    noise_faostat = dataset_noise['Crops and livestock products']
 
-    noise_ssb = dataset_noise['03710']['value']
+    noise_ssb = dataset_noise['03710']
 
-    noise_wool = dataset_noise['Landbruksdirektoratet_wool']['value']
+    noise_wool = dataset_noise['Landbruksdirektoratet_wool']
 
-    # Trendstøy (hvis definert i dataset_noise, ellers 1.0)
-    noise_trend = dataset_noise['trend interpolation']['value']
+    noise_trend = dataset_noise['trend interpolation']
 
     # 2. Hent støybelagte parametere fra current_params (krasjer hardt om de mangler)
     N_content_hides = current_params.get('prod_Raw hides and skins')
@@ -1016,9 +972,9 @@ def find_recycling(preloaded_data, current_params, current_trade_factors, datase
     year_values = {y: 0.0 for y in range(1990, 2024)}
     
     # Hent tabellstøy
-    noise_05281 = float(dataset_noise.get('05281', {}).get('value', 1.0))
-    noise_10513 = float(dataset_noise.get('10513', {}).get('value', 1.0))
-    noise_old = float(dataset_noise.get('historical_waste', {}).get('value', noise_05281))
+    noise_05281 = float(dataset_noise['05281'])
+    noise_10513 = float(dataset_noise['10513'])
+    noise_old = float(dataset_noise['historical_waste'])
 
     # N-fraksjoner
     paper_N   = float(current_params.waste_N_frac('paper'))
@@ -1108,14 +1064,13 @@ def find_recycling(preloaded_data, current_params, current_trade_factors, datase
     df_10514_ind = preloaded_data['ssb_10514']
     df_hist_ind  = preloaded_data['ssb_hist_industry_waste']
     
-    # Kaller funksjonen kirurgisk med alle 5 korrekte argumenter og henter ut kun waste-dicten [0]
     industry_waste = find_other_industry_waste(
         df_05282_ind, 
         df_10514_ind, 
         df_hist_ind, 
         current_params, 
         dataset_noise
-    )[0]
+    )
 
     workbook = openpyxl.load_workbook('data_files/kommunalt_avfall_1985_1995.xlsx')
     sheet = workbook['forbrenning og gjenvinning']
@@ -1221,14 +1176,7 @@ def find_treated_wastewater_discharge(df_05280, df_utslipp, current_params, data
     
     # 1. Hent aktivitetsstøy for avløp (SSB tabell 05280)
     key_ssb = '05280'
-    noise_ww = 1.0
-    
-    if dataset_noise and key_ssb in dataset_noise:
-        noise_info = dataset_noise[key_ssb]
-        if noise_info['type'] == 'perc':
-            noise_ww = float(noise_info['value'])
-    else:
-        noise_ww = float(current_params.get('05280'))
+    noise_ww = dataset_noise[key_ssb]
 
     # For ekstrapolering bakover til 1990 trenger vi å holde styr på 1997-verdien
     value_1997 = 0.0

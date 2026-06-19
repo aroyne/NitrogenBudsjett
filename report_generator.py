@@ -160,6 +160,31 @@ def format_apa_authors(author_str):
         return f"{all_but_last}, & {formatted_names[-1]}"
     
 
+def get_short_author(raw_author_str):
+    if not raw_author_str or raw_author_str == 'Unknown':
+        return 'Unknown'
+    
+    # Splitter på " and " for å isolere hver forfatter
+    authors = raw_author_str.split(" and ")
+    last_names = []
+    
+    for auth in authors:
+        auth = auth.strip()
+        if "," in auth:
+            # Hvis 'Etternavn, Fornavn', hent det som står før komma
+            last_names.append(auth.split(",")[0].strip())
+        else:
+            # Fallback hvis formatet er 'Fornavn Etternavn' eller org-navn
+            last_names.append(auth.split()[-1].strip())
+            
+    # Formater i henhold til antall forfattere (APA7 i tekst)
+    if len(last_names) == 1:
+        return last_names[0]
+    elif len(last_names) == 2:
+        return f"{last_names[0]} & {last_names[1]}"
+    else:
+        return f"{last_names[0]} et al."
+
 def fix_all_citations_in_folder(folder_path, bib_filename):
     if not os.path.exists(bib_filename):
         print(f"Bib-fil ikke funnet: {bib_filename}")
@@ -191,14 +216,13 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
                 if key in ['author', 'year', 'title', 'journal', 'booktitle', 'publisher', 'url', 'doi']:
                     references_dict[current_entry][key] = val
 
-    # Interne hjelpefunksjoner for siteringer i teksten (\citep og \citet)
     def citep_replacer(match):
         keys = [k.strip() for k in match.group(1).split(',')]
         parts = []
         for key in keys:
             if key in references_dict:
                 author = references_dict[key].get('author', 'Unknown')
-                short_author = author.split(',')[0].strip()
+                short_author = get_short_author(author)  # Bruker ny logikk her
                 year = references_dict[key].get('year', 'n.d.')
                 parts.append(f"{short_author}, {year}")
             else:
@@ -211,12 +235,13 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
         for key in keys:
             if key in references_dict:
                 author = references_dict[key].get('author', 'Unknown')
-                short_author = author.split(',')[0].strip()
+                short_author = get_short_author(author)  # Bruker ny logikk her
                 year = references_dict[key].get('year', 'n.d.')
                 parts.append(f"{short_author} ({year})")
             else:
                 parts.append(f"{key} (n.d.)")
         return ", ".join(parts)
+
 
     # 2. Gå igjennom alle filer
     for root, dirs, files in os.walk(folder_path):
@@ -358,7 +383,7 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename):
         if "agsm" in norm and "fixation" in norm: exact_flow_code, display_name = "AT.AT-AG.SM-Biological N2 fixation-N2", "Biological N2 Fixation (Agricultural Soils)"
         elif "agsm" in norm and "deposition" in norm and "oxn" in norm: exact_flow_code, display_name = "AT.AT-AG.SM-Deposition-OXN", "Oxidized N Deposition (Agricultural Soils)"
         elif "agsm" in norm and "deposition" in norm and "rdn" in norm: exact_flow_code, display_name = "AT.AT-AG.SM-Deposition-RDN", "Reduced N Deposition (Agricultural Soils)"
-        elif "fsfo" in norm and "fixation" in norm: exact_flow_code, display_name = "AT.AT-FS.FO-N2 fixation-N2", "N2 Fixation (Forest)"
+        elif "fsfo" in norm and "fixation" in norm: exact_flow_code, display_name = "AT.AT-FS.FO-N2 fixation-N2", "Biological N2 Fixation (Forest)"
         elif "fsfo" in norm and "deposition" in norm and "oxn" in norm: exact_flow_code, display_name = "AT.AT-FS.FO-Deposition-OXN", "Oxidized N Deposition (Forest)"
         elif "fsfo" in norm and "deposition" in norm and "rdn" in norm: exact_flow_code, display_name = "AT.AT-FS.FO-Deposition-RDN", "Reduced N Deposition (Forest)"
         elif "fsol" in norm and "fixation" in norm: exact_flow_code, display_name = "AT.AT-FS.OL-Biological N2 fixation-N2", "Biological N2 Fixation (Other Land)"
@@ -368,7 +393,7 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename):
         elif "hshs" in norm and "deposition" in norm and "rdn" in norm: exact_flow_code, display_name = "AT.AT-HS.HS-Deposition-RDN", "Reduced N Deposition (Settlements)"
         elif "hysw" in norm and "deposition" in norm and "oxn" in norm: exact_flow_code, display_name = "AT.AT-HY.SW-Deposition-OXN", "Oxidized N Deposition (Surface Water)"
         elif "hysw" in norm and "deposition" in norm and "rdn" in norm: exact_flow_code, display_name = "AT.AT-HY.SW-Deposition-RDN", "Reduced N Deposition (Surface Water)"
-        elif "hysw" in norm and "fixation" in norm: exact_flow_code, display_name = "AT.AT-HY.SW-N2 fixation-N2", "N2 Fixation (Surface Water)"
+        elif "hysw" in norm and "fixation" in norm: exact_flow_code, display_name = "AT.AT-HY.SW-N2 fixation-N2", "Biological N2 Fixation (Surface Water)"
         elif "mpop" in norm and "synthesis" in norm: exact_flow_code, display_name = "AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2", "Ammonia Synthesis N2 Fixation"
         elif "rwrw" in norm and "outflow" in norm and "oxn" in norm: exact_flow_code, display_name = "AT.AT-RW.RW-Atmospheric outflow-OXN", "Atmospheric Outflow (Oxidized N)"
         elif "rwrw" in norm and "outflow" in norm and "rdn" in norm: exact_flow_code, display_name = "AT.AT-RW.RW-Atmospheric outflow-RDN", "Atmospheric Outflow (Reduced N)"
@@ -380,7 +405,7 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename):
 
             if exact_flow_code == "AT.AT-AG.SM-Biological N2 fixation-N2":
                 # Byttet ut [ukjent_nøkkel] med en narrativ LaTeX-sitatvariant \citet{}
-                f.write(f"""**{exact_flow_code}**
+                f.write("""
                     \\citet{{schappi_annexes_2025}} advises using data from the EUROSTAT Gross nutrient balance, but there \
                     is an error in this dataset for Norway which is currently being corrected (as of February 2026; personal correspondence, \
                     EUROSTAT). According to the EUROSTAT metadata, the BNF in this statistic is calculated based on the area of leguminous crops and \
@@ -391,7 +416,7 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename):
                     this area, they found a total of 7.6 ktN per year and summed up to 8 ktN to account for BNF from free-living orghanisms and \
                     other sources. The rate of 80 kgN/ha agrees relatively well with later studies of agricultural BNF in Norway, where average \
                     values between 10 and 100 kgN/ha have been found; the highest values in particularly productive areas were up to 260 kgN/ha \
-                    (https://orgprints.org/id/eprint/37546/1/NORSØK%20Rapport%20nr.%203%202020%20Engbelgvekster.pdf). Yearly statistics of clover \
+                    \\citet{hansen_engbelgvekster_2020}. Yearly statistics of clover \
                     seed sales are not available, but according to NIBIO Totalkalkylen (NIBIO, 2025b), the area where grass/clover mixes may be \
                     sown for pasture and fodder production (fulldyrka eng) has remained constant to within about 3 % from 1995 up to today. Our \
                     best estimate for BNF, and for consistency with the previous study, is therefore to assume a constant value of 8 ktN/year. \
@@ -409,17 +434,19 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename):
                         "also reported values of 74.7 and 33.5 ktN per year using two different methods "
                         "for estimating biome-dependent N deposition rates.")
             elif exact_flow_code == "AT.AT-FS.FO-N2 fixation-N2":
-                f.write(f"**{exact_flow_code}**\n\n" + "\n\nFollowing the Swedish NBB \\cite{{moldan_where_2025}}, we use an N-fixation "
+                f.write("Following the Swedish NBB \\cite{{moldan_where_2025}}, we use an N-fixation "
                         "rate of 1.5 kg/ha/year and a forested area of 12.0 mill ha as given by SSB for 2019-2023 (table 14368); we assume this value is "
                         "constant for our entire time period. This gives an annual N-fixation rate of 18.0 ktN. For comparison, the value for Sweden "
-                        "in 2015 was found to be 39.5 ktN \\cite{{moldan_where_2025}}. IN PROGRESS")
+                        "in 2015 was found to be 39.5 ktN \cite{moldan_where_2025}.")
             elif exact_flow_code == "AT.AT-FS.OL-N2 fixation-N2":
-                f.write(f"**{exact_flow_code}**\n\n" + "\n\nIN PROGRESS")
+                f.write("We use N2 fixation rates from Table 62 in \\citet{schappi_annexes_2025} together with land type areas calculated from the CORINE land cover "
+                        " inventory \\citet{european_environment_agency_corine_2019}. "
+                        "In the Swedish NNB \\citep{moldan_where_2025}, N2 fixation in the OL compartment was considered negligible.")
             elif exact_flow_code == "AT.AT-HY.SW-N2 Fixation-N2":
-                f.write(f"**{exact_flow_code}**\n\n" + "According to NIBIO, the surface water area is 20 457 km2 "
+                f.write(f"**{exact_flow_code}**\n\n" + "According to NIBIO \\citep{nibio_arealbarometer_2026}, the surface water area is 20 457 km2 "
                         "https://arealbarometer.nibio.no/nb/norge/. According to  \\citep{{schappi_annexes_2025}}, the biological fixation rate can vary "
                         "between < 0.1 tN/km2 in ologotrophic and mesotrophic lakes to up to 10 tN/km2 in eutrophic lakes. Most lakes in Norway are not "
-                        "eutrophic and we use a low value of 0.1 tN/km2, which gives 2 ktN/year.")
+                        "eutrophic and we use a median value of 0.1 tN/km2, with highest and lowest values of 0 and 2 tN/km2.")
             elif exact_flow_code == "AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2":
                 f.write(f"**{exact_flow_code}**\n\n" + "is found through mass balance where we use data from FAOSTAT Fertilizer by nutrient, domestic "
                         "fertilizer production, and subtracted the amount of ammonia imported from SSB trade data (table 08801). The result is a very "

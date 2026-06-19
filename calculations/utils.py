@@ -200,8 +200,7 @@ def load_crltap_emissions_to_N(raw_lines, categories, pollutant, conv_to_N, data
     """
     # 1. Klargjør asymmetrisk datasettstøy
     has_noise = dataset_noise and noise_key in dataset_noise
-    noise_val = dataset_noise[noise_key]['value'] if has_noise else 1.0
-    noise_type = dataset_noise[noise_key]['type'] if has_noise else 'perc'
+    noise_val = dataset_noise[noise_key]
     
     # 2. Prosesser tekstlinjene fra RAM (hopp over skiprows)
     valid_lines = raw_lines[skiprows:] if len(raw_lines) > skiprows else []
@@ -238,15 +237,7 @@ def load_crltap_emissions_to_N(raw_lines, categories, pollutant, conv_to_N, data
     for year, raw_sum in yearly_raw_sums.items():
         # Grunnverdi etter konverteringsfaktor (f.eks. NH3 -> N)
         base_value = raw_sum * conv_to_N
-        
-        if has_noise:
-            if noise_type == 'perc':
-                value = base_value * noise_val
-            else:
-                bound = dataset_noise[noise_key]['upp_bound'] if noise_val >= 0 else dataset_noise[noise_key]['low_bound']
-                value = base_value + (noise_val * bound)
-        else:
-            value = base_value
+        value = base_value * noise_val
             
         if value < 0:
             value = 0.0
@@ -380,16 +371,8 @@ def process_generic_trade_flow(preloaded_data, current_params, current_trade_fac
         return {}
 
     # --- 1. KORREKT HÅNDTERING AV DATASETT-STØY FOR SSB 08801 ---
-    # Vi sjekker om 'SSB_08801' eller tabellnummeret ligger i dataset_noise
-    dataset_key = '08801'  # <--- SE MERKNAD UNDER: Juster dette navnet så det matcher ID-en i Excel!
-    if dataset_noise and 'SSB_08801' in dataset_noise:
-        dataset_key = 'SSB_08801'
-    elif dataset_noise and '08801' in dataset_noise:
-        dataset_key = '08801'
-        
-    has_noise = dataset_noise and dataset_key in dataset_noise
-    noise_val = dataset_noise[dataset_key]['value'] if has_noise else 1.0
-    unc_type = dataset_noise[dataset_key]['type'] if has_noise else 'perc'
+    dataset_key = '08801' 
+    noise_val = dataset_noise[dataset_key]
     
     # 2. Sørg for at target_types er et sett med små bokstaver
     if isinstance(target_types, (str, int, float)):
@@ -411,15 +394,7 @@ def process_generic_trade_flow(preloaded_data, current_params, current_trade_fac
         v_factors = df_filtered['konv'].astype(str).str.strip().map(current_trade_factors).fillna(0.0)
         
         # 5. Påfør datasett-støy vektorisert (støy på mengde/aktivitetsnivå)
-        if has_noise and unc_type == 'perc':
-            # Prosentvis støy multipliseres direkte inn på mengden
-            df_filtered['perturbed_amount'] = df_filtered['amount'] * noise_val
-        elif has_noise and unc_type == 'abs':
-            # Absolutt støy (siden det er en sammenslått tabell, fordeles absolutt støy flatt pr rad basert på fortegn)
-            bound = dataset_noise[dataset_key]['upp_bound'] if noise_val >= 0 else dataset_noise[dataset_key]['low_bound']
-            df_filtered['perturbed_amount'] = df_filtered['amount'] + (noise_val * bound / len(df_filtered))
-        else:
-            df_filtered['perturbed_amount'] = df_filtered['amount']
+        df_filtered['perturbed_amount'] = df_filtered['amount'] * noise_val
             
         # Sluttberegning: [Mengde med støy] * [N-faktor med støy] / 1e6 (kg -> kt N)
         df_filtered['N_amount'] = df_filtered['perturbed_amount'] * v_factors / 1e6 

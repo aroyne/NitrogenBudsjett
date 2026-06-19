@@ -117,7 +117,7 @@ def _add_seeds_and_planting_material_mc(results, preloaded_data, current_params,
     key_dataset = 'Totalkalkylen'
     if not dataset_noise or key_dataset not in dataset_noise:
         raise KeyError(f"[KRITISK] Støy-nøkkel '{key_dataset}' mangler i dataset_noise for {flow_code}!")
-    noise_totalkalkylen = dataset_noise[key_dataset]['value']
+    noise_totalkalkylen = dataset_noise[key_dataset]
     
     # Ordbok for å akkumulere verdiene per år på tvers av alle fanene
     year_values = {}
@@ -196,9 +196,9 @@ def _add_farm_animal_feed_mc(results, preloaded_data, current_params, dataset_no
     if not dataset_noise or 'Kraftforstatistikk' not in dataset_noise or 'Totalkalkylen' not in dataset_noise:
         raise KeyError(f"[KRITISK] Støy-nøkler mangler i dataset_noise for {flow_code}!")
         
-    noise_kraftfor = dataset_noise['Kraftforstatistikk']['value']
-    noise_totalkalkylen = dataset_noise['Totalkalkylen']['value']
-    noise_trend_interpolation = dataset_noise['trend interpolation']['value']
+    noise_kraftfor = dataset_noise['Kraftforstatistikk']
+    noise_totalkalkylen = dataset_noise['Totalkalkylen']
+    noise_trend_interpolation = dataset_noise['trend interpolation']
     
     final_yearly_values = {}
     
@@ -358,10 +358,7 @@ def _add_food_industry_wastewater_mc(results, preloaded_data, current_params, da
     if not dataset_noise or key_støy not in dataset_noise:
         raise KeyError(f"[KRITISK USIKKERHETSFEIL] Støy-nøkkel '{key_støy}' mangler i dataset_noise for {flow_code}!")
         
-    if dataset_noise[key_støy]['type'] != 'perc':
-        raise ValueError(f"[KRITISK KONFIGURASJONSFEIL] {flow_code} krever støytype 'perc'!")
-        
-    noise_factor = float(dataset_noise[key_støy]['value'])
+    noise_factor = float(dataset_noise[key_støy])
 
     # --- 4. PROSESSER OG FILTRER DATA I RAM ---
     emissions = df_emissions_raw[df_emissions_raw['Komponent'] == 'nitrogen, totalt']
@@ -421,11 +418,11 @@ def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise
         missing = [k for k in required_noise if not dataset_noise or k not in dataset_noise]
         raise KeyError(f"[KRITISK] Mangler støy-nøkler for matvarer: {missing}")
         
-    noise_13695 = float(dataset_noise['13695']['value'])
-    noise_10249 = float(dataset_noise['10249']['value'])
-    noise_06376 = float(dataset_noise['06376']['value'])
-    noise_pop = float(dataset_noise['06913']['value'])
-    noise_trend = float(dataset_noise['trend interpolation']['value'])
+    noise_13695 = float(dataset_noise['13695'])
+    noise_10249 = float(dataset_noise['10249'])
+    noise_06376 = float(dataset_noise['06376'])
+    noise_pop = float(dataset_noise['06913'])
+    noise_trend = float(dataset_noise['trend interpolation'])
 
     # 3. Hent datarammer fra preloaded_data
     df_13695 = preloaded_data.get('ssb_13695')
@@ -633,10 +630,7 @@ def _add_fp_untreated_wastewater_mc(results, preloaded_data, current_params, dat
     if not dataset_noise or key_støy not in dataset_noise:
         raise KeyError(f"[KRITISK USIKKERHETSFEIL] Støy-nøkkel '{key_støy}' mangler i dataset_noise for {flow_code}!")
         
-    if dataset_noise[key_støy]['type'] != 'perc':
-        raise ValueError(f"[KRITISK KONFIGURASJONSFEIL] {flow_code} krever støytype 'perc'!")
-        
-    noise_factor = float(dataset_noise[key_støy]['value'])
+    noise_factor = float(dataset_noise[key_støy])
 
     # --- 4. PROSESSER OG FILTRER DATA I RAM ---
     emissions = df_emissions_raw[df_emissions_raw['Komponent'] == 'nitrogen, totalt']
@@ -817,7 +811,7 @@ def _add_ag_mineral_fertilizer_mc(results, preloaded_data, current_params, datas
     if 'Fertilizer by nutrient' not in dataset_noise:
         raise KeyError(f"[KRITISK USIKKERHETSFEIL] Fant ikke støyfaktoren 'Fertilizer by nutrient' i dataset_noise for {flow_code}!")
     
-    noise_factor = float(dataset_noise['Fertilizer by nutrient']['value'])
+    noise_factor = float(dataset_noise['Fertilizer by nutrient'])
 
     # --- 3. DEFINER GYLDIG TIDSROM BASERT PÅ KILDEDATA (Stopper i 2023) ---
     available_use_years = set(data_use['Year'].unique())
@@ -921,7 +915,7 @@ def _add_other_industry_waste_mc(results, preloaded_data, current_params, datase
         raise ValueError(f"[KRITISK] Datatabeller mangler i preloaded_data for {flow_code}!")
         
     # 2. Kjør kjerneberegningen
-    industry_waste, industry_waste_unc = find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params, dataset_noise)    
+    industry_waste = find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params, dataset_noise)    
     
     # 3. Pakk ut til resultater og akkumuler i OP_out matrix
     for year, value in industry_waste.items():
@@ -929,18 +923,13 @@ def _add_other_industry_waste_mc(results, preloaded_data, current_params, datase
             collected_years.add(year)   
             
             comment = 'extrapolated' if year < 1995 else 'ok'
-                            
-            # Finn usikkerhets-metadata hvis tilgjengelig, ellers 0.0
-            støy_nøkkel = '05282' if year < 2012 else '10514'
-            low_bound = dataset_noise.get(støy_nøkkel, {}).get('low_bound', 0.0)
-            
+                                        
             results.append({
                 'flow_name': flow_code,
                 'year': int(year),
                 'value': max(0.0, value),
                 'comment': comment,
                 'data_sources': data_sources,
-                'uncertainty': low_bound        
             })
             
     missing_years = EXPECTED_YEARS - collected_years
@@ -971,10 +960,7 @@ def _add_other_industry_wastewater_mc(results, preloaded_data, current_params, d
     if not dataset_noise or key_støy not in dataset_noise:
         raise KeyError(f"[KRITISK USIKKERHETSFEIL] Støy-nøkkel '{key_støy}' mangler i dataset_noise for {flow_code}!")
         
-    if dataset_noise[key_støy]['type'] != 'perc':
-        raise ValueError(f"[KRISK KONFIGURASJONSFEIL] {flow_code} krever støytype 'perc'!")
-        
-    noise_factor = float(dataset_noise[key_støy]['value'])
+    noise_factor = float(dataset_noise[key_støy])
 
     # --- 4. PROSESSER OG FILTRER DATA I RAM ---
     emissions = df_emissions_raw[df_emissions_raw['Komponent'] == 'nitrogen, totalt']
@@ -1035,11 +1021,7 @@ def _add_hs_mineral_fertilizer_mc(results, preloaded_data, current_params, datas
     if not dataset_noise or key_støy not in dataset_noise:
         raise KeyError(f"[KRITISK USIKKERHETSFEIL] Støy-nøkkel '{key_støy}' mangler i dataset_noise for {flow_code}!")
         
-    støy_type = dataset_noise[key_støy]['type']
-    if støy_type != 'perc':
-        raise ValueError(f"[KRITISK KONFIGURASJONSFEIL] {flow_code} krever støytype 'perc', men fant '{støy_type}'!")
-        
-    noise_factor = float(dataset_noise[key_støy]['value'])
+    noise_factor = float(dataset_noise[key_støy])
     
     # --- 3. HENT FERDIG INNLASTET FAOSTAT-DATA ---
     df_faostat = preloaded_data.get('faostat_fertilizer_use')
@@ -1099,17 +1081,14 @@ def _add_fo_mineral_fertilizer_mc(results, preloaded_data, current_params, datas
         missing = [k for k in required_noise if not dataset_noise or k not in dataset_noise]
         raise KeyError(f"[KRITISK] Mangler støy-nøkler for skoggjødsling: {missing}")
         
-    noise_ssb = float(dataset_noise['05543']['value'])
-    noise_trend = float(dataset_noise['trend interpolation']['value'])
-    noise_hist = float(dataset_noise.get('skoggjødsling_historisk', dataset_noise['05543'])['value'])
+    noise_ssb = float(dataset_noise['05543'])
+    noise_trend = float(dataset_noise['trend interpolation'])
+    noise_hist = float(dataset_noise['skoggjødsling_historisk'])
 
     # --- 3. HENT DATAFRAMES FRA PRELOADED_DATA ---
     df_ssb_new = preloaded_data.get('ssb_05543_raw')
     df_hist = preloaded_data.get('skoggjoedsling_foer_1995_raw')
     
-    if df_ssb_new is None or df_hist is None:
-        raise ValueError(f"[KRITISK] Datatabeller ('ssb_05543_raw' / 'skoggjoedsling_foer_1995_raw') mangler i preloaded_data!")
-
     # --- 4. PROSESSER NYERE DATA (SSB Tabell 05543) ---
     # Starter fra rad 3 basert på diagnostikkutskriften din
     for idx in range(3, len(df_ssb_new)):
@@ -1309,8 +1288,8 @@ def _add_op_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
     if not dataset_noise or key_n2o not in dataset_noise:
         raise KeyError(f"[KRITISK] Støy-nøkkel '{key_n2o}' mangler i dataset_noise for {flow_code}!")
     
-    noise_val = dataset_noise[key_n2o]['value']
-    noise_type = dataset_noise[key_n2o]['type']
+    noise_val = dataset_noise[key_n2o]
+    noise_type = dataset_noise[key_n2o]
 
     # 3. Hent ferdiglastet DataFrame fra RAM
     df_op_emissions = preloaded_data.get('n2o_nox_op_raw')
@@ -1336,11 +1315,7 @@ def _add_op_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
             base_value = float(n2o_val) * conv_N2O
 
             # Påfør støyen matematisk korrekt basert på støytype (Prosent eller Grenseverdi)
-            if noise_type == 'perc':
-                value = base_value * noise_val
-            else:
-                bound = dataset_noise[key_n2o]['upp_bound'] if noise_val >= 0 else dataset_noise[key_n2o]['low_bound']
-                value = base_value + (noise_val * bound)
+            value = base_value * noise_val
 
             # Sikre at fysiske utslipp aldri blir negative tall på grunn av støytrekk
             if value < 0: 
@@ -1386,10 +1361,7 @@ def _add_op_untreated_wastewater_mc(results, preloaded_data, current_params, dat
     if not dataset_noise or key_støy not in dataset_noise:
         raise KeyError(f"[KRITISK USIKKERHETSFEIL] Støy-nøkkel '{key_støy}' mangler i dataset_noise for {flow_code}!")
         
-    if dataset_noise[key_støy]['type'] != 'perc':
-        raise ValueError(f"[KRITISK KONFIGURASJONSFEIL] {flow_code} krever støytype 'perc'!")
-        
-    noise_factor = float(dataset_noise[key_støy]['value'])
+    noise_factor = float(dataset_noise[key_støy])
 
     # --- 4. PROSESSER OG FILTRER DATA I RAM ---
     emissions = df_emissions_raw[df_emissions_raw['Komponent'] == 'nitrogen, totalt']
@@ -1441,8 +1413,7 @@ def _add_mineral_fertilizer_export_mc(results, preloaded_data, current_params, d
     if not dataset_noise or key_gjødsel not in dataset_noise:
         raise KeyError(f"[KRITISK] Støy-nøkkel '{key_gjødsel}' mangler i dataset_noise for {flow_code}!")
     
-    noise_val = dataset_noise[key_gjødsel]['value']
-    noise_type = dataset_noise[key_gjødsel]['type']
+    noise_val = dataset_noise[key_gjødsel]
 
     # 2. Hent ferdiglastet DataFrame fra RAM med din eksisterende nøkkel
     df_faostat = preloaded_data.get('fao_mineral_fertilizer')
@@ -1473,11 +1444,7 @@ def _add_mineral_fertilizer_export_mc(results, preloaded_data, current_params, d
             base_value = fao_dict[year] / 1000.0
 
             # Påfør støyen matematisk korrekt basert på støytype
-            if noise_type == 'perc':
-                value = base_value * noise_val
-            else:
-                bound = dataset_noise[key_gjødsel]['upp_bound'] if noise_val >= 0 else dataset_noise[key_gjødsel]['low_bound']
-                value = base_value + (noise_val * bound)
+            value = base_value * noise_val
 
             # Sikre mot urealistiske negative eksportverdier etter støy
             if value < 0:

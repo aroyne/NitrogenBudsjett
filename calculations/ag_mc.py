@@ -83,17 +83,10 @@ def _add_food_crop_products_flow_mc(results, preloaded_data, current_params, dat
 
     # 2. Slå opp ferdig generert støy – krasj hvis nøklene mangler
     dataset_key = 'Gross nutrient balance'
-    if not dataset_noise or dataset_key not in dataset_noise:
-        raise KeyError(f"[KRITISK] Støy-nøkkel '{dataset_key}' mangler i dataset_noise for {flow_code}!")
-        
-    noise_val = dataset_noise[dataset_key]['value']
-    noise_type = dataset_noise[dataset_key]['type']
+    noise_val = dataset_noise[dataset_key]
 
     key_interp = 'trend interpolation'
-    if key_interp not in dataset_noise:
-        raise KeyError(f"[KRITISK] Støy-nøkkel '{key_interp}' mangler i dataset_noise for {flow_code}!")
-    noise_interp_val = dataset_noise[key_interp]['value']
-    noise_interp_type = dataset_noise[key_interp]['type']
+    noise_interp_val = dataset_noise[key_interp]
 
     # --- Sheet 26: total crops ---
     sheet_26 = workbook['Sheet 26']  # nutrient removal by harvest of crops
@@ -130,11 +123,7 @@ def _add_food_crop_products_flow_mc(results, preloaded_data, current_params, dat
         collected_years.add(year)
         
         # Påfør støyen matematisk korrekt basert på støytype
-        if noise_type == 'perc':
-            value = total_value * noise_val
-        else:
-            bound = dataset_noise[dataset_key]['upp_bound'] if noise_val >= 0 else dataset_noise[dataset_key]['low_bound']
-            value = total_value + (noise_val * bound)
+        value = total_value * noise_val
         if value < 0: 
             value = 0.0
 
@@ -161,18 +150,10 @@ def _add_food_crop_products_flow_mc(results, preloaded_data, current_params, dat
             base_interp_val = value_2016 + (value_2020 - value_2016) / 4.0 * (year - 2016)
             
             # Påfør først den generelle GNB-støyen
-            if noise_type == 'perc':
-                val_with_gnb = base_interp_val * noise_val
-            else:
-                bound_gnb = dataset_noise[dataset_key]['upp_bound'] if noise_val >= 0 else dataset_noise[dataset_key]['low_bound']
-                val_with_gnb = base_interp_val + (noise_val * bound_gnb)
+            val_with_gnb = base_interp_val * noise_val
 
             # Påfør deretter trend/interpolasjonsstøy harmonisert
-            if noise_interp_type == 'perc':
-                value = val_with_gnb * noise_interp_val
-            else:
-                bound_interp = dataset_noise[key_interp]['upp_bound'] if noise_interp_val >= 0 else dataset_noise[key_interp]['low_bound']
-                value = val_with_gnb + (noise_interp_val * bound_interp)
+            value = val_with_gnb * noise_interp_val
 
             if value < 0: 
                 value = 0.0
@@ -248,16 +229,10 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
 
     # 2. Hent og valider datasettstøy for SSB-kildene – krasj hvis nøkler mangler
     key_13648 = '13648'
-    if not dataset_noise or key_13648 not in dataset_noise:
-        raise KeyError(f"[KRITISK] Støy-nøkkel '{key_13648}' mangler i dataset_noise for {flow_code}!")
-    noise_13648_val = dataset_noise[key_13648]['value']
-    noise_13648_type = dataset_noise[key_13648]['type']
+    noise_13648_val = dataset_noise[key_13648]
 
     key_05772 = '05772'
-    if not dataset_noise or key_05772 not in dataset_noise:
-        raise KeyError(f"[KRITISK] Støy-nøkkel '{key_05772}' mangler i dataset_noise for {flow_code}!")
-    noise_05772_val = dataset_noise[key_05772]['value']
-    noise_05772_type = dataset_noise[key_05772]['type']
+    noise_05772_val = dataset_noise[key_05772]
 
     # 3. Hent og valider at alle rådata-filer eksisterer i RAM
     df_13648 = preloaded_data.get('ssb_13648_raw')
@@ -288,12 +263,7 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
             
             base_value = (float(val5) + float(val6)) * N_content
             
-            if noise_13648_type == 'perc':
-                value = base_value * noise_13648_val
-            else:
-                bound = dataset_noise[key_13648]['upp_bound'] if noise_13648_val >= 0 else dataset_noise[key_13648]['low_bound']
-                value = base_value + (noise_13648_val * bound)
-            
+            value = base_value * noise_13648_val
             if value < 0: value = 0.0
             
             results.append({
@@ -318,11 +288,7 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
             
             base_value = (float(val4) + float(val5)) * N_content
             
-            if noise_05772_type == 'perc':
-                value = base_value * noise_05772_val
-            else:
-                bound = dataset_noise[key_05772]['upp_bound'] if noise_05772_val >= 0 else dataset_noise[key_05772]['low_bound']
-                value = base_value + (noise_05772_val * bound)
+            value = base_value * noise_05772_val
             
             if value < 0: value = 0.0
             
@@ -349,12 +315,7 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
             base_value = (float(val2) + float(val3)) * N_content
             
             # Bruker samme støykonfigurasjon for historisk data som for 05772
-            if noise_05772_type == 'perc':
-                value = base_value * noise_05772_val
-            else:
-                bound = dataset_noise[key_05772]['upp_bound'] if noise_05772_val >= 0 else dataset_noise[key_05772]['low_bound']
-                value = base_value + (noise_05772_val * bound)
-            
+            value = base_value * noise_05772_val
             if value < 0: value = 0.0
             
             results.append({
@@ -481,8 +442,8 @@ def _add_N2O_emissions_soil_management_mc(results, preloaded_data, current_param
     if not dataset_noise or key_n2o not in dataset_noise:
         raise KeyError(f"[KRITISK] Støy-nøkkel '{key_n2o}' mangler i dataset_noise for {flow_code}!")
     
-    noise_val = dataset_noise[key_n2o]['value']
-    noise_type = dataset_noise[key_n2o]['type']
+    noise_val = dataset_noise[key_n2o]
+    noise_type = dataset_noise[key_n2o]
 
     # 3. Hent ferdiglastet DataFrame fra RAM – krasj hardt hvis den mangler
     df_unfccc = preloaded_data.get('unfccc_ark1_raw')
@@ -501,14 +462,7 @@ def _add_N2O_emissions_soil_management_mc(results, preloaded_data, current_param
             collected_years.add(year)
 
             base_value = float(ton_val) * conv_N2O
-
-            # Påfør støyen matematisk korrekt basert på støytype
-            if noise_type == 'perc':
-                value = base_value * noise_val
-            else:
-                # Absolutt støy bruker grensene trukket fra den asymmetriske distribusjonen
-                bound = dataset_noise[key_n2o]['upp_bound'] if noise_val >= 0 else dataset_noise[key_n2o]['low_bound']
-                value = base_value + (noise_val * bound)
+            value = base_value * noise_val
 
             if value < 0: 
                 value = 0.0
@@ -541,8 +495,7 @@ def _add_leaching_soil_management_mc(results, preloaded_data, current_params, da
     if not dataset_noise or key_leach not in dataset_noise:
         raise KeyError(f"[KRITISK] Støy-nøkkel '{key_leach}' mangler i dataset_noise for {flow_code}!")
         
-    noise_val = dataset_noise[key_leach]['value']
-    noise_type = dataset_noise[key_leach]['type']
+    noise_val = dataset_noise[key_leach]
 
     # 2. Hent ferdiglastet DataFrame fra RAM – krasj hardt hvis den mangler
     df_leaching = preloaded_data.get('ag_leaching_csv')
@@ -560,14 +513,7 @@ def _add_leaching_soil_management_mc(results, preloaded_data, current_params, da
         collected_years.add(year)
         
         base_value = float(values_sm[i])
-
-        # Påfør asymmetrisk støy matematisk korrekt ut fra støytype
-        if noise_type == 'perc':
-            value = base_value * noise_val
-        else:
-            # Absolutt støy bruker grensene trukket fra den asymmetriske distribusjonen
-            bound = dataset_noise[key_leach]['upp_bound'] if noise_val >= 0 else dataset_noise[key_leach]['low_bound']
-            value = base_value + (noise_val * bound)
+        value = base_value * noise_val
 
         if value < 0: 
             value = 0.0
@@ -601,8 +547,7 @@ def _add_leaching_manure_management_mc(results, preloaded_data, current_params, 
     if not dataset_noise or key_leach not in dataset_noise:
         raise KeyError(f"[KRITISK] Støy-nøkkel '{key_leach}' mangler i dataset_noise for {flow_code}!")
         
-    noise_val = dataset_noise[key_leach]['value']
-    noise_type = dataset_noise[key_leach]['type']
+    noise_val = dataset_noise[key_leach]
 
     # 2. Hent ferdiglastet DataFrame fra RAM – krasj hardt hvis den mangler
     df_leaching = preloaded_data.get('ag_leaching_csv')
@@ -620,14 +565,7 @@ def _add_leaching_manure_management_mc(results, preloaded_data, current_params, 
         collected_years.add(year)
         
         base_value = float(values_mm[i])
-
-        # Påfør asymmetrisk støy matematisk korrekt ut fra støytype
-        if noise_type == 'perc':
-            value = base_value * noise_val
-        else:
-            # Absolutt støy bruker grensene trukket fra den asymmetriske distribusjonen
-            bound = dataset_noise[key_leach]['upp_bound'] if noise_val >= 0 else dataset_noise[key_leach]['low_bound']
-            value = base_value + (noise_val * bound)
+        value = base_value * noise_val
 
         if value < 0: 
             value = 0.0
@@ -668,8 +606,7 @@ def _add_animal_products_flow_mc(results, preloaded_data, current_params, datase
     if not dataset_noise or key_fao not in dataset_noise:
         raise KeyError(f"[KRITISK] Støy-nøkkel '{key_fao}' mangler i dataset_noise for {flow_code}!")
         
-    noise_val = dataset_noise[key_fao]['value']
-    noise_type = dataset_noise[key_fao]['type']
+    noise_val = dataset_noise[key_fao]
     
     # 3. Slå opp den flate, perturberte N-prosenten (Krasjer hardt ved manglende data)
     def get_perturbed_product_frac(item_name):
@@ -698,13 +635,7 @@ def _add_animal_products_flow_mc(results, preloaded_data, current_params, datase
         if year in total_N_per_year:
             collected_years.add(year)
             base_value = float(total_N_per_year[year])
-            
-            # Påfør asymmetrisk datasettstøy basert på støytype
-            if noise_type == 'perc':
-                value = base_value * noise_val
-            else:
-                bound = dataset_noise[key_fao]['upp_bound'] if noise_val >= 0 else dataset_noise[key_fao]['low_bound']
-                value = base_value + (noise_val * bound)
+            value = base_value * noise_val
 
             if value < 0: 
                 value = 0.0
@@ -797,16 +728,10 @@ def _add_manure_application_flow_mc(results, preloaded_data, current_params, dat
 
     # 2. Hent ut asymmetrisk datasettstøy – krasj hvis nøkler mangler
     key_gnb = 'Gross nutrient balance'
-    if not dataset_noise or key_gnb not in dataset_noise:
-        raise KeyError(f"[KRITISK] Støy-nøkkel '{key_gnb}' mangler i dataset_noise for {flow_code}!")
-    noise_gnb_val = dataset_noise[key_gnb]['value']
-    noise_gnb_type = dataset_noise[key_gnb]['type']
+    noise_gnb_val = dataset_noise[key_gnb]
 
     key_interp = 'trend interpolation'
-    if key_interp not in dataset_noise:
-        raise KeyError(f"[KRITISK] Støy-nøkkel '{key_interp}' mangler i dataset_noise for {flow_code}!")
-    noise_interp_val = dataset_noise[key_interp]['value']
-    noise_interp_type = dataset_noise[key_interp]['type']
+    noise_interp_val = dataset_noise[key_interp]
 
     # 3. Rekonstruer tabelloppslag (Sheet 12)
     year_row_idx = 8
@@ -846,12 +771,7 @@ def _add_manure_application_flow_mc(results, preloaded_data, current_params, dat
         elif year == 2020:
             value_2020 = base_value
 
-        # Påfør asymmetrisk datasettstøy for rapporterte data
-        if noise_gnb_type == 'perc':
-            value = base_value * noise_gnb_val
-        else:
-            bound = dataset_noise[key_gnb]['upp_bound'] if noise_gnb_val >= 0 else dataset_noise[key_gnb]['low_bound']
-            value = base_value + (noise_gnb_val * bound)
+        value = base_value * noise_gnb_val
 
         if value < 0: 
             value = 0.0
@@ -879,20 +799,8 @@ def _add_manure_application_flow_mc(results, preloaded_data, current_params, dat
             
             # Lineær interpolasjon på basistallene
             base_interp_val = value_2016 + (value_2020 - value_2016) / 4.0 * (year - 2016)
-            
-            # Påfør først GNB-støy
-            if noise_gnb_type == 'perc':
-                val_with_gnb = base_interp_val * noise_gnb_val
-            else:
-                bound_gnb = dataset_noise[key_gnb]['upp_bound'] if noise_gnb_val >= 0 else dataset_noise[key_gnb]['low_bound']
-                val_with_gnb = base_interp_val + (noise_gnb_val * bound_gnb)
-
-            # Påfør deretter trend/interpolasjonsstøy harmonisert
-            if noise_interp_type == 'perc':
-                value = val_with_gnb * noise_interp_val
-            else:
-                bound_interp = dataset_noise[key_interp]['upp_bound'] if noise_interp_val >= 0 else dataset_noise[key_interp]['low_bound']
-                value = val_with_gnb + (noise_interp_val * bound_interp)
+            val_with_gnb = base_interp_val * noise_gnb_val
+            value = val_with_gnb * noise_interp_val
 
             if value < 0: 
                 value = 0.0
@@ -1022,8 +930,7 @@ def _add_N2O_emissions_manure_management_mc(results, preloaded_data, current_par
     if not dataset_noise or key_n2o not in dataset_noise:
         raise KeyError(f"[KRITISK] Støy-nøkkel '{key_n2o}' mangler i dataset_noise for {flow_code}!")
     
-    noise_val = dataset_noise[key_n2o]['value']
-    noise_type = dataset_noise[key_n2o]['type']
+    noise_val = dataset_noise[key_n2o]
 
     # 3. Hent ferdiglastet DataFrame fra RAM – krasj hardt hvis den mangler
     df_unfccc = preloaded_data.get('unfccc_ark1_raw')
@@ -1042,13 +949,7 @@ def _add_N2O_emissions_manure_management_mc(results, preloaded_data, current_par
             collected_years.add(year)
 
             base_value = float(ton_val) * conv_N2O
-
-            # Påfør støyen matematisk korrekt basert på støytype
-            if noise_type == 'perc':
-                value = base_value * noise_val
-            else:
-                bound = dataset_noise[key_n2o]['upp_bound'] if noise_val >= 0 else dataset_noise[key_n2o]['low_bound']
-                value = base_value + (noise_val * bound)
+            value = base_value * noise_val
 
             if value < 0: 
                 value = 0.0
@@ -1090,18 +991,10 @@ def _add_live_animal_export_mc(results, preloaded_data, current_params, dataset_
     if not dataset_noise or key_fao not in dataset_noise:
         raise KeyError(f"[KRITISK] Støy-nøkkel '{key_fao}' mangler i dataset_noise for {flow_code}!")
         
-    noise_fao_val = dataset_noise[key_fao]['value']
-    noise_fao_type = dataset_noise[key_fao]['type']
+    noise_fao_val = dataset_noise[key_fao]
 
     df_round = final_data.copy()
-    
-    # Påfør asymmetrisk støy på kildedataene basert på støytype
-    if noise_fao_type == 'perc':
-        df_round['perturbed_value'] = df_round['Value'] * noise_fao_val
-    else:
-        # Absolutt støy (bruker asymmetriske grenser trukket sentralt)
-        bound = dataset_noise[key_fao]['upp_bound'] if noise_fao_val >= 0 else dataset_noise[key_fao]['low_bound']
-        df_round['perturbed_value'] = df_round['Value'] + (noise_fao_val * bound)
+    df_round['perturbed_value'] = df_round['Value'] * noise_fao_val
 
     # 4. Hjelpefunksjon for å hente de ferdig perturberte enkeltvektene per dyretype
     def get_perturbed_weight(item_name):

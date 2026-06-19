@@ -57,26 +57,6 @@ def execute_calculations_ef(preloaded_data, current_params, dataset_noise, curre
     return results
 
 
-def _apply_dataset_noise(base_value, dataset_key, dataset_noise, caller_func):
-    """
-    Legger støy på verdi. Krasjer hardt med en KeyError dersom støy-nøkkel mangler.
-    """
-    if not dataset_noise or dataset_key not in dataset_noise:
-        raise KeyError(
-            f"[KRITISK FEIL] Støy-nøkkel '{dataset_key}' mangler i dataset_noise under kallet fra {caller_func.__name__}! "
-            f"Kan ikke kjøre usikkerhetsanalyse deterministisk."
-        )
-
-    noise_info = dataset_noise[dataset_key]
-    noise_val = noise_info['value']
-    
-    if noise_info['type'] == 'perc':
-        return base_value * noise_val
-    else:
-        bound = noise_info['upp_bound'] if noise_val >= 0 else noise_info['low_bound']
-        return base_value + (noise_val * bound)
-
-
 def _add_fuel_for_industry_mc(results, preloaded_data, dataset_noise):
     flow_code = 'EF.EC-EF.IC-Fuel for industry-Nmix'
     collected_years = set()
@@ -90,8 +70,9 @@ def _add_fuel_for_industry_mc(results, preloaded_data, dataset_noise):
         year = int(row['year'])
         collected_years.add(year)
         raw_val = float(row['value'])
-        
-        value = _apply_dataset_noise(raw_val, dataset_key, dataset_noise, _add_fuel_for_industry_mc)
+        noise_val = dataset_noise[dataset_key]
+        value = raw_val * noise_val
+
         if value < 0: value = 0.0
         
         results.append({
@@ -115,8 +96,8 @@ def _add_fuel_for_transport_mc(results, preloaded_data, dataset_noise):
         year = int(row['year'])
         collected_years.add(year)
         raw_val = float(row['value'])
-        
-        value = _apply_dataset_noise(raw_val, dataset_key, dataset_noise, _add_fuel_for_transport_mc)
+        noise_val = dataset_noise[dataset_key]
+        value = raw_val * noise_val
         if value < 0: value = 0.0
         
         results.append({
@@ -139,8 +120,8 @@ def _add_fuel_for_heating_mc(results, preloaded_data, dataset_noise):
         year = int(row['year'])
         collected_years.add(year)
         raw_val = float(row['value'])
-        
-        value = _apply_dataset_noise(raw_val, dataset_key, dataset_noise, _add_fuel_for_heating_mc)
+        noise_val = dataset_noise[dataset_key]
+        value = raw_val * noise_val
         if value < 0: value = 0.0
         
         results.append({
@@ -185,11 +166,12 @@ def _add_ec_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
         conv, 
         dataset_noise
     )
+    noise_val = dataset_noise[dataset_key]
     
     for year, val in sums.items():
         year = int(year)
         collected_years.add(year)
-        value = _apply_dataset_noise(float(val), dataset_key, dataset_noise, _add_ec_NOx_emissions_mc)
+        value = float(val) * noise_val
         if value < 0: value = 0.0
         
         results.append({
@@ -207,13 +189,14 @@ def _add_ec_N2O_emissions_mc(results, preloaded_data, dataset_noise):
     df = preloaded_data.get('n2o_ec_data')
     if df is None:
         raise ValueError(f"[KRITISK] Data 'n2o_ec_data' mangler i preloaded_data for {flow_code}!")
+        
+    noise_val = dataset_noise[dataset_key]
 
     for _, row in df.iterrows():
         year = int(row['year'])
         collected_years.add(year)
-        raw_val = float(row['value_EC'])
-        
-        value = _apply_dataset_noise(raw_val, dataset_key, dataset_noise, _add_ec_N2O_emissions_mc)
+        raw_val = float(row['value_EC'])        
+        value = raw_val * noise_val
         if value < 0: value = 0.0
         
         results.append({
@@ -251,7 +234,6 @@ def _add_fuel_export_mc(results, preloaded_data, current_params, current_trade_f
 def _add_ic_NH3_emissions_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'EF.IC-AT.AT-Emissions-NH3'
     collected_years = set()
-    dataset_key = 'CRLTAP'
     
     conv = float(current_params.get("NH3_to_N_factor"))
     crltap_data = preloaded_data.get('ag_crltap_raw_lines')
@@ -266,10 +248,9 @@ def _add_ic_NH3_emissions_mc(results, preloaded_data, current_params, dataset_no
         dataset_noise
     )
     
-    for year, val in sums.items():
+    for year, value in sums.items():
         year = int(year)
         collected_years.add(year)
-        value = _apply_dataset_noise(float(val), dataset_key, dataset_noise, _add_ic_NH3_emissions_mc)
         if value < 0: value = 0.0
         
         results.append({
@@ -282,7 +263,6 @@ def _add_ic_NH3_emissions_mc(results, preloaded_data, current_params, dataset_no
 def _add_ic_NOx_emissions_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'EF.IC-AT.AT-Emissions-NOx'
     collected_years = set()
-    dataset_key = 'CRLTAP'
     
     conv = float(current_params.get("NOx_to_N_factor"))
     crltap_data = preloaded_data.get('ag_crltap_raw_lines')
@@ -297,10 +277,9 @@ def _add_ic_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
         dataset_noise
     )
     
-    for year, val in sums.items():
+    for year, value in sums.items():
         year = int(year)
         collected_years.add(year)
-        value = _apply_dataset_noise(float(val), dataset_key, dataset_noise, _add_ic_NOx_emissions_mc)
         if value < 0: value = 0.0
         
         results.append({
@@ -318,13 +297,12 @@ def _add_ic_N2O_emissions_mc(results, preloaded_data, dataset_noise):
     df = preloaded_data.get('n2o_ec_data')
     if df is None:
         raise ValueError(f"[KRITISK] Data 'n2o_ec_data' mangler i preloaded_data for {flow_code}!")
-
+    noise_val = dataset_noise[dataset_key]
     for _, row in df.iterrows():
         year = int(row['year'])
         collected_years.add(year)
         raw_val = float(row['value_IC'])
-        
-        value = _apply_dataset_noise(raw_val, dataset_key, dataset_noise, _add_ic_N2O_emissions_mc)
+        value = raw_val * noise_val
         if value < 0: value = 0.0
         
         results.append({
@@ -337,7 +315,6 @@ def _add_ic_N2O_emissions_mc(results, preloaded_data, dataset_noise):
 def _add_tr_NH3_emissions_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'EF.TR-AT.AT-Emissions-NH3'
     collected_years = set()
-    dataset_key = 'CRLTAP'
     
     conv = float(current_params.get("NH3_to_N_factor"))
     crltap_data = preloaded_data.get('ag_crltap_raw_lines')
@@ -352,10 +329,9 @@ def _add_tr_NH3_emissions_mc(results, preloaded_data, current_params, dataset_no
         dataset_noise
     )
     
-    for year, val in sums.items():
+    for year, value in sums.items():
         year = int(year)
         collected_years.add(year)
-        value = _apply_dataset_noise(float(val), dataset_key, dataset_noise, _add_tr_NH3_emissions_mc)
         if value < 0: value = 0.0
         
         results.append({
@@ -368,7 +344,6 @@ def _add_tr_NH3_emissions_mc(results, preloaded_data, current_params, dataset_no
 def _add_tr_NOx_emissions_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'EF.TR-AT.AT-Emissions-NOx'
     collected_years = set()
-    dataset_key = 'CRLTAP'
     
     conv = float(current_params.get("NOx_to_N_factor"))
     crltap_data = preloaded_data.get('ag_crltap_raw_lines')
@@ -383,10 +358,9 @@ def _add_tr_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
         dataset_noise
     )
     
-    for year, val in sums.items():
+    for year, value in sums.items():
         year = int(year)
         collected_years.add(year)
-        value = _apply_dataset_noise(float(val), dataset_key, dataset_noise, _add_tr_NOx_emissions_mc)
         if value < 0: value = 0.0
         
         results.append({
@@ -402,6 +376,8 @@ def _add_tr_N2O_emissions_mc(results, preloaded_data, dataset_noise):
     dataset_key = 'UNFCCC_emissions'
     
     df = preloaded_data.get('n2o_ec_data')
+    
+    noise_val = dataset_noise[dataset_key]
     if df is None:
         raise ValueError(f"[KRITISK] Data 'n2o_ec_data' mangler i preloaded_data for {flow_code}!")
 
@@ -409,8 +385,7 @@ def _add_tr_N2O_emissions_mc(results, preloaded_data, dataset_noise):
         year = int(row['year'])
         collected_years.add(year)
         raw_val = float(row['value_TR'])
-        
-        value = _apply_dataset_noise(raw_val, dataset_key, dataset_noise, _add_tr_N2O_emissions_mc)
+        value = raw_val*noise_val
         if value < 0: value = 0.0
         
         results.append({
@@ -448,7 +423,6 @@ def _add_export_of_transport_fuels_mc(results, preloaded_data, current_params, c
 def _add_oe_NH3_emissions_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'EF.OE-AT.AT-Emissions-NH3'
     collected_years = set()
-    dataset_key = 'CRLTAP'
     
     conv = float(current_params.get("NH3_to_N_factor"))
     crltap_data = preloaded_data.get('ag_crltap_raw_lines')
@@ -463,10 +437,9 @@ def _add_oe_NH3_emissions_mc(results, preloaded_data, current_params, dataset_no
         dataset_noise
     )
     
-    for year, val in sums.items():
+    for year, value in sums.items():
         year = int(year)
         collected_years.add(year)
-        value = _apply_dataset_noise(float(val), dataset_key, dataset_noise, _add_oe_NH3_emissions_mc)
         if value < 0: value = 0.0
         
         results.append({
@@ -479,7 +452,6 @@ def _add_oe_NH3_emissions_mc(results, preloaded_data, current_params, dataset_no
 def _add_oe_NOx_emissions_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'EF.OE-AT.AT-Emissions-NOx'
     collected_years = set()
-    dataset_key = 'CRLTAP'
     
     conv = float(current_params.get("NOx_to_N_factor"))
     crltap_data = preloaded_data.get('ag_crltap_raw_lines')
@@ -494,10 +466,9 @@ def _add_oe_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
         dataset_noise
     )
     
-    for year, val in sums.items():
+    for year, value in sums.items():
         year = int(year)
         collected_years.add(year)
-        value = _apply_dataset_noise(float(val), dataset_key, dataset_noise, _add_oe_NOx_emissions_mc)
         if value < 0: value = 0.0
         
         results.append({
@@ -513,6 +484,7 @@ def _add_oe_N2O_emissions_mc(results, preloaded_data, dataset_noise):
     dataset_key = 'UNFCCC_emissions'
     
     df = preloaded_data.get('n2o_ec_data')
+    noise_val = dataset_noise[dataset_key]
     if df is None:
         raise ValueError(f"[KRITISK] Data 'n2o_ec_data' mangler i preloaded_data for {flow_code}!")
 
@@ -520,8 +492,7 @@ def _add_oe_N2O_emissions_mc(results, preloaded_data, dataset_noise):
         year = int(row['year'])
         collected_years.add(year)
         raw_val = float(row['value_OE'])
-        
-        value = _apply_dataset_noise(raw_val, dataset_key, dataset_noise, _add_oe_N2O_emissions_mc)
+        value = raw_val * noise_val
         if value < 0: value = 0.0
         
         results.append({

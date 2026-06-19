@@ -41,14 +41,8 @@ def _apply_dataset_noise(base_value, dataset_key, dataset_noise, caller_func):
             f"[KRITISK FEIL] Støy-nøkkel '{dataset_key}' mangler i dataset_noise under kallet fra {caller_func.__name__}!"
         )
 
-    noise_info = dataset_noise[dataset_key]
-    noise_val = noise_info['value']
-    
-    if noise_info['type'] == 'perc':
-        return base_value * noise_val
-    else:
-        bound = noise_info['upp_bound'] if noise_val >= 0 else noise_info['low_bound']
-        return base_value + (noise_val * bound)
+    noise_val = dataset_noise[dataset_key]
+    return base_value * noise_val
 
 
 def _add_fo_N2O_emissions_mc(results, preloaded_data, current_params, dataset_noise):
@@ -68,7 +62,8 @@ def _add_fo_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
         collected_years.add(year)
         
         raw_val = float(df_unfccc.iloc[row, 3])
-        perturbed_raw = _apply_dataset_noise(raw_val, dataset_key, dataset_noise, _add_fo_N2O_emissions_mc)
+        noise_val = dataset_noise[dataset_key]
+        perturbed_raw = raw_val * noise_val
         
         value = perturbed_raw * N2O_to_N
         if value < 0: value = 0.0
@@ -100,7 +95,8 @@ def _add_fo_N2_emissions_mc(results, preloaded_data, current_params, dataset_noi
         collected_years.add(year)
         
         raw_val = float(df_unfccc.iloc[row, 3])
-        perturbed_raw = _apply_dataset_noise(raw_val, dataset_key, dataset_noise, _add_fo_N2_emissions_mc)
+        noise_val = dataset_noise[dataset_key]
+        perturbed_raw = raw_val * noise_val
         
         value = perturbed_raw * N2O_to_N * ratio
         if value < 0: value = 0.0
@@ -133,7 +129,8 @@ def _add_fo_leaching_mc(results, preloaded_data, current_params, dataset_noise):
         collected_years.add(year)
         
         raw_val = float(df_kyst.iloc[r, 3]) / 1000
-        perturbed_raw = _apply_dataset_noise(raw_val, dataset_key, dataset_noise, _add_fo_leaching_mc)
+        noise_val = dataset_noise[dataset_key]
+        perturbed_raw = raw_val * noise_val
         
         value = perturbed_raw * frac
         if value < 0: value = 0.0
@@ -149,7 +146,8 @@ def _add_fo_leaching_mc(results, preloaded_data, current_params, dataset_noise):
         collected_years.add(year)
         
         raw_val = float(df_teotil3.iloc[r, 10]) / 1000 
-        value = _apply_dataset_noise(raw_val, dataset_key, dataset_noise, _add_fo_leaching_mc)
+        noise_val = dataset_noise[dataset_key]
+        value = raw_val * noise_val
         if value < 0: value = 0.0
 
         results.append({
@@ -194,7 +192,8 @@ def _add_fuel_wood_for_households_mc(results, preloaded_data, current_params, da
         collected_years.add(year)
         
         raw_val = float(df_ved.iloc[r, 1])
-        perturbed_raw = _apply_dataset_noise(raw_val, dataset_key, dataset_noise, _add_fuel_wood_for_households_mc)
+        noise_val = dataset_noise[dataset_key]
+        perturbed_raw = raw_val * noise_val
         
         value = perturbed_raw * N_content 
         if value < 0: value = 0.0
@@ -225,7 +224,8 @@ def _add_ol_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
         collected_years.add(year)
         
         raw_val = float(df_unfccc.iloc[row, 7])
-        perturbed_raw = _apply_dataset_noise(raw_val, dataset_key, dataset_noise, _add_ol_N2O_emissions_mc)
+        noise_val = dataset_noise[dataset_key]
+        perturbed_raw = raw_val * noise_val
         
         value = perturbed_raw * N2O_to_N
         if value < 0: value = 0.0
@@ -257,7 +257,8 @@ def _add_ol_N2_emissions_mc(results, preloaded_data, current_params, dataset_noi
         collected_years.add(year)
         
         raw_val = float(df_unfccc.iloc[row, 7])
-        perturbed_raw = _apply_dataset_noise(raw_val, dataset_key, dataset_noise, _add_ol_N2_emissions_mc)
+        noise_val = dataset_noise[dataset_key]
+        perturbed_raw = raw_val * noise_val
         
         value = perturbed_raw * N2O_to_N * ratio
         if value < 0: value = 0.0
@@ -315,12 +316,14 @@ def _add_ol_leaching_mc(results, preloaded_data, current_params, dataset_noise):
         
         if year in teotil_dict:
             raw_val = teotil_dict[year] / 1000
-            perturbed_raw = _apply_dataset_noise(raw_val, dataset_key, dataset_noise, _add_ol_leaching_mc)
+            noise_val = dataset_noise[dataset_key]
+            perturbed_raw = raw_val * noise_val
             value = perturbed_raw
             
         elif year in kyst_dict:
             raw_val = kyst_dict[year] / 1000
-            perturbed_raw = _apply_dataset_noise(raw_val, dataset_key, dataset_noise, _add_ol_leaching_mc)
+            noise_val = dataset_noise[dataset_key]
+            perturbed_raw = raw_val * noise_val
             value = perturbed_raw * frac
 
         else:
@@ -345,7 +348,7 @@ def _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise):
     collected_years = set()
     data_sources = 'NIBIO'
     dataset_key = 'beitestatistikk'
-    
+    noise_val = dataset_noise[dataset_key]
     Jones = float(current_params.get("Jones_factor"))
     
     fu_sheep_1996 = float(current_params.get("fu_sheep_1996")) * 1e6
@@ -361,10 +364,9 @@ def _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise):
             year = int(df.iloc[0, col])
             r_sau = float(df.iloc[row_idx, col-3])
             r_lam = float(df.iloc[row_idx, col-2])
+            sau[year] = r_sau * noise_val
+            lam[year] = r_lam * noise_val
             
-            sau[year] = _apply_dataset_noise(r_sau, dataset_key, dataset_noise, _add_ol_grazing_mc)
-            lam[year] = _apply_dataset_noise(r_lam, dataset_key, dataset_noise, _add_ol_grazing_mc)
-
     # Krasj hvis beite-datasett mangler i RAM
     required_sau_keys = ['obb_Sau1990-99_raw', 'obb_Sau2000-09_raw', 'obb_Sau2010-19_raw', 'obb_Sau2020-29_raw']
     for k in required_sau_keys:
@@ -384,15 +386,15 @@ def _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise):
         year = int(df_sg_old.iloc[0, col])
         r_st = float(df_sg_old.iloc[23, col-2])
         r_gt = float(df_sg_old.iloc[23, col-1])
-        storfe[year] = _apply_dataset_noise(r_st, dataset_key, dataset_noise, _add_ol_grazing_mc)
-        geit[year] = _apply_dataset_noise(r_gt, dataset_key, dataset_noise, _add_ol_grazing_mc)
+        storfe[year] = r_st * noise_val
+        geit[year] = r_gt * noise_val
         
     for col in range(66, 200, 8):
         year = int(df_sg_old.iloc[0, col])
         r_st = float(df_sg_old.iloc[23, col-2])
         r_gt = float(df_sg_old.iloc[23, col-1])
-        storfe[year] = _apply_dataset_noise(r_st, dataset_key, dataset_noise, _add_ol_grazing_mc)
-        geit[year] = _apply_dataset_noise(r_gt, dataset_key, dataset_noise, _add_ol_grazing_mc)
+        storfe[year] = r_st * noise_val
+        geit[year] = r_gt * noise_val
 
     df_sg_new = preloaded_data.get('obb_Storfe og geit2020-29_raw')
     if df_sg_new is None:
@@ -402,8 +404,8 @@ def _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise):
         year = int(df_sg_new.iloc[0, col])
         r_st = float(df_sg_new.iloc[13, col-2])
         r_gt = float(df_sg_new.iloc[13, col-1])
-        storfe[year] = _apply_dataset_noise(r_st, dataset_key, dataset_noise, _add_ol_grazing_mc)
-        geit[year] = _apply_dataset_noise(r_gt, dataset_key, dataset_noise, _add_ol_grazing_mc)
+        storfe[year] = r_st * noise_val
+        geit[year] = r_gt * noise_val
 
     # Lineær ekstrapolering bakover for de manglende årene (1990-1992)
     for animal_dict in [storfe, geit]:

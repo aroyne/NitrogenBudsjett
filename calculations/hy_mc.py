@@ -63,7 +63,7 @@ def _add_inflow_to_coastal_waters(results, preloaded_data, current_params, datas
     key_teotil = 'TEOTIL'
     if not dataset_noise or key_teotil not in dataset_noise:
         raise KeyError(f"[KRITISK] Støy-nøkkel '{key_teotil}' mangler i dataset_noise for {flow_code}!")
-    noise_teotil = dataset_noise[key_teotil]['value']
+    noise_teotil = dataset_noise[key_teotil]
     
     if 'hy_ssb_05280_raw' not in preloaded_data or 'hy_utslipp_avlop_raw' not in preloaded_data:
         raise ValueError(f"[KRITISK] Avløpsdata mangler i preloaded_data for felles avløpsstrøm i {flow_code}!")
@@ -161,7 +161,7 @@ def _add_wild_shellfish_and_macroalgae(results, preloaded_data, current_params, 
     key_fisk = 'Fiskeridirektoratet'
     if not dataset_noise or key_fisk not in dataset_noise:
         raise KeyError(f"[KRITISK] Støy-nøkkel '{key_fisk}' mangler i dataset_noise for {flow_code}!")
-    noise_fisk = dataset_noise[key_fisk]['value']
+    noise_fisk = dataset_noise[key_fisk]
 
     # Moderne data
     df_art = preloaded_data.get('hy_art_raw')
@@ -241,7 +241,7 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
     
     if not dataset_noise or key_teotil not in dataset_noise:
         raise KeyError(f"[KRITISK] Støy-nøkkel '{key_teotil}' mangler i dataset_noise!")
-    noise_teotil = dataset_noise[key_teotil]['value']
+    noise_teotil = dataset_noise[key_teotil]
 
     # 1. Moderne år (2013+): Hent direkte fra TEOTIL3-retensjonsmatrisen
     df_t3_ret = preloaded_data.get('hy_teotil3_retention')
@@ -268,9 +268,7 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
             raise ValueError(f"[KRITISK DATAFEIL] Kunne ikke prosessere retensjonsmatrise på rad {r}: {e}")
 
     # 2. Historiske år (1990 - 2012): Bruk baklengs kalkyle basert på outflow_tracker
-    if not dataset_noise or key_interp not in dataset_noise:
-        raise KeyError(f"[KRITISK] Støy-nøkkelen '{key_interp}' mangler i dataset_noise!")
-    noise_interp = dataset_noise[key_interp]['value']
+    noise_interp = dataset_noise[key_interp]
     
     # Finn hvilke av de forventede årene (fra 1990 og oppover) vi ikke har dekket ennå
     missing_years = {y for y in EXPECTED_YEARS if y >= 1990} - collected_years
@@ -306,7 +304,7 @@ def _add_wild_fish_catch(results, preloaded_data, current_params, dataset_noise)
     key_fisk = 'Fiskeridirektoratet'
     if not dataset_noise or key_fisk not in dataset_noise:
         raise KeyError(f"[KRITISK] Støy-nøkkel '{key_fisk}' mangler i dataset_noise for {flow_code}!")
-    noise_fisk = dataset_noise[key_fisk]['value']
+    noise_fisk = dataset_noise[key_fisk]
 
     df_art = preloaded_data.get('hy_art_raw')
     if df_art is None:

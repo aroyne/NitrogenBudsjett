@@ -125,15 +125,13 @@ def _add_animal_feed_import_mc(results, preloaded_data, current_params, dataset_
     key_kraft = 'Kraftforstatistikk'
     if not dataset_noise or key_kraft not in dataset_noise:
         raise KeyError(f"[KRITISK] Støy-nøkkel '{key_kraft}' mangler i dataset_noise for {flow_code}!")
-    noise_kraft = dataset_noise[key_kraft]['value']
-    type_kraft = dataset_noise[key_kraft]['type']
+    noise_kraft = dataset_noise[key_kraft]
     
     # Datasetstøy: Totalkalkylen
     key_total = 'Totalkalkylen'
     if not dataset_noise or key_total not in dataset_noise:
         raise KeyError(f"[KRITISK] Støy-nøkkel '{key_total}' mangler i dataset_noise for {flow_code}!")
-    noise_total = dataset_noise[key_total]['value']
-    type_total = dataset_noise[key_total]['type']
+    noise_total = dataset_noise[key_total]
 
     # --- Nyere år (Landbruksdirektoratet) ---
     N_cont_sum = 0
@@ -152,15 +150,8 @@ def _add_animal_feed_import_mc(results, preloaded_data, current_params, dataset_
                 base_carb = float(row['value_carb'])
                 base_prot = float(row['value_prot'])
                 
-                if type_kraft == 'perc':
-                    value_carb = base_carb * noise_kraft
-                    value_prot = base_prot * noise_kraft
-                elif type_kraft == 'abs':
-                    bound = dataset_noise[key_kraft]['upp_bound'] if noise_kraft >= 0 else dataset_noise[key_kraft]['low_bound']
-                    value_carb = base_carb + (noise_kraft * bound / 2)
-                    value_prot = base_prot + (noise_kraft * bound / 2)
-                else:
-                    raise ValueError(f"[KRITISK] Ukjent støytype '{type_kraft}' på rad {idx} i df_raavarer!")
+                value_carb = base_carb * noise_kraft
+                value_prot = base_prot * noise_kraft
                     
                 imported_feed_N = (value_carb * N_content_carb + value_prot * N_content_prot) / 1000
                 imported_feed_N = max(0.0, imported_feed_N)
@@ -192,15 +183,8 @@ def _add_animal_feed_import_mc(results, preloaded_data, current_params, dataset_
             if year in EXPECTED_YEARS:
                 collected_years.add(year)
                 
-                base_feed_tonn = float(row['value'])
-                
-                if type_total == 'perc':
-                    feed_tonn = base_feed_tonn * noise_total
-                elif type_total == 'abs':
-                    bound = dataset_noise[key_total]['upp_bound'] if noise_total >= 0 else dataset_noise[key_total]['low_bound']
-                    feed_tonn = base_feed_tonn + (noise_total * bound)
-                else:
-                    raise ValueError(f"[KRITISK] Ukjent støytype '{type_total}' på rad {idx} i df_totalkalkyle!")
+                base_feed_tonn = float(row['value'])                
+                feed_tonn = base_feed_tonn * noise_total
                 
                 # Sjekker om dom_frac mangler i Excel-filen
                 if 'dom_frac' not in row or pd.isna(row['dom_frac']):
@@ -286,13 +270,10 @@ def _add_live_animal_import_mc(results, preloaded_data, current_params, dataset_
     key_fao = 'Crops and livestock products'
     if not dataset_noise or key_fao not in dataset_noise:
         raise KeyError(f"[KRITISK] Støy-nøkkel '{key_fao}' mangler i dataset_noise for {flow_code}!")
-    noise_fao = dataset_noise[key_fao]['value']
+    noise_fao = dataset_noise[key_fao]
 
     df_round = final_data.copy()
-    if dataset_noise[key_fao]['type'] == 'perc':
-        df_round['perturbed_value'] = df_round['Value'] * noise_fao
-    else:
-        raise ValueError(f"[KRITISK] Forventet støytype 'perc' for {key_fao}, fikk '{dataset_noise[key_fao]['type']}'")
+    df_round['perturbed_value'] = df_round['Value'] * noise_fao
 
     # Trygg oppslag: returnerer 0.0 hvis dyrearten mangler i parameterfilen
     def get_perturbed_weight(item_name):
@@ -336,7 +317,7 @@ def _add_mineral_fertilizer_import_mc(results, preloaded_data, current_params, d
     key_fert = 'Fertilizer by nutrient'
     if not dataset_noise or key_fert not in dataset_noise:
         raise KeyError(f"[KRITISK] Støy-nøkkel '{key_fert}' mangler i dataset_noise for {flow_code}!")
-    noise_fert = dataset_noise[key_fert]['value']
+    noise_fert = dataset_noise[key_fert]
     
     # --- STRUKTURELL FIX: Strip kolonnenavn for å fjerne whitespace, og filtrer på Import ---
     final_data.columns = [col.strip() for col in final_data.columns]
@@ -350,12 +331,8 @@ def _add_mineral_fertilizer_import_mc(results, preloaded_data, current_params, d
     for year in sorted(EXPECTED_YEARS):
         if year in total_fert_per_year:
             collected_years.add(year)
-            base_value = float(total_fert_per_year[year])
-            
-            if dataset_noise[key_fert]['type'] == 'perc':
-                perturbed_value = base_value * noise_fert
-            else:
-                raise ValueError(f"[KRITISK] Forventet støytype 'perc' for {key_fert}, fikk '{dataset_noise[key_fert]['type']}'")
+            base_value = float(total_fert_per_year[year])            
+            perturbed_value = base_value * noise_fert
             
             # Konverterer fra tonn (t) til kilotonn (ktN)
             value_kt = max(0.0, perturbed_value / 1000.0)
@@ -406,16 +383,8 @@ def _add_rw_outflow_oxn_mc(results, preloaded_data, current_params, dataset_nois
             if not dataset_noise or dataset_key not in dataset_noise:
                 raise KeyError(f"[KRITISK] Atmosfærisk støy-nøkkel '{dataset_key}' mangler i dataset_noise for {flow_code}!")
                 
-            noise_info = dataset_noise[dataset_key]
-            noise_val = noise_info['value']
-            
-            if noise_info['type'] == 'perc':
-                value = base_value * noise_val
-            elif noise_info['type'] == 'abs':
-                bound = noise_info['upp_bound'] if noise_val >= 0 else noise_info['low_bound']
-                value = base_value + (noise_val * bound)
-            else:
-                raise ValueError(f"[KRITISK] Ukjent usikkerhetstype '{noise_info['type']}' funnet for {dataset_key}!")
+            noise_val = dataset_noise[dataset_key]
+            value = base_value * noise_val
                 
             value = max(0.0, value)
                 
@@ -463,16 +432,8 @@ def _add_rw_outflow_rdn_mc(results, preloaded_data, current_params, dataset_nois
             if not dataset_noise or dataset_key not in dataset_noise:
                 raise KeyError(f"[KRITISK] Atmosfærisk støy-nøkkel '{dataset_key}' mangler i dataset_noise for {flow_code}!")
                 
-            noise_info = dataset_noise[dataset_key]
-            noise_val = noise_info['value']
-            
-            if noise_info['type'] == 'perc':
-                value = base_value * noise_val
-            elif noise_info['type'] == 'abs':
-                bound = noise_info['upp_bound'] if noise_val >= 0 else noise_info['low_bound']
-                value = base_value + (noise_val * bound)
-            else:
-                raise ValueError(f"[KRITISK] Ukjent usikkerhetstype '{noise_info['type']}' funnet for {dataset_key}!")
+            noise_val = dataset_noise[dataset_key]
+            value = base_value * noise_val
                 
             value = max(0.0, value)
                 

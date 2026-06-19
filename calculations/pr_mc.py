@@ -59,25 +59,6 @@ def execute_calculations_pr(preloaded_data, current_params, dataset_noise, curre
     return results
 
 
-def _apply_dataset_noise(base_value, dataset_key, dataset_noise, caller_func):
-    """
-    Legger støy på verdi. Krasjer hardt dersom støy-nøkkel mangler.
-    """
-    if not dataset_noise or dataset_key not in dataset_noise:
-        raise KeyError(
-            f"[KRITISK FEIL] Støy-nøkkel '{dataset_key}' mangler i dataset_noise under kallet fra {caller_func.__name__}!"
-        )
-
-    noise_info = dataset_noise[dataset_key]
-    noise_val = noise_info['value']
-    
-    if noise_info['type'] == 'perc':
-        return base_value * noise_val
-    else:
-        bound = noise_info['upp_bound'] if noise_val >= 0 else noise_info['low_bound']
-        return base_value + (noise_val * bound)
-
-
 def _calculate_scaled_waste_timeseries(tonnes_modern_dict, tonnes_10513_dict, target_year_modern, target_year_10513, noise_modern, noise_10513, noise_hist):
     """
     Universell skaleringsmotor for avfallsstrømmer i MC-loopen.
@@ -138,6 +119,7 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
     # =========================================================================
     dataset_key_05281 = '05281'
     df_05281 = preloaded_data.get('ssb_waste_05281')
+    noise_05281 = dataset_noise[dataset_key_05281]
     if df_05281 is None:
         raise ValueError(f"[KRITISK] Data 'ssb_waste_05281' mangler i preloaded_data for {flow_code}!")
 
@@ -166,7 +148,7 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
         raw_tonnage += float(df_05281.iloc[72, col]) * contam_N   
         raw_tonnage += float(df_05281.iloc[100, col]) * contam_N  
 
-        value = _apply_dataset_noise(raw_tonnage, dataset_key_05281, dataset_noise, _add_waste_to_energy_mc)
+        value = raw_tonnage*noise_05281
         if value < 0: value = 0.0
 
         results.append({
@@ -179,6 +161,7 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
     # =========================================================================
     dataset_key_10513 = '10513'
     df_10513 = preloaded_data.get('ssb_waste_10513')
+    noise_10513 = dataset_noise[dataset_key_10513]
     if df_10513 is None:
         raise ValueError(f"[KRITISK] Data 'ssb_waste_10513' mangler i preloaded_data for {flow_code}!")
 
@@ -201,7 +184,7 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
         raw_tonnage += float(df_10513.iloc[23, col+5]) * other_N     
         raw_tonnage += float(df_10513.iloc[24, col+5]) * contam_N    
 
-        value = _apply_dataset_noise(raw_tonnage, dataset_key_10513, dataset_noise, _add_waste_to_energy_mc)
+        value = raw_tonnage*noise_10513
         if value < 0: value = 0.0
 
         results.append({
@@ -214,12 +197,14 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
     # =========================================================================
     dataset_key_hist = 'historical_waste'
     df_hist = preloaded_data.get('waste_historical_fractions')
+    noise_hist = dataset_noise[dataset_key_hist]
+    noise_trend = dataset_noise['trend interpolation']
     if df_hist is None:
         raise ValueError(f"[KRITISK] Data 'waste_historical_fractions' mangler i preloaded_data for {flow_code}!")
 
     # Henter dataene direkte slik funksjonene leverer dem i MC-miljøet
     household_waste = find_household_waste(preloaded_data, current_params, dataset_noise)
-    industry_waste, _ = find_other_industry_waste(
+    industry_waste = find_other_industry_waste(
         preloaded_data['ssb_05282'], 
         preloaded_data['ssb_10514'], 
         preloaded_data['ssb_hist_industry_waste'], 
@@ -249,8 +234,7 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
         # Nøyaktig opprinnelig formel
         raw_val = waste * inc_frac
         
-        value = _apply_dataset_noise(raw_val, dataset_key_hist, dataset_noise, _add_waste_to_energy_mc)
-        value = _apply_dataset_noise(value, 'trend interpolation', dataset_noise, _add_waste_to_energy_mc)
+        value = raw_val*noise_hist*noise_trend
 
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
@@ -300,10 +284,10 @@ def _add_ag_biologically_treated_organic_waste_mc(results, preloaded_data, curre
     # STRIKT STØYHENTING (Ingen fallbacks)
     # =========================================================================
     try:
-        noise_biogass = float(dataset_noise['Biogass_Norge']['value'])
-        # noise_12818   = float(dataset_noise['12818']['value'])
-        noise_10513   = float(dataset_noise['10513']['value'])
-        noise_hist    = float(dataset_noise['historical_waste']['value'])
+        noise_biogass = float(dataset_noise['Biogass_Norge'])
+        noise_12818   = float(dataset_noise['12818'])
+        noise_10513   = float(dataset_noise['10513'])
+        noise_hist    = float(dataset_noise['historical_waste'])
     except KeyError as e:
         raise KeyError(f"[KRITISK STOPP] Støy-ordboken mangler nødvendig MC-nøkkel for AG: {e}")
 
@@ -359,7 +343,7 @@ def _add_ag_biologically_treated_organic_waste_mc(results, preloaded_data, curre
     df_10513 = preloaded_data.get('ssb_waste_10513')
     if df_10513 is None:
         raise ValueError("[KRITISK] Data 'ssb_waste_10513' mangler i preloaded_data!")
-
+    noise_10513 = dataset_noise['10513']
     tonnes_10513_dict = {}
     
     for col in range(1, df_10513.shape[1], 9):
@@ -402,12 +386,7 @@ def _add_ag_biologically_treated_organic_waste_mc(results, preloaded_data, curre
         if year in tonnes_modern_dict:
             raw_val = tonnes_modern_dict[year]
             # Funksjonen håndterer nå automatisk om '12818' er oppgitt som 'perc' eller 'low_bound'/'upp_bound'
-            final_values[year] = _apply_dataset_noise(
-                base_value=raw_val, 
-                dataset_key='12818', 
-                dataset_noise=dataset_noise, 
-                caller_func=_add_ag_biologically_treated_organic_waste_mc
-            )
+            final_values[year] = raw_val*noise_12818
     # Nullut år før 1990 slik notatene dine spesifiserte ("extrapolate back to 1990")
     for year in range(1984, 1990):
         final_values[year] = 0.0
@@ -450,7 +429,7 @@ def _add_wastewater_from_landfills_mc(results, preloaded_data, current_params, d
     # STRIKT STØYHENTING
     # =========================================================================
     try:
-        noise_mildir = float(dataset_noise['norskeutslipp']['value'])
+        noise_mildir = float(dataset_noise['norskeutslipp'])
     except KeyError as e:
         raise KeyError(f"[KRITISK STOPP] Støy-ordboken mangler nødvendig MC-nøkkel: {e}")
 
@@ -584,7 +563,7 @@ def _add_hs_biologically_treated_organic_waste_mc(results, preloaded_data, curre
     df_12818 = preloaded_data.get('ssb_waste_12818')
     if df_12818 is None:
         raise ValueError("[KRITISK] Data 'ssb_waste_12818' mangler i preloaded_data!")
-
+    noise_12818 = dataset_noise['12818']
     tonnes_modern_dict = {}
     # Kolonner 1 til 7 tilsvarer årene i tabellen (juster range om nødvendig basert på filendringer)
     for col_idx in range(1, 8):
@@ -606,7 +585,7 @@ def _add_hs_biologically_treated_organic_waste_mc(results, preloaded_data, curre
     df_10513 = preloaded_data.get('ssb_waste_10513')
     if df_10513 is None:
         raise ValueError("[KRITISK] Data 'ssb_waste_10513' mangler i preloaded_data!")
-
+    noise_10513 = dataset_noise['10513']
     tonnes_10513_dict = {}
     
     # Gå gjennom kolonnene i tabell 10513 (steg på 9 slik som før)
@@ -643,6 +622,8 @@ def _add_hs_biologically_treated_organic_waste_mc(results, preloaded_data, curre
         noise_hist         = 1.0
     )
     
+    noise_hist = dataset_noise['historical_waste']
+    noise_trend = dataset_noise['trend interpolation']
     # 2. Påfør riktig type distribusjonsstøy basert på tidsperiode
     for year in sorted(clean_values.keys()):
         collected_years.add(year)
@@ -650,28 +631,18 @@ def _add_hs_biologically_treated_organic_waste_mc(results, preloaded_data, curre
         
         # Bestem støy-nøkkel basert på årsepoken dataene opprinnelig kom fra
         if year >= 2012:
-            current_key = '12818' if year >= 2018 else '10513'
+            if year >= 2018:
+                val = raw_val*noise_12818
+            else:
+                val = raw_val*noise_10513
         else:
-            current_key = 'historical_waste'
-            
-        # Kjør gjennom den sentrale motoren
-        val = _apply_dataset_noise(
-            base_value=raw_val, 
-            dataset_key=current_key, 
-            dataset_noise=dataset_noise, 
-            caller_func=_add_hs_biologically_treated_organic_waste_mc
-        )
+            val = raw_val * noise_hist
         
         # B) EKSTRA STØY FOR EKSTRAPOLERTE ÅR (Før 2012)
         # Siden de historiske dataene er basert på en fremskrevet trend, påfører vi 
         # 'trend interpolation'-støy på toppen av den vanlige basestøyen.
         if year < 2012:
-            val = _apply_dataset_noise(
-                base_value=val,
-                dataset_key='trend interpolation',  # Krasjer hardt hvis denne mangler i Excel/dict
-                dataset_noise=dataset_noise,
-                caller_func=_add_hs_biologically_treated_organic_waste_mc
-            )
+            val *= noise_trend
         
         if val < 0: 
             val = 0.0
@@ -681,7 +652,7 @@ def _add_hs_biologically_treated_organic_waste_mc(results, preloaded_data, curre
             comment_str = 'Ekstrapolert trend fra 2012'
             source_str  = 'extrapolated'
         else:
-            comment_str = f'ok (MC-støy {current_key} påført sentralt)'
+            comment_str = 'ok (MC-støy påført sentralt)'
             source_str  = 'SSB (Tabell 12818 / 10513)'
     
         results.append({
@@ -703,9 +674,9 @@ def _add_biofuels_production_wastewater_mc(results, preloaded_data, current_para
     # STRIKT STØYHENTING (Krasjer hvis nøkler mangler)
     # =========================================================================
     try:
-        noise_biogass = float(dataset_noise['Biogass']['value'])
-        noise_10513   = float(dataset_noise['10513']['value'])
-        noise_12359   = float(dataset_noise['12359']['value'])
+        noise_biogass = float(dataset_noise['Biogass'])
+        noise_10513   = float(dataset_noise['10513'])
+        noise_12359   = float(dataset_noise['12359'])
     except KeyError as e:
         raise KeyError(f"[KRITISK STOPP] Støy-ordboken mangler nødvendig MC-nøkkel for biofuels wastewater: {e}")
 
@@ -956,8 +927,7 @@ def _add_so_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
     if not dataset_noise or key_n2o not in dataset_noise:
         raise KeyError(f"[KRITISK] Støy-nøkkel '{key_n2o}' mangler i dataset_noise for {flow_code}!")
     
-    noise_val = dataset_noise[key_n2o]['value']
-    noise_type = dataset_noise[key_n2o]['type']
+    noise_val = dataset_noise[key_n2o]
 
     # 3. Hent ferdiglastet DataFrame fra RAM
     df_so_emissions = preloaded_data.get('n2o_so_raw')
@@ -983,11 +953,7 @@ def _add_so_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
             base_value = float(n2o_val) * conv_N2O
 
             # Påfør støyen matematisk korrekt basert på støytype
-            if noise_type == 'perc':
-                value = base_value * noise_val
-            else:
-                bound = dataset_noise[key_n2o]['upp_bound'] if noise_val >= 0 else dataset_noise[key_n2o]['low_bound']
-                value = base_value + (noise_val * bound)
+            value = base_value * noise_val
 
             # Sikre at fysiske utslipp aldri blir negative
             if value < 0: 
@@ -1023,7 +989,7 @@ def _add_so_leaching_mc(results, preloaded_data, current_params, dataset_noise):
     # STRIKT STØYHENTING
     # =========================================================================
     try:
-        noise_mildir = float(dataset_noise['norskeutslipp']['value'])
+        noise_mildir = float(dataset_noise['norskeutslipp'])
     except KeyError as e:
         raise KeyError(f"[KRITISK STOPP] Støy-ordboken mangler nødvendig MC-nøkkel: {e}")
 
@@ -1222,8 +1188,7 @@ def _add_ww_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
     if not dataset_noise or key_n2o not in dataset_noise:
         raise KeyError(f"[KRITISK] Støy-nøkkel '{key_n2o}' mangler i dataset_noise for {flow_code}!")
     
-    noise_val = dataset_noise[key_n2o]['value']
-    noise_type = dataset_noise[key_n2o]['type']
+    noise_val = dataset_noise[key_n2o]
 
     # 3. Hent ferdiglastet DataFrame fra RAM (bruker samme csv-grunnlag som SO)
     df_ww_emissions = preloaded_data.get('n2o_ww_raw')
@@ -1249,12 +1214,8 @@ def _add_ww_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
             base_value = float(n2o_val) * conv_N2O
 
             # Påfør støyen matematisk korrekt basert på støytype
-            if noise_type == 'perc':
-                value = base_value * noise_val
-            else:
-                bound = dataset_noise[key_n2o]['upp_bound'] if noise_val >= 0 else dataset_noise[key_n2o]['low_bound']
-                value = base_value + (noise_val * bound)
-
+            value = base_value * noise_val
+ 
             # Sikre at fysiske utslipp aldri blir negative
             if value < 0: 
                 value = 0.0
@@ -1342,6 +1303,7 @@ def _add_ag_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
     """
     flow_code = 'PR.WW-AG.SM-Sewage sludge fertilizer-Nmix'
     dataset_key = '05279'
+    noise_val = dataset_noise[dataset_key]
     collected_years = set()
     comment = 'ok (MC-støy påført aktivitetsnivå og slam-N)'
     
@@ -1368,7 +1330,7 @@ def _add_ag_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
             
         collected_years.add(year)
         raw_tonnage = float(raw_val)
-        perturbed_tonnage = _apply_dataset_noise(raw_tonnage, dataset_key, dataset_noise, _add_ag_sewage_sludge_fertilizer_mc)
+        perturbed_tonnage = raw_tonnage*noise_val
         
         # Verdi i tonn tørrstoff -> deles på 1000 for å få kilotonn
         value = (perturbed_tonnage / 1000) * N_content 
@@ -1382,6 +1344,7 @@ def _add_ag_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
         })
         
     # 2. 1993-2001 (Historisk SSB-data via DataFrame)
+    noise_val = dataset_noise['historical_waste']
     # Starter på radindeks 1 til og med 9
     for r in range(1, 10):  
         year_val = df_hist.iloc[r, 0]
@@ -1395,7 +1358,7 @@ def _add_ag_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
         
         collected_years.add(year)
         raw_tonnage = float(raw_val)
-        perturbed_tonnage = _apply_dataset_noise(raw_tonnage, dataset_key, dataset_noise, _add_ag_sewage_sludge_fertilizer_mc)
+        perturbed_tonnage = raw_tonnage*noise_val
         
         # Historisk tabell er allerede i 1000 tonn, share er i %, så vi deler share på 100
         share = float(df_hist.iloc[r, 3]) / 100  # Kolonne indeks 3 er '% jordbruk'
@@ -1442,6 +1405,8 @@ def _add_hs_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
     
     df_modern = preloaded_data['sewage_sludge_modern']
     df_hist = preloaded_data['sewage_sludge_historical']
+    noise_modern = dataset_noise[dataset_key]
+    noise_hist = dataset_noise['historical_waste']
     
     # 1. 2002-2024
     data_sources = 'SSB table 05279'
@@ -1462,8 +1427,8 @@ def _add_hs_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
         tonnage_green = float(val_green) if val_green is not None and not pd.isna(val_green) else 0.0
         tonnage_soil = float(val_soil) if val_soil is not None and not pd.isna(val_soil) else 0.0
         
-        perturbed_green = _apply_dataset_noise(tonnage_green, dataset_key, dataset_noise, _add_hs_sewage_sludge_fertilizer_mc)
-        perturbed_soil = _apply_dataset_noise(tonnage_soil, dataset_key, dataset_noise, _add_hs_sewage_sludge_fertilizer_mc)
+        perturbed_green = tonnage_green*noise_modern
+        perturbed_soil = tonnage_soil*noise_modern
         
         value = ((perturbed_green + perturbed_soil) / 1000) * N_content 
         
@@ -1488,7 +1453,7 @@ def _add_hs_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
         
         collected_years.add(year)
         raw_tonnage = float(raw_val)
-        perturbed_tonnage = _apply_dataset_noise(raw_tonnage, dataset_key, dataset_noise, _add_hs_sewage_sludge_fertilizer_mc)
+        perturbed_tonnage = raw_tonnage*noise_hist
         
         share = float(df_hist.iloc[r, 2]) / 100  # Kolonne indeks 2 er 'grøntareal %'
         value = perturbed_tonnage * share * N_content  
@@ -1536,6 +1501,7 @@ def _add_sewage_sludge_landfill_mc(results, preloaded_data, current_params, data
     
     # 1. 2002-2024
     data_sources = 'SSB table 05279'
+    noise_05279 = dataset_noise['05279']
     # Det opprinnelige skriptet stoppet på kolonne 26 i Excel (tilsvarer indeks 25 her)
     for col_idx in range(2, min(25, len(df_modern.columns))):
         year_val = df_modern.iloc[2, col_idx]
@@ -1552,11 +1518,11 @@ def _add_sewage_sludge_landfill_mc(results, preloaded_data, current_params, data
         collected_years.add(year)
         
         tonnage_cover = float(val_cover) if val_cover is not None and not pd.isna(val_cover) else 0.0
-        perturbed_cover = _apply_dataset_noise(tonnage_cover, dataset_key, dataset_noise, _add_sewage_sludge_landfill_mc)
+        perturbed_cover = tonnage_cover*noise_05279
         value = (perturbed_cover / 1000) * N_content
         
         if val_landfill is not None and not isinstance(val_landfill, str) and not pd.isna(val_landfill):
-            perturbed_landfill = _apply_dataset_noise(float(val_landfill), dataset_key, dataset_noise, _add_sewage_sludge_landfill_mc)
+            perturbed_landfill = val_landfill*noise_05279
             value += (perturbed_landfill / 1000) * N_content
             
         results.append({
@@ -1568,6 +1534,7 @@ def _add_sewage_sludge_landfill_mc(results, preloaded_data, current_params, data
         })
         
     # 2. 1993-2001
+    noise_hist = dataset_noise['slamdisponering']
     for r in range(1, 10):  
         year_val = df_hist.iloc[r, 0]
         if year_val is None or pd.isna(year_val): 
@@ -1580,7 +1547,7 @@ def _add_sewage_sludge_landfill_mc(results, preloaded_data, current_params, data
         
         collected_years.add(year)
         raw_tonnage = float(raw_val)
-        perturbed_tonnage = _apply_dataset_noise(raw_tonnage, dataset_key, dataset_noise, _add_sewage_sludge_landfill_mc)
+        perturbed_tonnage = raw_tonnage*noise_hist
         
         share = float(df_hist.iloc[r, 4]) / 100  # Kolonne indeks 4 er '% slamdeponi + avfallsfylling'
         value = perturbed_tonnage * share * N_content  
@@ -1621,6 +1588,7 @@ def _add_ww_N2_emissions_mc(results, preloaded_data, current_params, dataset_noi
     comment = 'ok (MC-støy påført renseanlegg og rensegrader)'
     data_sources = 'treatment plant reports (norskeutslipp.no / veas.nu)'
     dataset_key = 'nitrogenrensing_avlop'
+    noise_val = dataset_noise[dataset_key]
 
     # 1. Hent standard rensegrad (krasjer strikt hvis parameteren mangler i MC)
     removal_default = float(current_params.get("avlop_removal_default_rate")) # f.eks. 0.7
@@ -1647,7 +1615,7 @@ def _add_ww_N2_emissions_mc(results, preloaded_data, current_params, dataset_noi
         val = row[plant_column].iloc[0]
         if pd.isna(val) or val is None:
             return 0.0
-        return float(_apply_dataset_noise(val, dataset_key, dataset_noise, _add_ww_N2_emissions_mc))
+        return float(val*noise_val)
 
     # Beregn historiske snitt basert på de støyiniserte kolonnene
     # (Vi gjør dette dynamisk per MC-iterasjon basert på tabellen med støy)
@@ -1857,6 +1825,7 @@ def _add_treated_ww_discharge_mc(results, preloaded_data, current_params, datase
     df_hist = preloaded_data['avlop_utslipp_historical']
     
     # 1. Nyere data: 2002 til 2024 (År i rad 2, Verdier i rad 3, fra kolonne 3 og utover)
+    noise_val = dataset_noise[dataset_key]
     data_sources = 'SSB table 05280'
     max_col = min(26, df_modern.shape[1])
     
@@ -1875,7 +1844,7 @@ def _add_treated_ww_discharge_mc(results, preloaded_data, current_params, datase
             raise ValueError(f"[KRITISK FEIL] Klarte ikke å konvertere data i kolonne {col_idx}. År: {year_val}, Verdi: {raw_val}")
             
         collected_years.add(year)
-        perturbed_tonnage = _apply_dataset_noise(raw_tonnage, dataset_key, dataset_noise, _add_treated_ww_discharge_mc)
+        perturbed_tonnage = raw_tonnage*noise_val
         
         # Siden SSB-tabellen oppgir verdien direkte i tonn (f.eks. 15654.8), 
         # må vi dele på 1000 for å konvertere til ktN (kilotonn) som modellen din krever:
@@ -1890,6 +1859,7 @@ def _add_treated_ww_discharge_mc(results, preloaded_data, current_params, datase
         })
         
     # 2. Historiske data: 1997 til 2001 (Excel rad 2 til 7 -> radindeks 1 til 6)
+    noise_val = dataset_noise['utslipp_avløp']
     value_1997 = None
     for r in range(1, 6):
         year_val = df_hist.iloc[r, 0]
@@ -1905,7 +1875,7 @@ def _add_treated_ww_discharge_mc(results, preloaded_data, current_params, datase
         raw_tonnage = float(raw_val)
         
         # Siden den historiske tidsrekken bygger på tabell 05280s historikk, brukes samme støy-nøkkel
-        perturbed_tonnage = _apply_dataset_noise(raw_tonnage, dataset_key, dataset_noise, _add_treated_ww_discharge_mc)
+        perturbed_tonnage = raw_tonnage*noise_val
         
         results.append({
             'flow_name': flow_code,

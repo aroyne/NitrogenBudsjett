@@ -10,7 +10,7 @@ nav_order: 3
 ![HY.SW-HY.CW-Inflow to coastal waters-Nmix](../output_files/plots/HY_SW_HY_CW_Inflow_to_coastal_waters_Nmix.png)
 
 ### Flow Description
-Found from data supplied by NIVA, produced in the TEOTIL3 model Sample (2024). Before 2013 we have
+Found from data supplied by NIVA, produced in the TEOTIL3 model Sample et al. (2024). Before 2013 we have
 
 ### References
 

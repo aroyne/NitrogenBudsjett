@@ -10,7 +10,7 @@ nav_order: 2
 ![HY.SW-AT.AT-Emissions-N2O](../output_files/plots/HY_SW_AT_AT_Emissions_N2O.png)
 
 ### Flow Description
-Uses data on N retention in surface waters supplied by NIVA, produced in the TEOTIL3 model Sample (2024),
+Uses data on N retention in surface waters supplied by NIVA, produced in the TEOTIL3 model Sample et al. (2024),
 
 ### References
 
