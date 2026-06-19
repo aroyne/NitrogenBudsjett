@@ -1686,7 +1686,7 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
             elif "hshs" in norm:
                 exact_flow_code = "PR.WW-HS.HS-Sewage sludge fertilizer-Nmix"
                 display_name = "Sewage Sludge Fertilizer to HS"
-                flow_description = "**{exact_flow_code}** is taken from SSB table 05279 *Avløpsslam, etter slamdisponering, statistikkvariabel, år og region*, "
+                flow_description = "Taken from SSB table 05279 *Avløpsslam, etter slamdisponering, statistikkvariabel, år og region*, "
                 "including all sludge used for green areas and for soil production \\citet{schappi_annexes_2025}. For years 1993-2001 we use data from the "
                 "SSB *Naturressurser og miljø series*. For years 1990-1992 we use the average value of the 1993-1995. We use a N content of 2.6 %  as given in "
                 "Table 54 in \\citet{schappi_annexes_2025}."
@@ -1699,7 +1699,7 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
             elif "prso" in norm and "landfill" in norm:
                 exact_flow_code = "PR.WW-PR.SO-Sewage sludge landfill-Nmix"
                 display_name = "Sewage Sludge to Landfill"
-                flow_description = "**{exact_flow_code}** is taken from SSB table 05279 *Avløpsslam, etter slamdisponering, statistikkvariabel, år og region*, "
+                flow_description = "Taken from SSB table 05279 *Avløpsslam, etter slamdisponering, statistikkvariabel, år og region*, "
                 "including both sludge that is landfilled and sludge used for top cover on landfills \\citet{schappi_annexes_2025}. For years 1993-2001 we "
                 "use data from the SSB Naturressurser og miljø series. For years 1990-1992 we use the average value of the 1993-1995. We use a N content of 2.6 % "
                 "as given in Table 54 in \\citet{schappi_annexes_2025}."

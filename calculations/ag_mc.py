@@ -1031,7 +1031,7 @@ def _add_N2O_emissions_manure_management_mc(results, preloaded_data, current_par
         raise ValueError(f"[KRITISK] 'unfccc_ark1_raw' mangler i preloaded_data for {flow_code}!")
 
     # 4. Gå gjennom radene og beregn verdier med støy
-    for r_idx in range(3, 37):
+    for r_idx in range(4, 38):
         year_val = df_unfccc.iloc[r_idx, 0]
         ton_val = df_unfccc.iloc[r_idx, 1]  # Kolonne 1 inneholder verdien for Manure Management
 

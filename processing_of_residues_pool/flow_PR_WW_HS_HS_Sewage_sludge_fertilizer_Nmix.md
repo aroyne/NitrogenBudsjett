@@ -10,5 +10,5 @@ nav_order: 4
 ![PR.WW-HS.HS-Sewage sludge fertilizer-Nmix](../output_files/plots/PR_WW_HS_HS_Sewage_sludge_fertilizer_Nmix.png)
 
 ### Flow Description
-**{exact_flow_code}** is taken from SSB table 05279 *Avløpsslam, etter slamdisponering, statistikkvariabel, år og region*, 
+Taken from SSB table 05279 *Avløpsslam, etter slamdisponering, statistikkvariabel, år og region*, 
 
