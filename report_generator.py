@@ -1503,7 +1503,13 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename):
                 display_name = "Other Goods Export"
                 description = (
                     "**MP.OP-RW.RW-Other goods export-Nmix** is taken from SSB trade data (table 08801) on goods that can be characterized as flowers, chemicals, "
-                    "soap, industrial protein, leather, wood and textiles. Ammonia export is also included in this flow."
+                    "soap, industrial protein, leather, wood and textiles. "
+                )
+            elif "ammonia" in norm and "export" in norm:
+               exact_flow_code = "MP.OP-RW.RW-Ammonia export-NH3"
+               display_name = "Other Goods Export"
+               description = (
+                   "*Taken from SSB trade data (table 08801)."
                 )
 
         # Skriv ut filen for den gjeldende strømmen

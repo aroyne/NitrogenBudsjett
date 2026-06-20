@@ -794,6 +794,7 @@ def _add_ag_mineral_fertilizer_mc(results, preloaded_data, current_params, datas
     MC-VERSJON: Innenlandsk mineralgjødsel (Market Place til Agriculture Soil Management).
     STRIKT: Henter forbruk fra faostat_fertilizer (11-21) og isolerer import fra fao_mineral_fertilizer (11-12-2).
     Krasjer hardt ved datahull, negative verdier eller manglende støyfaktorer.
+    NB! Vurder å bytte til produksjon-eksport
     """
     flow_code = 'MP.OP-AG.SM-Mineral fertilizer-Nmix'
     collected_years = set()
@@ -1478,8 +1479,24 @@ def _add_other_goods_export_mc(results, preloaded_data, current_params, current_
             'organisk materiale', 'blomster', 'frø', 'kjemikalier', 'såpe', 
             'industrielt protein', 'plastprodukter', 'gummi', 'skinn', 'lærprodukter', 
             'tre', 'silke', 'ull', 'bomull', 'nylon', 'tekstil', 'møbler', 
-            'plast', 'leker', 'NH3'
+            'plast', 'leker'
         ],
+        is_import=False, 
+        dataset_noise=dataset_noise
+    )
+    
+def _add_ammonia_export_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise):
+    """
+    MC-VERSJON: Eksport av andre varer (MP.OP-RW.RW-Other goods export-Nmix).
+    Gjenbruker den generiske handelsløsningen for MC med full tidsserie (ingen 2023-kutt).
+    """
+    process_generic_trade_flow(
+        results=results, 
+        preloaded_data=preloaded_data, 
+        current_params=current_params,
+        current_trade_factors=current_trade_factors, 
+        flow_code='MP.OP-RW.RW-Ammonia export-NH3',
+        target_types=['NH3'],
         is_import=False, 
         dataset_noise=dataset_noise
     )

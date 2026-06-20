@@ -1595,9 +1595,9 @@ def _add_ww_N2_emissions_mc(results, preloaded_data, current_params, dataset_noi
     
     # 2. Hent eller last arket (støtter både preloaded data og direkte disk-fallback)
     N_released_df = preloaded_data.get('avlop_sewage_cleaning')
-    if N_released_df is None:
-        # Midlertidig fallback hvis den ikke er lagt til i data_loader.py ennå
-        N_released_df = pd.read_excel("data_files/nitrogenrensing_avløp.xlsx", sheet_name="Ark1", nrows=31)
+    # if N_released_df is None:
+        # #Midlertidig fallback hvis den ikke er lagt til i data_loader.py ennå
+        # N_released_df = pd.read_excel("data_files/nitrogenrensing_avløp.xlsx", sheet_name="Ark1", nrows=31)
 
     # Klon tabellen så vi ikke muterer originalen i RAM mellom MC-iterasjonene
     df = N_released_df.copy()
@@ -1615,7 +1615,7 @@ def _add_ww_N2_emissions_mc(results, preloaded_data, current_params, dataset_noi
         val = row[plant_column].iloc[0]
         if pd.isna(val) or val is None:
             return 0.0
-        return float(val*noise_val)
+        return float(val)
 
     # Beregn historiske snitt basert på de støyiniserte kolonnene
     # (Vi gjør dette dynamisk per MC-iterasjon basert på tabellen med støy)
@@ -1633,7 +1633,7 @@ def _add_ww_N2_emissions_mc(results, preloaded_data, current_params, dataset_noi
 
     # Faktor-funksjon for renseeffekt: r / (1 - r)
     def _factor(r):
-        return r / (1.0 - r) if r < 1.0 else 0.0
+        return r / (1.0 - r)
 
     # 3. Hovedløkke over alle simuleringsår
     for year in EXPECTED_YEARS:
@@ -1794,6 +1794,8 @@ def _add_ww_N2_emissions_mc(results, preloaded_data, current_params, dataset_noi
             rem_nrva = _get_val("rensegrad NRVA", year) * 1000.0
             value += _get_val("NRVA", year) * _factor(rem_nrva if rem_nrva > 0 else removal_default)
             value += _get_val("Hokksund", year) * _factor(removal_default)
+
+        value *= noise_val
 
         # Vask mot negative verdier og NaN
         if value < 0 or pd.isna(value):

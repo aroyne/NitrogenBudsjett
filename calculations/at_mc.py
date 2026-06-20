@@ -48,9 +48,18 @@ def execute_calculations_at(preloaded_data, current_params, dataset_noise, curre
         is_import=True,
         dataset_noise=dataset_noise
     )    
+    
+    ammonia_export_dict = process_generic_trade_flow(
+        preloaded_data=preloaded_data,
+        current_params=current_params,
+        current_trade_factors=current_trade_factors,
+        target_types='NH3',  
+        is_import=False,
+        dataset_noise=dataset_noise
+    )  
             
     # Kjør fikseringsberegningen din
-    _add_OP_N2_fixation_mc(results, preloaded_data, current_params, ammonia_import_dict, dataset_noise)    
+    _add_OP_N2_fixation_mc(results, preloaded_data, current_params, ammonia_import_dict, ammonia_export_dict, dataset_noise)    
     
     # 3. Biologiske N2-fikseringer (parameter-baserte - krasjer internt i parameter-get hvis de mangler)
     _add_AG_N2_fixation_mc(results, current_params)
@@ -162,14 +171,14 @@ def _deposition_flow_mc(results, flow_code, class4, poll, preloaded_data, curren
         })
         
         
-def _add_OP_N2_fixation_mc(results, preloaded_data, current_params, ammonia_import_dict, dataset_noise):
+def _add_OP_N2_fixation_mc(results, preloaded_data, current_params, ammonia_import_dict, ammonia_export_dict, dataset_noise):
     flow_code = 'AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2'
     collected_years = set()
     
     dataset_key = 'Fertilizer by nutrient'
     data_sources = 'FAOSTAT Fertilizer by nutrient + SSB'
     
-    # Hent ferdiglastet FAOSTAT-data – krasj hardt hvis de mangler
+    # data for produksjon
     df_faostat = preloaded_data.get('faostat_fertilizer_production')
     if df_faostat is None:
         raise ValueError(f"[KRITISK] Mangler 'faostat_fertilizer_production' i preloaded_data for {flow_code}!")
@@ -194,9 +203,9 @@ def _add_OP_N2_fixation_mc(results, preloaded_data, current_params, ammonia_impo
             
             if perturbed_faostat < 0:
                 perturbed_faostat = 0.0
-
-            # Formel: (FAOSTAT med støy) - (Ammoniakkimport med støy)
-            value = perturbed_faostat - ammonia_import_dict[year]
+                
+             # Formel: (FAOSTAT med støy) - (Ammoniakkimport med støy)
+            value = perturbed_faostat - ammonia_import_dict[year] + ammonia_export_dict.get(year, 0.0)
             
             if value < 0:
                 comment = 'ok (Negativ verdi pga. MC-støy i massebalanse)'
