@@ -15,7 +15,7 @@ DEPOSITION_TEXT = (
     "1988-1992, 1997-2001, 2002-2006, 2007-2011 and 2012-2016. For 2017-2021 we use "
     "total NILU data for that period and scale with the distribution across land classes "
     "for the previous period. Values after 2021 are extrapolated. To find deposition on "
-    "different land categories we use the map resource AR5 from NIBIO \\\\citet{nibio_ar5_2016}. "
+    "different land categories we use the map resource AR5 from NIBIO \\\\citep{nibio_ar5_2016}. "
     "We find the total value of atmospheric deposition to the Norwegian mainland is, "
     "as given by NILU, 142 ktN in 2012-2016.\n\n"
 )
@@ -190,7 +190,7 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
         print(f"Bib-fil ikke funnet: {bib_filename}")
         return
 
-    # 1. Pars .bib-filen
+    # 1. Pars .bib-filen (utvidet for APA7 detaljer)
     references_dict = {}
     current_entry = None
     
@@ -213,9 +213,10 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
                 if key in ['url', 'doi']:
                     val = val.rstrip(']')
                 
-                if key in ['author', 'year', 'title', 'journal', 'booktitle', 'publisher', 'url', 'doi']:
+                # LA TIL: 'volume', 'number', 'pages' i listen over lagrede nøkler
+                if key in ['author', 'year', 'title', 'journal', 'booktitle', 'publisher', 'url', 'doi', 'volume', 'number', 'pages']:
                     references_dict[current_entry][key] = val
-
+                    
     def citep_replacer(match):
         keys = [k.strip() for k in match.group(1).split(',')]
         parts = []
@@ -274,15 +275,15 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
                         if key in references_dict:
                             entry = references_dict[key]
                             
-                            # Formater forfattere etter APA7-regler
                             raw_author = entry.get('author', 'Unknown Author')
                             author = format_apa_authors(raw_author)
-                            
                             year = entry.get('year', 'n.d.')
                             title = entry.get('title', 'Untitled')
                             
-                            # Hent kilde/utgiver
-                            source = entry.get('journal') or entry.get('booktitle') or entry.get('publisher') or ""
+                            journal = entry.get('journal') or entry.get('booktitle') or entry.get('publisher') or ""
+                            volume = entry.get('volume', '')
+                            number = entry.get('number', '')
+                            pages = entry.get('pages', '')
                             
                             doi = entry.get('doi', '')
                             url = entry.get('url', '')
@@ -290,27 +291,42 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
                             # 1. Forfatter (År).
                             ref_str = f"* {author} ({year})."
                             
-                            # 2. Tittel i kursiv
-                            ref_str += f" *{title}*."
+                            # 2. Tittel på artikkelen (Vanlig tekst i APA7 hvis journal er oppgitt)
+                            if journal:
+                                ref_str += f" {title}."
+                            else:
+                                ref_str += f" *{title}*."
                             
-                            # 3. Kilde/Utgiver (hvis den ikke er identisk med forfatteren, f.eks. NIBIO)
-                            if source and source.lower() != raw_author.lower():
-                                # Fjern eventuelle backslasher BibTeX legger til før tegn (f.eks. \& -> &)
-                                source_clean = source.replace(r'\&', '&')
-                                ref_str += f" {source_clean}."
+                            # 3. Journal, Volum(Issue), Sider
+                            if journal:
+                                journal_clean = journal.replace(r'\&', '&')
+                                # Journal og Volum skal være i kursiv: *Journal, Volum*
+                                if volume:
+                                    ref_str += f" *{journal_clean}, {volume}*"
+                                else:
+                                    ref_str += f" *{journal_clean}*"
                                 
-                            # 4. Lenke-håndtering i APA7: Prioriter alltid DOI over URL
+                                # Issue/Number skal stå i vanlige parenteser rett bak volumet (ikke kursiv)
+                                if number:
+                                    ref_str += f"({number})"
+                                    
+                                # Sidetall legges til på slutten, separert med komma
+                                if pages:
+                                    # Erstatt eventuelle LaTeX-bindestreker (--) med vanlig bindestrek
+                                    pages_clean = pages.replace('--', '-')
+                                    ref_str += f", {pages_clean}."
+                                else:
+                                    ref_str += "."
+                                
+                            # 4. Lenke-håndtering (Prioriter DOI over URL)
                             if doi:
-                                # Standardiser DOI-lenken slik at den alltid blir en gyldig https://doi.org/...
                                 doi_clean = doi.lower().replace("doi.org/", "").replace("https://", "").replace("http://", "")
                                 doi_url = f"https://doi.org/{doi_clean}"
-                                ref_str += f" [{doi_url}]({doi_url})"
+                                ref_str += f" {doi_url}"  # Fjernet Markdown-klikkbarhet her for renere tekst, legg eventuelt til []() igjen om ønskelig på nett
                             elif url:
-                                ref_str += f" [{url}]({url})"
+                                ref_str += f" {url}"
                                 
                             formatted_refs.append(ref_str)
-                        else:
-                            formatted_refs.append(f"* Missing reference data for key: `{key}`")
                             
                     ref_block += "\n".join(formatted_refs) + "\n"
                     final_content = base_content + ref_block
@@ -408,13 +424,13 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename):
                     is an error in this dataset for Norway which is currently being corrected (as of February 2026; personal correspondence, \
                     EUROSTAT). According to the EUROSTAT metadata, the BNF in this statistic is calculated based on the area of leguminous crops and \
                     fization coefficients. The production of leguminous crops (peas, beans etc) in Norway is very low and we assume that agricultural \
-                    BNF is for the most part determined by leguminous crops such as clover grown on pastures and in fodder production. \
+                    BNF is for the most part determined by leguminous crops such as clover grown on pastures and in fodder production.\n \
                     \\citet{bleken_nitrogen_1997} based their estimate for BNF from the sale of clover seeds: a sale of about 145 t seeds was \
                     estimated to be used to plant 95 000 ha of grass/clover mixtures (655 ha/t seeds). Together with a rate of BNF of 80 kgN/ha on \
                     this area, they found a total of 7.6 ktN per year and summed up to 8 ktN to account for BNF from free-living orghanisms and \
                     other sources. The rate of 80 kgN/ha agrees relatively well with later studies of agricultural BNF in Norway, where average \
                     values between 10 and 100 kgN/ha have been found; the highest values in particularly productive areas were up to 260 kgN/ha \
-                    \\citet{hansen_engbelgvekster_2020}. Yearly statistics of clover \
+                    \\citet{hansen_engbelgvekster_2020}. \n Yearly statistics of clover \
                     seed sales are not available, but according to NIBIO Totalkalkylen (NIBIO, 2025b), the area where grass/clover mixes may be \
                     sown for pasture and fodder production (fulldyrka eng) has remained constant to within about 3 % from 1995 up to today. Our \
                     best estimate for BNF, and for consistency with the previous study, is therefore to assume a constant value of 8 ktN/year. \
@@ -435,7 +451,7 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename):
                 f.write("Following the Swedish NBB \\citet{moldan_where_2025}, we use an N-fixation "
                         "rate of 1.5 kg/ha/year and a forested area of 12.0 mill ha as given by SSB for 2019-2023 (table 14368); we assume this value is "
                         "constant for our entire time period. This gives an annual N-fixation rate of 18.0 ktN. For comparison, the value for Sweden "
-                        "in 2015 was found to be 39.5 ktN \\cite{moldan_where_2025}.")
+                        "in 2015 was found to be 39.5 ktN \\citet{moldan_where_2025}.")
             elif exact_flow_code == "AT.AT-FS.OL-N2 fixation-N2":
                 f.write("We use N2 fixation rates from Table 62 in \\citet{schappi_annexes_2025} together with land type areas calculated from the CORINE land cover "
                         " inventory \\citet{european_environment_agency_corine_2019}. "
@@ -1763,15 +1779,15 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
 
     # Liste over alle pool-mappene vi bruker
     pool_folders = [
-        "atmosphere_pool",
-        "rest_of_the_world_pool",
-        "agriculture_pool",
-        "forests_and_semi_natural_pool",
-        "hydrosphere_pool",
-        "humans_and_settlements_pool",
         "energy_and_fuels_pool",
         "materials_and_products_pool",
-        "processing_of_residues_pool"
+        "agriculture_pool",
+        "forests_and_semi_natural_pool",
+        "processing_of_residues_pool",
+        "humans_and_settlements_pool",
+        "atmosphere_pool",
+        "hydrosphere_pool",
+        "rest_of_the_world_pool",
     ]
 
     print("[RAPPORT] Sletter gamle midlertidige filer fra pool-mappene for å unngå rot...")

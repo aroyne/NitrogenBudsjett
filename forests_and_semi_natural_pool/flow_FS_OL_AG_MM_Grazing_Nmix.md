@@ -15,4 +15,4 @@ Calculated using data from NIBIO on organised grazing (NIBIO, 2025) together wit
 ### References
 
 * Hegrenes, A. & Asheim, L. J. (2006). *Verdi av fôr frå utmarksbeite og sysselsetting i beitebaserte næringar*.
-* NIBIO (2025). *Beitestatistikk*. [https://www.nibio.no/tema/landskap/utmarksbeite/beitebruk/beitestatistikk](https://www.nibio.no/tema/landskap/utmarksbeite/beitebruk/beitestatistikk)
+* NIBIO (2025). *Beitestatistikk*. https://www.nibio.no/tema/landskap/utmarksbeite/beitebruk/beitestatistikk

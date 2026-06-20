@@ -6,7 +6,7 @@ nav_order: 1
 
 # Nitrogen Budget for Norway
 
-**Last Updated:** June 19, 2026
+**Last Updated:** June 20, 2026
 
 {: .label .label-red }
 Work in Progress
@@ -25,4 +25,4 @@ This NNB is built using the guidelines from (Winiwarter et al., 2025). Where flo
 
 ### References
 
-* Winiwarter, W., Hayashi, K., Geupel, M., Gu, B., Zhang, X., Sutton, M. A., Schlegel, M., Baron, J., & van Grinsven, H. J. (2025). *INMS Guidance Document on National Nitrogen Budgets*. UK Centre for Ecology & Hydrology. [https://doi.org/10.5281/zenodo.15632929](https://doi.org/10.5281/zenodo.15632929)
+* Winiwarter, W., Hayashi, K., Geupel, M., Gu, B., Zhang, X., Sutton, M. A., Schlegel, M., Baron, J., & van Grinsven, H. J. (2025). INMS Guidance Document on National Nitrogen Budgets. *UK Centre for Ecology & Hydrology*. https://doi.org/10.5281/zenodo.15632929
