@@ -401,7 +401,7 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename):
         elif "fsfo" in norm and "fixation" in norm: exact_flow_code, display_name = "AT.AT-FS.FO-N2 fixation-N2", "Biological N2 Fixation (Forest)"
         elif "fsfo" in norm and "deposition" in norm and "oxn" in norm: exact_flow_code, display_name = "AT.AT-FS.FO-Deposition-OXN", "Oxidized N Deposition (Forest)"
         elif "fsfo" in norm and "deposition" in norm and "rdn" in norm: exact_flow_code, display_name = "AT.AT-FS.FO-Deposition-RDN", "Reduced N Deposition (Forest)"
-        elif "fsol" in norm and "fixation" in norm: exact_flow_code, display_name = "AT.AT-FS.OL-Biological N2 fixation-N2", "Biological N2 Fixation (Other Land)"
+        elif "fsol" in norm and "fixation" in norm: exact_flow_code, display_name = "AT.AT-FS.OL-N2 fixation-N2", "Biological N2 Fixation (Other Land)"
         elif "fsol" in norm and "deposition" in norm and "oxn" in norm: exact_flow_code, display_name = "AT.AT-FS.OL-Deposition-OXN", "Oxidized N Deposition (Other Land)"
         elif "fsol" in norm and "deposition" in norm and "rdn" in norm: exact_flow_code, display_name = "AT.AT-FS.OL-Deposition-RDN", "Reduced N Deposition (Other Land)"
         elif "hshs" in norm and "deposition" in norm and "oxn" in norm: exact_flow_code, display_name = "AT.AT-HS.HS-Deposition-OXN", "Oxidized N Deposition (Settlements)"
@@ -456,7 +456,7 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename):
                 f.write("We use N2 fixation rates from Table 62 in \\citet{schappi_annexes_2025} together with land type areas calculated from the CORINE land cover "
                         " inventory \\citet{european_environment_agency_corine_2019}. "
                         "In the Swedish NNB \\citep{moldan_where_2025}, N2 fixation in the OL compartment was considered negligible.")
-            elif exact_flow_code == "AT.AT-HY.SW-N2 Fixation-N2":
+            elif exact_flow_code == "AT.AT-HY.SW-N2 fixation-N2":
                 f.write(f"**{exact_flow_code}**\n\n" + "According to NIBIO \\citep{nibio_arealbarometer_2026}, the surface water area is 20 457 km2 "
                         "https://arealbarometer.nibio.no/nb/norge/. According to  \\citep{{schappi_annexes_2025}}, the biological fixation rate can vary "
                         "between < 0.1 tN/km2 in ologotrophic and mesotrophic lakes to up to 10 tN/km2 in eutrophic lakes. Most lakes in Norway are not "
