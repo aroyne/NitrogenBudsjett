@@ -26,4 +26,4 @@ The chart below illustrates the integrated nitrogen mass balance for **FS**. It 
 
 ### References
 
-* Steinset, T. A. (2021). Verdi og mengde av viltkjøtt. *Bærekraftig skogbruk i {Norge*. https://www.skogbruk.nibio.no/verdi-og-mengde-av-viltkjott
+* Steinset, T. A. (2021). Verdi og mengde av viltkjøtt. *Bærekraftig skogbruk i {Norge*. [https://www.skogbruk.nibio.no/verdi-og-mengde-av-viltkjott](https://www.skogbruk.nibio.no/verdi-og-mengde-av-viltkjott)

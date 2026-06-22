@@ -161,8 +161,8 @@ def generate_mc_parameters_fast(base_params, df_global, df_datasets, df_animal_p
             abs_max = val * (1 + upp_b / 100.0)
             std_dev = ((low_b + upp_b) / 2.0 / 100.0) * val
         else:
-            abs_min = val - low_b
-            abs_max = val + upp_b
+            abs_min = low_b
+            abs_max = upp_b
             std_dev = (low_b + upp_b) / 2.0 / 1.96
 
         if 'pert' in dist_type:

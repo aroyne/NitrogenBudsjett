@@ -26,4 +26,4 @@ The chart below illustrates the integrated nitrogen mass balance for **RW**. It 
 
 ### References
 
-* Schulte-Uebbing, L. F., Beusen, A. H. W., Bouwman, A. F., & de Vries, W. (2022). From planetary to regional boundaries for agricultural nitrogen pollution. *Nature, 610*(7932), 507-512. https://doi.org/10.1038/s41586-022-05158-2
+* Schulte-Uebbing, L. F., Beusen, A. H. W., Bouwman, A. F., & de Vries, W. (2022). From planetary to regional boundaries for agricultural nitrogen pollution. *Nature, 610*(7932), 507-512. [https://doi.org/10.1038/s41586-022-05158-2](https://doi.org/10.1038/s41586-022-05158-2)

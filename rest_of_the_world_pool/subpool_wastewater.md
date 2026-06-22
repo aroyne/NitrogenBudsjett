@@ -26,4 +26,4 @@ Note on sewage sludge: SSB table 05279 reports significant amounts of sewage slu
 
 ### References
 
-* EMEP (2025). *Officially reported emission data*. https://www.ceip.at/webdab-emission-database/reported-emissiondata
+* EMEP (2025). *Officially reported emission data*. [https://www.ceip.at/webdab-emission-database/reported-emissiondata](https://www.ceip.at/webdab-emission-database/reported-emissiondata)

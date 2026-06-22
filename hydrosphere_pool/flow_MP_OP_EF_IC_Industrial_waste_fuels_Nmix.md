@@ -15,5 +15,5 @@ nav_order: 5
 
 ### References
 
-* Garg, A., Kazunari, K., & Pulles, T. (2006). Chapter 1. {Introduction. *IPCC} {Guidelines} for {National} {Greenhouse} {Gas} {Inventories*. https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_1_Ch1_Introduction.pdf
+* Garg, A., Kazunari, K., & Pulles, T. (2006). Chapter 1. {Introduction. *IPCC} {Guidelines} for {National} {Greenhouse} {Gas} {Inventories*. [https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_1_Ch1_Introduction.pdf](https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_1_Ch1_Introduction.pdf)
 * Spilde, D. & Aasestad, K. (2004). Energibruk i norsk industri: 1991 - 2001. *Statistisk Sentralbyrå*(2004,3).

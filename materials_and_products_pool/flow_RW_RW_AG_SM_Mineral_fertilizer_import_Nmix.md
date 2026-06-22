@@ -14,4 +14,4 @@ Is taken from FAOSTAT Fertilizer by nutrient FAO (2025). Because anhydrous ammon
 
 ### References
 
-* FAO (2025). *Fertilizer by nutrient*. https://www.fao.org/faostat/en/#data/RFN
+* FAO (2025). *Fertilizer by nutrient*. [https://www.fao.org/faostat/en/#data/RFN](https://www.fao.org/faostat/en/#data/RFN)

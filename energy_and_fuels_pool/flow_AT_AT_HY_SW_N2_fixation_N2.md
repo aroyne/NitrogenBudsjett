@@ -16,4 +16,4 @@ According to NIBIO (NIBIO, 2026), the surface water area is 20 457 km2 https://a
 
 ### References
 
-* NIBIO (2026). Arealbarometer for {Norge. *nibio.no*. https://arealbarometer.nibio.no/nb/norge/
+* NIBIO (2026). Arealbarometer for {Norge. *nibio.no*. [https://arealbarometer.nibio.no/nb/norge/](https://arealbarometer.nibio.no/nb/norge/)

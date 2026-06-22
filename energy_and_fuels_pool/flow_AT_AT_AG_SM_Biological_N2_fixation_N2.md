@@ -16,7 +16,7 @@ Schäppi et al. (2025) advises using data from the EUROSTAT Gross nutrient balan
 
 ### References
 
-* Bleken, M. A. & Bakken, L. R. (1997). The {Nitrogen} {Cost} of {Food} {Production}: {Norwegian} {Society. *Ambio, 26*(3), 134-142. https://www.jstor.org/stable/4314571
-* Hansen, S., Pommeresche, R., & Serikstad, G. L. (2020). *Engbelgvekster med mange oppgaver Økosystemtjenester fra kløver*. https://orgprints.org/id/eprint/37546/1/NORSØK%20Rapport%20nr.%203%202020%20Engbelgvekster.pdf
-* Moldan, F., Stadmark, J., Jutterström, S., & Ljunggren, J. (2025). Where does Sweden’s nitrogen go? Building a comprehensive national nitrogen budget. *Environmental Research Letters, 20*(12), 124068. https://doi.org/10.1088/1748-9326/ae2697
-* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf
+* Bleken, M. A. & Bakken, L. R. (1997). The {Nitrogen} {Cost} of {Food} {Production}: {Norwegian} {Society. *Ambio, 26*(3), 134-142. [https://www.jstor.org/stable/4314571](https://www.jstor.org/stable/4314571)
+* Hansen, S., Pommeresche, R., & Serikstad, G. L. (2020). *Engbelgvekster med mange oppgaver Økosystemtjenester fra kløver*. [https://orgprints.org/id/eprint/37546/1/NORSØK%20Rapport%20nr.%203%202020%20Engbelgvekster.pdf](https://orgprints.org/id/eprint/37546/1/NORSØK%20Rapport%20nr.%203%202020%20Engbelgvekster.pdf)
+* Moldan, F., Stadmark, J., Jutterström, S., & Ljunggren, J. (2025). Where does Sweden’s nitrogen go? Building a comprehensive national nitrogen budget. *Environmental Research Letters, 20*(12), 124068. [https://doi.org/10.1088/1748-9326/ae2697](https://doi.org/10.1088/1748-9326/ae2697)
+* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)

@@ -16,4 +16,4 @@ Atmospheric deposition was calculated using data from NILU which gives gridded d
 
 ### References
 
-* NIBIO (2016). *AR5*. https://www.nibio.no/tema/jord/arealressurser/arealressurskart-ar5?locationfilter=true
+* NIBIO (2016). *AR5*. [https://www.nibio.no/tema/jord/arealressurser/arealressurskart-ar5?locationfilter=true](https://www.nibio.no/tema/jord/arealressurser/arealressurskart-ar5?locationfilter=true)

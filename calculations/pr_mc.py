@@ -1617,7 +1617,7 @@ def _add_ww_N2_emissions_mc(results, preloaded_data, current_params, dataset_noi
             return 0.0
         return float(val)
 
-    # Beregn historiske snitt basert på de støyiniserte kolonnene
+    # Beregn historiske snitt for utslipp basert på de støyiniserte kolonnene
     # (Vi gjør dette dynamisk per MC-iterasjon basert på tabellen med støy)
     mean_Lillehammer = df["Lillehammer"].mean() 
     

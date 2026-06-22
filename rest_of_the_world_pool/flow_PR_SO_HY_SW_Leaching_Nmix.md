@@ -14,4 +14,4 @@ nav_order: 7
 
 ### References
 
-* Miljødirektoratet (2026). *Norske {Utslipp*. norskeutslipp.no
+* Miljødirektoratet (2026). *Norske {Utslipp*. [norskeutslipp.no](norskeutslipp.no)

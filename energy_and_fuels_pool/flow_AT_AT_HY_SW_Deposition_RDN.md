@@ -18,4 +18,4 @@ For comparison, the data used in the TEOTIL model gives 3.5 ktN in 2013 and 3.0 
 
 ### References
 
-* NIBIO (2016). *AR5*. https://www.nibio.no/tema/jord/arealressurser/arealressurskart-ar5?locationfilter=true
+* NIBIO (2016). *AR5*. [https://www.nibio.no/tema/jord/arealressurser/arealressurskart-ar5?locationfilter=true](https://www.nibio.no/tema/jord/arealressurser/arealressurskart-ar5?locationfilter=true)

@@ -17,7 +17,7 @@ nav_order: 1
 
 * Bruholt, L. & Longva, S. (1994). *Jordbruksstatistikk 1994*.
 * Eidem, B. & Ruud, T. (2022). *Fôr- og husdyrbaserte verdikjeder i norsk matproduksjon – nåsituasjon og begreper*.
-* FAO (2021). Annex 1. {Food} composition tables. *FOOD} {BALANCE} {SHEETS}. {A} handbook*. https://www.fao.org/4/x9892e/X9892e05.htm
-* FAO (2023). CHAPTER} 2: {METHODS} {OF} {FOOD} {ANALYSIS. *Food energy - methods of analysis and conversion factors*. https://www.fao.org/4/y5022e/y5022e03.htm
-* Hohmann-Marriott, M. F. (2025). A Nitrogen budget for Norway analysis of Nitrogen flows from societal and natural sources (1961–2020). *PLOS ONE, 20*(2), e0313598. https://doi.org/10.1371/journal.pone.0313598
-* Landbruksdirektoratet (2025). *Kraftforstatistikk - årlig råvareforbruk*. https://www.landbruksdirektoratet.no/nb/statistikk-og-utviklingstrekk/utvikling-i-jordbruket/kraftforstatistikk
+* FAO (2021). Annex 1. {Food} composition tables. *FOOD} {BALANCE} {SHEETS}. {A} handbook*. [https://www.fao.org/4/x9892e/X9892e05.htm](https://www.fao.org/4/x9892e/X9892e05.htm)
+* FAO (2023). CHAPTER} 2: {METHODS} {OF} {FOOD} {ANALYSIS. *Food energy - methods of analysis and conversion factors*. [https://www.fao.org/4/y5022e/y5022e03.htm](https://www.fao.org/4/y5022e/y5022e03.htm)
+* Hohmann-Marriott, M. F. (2025). A Nitrogen budget for Norway analysis of Nitrogen flows from societal and natural sources (1961–2020). *PLOS ONE, 20*(2), e0313598. [https://doi.org/10.1371/journal.pone.0313598](https://doi.org/10.1371/journal.pone.0313598)
+* Landbruksdirektoratet (2025). *Kraftforstatistikk - årlig råvareforbruk*. [https://www.landbruksdirektoratet.no/nb/statistikk-og-utviklingstrekk/utvikling-i-jordbruket/kraftforstatistikk](https://www.landbruksdirektoratet.no/nb/statistikk-og-utviklingstrekk/utvikling-i-jordbruket/kraftforstatistikk)

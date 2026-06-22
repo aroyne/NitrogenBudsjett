@@ -14,4 +14,4 @@ nav_order: 9
 
 ### References
 
-* Miljødirektoratet (2025). *Norske utslipp - {Utslipp} til luft og vann og generert avfall, {Nitrogen} totalt*. https://www.norskeutslipp.no/no/Komponenter/Utslipp/Nitrogen-totalt/?ComponentType=utslipp&ComponentPageID=226
+* Miljødirektoratet (2025). *Norske utslipp - {Utslipp} til luft og vann og generert avfall, {Nitrogen} totalt*. [https://www.norskeutslipp.no/no/Komponenter/Utslipp/Nitrogen-totalt/?ComponentType=utslipp&ComponentPageID=226](https://www.norskeutslipp.no/no/Komponenter/Utslipp/Nitrogen-totalt/?ComponentType=utslipp&ComponentPageID=226)

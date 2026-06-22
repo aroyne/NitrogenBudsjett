@@ -318,13 +318,16 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
                                 else:
                                     ref_str += "."
                                 
-                            # 4. Lenke-håndtering (Prioriter DOI over URL)
+                            # 4. Lenke-håndtering (Klikkbare Markdown-lenker for GitHub Pages)
                             if doi:
+                                # Vask doi-strengen for vanlige formateringsfeil fra .bib
                                 doi_clean = doi.lower().replace("doi.org/", "").replace("https://", "").replace("http://", "")
                                 doi_url = f"https://doi.org/{doi_clean}"
-                                ref_str += f" {doi_url}"  # Fjernet Markdown-klikkbarhet her for renere tekst, legg eventuelt til []() igjen om ønskelig på nett
+                                # APA7 anbefaler å vise hele URL-en som klikkbar lenke
+                                ref_str += f" [{doi_url}]({doi_url})"
                             elif url:
-                                ref_str += f" {url}"
+                                # Gjør den vanlige nettside-urlen klikkbar
+                                ref_str += f" [{url}]({url})"
                                 
                             formatted_refs.append(ref_str)
                             
@@ -1057,7 +1060,7 @@ def process_humans_and_settlements_pool(hs_folder, plot_files, plot_dir, bib_fil
                 "households, services (tjenesteytende næringer), construction (Bygge- og anleggsvirksomhet), municipal services "
                 "(power and water), and waste management.\n\n"
                 "Detailed data are not available prior to 1995, but trends in municipal and other waste are described by \\\\citet{ssb_naturressurser_1997}. "
-                "Household waste per inhabitant increased from about 200 kg/person to 289 kg/person in 1995 \\\\citep[figure 4.1]{ssb_naturressurser_1997}, "
+                "Household waste per inhabitant increased from about 200 kg/person to 289 kg/person in 1995 Figure 4.1 in \\\\citep{ssb_naturressurser_1997}, "
                 "with an assumed linear increase in the years between. Based on this we assume a constant N content per unit mass "
                 "and extrapolate from 1995 values back to 1990."
             )
@@ -1605,7 +1608,7 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
                     f"**{exact_flow_code}** is found from SSB tables 05281 “Avfallsregnskap for Norge (1 000 tonn), "
                     "etter statistikkvariabel, behandlingsmåte, materialtype og år “ (1995-2011) and 10513 “Avfallsregnskap "
                     "for Norge (1 000 tonn), etter materialtype, statistikkvariabel, år og behandlingsmåte” (2012-2023), "
-                    "using N content values from \\citet{schappi_annexes_2025}.\n\\n"
+                    "using N content values from \\citet{schappi_annexes_2025}.\n\n"
                     "For years prior to 1995, we use the overall fraction of waste to incineration given in historical "
                     "records and assume that the overall N content of the waste is equal to the 1995 value. For years with missing data, "
                     "we interpolate."
@@ -1651,11 +1654,11 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
                     "and used in agricultural soils. Biological treatment of organic waste includes both composting and biogas production, "
                     "but in Norway, most of the waste composted in the municipal waste sector is used on the private sector, not in agriculture.\\n\\n"
                     "SSB statistics on composted organic waste also includes some composted wastewater sludge, but there is no exact statistics "
-                    "on the amount. Opportunities and limitations regarding the agronomic use of human excreta and urban compost are reviewed in \\\\citep{{starck_fate_2023}} and \\\\citep{{kaltenegger_urban_2023}}.\\n\\n"
+                    "on the amount.\n\n"
                     "From 2018, we use data on the disposal of biologically produced waste from SSB table 12818 assuming a typical N content "
                     "of compost, although a smaller fraction is also biogas digestate.\\n\\n"
                     "For 2012-2017, we use data on composted organic waste from SSB table 10513 “Avfallsregnskap for Norge (1 000 tonn) and "
-                    "scale the nitrogen value in 2018 for consistency.\\n\\n"
+                    "scale the nitrogen value in 2018 for consistency.\n\n"
                     "There are no official data prior to 2012, but we know that there was organic waste composted and used in the private sector. "
                     "In lack of other data we extrapolate the 2012 value back to 1990."
                 )
