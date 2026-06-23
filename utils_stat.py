@@ -597,16 +597,20 @@ def plot_global_sankey_interactive(df_flows, output_dir="output_files/plots"):
         # y=node_y  # (Kan legges til hvis du vil låse dem vertikalt også)
     )
     
-    # Definer strømmene som skal skjules i versjon nr. 2
-    hidden_flows = [
-        "RW.RW-MP.OP-Ammonia import-Nmix", 
-        "MP.OP-RW.RW-Ammonia export-NH3", 
-        "AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2", 
-        "MP.OP-RW.RW-Mineral fertilizer export-Nmix"
+    # Vi forenkler listen til kun å inneholde kjerneordene i STORE bokstaver
+    hidden_keywords = [
+        "AMMONIA IMPORT", 
+        "AMMONIA EXPORT", 
+        "AMMONIA SYNTHESIS", 
+        "FERTILIZER EXPORT"
     ]
     
-    # Opprett datasettet uten kunstgjødsel-strømmer
-    df_filtered = df_base[~df_base['flow_name'].str.upper().isin(hidden_flows)].copy()
+    # Vi bygger en "reguler uttrykk"-streng (regex) separert med '|' (betyr ELLER)
+    # Resultatet blir: "AMMONIA IMPORT|AMMONIA EXPORT|AMMONIA SYNTHESIS|FERTILIZER EXPORT"
+    filter_regex = "|".join(hidden_keywords)
+    
+    # Vi bruker .str.contains() for å fjerne alle rader som inneholder ett av disse ordene
+    df_filtered = df_base[~df_base['flow_name'].str.upper().str.contains(filter_regex, na=False)].copy()
 
     # --- 4. INDRE FUNKSJON FOR Å BYGGE EN ENKELT HTML-FIGUR ---
     def build_sankey_figure(df_data, title_suffix):

@@ -382,10 +382,10 @@ def build_landing_page(output_filename, current_date_str, bib_filename, target_f
             # --- NYTT: Informasjon og bryter/lenke for å se diagrammet uten kunstgjødsel ---
             f.write("> 💡 **Tip:** The national budget is highly dominated by fertilizer production and trade. "
                     "If you want to study the smaller, internal environmental and agricultural cycles more closely, "
-                    "you can view the **[Sankey Map with Fertilizer Trade Hidden](plots/global_nitrogen_sankey_no_fertilizer.html)**.\n\n")
+                    "you can view the **[Sankey Map with Fertilizer Trade Hidden](output_files/plots/global_nitrogen_sankey_no_fertilizer.html)**.\n\n")
             
             # Standard visning (Viser alle strømmer)
-            f.write('<iframe src="plots/global_nitrogen_sankey.html" '
+            f.write('<iframe src="output_files/plots/global_nitrogen_sankey.html" '
                     'width="100%" height="800px" frameborder="0" scrolling="no"></iframe>\n\n')
             f.write("---\n\n")
         else:
