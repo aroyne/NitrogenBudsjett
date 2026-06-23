@@ -8,6 +8,14 @@ has_children: true
 
 # Subpool: Wastewater (PR.WW)
 
+
+---
+
+## Interactive Mass Balance Overview (1990-2023)
+
+Hover over the chart to inspect specific streams, or click legend items to toggle visibility.
+
+<iframe src="../output_files/plots/balance_PR_WW.html" width="100%" height="600px" frameborder="0" scrolling="no"></iframe>
 We considered added a flow *PR.WW-PR.SO-Sewage sludge to biogas-Nmix* to account for sewage sludge used in biogas production. However, the digestate from these biogas plants is counted together with other sewage sludge when SSB reports end uses. In order to avoid double counting we have neglected this flow. 
 ### Flows that are zero or neglected:
 

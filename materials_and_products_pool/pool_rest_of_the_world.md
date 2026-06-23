@@ -10,6 +10,14 @@ has_children: true
 This section contains all documented nitrogen inflows and transfers originating from the Rest of the world (RW) pool. Click on the individual sub-flows in the left-hand menu to view graphs and methodological explanations.
 
 
+---
+
+## Interactive Mass Balance Overview (1990-2023)
+
+Hover over the chart to inspect specific streams, or click legend items to toggle visibility.
+
+<iframe src="../output_files/plots/balance_RW.html" width="100%" height="600px" frameborder="0" scrolling="no"></iframe>
+
 ### Flows that are zero or neglected:
 
 * **RW.RW-MP.FP-Sea fish (landings)-Nmix** is set to zero because all wild fish catch is accounted for under HY.

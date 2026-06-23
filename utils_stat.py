@@ -610,36 +610,36 @@ def process_and_export_mc_results(all_records):
     
     df_balance_input = summary_df.copy()
     
-    def extract_source_target(flow_name):
-        """
-        Altetende splitter som garanterer at kilde og mottaker blir funnet.
-        """
-        fn = flow_name.upper().strip()
+    # def extract_source_target(flow_name):
+    #     """
+    #     Altetende splitter som garanterer at kilde og mottaker blir funnet.
+    #     """
+    #     fn = flow_name.upper().strip()
         
-        if '-' in fn:
-            parts = fn.split('-')
-            return parts[0].strip(), parts[1].strip()
+    #     if '-' in fn:
+    #         parts = fn.split('-')
+    #         return parts[0].strip(), parts[1].strip()
         
-        if '_' in fn:
-            parts = fn.split('_')
-            if len(parts) >= 4 and parts[0] == "AG" and parts[2] in ["AT", "RW", "HY", "MP", "FS", "PR"]:
-                return f"{parts[0]}.{parts[1]}", f"{parts[2]}.{parts[3]}"
-            if len(parts) >= 4 and parts[0] == "AG" and parts[2] == "AG":
-                return f"{parts[0]}.{parts[1]}", f"{parts[2]}.{parts[3]}"
-            if parts[0] == "AG" and parts[1] in ["MM", "SM"]:
-                src = f"AG.{parts[1]}"
-                if "LEACHING" in parts or "HY" in parts: tgt = "HY.SW"
-                elif "EMISSIONS" in parts or "AT" in parts: tgt = "AT.AT"
-                elif "PRODUCT" in parts or "MP" in parts: tgt = "MP.FP"
-                elif "EXPORT" in parts or "RW" in parts: tgt = "RW.RW"
-                elif "APPLICATION" in parts: tgt = "AG.SM"
-                elif "FODDER" in parts: tgt = "AG.MM"
-                else: tgt = "Unknown"
-                return src, tgt
+    #     if '_' in fn:
+    #         parts = fn.split('_')
+    #         if len(parts) >= 4 and parts[0] == "AG" and parts[2] in ["AT", "RW", "HY", "MP", "FS", "PR"]:
+    #             return f"{parts[0]}.{parts[1]}", f"{parts[2]}.{parts[3]}"
+    #         if len(parts) >= 4 and parts[0] == "AG" and parts[2] == "AG":
+    #             return f"{parts[0]}.{parts[1]}", f"{parts[2]}.{parts[3]}"
+    #         if parts[0] == "AG" and parts[1] in ["MM", "SM"]:
+    #             src = f"AG.{parts[1]}"
+    #             if "LEACHING" in parts or "HY" in parts: tgt = "HY.SW"
+    #             elif "EMISSIONS" in parts or "AT" in parts: tgt = "AT.AT"
+    #             elif "PRODUCT" in parts or "MP" in parts: tgt = "MP.FP"
+    #             elif "EXPORT" in parts or "RW" in parts: tgt = "RW.RW"
+    #             elif "APPLICATION" in parts: tgt = "AG.SM"
+    #             elif "FODDER" in parts: tgt = "AG.MM"
+    #             else: tgt = "Unknown"
+    #             return src, tgt
         
-        if fn.startswith("AG.MM"): return "AG.MM", "Unknown"
-        if fn.startswith("AG.SM"): return "AG.SM", "Unknown"
-        return "Unknown", "Unknown"
+    #     if fn.startswith("AG.MM"): return "AG.MM", "Unknown"
+    #     if fn.startswith("AG.SM"): return "AG.SM", "Unknown"
+    #     return "Unknown", "Unknown"
 
     # 1. Bruk splittefunksjonen til å tildele kilde (source), mottaker (target) og verdi/usikkerhet
     res = df_balance_input['flow_name'].apply(extract_source_target)

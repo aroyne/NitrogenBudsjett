@@ -42,6 +42,8 @@ def get_balance_image_markdown(pool_code, plot_files, plot_dir, relative_depth="
                 f"Hover over the chart to inspect specific streams, or click legend items to toggle visibility.\n\n"
                 f'<iframe src="{relative_depth}{plot_dir}/{balance_file}" '
                 f'width="100%" height="600px" frameborder="0" scrolling="no"></iframe>\n'            )
+    print(balance_file)
+    print(plot_files)
     return ""
 
 
@@ -985,7 +987,6 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename, targ
         else:
             parent_subpool = "Aquaculture (HY.AC)"
             if "excretia" in norm:
-                print('hei')
                 exact_flow_code = "HY.AC-HY.CW-Excretia-Nmix"
                 display_name = "Excretia"
                 description = "Found through mass balance by assuming N that does not become fish or waste feed is excreted."
@@ -1805,7 +1806,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
         print(f"[INFO] Fant ikke mappen '{plot_dir}'. Rapporten ble ikke laget.")
         return
 
-    plot_files = sorted([f for f in os.listdir(plot_dir) if f.endswith('.png')])
+    plot_files = sorted([f for f in os.listdir(plot_dir) if f.endswith('.png') or f.endswith('.html')])
     if not plot_files:
         print(f"[INFO] Ingen plot-filer funnet i '{plot_dir}'.")
         return

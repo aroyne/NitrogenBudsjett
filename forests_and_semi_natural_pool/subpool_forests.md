@@ -9,6 +9,14 @@ has_children: true
 # Subpool: Forests (FS.FO)
 
 
+---
+
+## Interactive Mass Balance Overview (1990-2023)
+
+Hover over the chart to inspect specific streams, or click legend items to toggle visibility.
+
+<iframe src="../output_files/plots/balance_FS_FO.html" width="100%" height="600px" frameborder="0" scrolling="no"></iframe>
+
 ### Flows that are zero or neglected:
 
 * **FS.FO-AT.AT-Emissions-NOx** is neglected because no values are reported in the CRLTAP/WebDab categories 4A1 and 4A2 (forest soils).

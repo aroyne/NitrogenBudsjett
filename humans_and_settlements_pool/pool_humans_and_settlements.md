@@ -8,6 +8,14 @@ has_children: true
 # Pool: Humans and settlements (HS)
 
 
+---
+
+## Interactive Mass Balance Overview (1990-2023)
+
+Hover over the chart to inspect specific streams, or click legend items to toggle visibility.
+
+<iframe src="../output_files/plots/balance_HS.html" width="100%" height="600px" frameborder="0" scrolling="no"></iframe>
+
 ### Flows that are zero or neglected:
 
 * **HS.HS-AT.AT-LUC emissions-NH3** is assumed negligible as no NH3 emissions are given in the CLRTAP inventory submissions.

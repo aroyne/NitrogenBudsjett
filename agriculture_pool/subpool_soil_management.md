@@ -9,6 +9,14 @@ has_children: true
 # Subpool: Soil management (AG.SM)
 
 
+---
+
+## Interactive Mass Balance Overview (1990-2023)
+
+Hover over the chart to inspect specific streams, or click legend items to toggle visibility.
+
+<iframe src="../output_files/plots/balance_AG_SM.html" width="100%" height="600px" frameborder="0" scrolling="no"></iframe>
+
 ### Flows that are zero or neglected:
 
 * **AG.SM-HY.SW-Overland flow-Nmix**, **AG.SM-FS.OL-Overland flow-Nmix** and **AG.SM-FS.WL-Overland flow-Nmix** are neglected as suggested by Schäppi et al. (2025): «In a first approximation it can be assumed that N losses to hydrosphere or forests and semi-natural vegetation occur mainly via leaching. If no country specific data is available on fractions for overland flow of N, the overland flows can be neglected for simplification purposes». is not included because all runoff and leaching is included in Leaching.

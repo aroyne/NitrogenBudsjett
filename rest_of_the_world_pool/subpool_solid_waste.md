@@ -8,6 +8,14 @@ has_children: true
 
 # Subpool: Solid Waste (PR.SO)
 
+
+---
+
+## Interactive Mass Balance Overview (1990-2023)
+
+Hover over the chart to inspect specific streams, or click legend items to toggle visibility.
+
+<iframe src="../output_files/plots/balance_PR_SO.html" width="100%" height="600px" frameborder="0" scrolling="no"></iframe>
 We have added the flow *PR.SO-EF.EC-Waste to energy-Nmix* to better account for the Norwegian waste management system and statistics. This accounts for all waste incineration. Although the SSB data does separate between incineration with and without energy recovery for use, the fraction for energy reuse has consistently been around or above 80% since 1995, and we therefore for simplicity assign the entire waste incineration process to the EF.EC sector.
 
  It is expected that there should be a surplus for all years because landfilled waste stays in the PR sector and thus does not represent an outflow. The fraction of waste to landfill has been decreasing. 

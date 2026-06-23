@@ -16,3 +16,11 @@ This pool is divided into four operational sub-pools. Explore them using the sid
 * [Transportation (EF.TR)](subpool_transport.html)
 * [Other energy and fuels (EF.OE)](subpool_other_energy.html)
 
+
+---
+
+## Interactive Mass Balance Overview (1990-2023)
+
+Hover over the chart to inspect specific streams, or click legend items to toggle visibility.
+
+<iframe src="../output_files/plots/balance_EF.html" width="100%" height="600px" frameborder="0" scrolling="no"></iframe>
