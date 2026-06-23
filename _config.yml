@@ -21,4 +21,6 @@ scholar:
   references_section: 
       title: References
       
-include: [plots]
+include:
+  - output_files
+  - plots
