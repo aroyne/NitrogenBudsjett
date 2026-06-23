@@ -355,7 +355,7 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
 # ==============================================================================
 
 def build_landing_page(output_filename, current_date_str, bib_filename, target_format="html"):
-    """Genererer hovedlandingssiden (index.md) med kritisk advarsel."""
+    """Genererer hovedlandingssiden (index.md) med kritisk advarsel og oppdaterte Sankey-lenker."""
     with open(output_filename, 'w', encoding='utf-8') as f:
         f.write("---\nlayout: default\ntitle: Home\nnav_order: 1\n---\n\n")
         f.write("# Nitrogen Budget for Norway\n\n")
@@ -371,22 +371,30 @@ def build_landing_page(output_filename, current_date_str, bib_filename, target_f
         f.write("Use the navigation menu on the left side to explore the individual nitrogen pools ")
         f.write("(e.g., Forests and Semi-natural Vegetation, Agriculture, Atmosphere, Hydrosphere, Rest of the World) ")
         f.write("and access detailed statistical time-series graphs, methodological explanations, and parameterizations for each specific flow.\n\n")
+        
         if target_format == "html":
             f.write("### Interactive National Nitrogen Flow Map\n")
             f.write("The diagram below illustrates the integrated nitrogen economy of Norway. "
                     "Use the **slider at the bottom** or press **Play** to explore how the flow magnitudes "
-                    "have evolved over time. Piles are color-coded by chemical/functional type "
-                    "(e.g., gray for inert N₂, red for NOx, orange for NH₃).\n\n")
-            # Siden index.md ligger på roten, trenger vi ikke '../' foran plots/
+                    "have evolved over time. Flows are color-coded by chemical/functional type "
+                    "(e.g., gray for inert N₂, red for NOx, orange for NH₃/RDN, green for Nmix).\n\n")
+            
+            # --- NYTT: Informasjon og bryter/lenke for å se diagrammet uten kunstgjødsel ---
+            f.write("> 💡 **Tip:** The national budget is highly dominated by fertilizer production and trade. "
+                    "If you want to study the smaller, internal environmental and agricultural cycles more closely, "
+                    "you can view the **[Sankey Map with Fertilizer Trade Hidden](plots/global_nitrogen_sankey_no_fertilizer.html)**.\n\n")
+            
+            # Standard visning (Viser alle strømmer)
             f.write('<iframe src="plots/global_nitrogen_sankey.html" '
                     'width="100%" height="800px" frameborder="0" scrolling="no"></iframe>\n\n')
             f.write("---\n\n")
         else:
             # Fallback-tekst hvis man bygger en statisk PDF via Pandoc
-            f.write("> **Note on Interactive Content:** An interactive, animated Sankey diagram showing the "
-                    "evolution of national nitrogen flows from year to year is available in the web-based "
+            f.write("> **Note on Interactive Content:** Interactive, animated Sankey diagrams showing the "
+                    "evolution of national nitrogen flows (both complete and with fertilizer trade hidden) are available in the web-based "
                     "version of this report.\n\n")
             f.write("---\n\n")
+            
         f.write("For flows connected to the hydrosphere, and for land-relateds emissions and nitrogen deposition, "
                 "we only consider the Norwegian mainland. For emissions to air reported through the UNFCCC framework we "
                 "also include emissions from Norwegian economic activity on Svalbard (these are minor and mainly related to coal extraction, "
@@ -397,8 +405,6 @@ def build_landing_page(output_filename, current_date_str, bib_filename, target_f
         append_bibtex_references(f, bib_filename)
         
         
-
-
 def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename, target_format):
     """Genererer alle sider knyttet til Atmosphere (AT) poolen med ren LaTeX-siteringssyntaks."""
     with open(os.path.join(at_folder, "pool_atmosphere.md"), 'w', encoding='utf-8') as f:

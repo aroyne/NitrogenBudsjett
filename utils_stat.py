@@ -70,6 +70,7 @@ def plot_pool_balance_interactive(df_flows, pool_code, output_dir="output_files/
             x=all_years,
             y=-df_out_grouped[col], # Negative verdier for å dytte dem nedover
             mode='lines',
+            hoveron='fills',
             name=f"OUT: {col}",
             stackgroup='two',  # Egen stackgroup for de negative
             hovertemplate=(
@@ -149,7 +150,7 @@ def plot_pool_balance_interactive(df_flows, pool_code, output_dir="output_files/
             zerolinecolor='gray',
             zerolinewidth=1
         ),
-        hovermode="x", 
+        hovermode="closest", 
         plot_bgcolor='white',
         paper_bgcolor='white',
         legend=dict(
@@ -318,133 +319,431 @@ def plot_pool_balance(df_flows, pool_code, output_dir="output_files/plots"):
     print(f"[INFO] Balanseplott generert for {pool_code} -> {filepath}")
     return plot_filename
 
+# def plot_global_sankey_interactive(df_flows, output_dir="output_files/plots"):
+#     """
+#     Genererer et interaktivt Sankey-diagram på HOVED-POOL-nivå (AT, EF, AG osv.)
+#     begrenset til tidsperioden 1990-2023 med en slider for å bla gjennom årstall.
+#     """
+#     os.makedirs(output_dir, exist_ok=True)
+    
+#     # Kloner og klargjør kilde/mål-kolonner
+#     df = df_flows.copy()
+    
+#     # --- 1. BEGRENS TIL ÅRENE 1990 - 2023 ---
+#     df = df[(df['year'] >= 1990) & (df['year'] <= 2023)]
+    
+#     if df.empty:
+#         print("[WARN] Ingen data funnet for tidsperioden 1990-2023.")
+#         return None
+        
+#     res = df['flow_name'].apply(extract_source_target)
+    
+#     # Trunkerer subpools til hoved-pools (f.eks. EF.TR -> EF)
+#     df['source_pool'] = [r[0].split('.')[0] for r in res]
+#     df['target_pool'] = [r[1].split('.')[0] for r in res]
+    
+#     # Filtrer bort ukjente eller interne feilstrømmer
+#     df = df[(df['source_pool'] != "Unknown") & (df['target_pool'] != "Unknown")]
+    
+#     # Fjerner interne looper som oppstår ved sammenslåing (f.eks. EF -> EF)
+#     df = df[df['source_pool'] != df['target_pool']]
+    
+#     if df.empty:
+#         print("[WARN] Ingen gyldige strømmer funnet til å generere Sankey-diagram.")
+#         return None
+
+#     # Aggregerer verdiene på nytt etter sammenslåingen til hoved-pools
+#     df = df.groupby(['year', 'source_pool', 'target_pool', 'flow_name'], as_index=False).agg({
+#         'value': 'sum',
+#         'uncertainty': lambda x: np.sqrt((x**2).sum())
+#     })
+
+#     # --- 2. OPPDATERT FARGE-MAPPING FOR NITROGENTYPER ---
+#     def get_flow_color(flow_name):
+#         fn = flow_name.upper()
+#         if "N2O" in fn: 
+#             return "rgba(156, 39, 176, 0.4)"       # Lilla
+#         elif "N2" in fn and "NOX" not in fn: 
+#             return "rgba(180, 180, 180, 0.4)"       # Grå
+#         elif "NH3" in fn or "AMMONIA" in fn or "RDN" in fn: 
+#             return "rgba(255, 152, 0, 0.4)"         # Oransje
+#         elif "NOX" in fn or "OXN" in fn or "NITRITE" in fn or "NITRATE" in fn: 
+#             return "rgba(244, 67, 54, 0.4)"         # Rød
+#         elif "NMIX" in fn: 
+#             return "rgba(76, 175, 80, 0.4)"          # Grønn
+#         else: 
+#             return "rgba(33, 150, 243, 0.4)"         # Blå (Fallback)
+
+#     df['color'] = df['flow_name'].apply(get_flow_color)
+
+#     # 3. Map unike hoved-nodes til statiske indekser
+#     all_nodes = sorted(list(set(df['source_pool'].unique()) | set(df['target_pool'].unique())))
+#     node_indices = {node: i for i, node in enumerate(all_nodes)}
+    
+#     # --- OPPDATERT: Unike farger for dine 9 spesifikke pools ---
+#     node_color_map = {
+#         "AT": "#1a365d",  # Deep Navy (Atmosfære)
+#         "AG": "#2f855a",  # Skogsgrønn (Agriculture)
+#         "EF": "#c53030",  # Mørkerød (Energy and Fuels)
+#         "HY": "#2b6cb0",  # Klar blå (Hydrosfære)
+#         "FS": "#2c7a7b",  # Sjøgrønn/Teal (Forestry / Skogbruk)
+#         "HS": "#744210",  # Brun (Human Settlement / Avløp etc.)
+#         "RW": "#4a5568",  # Skifergrå (Regulert vann/Reservoarer)
+#         "PR": "#97266d",  # Vinrød/Plomme (Primary Processing / Industri)
+#         "MP": "#d69e2e",  # Dempet gull/oransje (Manufacturing Products)
+#     }
+    
+#     # Mapper fargene til rekkefølgen i all_nodes, med lys grå som sikkerhets-fallback
+#     node_colors = [node_color_map.get(node, "#bdc3c7") for node in all_nodes]
+    
+#     # Statisk node-konfigurasjon med den nye fargelisten
+#     static_node_config = dict(
+#         pad=20, 
+#         thickness=25, 
+#         line=dict(color="black", width=0.5),
+#         label=all_nodes, 
+#         color=node_colors  
+#     )
+    
+#     # 4. Klargjør tidsrammer (Frames)
+#     all_years = sorted(list(df['year'].unique()))
+#     frames = []
+#     slider_steps = []
+
+#     # Første tilgjengelige år i 1990-2023 serien som start-state
+#     first_year = all_years[0]
+#     df_first = df[df['year'] == first_year]
+    
+#     initial_sankey = go.Sankey(
+#         node=static_node_config,
+#         link=dict(
+#             source=[node_indices[s] for s in df_first['source_pool']],
+#             target=[node_indices[t] for t in df_first['target_pool']],
+#             value=df_first['value'],
+#             color=df_first['color'],
+#             label=df_first['flow_name'],
+#             line=dict(color="rgba(50, 50, 50, 0.3)", width=0.5)
+#         )
+#     )
+
+#     # Bygg uavhengige frames for hvert år i perioden
+#     for yr in all_years:
+#         df_yr = df[df['year'] == yr]
+        
+#         frames.append(go.Frame(
+#             data=[go.Sankey(
+#                 node=static_node_config, 
+#                 link=dict(
+#                     source=[node_indices[s] for s in df_yr['source_pool']],
+#                     target=[node_indices[t] for t in df_yr['target_pool']],
+#                     value=df_yr['value'],
+#                     color=df_yr['color'],
+#                     label=df_yr['flow_name']
+#                 )
+#             )],
+#             name=str(yr)
+#         ))
+        
+#         slider_steps.append(dict(
+#             method="animate",
+#             args=[[str(yr)], dict(mode="immediate", frame=dict(duration=200, redraw=True), transition=dict(duration=0))],
+#             label=str(yr)
+#         ))
+
+#     # 5. Sett sammen figuren og konfigurer layout
+#     fig = go.Figure(data=[initial_sankey], frames=frames)
+
+#     fig.update_layout(
+#         title=dict(
+#             text="Global Nitrogen Flow Evolution (1990-2023 - Main Pools)",
+#             font=dict(size=18, family="Arial")
+#         ),
+#         height=750,
+#         width=1100,
+#         updatemenus=[dict(
+#             type="buttons",
+#             showactive=False,
+#             x=0.05, y=-0.15, xanchor="right", yanchor="top",
+#             buttons=[
+#                 dict(label="▶ Play", method="animate", args=[None, dict(frame=dict(duration=400, redraw=True), fromcurrent=True)]),
+#                 dict(label="⏸ Pause", method="animate", args=[[None], dict(mode="immediate", frame=dict(duration=0, redraw=True))])
+#             ]
+#         )],
+#         sliders=[dict(
+#             active=0,
+#             steps=slider_steps,
+#             x=0.08, y=-0.15,
+#             currentvalue=dict(font=dict(size=14, color="navy"), prefix="Year: ", visible=True),
+#             len=0.9
+#         )]
+#     )
+
+#     filename = "global_nitrogen_sankey.html"
+#     filepath = os.path.join(output_dir, filename)
+#     fig.write_html(filepath, include_plotlyjs='cdn')
+    
+#     print(f"[SUCCESS] Interaktivt tidslinje-Sankey (1990-2023) generert -> {filepath}")
+#     return filename
+
+
+
 def plot_global_sankey_interactive(df_flows, output_dir="output_files/plots"):
     """
-    Genererer et interaktivt Sankey-diagram med en slider for å bla gjennom årstall.
-    Bredden på pilene endres dynamisk, og fargen bestemmes av nitrogentype (Nmix, N2, NOx, NH3, etc.).
+    Genererer to interaktive Sankey-diagrammer på HOVED-POOL-nivå begrenset til 1990-2023:
+    Ett med alle strømmer, og ett hvor de enorme kunstgjødsel-strømmene er filtrert ut.
     """
     os.makedirs(output_dir, exist_ok=True)
     
-    # Kloner og klargjør kilde/mål-kolonner ved å bruke din eksisterende logikk
-    df = df_flows.copy()
-    res = df['flow_name'].apply(extract_source_target)
-    df['source_pool'] = [r[0] for r in res]
-    df['target_pool'] = [r[1] for r in res]
+    # Kloner og klargjør kilde/mål-kolonner
+    df_base = df_flows.copy()
+    
+    # --- 1. BEGRENS TIL ÅRENE 1990 - 2023 ---
+    df_base = df_base[(df_base['year'] >= 1990) & (df_base['year'] <= 2023)]
+    
+    if df_base.empty:
+        print("[WARN] Ingen data funnet for tidsperioden 1990-2023.")
+        return None
+        
+    res = df_base['flow_name'].apply(extract_source_target)
+    
+    # Trunkerer subpools til hoved-pools (f.eks. EF.TR -> EF)
+    df_base['source_pool'] = [r[0].split('.')[0] for r in res]
+    df_base['target_pool'] = [r[1].split('.')[0] for r in res]
     
     # Filtrer bort ukjente eller interne feilstrømmer
-    df = df[(df['source_pool'] != "Unknown") & (df['target_pool'] != "Unknown")]
-    df = df[df['source_pool'] != df['target_pool']]  # Fjerner interne looper
+    df_base = df_base[(df_base['source_pool'] != "Unknown") & (df_base['target_pool'] != "Unknown")]
     
-    if df.empty:
+    # Fjerner interne looper som oppstår ved sammenslåing (f.eks. EF -> EF)
+    df_base = df_base[df_base['source_pool'] != df_base['target_pool']]
+    
+    if df_base.empty:
         print("[WARN] Ingen gyldige strømmer funnet til å generere Sankey-diagram.")
         return None
 
-    # 1. Definer farger basert på nitrogentype i flomnavnet
+    # Aggregerer verdiene på nytt etter sammenslåingen til hoved-pools
+    df_base = df_base.groupby(['year', 'source_pool', 'target_pool', 'flow_name'], as_index=False).agg({
+        'value': 'sum',
+        'uncertainty': lambda x: np.sqrt((x**2).sum())
+    })
+
+    # --- 2. FARGE-MAPPING FOR NITROGENTYPER ---
     def get_flow_color(flow_name):
         fn = flow_name.upper()
-        if "N2" in fn and "NOX" not in fn:
-            return "rgba(180, 180, 180, 0.5)"     # Grå for inert N2
-        elif "NH3" in fn or "AMMONIA" in fn:
-            return "rgba(255, 152, 0, 0.5)"       # Oransje for NH3
-        elif "NOX" in fn or "NITRITE" in fn:
-            return "rgba(244, 67, 54, 0.5)"       # Rød for NOx
-        elif "N2O" in fn:
-            return "rgba(156, 39, 176, 0.5)"      # Lilla for N2O
-        elif "FIXATION" in fn:
-            return "rgba(76, 175, 80, 0.5)"       # Grønn for fiksering
-        else:
-            return "rgba(33, 150, 243, 0.5)"      # Blå for standard reaktivt N (Nmix / gjødsel etc)
+        if "N2O" in fn: 
+            return "rgba(156, 39, 176, 0.4)"       # Lilla
+        elif "N2" in fn and "NOX" not in fn: 
+            return "rgba(180, 180, 180, 0.4)"       # Grå
+        elif "NH3" in fn or "AMMONIA" in fn or "RDN" in fn: 
+            return "rgba(255, 152, 0, 0.4)"         # Oransje
+        elif "NOX" in fn or "OXN" in fn or "NITRITE" in fn or "NITRATE" in fn: 
+            return "rgba(244, 67, 54, 0.4)"         # Rød
+        elif "NMIX" in fn: 
+            return "rgba(76, 175, 80, 0.4)"          # Grønn
+        else: 
+            return "rgba(33, 150, 243, 0.4)"         # Blå (Fallback)
 
-    df['color'] = df['flow_name'].apply(get_flow_color)
+    df_base['color'] = df_base['flow_name'].apply(get_flow_color)
 
-    # 2. Map unike noder (pools) til statiske indekser (så nodene ikke hopper rundt mellom år)
-    all_nodes = sorted(list(set(df['source_pool'].unique()) | set(df['target_pool'].unique())))
+    # 3. Map unike hoved-nodes til statiske indekser
+    all_nodes = sorted(list(set(df_base['source_pool'].unique()) | set(df_base['target_pool'].unique())))
     node_indices = {node: i for i, node in enumerate(all_nodes)}
     
-    # 3. Klargjør tidsrammer (Frames)
-    all_years = sorted(list(df['year'].unique()))
-    frames = []
-    slider_steps = []
-
-    # Vi bygger dataene for det FØRSTE året som start-state i plottet
-    first_year = all_years[0]
-    df_first = df[df['year'] == first_year]
+    # --- OPPDATERT: Unike farger med RGBA (gjennomsiktighet) for kant-nodene ---
+    node_color_map = {
+        "AT": "rgba(26, 54, 93, 0.4)",    # Gjennomsiktig mørkeblå (Venstre kant)
+        "HY": "rgba(43, 108, 176, 0.4)",  # Gjennomsiktig klarblå (Høyre kant)
+        "RW": "rgba(74, 85, 104, 0.4)",   # Gjennomsiktig skifergrå (Høyre kant)
+        
+        # Interne lukkede pools (Beholder solid farge)
+        "AG": "#2f855a",  # Skogsgrønn
+        "EF": "#c53030",  # Mørkerød
+        "FS": "#2c7a7b",  # Sjøgrønn/Teal
+        "HS": "#744210",  # Brun
+        "PR": "#97266d",  # Vinrød/Plomme
+        "MP": "#d69e2e",  # Dempet gull
+    }
+    node_colors = [node_color_map.get(node, "#bdc3c7") for node in all_nodes]
     
-    initial_sankey = go.Sankey(
-        node=dict(
-            pad=15, thickness=20, line=dict(color="black", width=0.5),
-            label=all_nodes, color="navy"
-        ),
-        link=dict(
-            source=[node_indices[s] for s in df_first['source_pool']],
-            target=[node_indices[t] for t in df_first['target_pool']],
-            value=df_first['value'],
-            color=df_first['color'],
-            label=df_first['flow_name']
+    # --- NYTT: Manuell plassering av nodene (X og Y koordinater) ---
+    # x: 0 = helt venstre, 1 = helt høyre
+    # y: 0 = helt øverst, 1 = helt nederst
+    node_x_map = {
+        "AT": 0.02,   # Kilde helt til venstre
+        "AG": 0.40,   # Senter-venstre
+        "FS": 0.40,   
+        "EF": 0.65,   # Senter-høyre
+        "PR": 0.65,   
+        "MP": 0.65,   
+        "HS": 0.65,   
+        "HY": 0.98,   # Sluk helt til høyre
+        "RW": 0.98,   # Sluk helt til høyre
+    }
+    
+    # Sorterer koordinatene så de matcher rekkefølgen i all_nodes
+    # Hvis en node mangler i x-mappen, setter vi den i midten (0.5) som sikkerhet
+    node_x = [node_x_map.get(node, 0.5) for node in all_nodes]
+    
+    # Vi lar Plotly bestemme Y-høyden (vertikal plassering) automatisk ved å IKKE sende med en y-liste.
+    # Men hvis du vil overstyre høyden også, kan du lage en 'node_y_map' på samme måte.
+
+    # Statisk node-konfigurasjon med låste X-posisjoner og gjennomsiktige farger
+    static_node_config = dict(
+        pad=20, 
+        thickness=25, 
+        line=dict(color="black", width=0.5),
+        label=all_nodes, 
+        color=node_colors,
+        x=node_x,  # <--- NYTT: Låser nodene horisontalt
+        # y=node_y  # (Kan legges til hvis du vil låse dem vertikalt også)
+    )
+    
+    # Definer strømmene som skal skjules i versjon nr. 2
+    hidden_flows = [
+        "RW.RW-MP.OP-Ammonia import-Nmix", 
+        "MP.OP-RW.RW-Ammonia export-NH3", 
+        "AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2", 
+        "MP.OP-RW.RW-Mineral fertilizer export-Nmix"
+    ]
+    
+    # Opprett datasettet uten kunstgjødsel-strømmer
+    df_filtered = df_base[~df_base['flow_name'].str.upper().isin(hidden_flows)].copy()
+
+    # --- 4. INDRE FUNKSJON FOR Å BYGGE EN ENKELT HTML-FIGUR ---
+    def build_sankey_figure(df_data, title_suffix):
+        all_years = sorted(list(df_data['year'].unique()))
+        frames = []
+        slider_steps = []
+
+        first_year = all_years[0]
+        df_first = df_data[df_data['year'] == first_year]
+        
+        initial_sankey = go.Sankey(
+            node=static_node_config,
+            link=dict(
+                source=[node_indices[s] for s in df_first['source_pool']],
+                target=[node_indices[t] for t in df_first['target_pool']],
+                value=df_first['value'],
+                color=df_first['color'],
+                label=df_first['flow_name'],
+                line=dict(color="rgba(50, 50, 50, 0.3)", width=0.5) # Kantlinje
+            )
         )
-    )
 
-    # Bygg uavhengige 'frames' for hvert eneste år
-    for yr in all_years:
-        df_yr = df[df['year'] == yr]
-        
-        frames.append(go.Frame(
-            data=[go.Sankey(
-                link=dict(
-                    source=[node_indices[s] for s in df_yr['source_pool']],
-                    target=[node_indices[t] for t in df_yr['target_pool']],
-                    value=df_yr['value'],
-                    color=df_yr['color'],
-                    label=df_yr['flow_name']
-                )
+        for yr in all_years:
+            df_yr = df_data[df_data['year'] == yr]
+            
+            frames.append(go.Frame(
+                data=[go.Sankey(
+                    node=static_node_config, 
+                    link=dict(
+                        source=[node_indices[s] for s in df_yr['source_pool']],
+                        target=[node_indices[t] for t in df_yr['target_pool']],
+                        value=df_yr['value'],
+                        color=df_yr['color'],
+                        label=df_yr['flow_name'],
+                        line=dict(color="rgba(50, 50, 50, 0.3)", width=0.5) # Kantlinje i alle frames
+                    )
+                )],
+                name=str(yr)
+            ))
+            
+            slider_steps.append(dict(
+                method="animate",
+                args=[[str(yr)], dict(mode="immediate", frame=dict(duration=200, redraw=True), transition=dict(duration=0))],
+                label=str(yr)
+            ))
+
+        fig = go.Figure(data=[initial_sankey], frames=frames)
+        fig.update_layout(
+            title=dict(
+                text=f"Global Nitrogen Flow Evolution (1990-2023) - {title_suffix}",
+                font=dict(size=18, family="Arial")
+            ),
+            height=750,
+            width=1100,
+            updatemenus=[dict(
+                type="buttons",
+                showactive=False,
+                x=0.05, y=-0.15, xanchor="right", yanchor="top",
+                buttons=[
+                    dict(label="▶ Play", method="animate", args=[None, dict(frame=dict(duration=400, redraw=True), fromcurrent=True)]),
+                    dict(label="⏸ Pause", method="animate", args=[[None], dict(mode="immediate", frame=dict(duration=0, redraw=True))])
+                ]
             )],
-            name=str(yr)
-        ))
-        
-        # Slider-instruksjoner per årstall
-        slider_steps.append(dict(
-            method="animate",
-            args=[[str(yr)], dict(mode="immediate", frame=dict(duration=200, redraw=True), transition=dict(duration=0))],
-            label=str(yr)
-        ))
+            sliders=[dict(
+                active=0,
+                steps=slider_steps,
+                x=0.08, y=-0.15,
+                currentvalue=dict(font=dict(size=14, color="navy"), prefix="Year: ", visible=True),
+                len=0.9
+            )]
+        )
+        return fig
 
-    # 4. Sett sammen figuren og konfigurer layout med slider
-    fig = go.Figure(data=[initial_sankey], frames=frames)
-
-    fig.update_layout(
-        title=dict(
-            text="Global Nitrogen Flow Evolution (Sankey System)",
-            font=dict(size=18, family="Arial")
-        ),
-        height=750,
-        width=1100,
-        updatemenus=[dict( # Legger til Spill av / Pause-knapper
-            type="buttons",
-            showactive=False,
-            x=0.05, y=-0.15, xanchor="right", yanchor="top",
-            buttons=[
-                dict(label="▶ Play", method="animate", args=[None, dict(frame=dict(duration=400, redraw=True), fromcurrent=True)]),
-                dict(label="⏸ Pause", method="animate", args=[[None], dict(mode="immediate", frame=dict(duration=0, redraw=True))])
-            ]
-        )],
-        sliders=[dict(
-            active=0,
-            steps=slider_steps,
-            x=0.08, y=-0.15,
-            currentvalue=dict(font=dict(size=14, color="navy"), prefix="Year: ", visible=True),
-            len=0.9
-        )]
-    )
-
-    # Lagre som HTML-fil
-    filename = "global_nitrogen_sankey.html"
-    filepath = os.path.join(output_dir, filename)
-    fig.write_html(filepath, include_plotlyjs='cdn')
+    # --- 5. GENERER OG LAGRE BEGGE FILENE ---
+    # Fil 1: Inneholder alt
+    fig_all = build_sankey_figure(df_base, "All Flows")
+    filename_all = "global_nitrogen_sankey.html"
+    filepath_all = os.path.join(output_dir, filename_all)
+    fig_all.write_html(filepath_all, include_plotlyjs='cdn')
+    print(f"[SUCCESS] Komplett Sankey generert -> {filepath_all}")
     
-    print(f"[SUCCESS] Interaktivt tidslinje-Sankey generert -> {filepath}")
-    return filename
+    # Fil 2: Isolert uten gjødsel-gigantene
+    fig_filtered = build_sankey_figure(df_filtered, "Fertilizer Trade Hidden")
+    filename_filtered = "global_nitrogen_sankey_no_fertilizer.html"
+    filepath_filtered = os.path.join(output_dir, filename_filtered)
+    fig_filtered.write_html(filepath_filtered, include_plotlyjs='cdn')
+    print(f"[SUCCESS] Filtrert Sankey (uten kunstgjødsel) generert -> {filepath_filtered}")
+    
+    return filename_all
 
+def extract_source_target(flow_name):
+        """
+        Altetende splitter som garanterer at kilde og mottaker blir funnet,
+        uansett om det brukes bindestrek, understrek eller punktum.
+        """
+        fn = flow_name.upper().strip()
+        
+        # Standard: Hvis den bruker bindestrek (f.eks. AG.MM-AT.AT-Emissions)
+        if '-' in fn:
+            parts = fn.split('-')
+            return parts[0].strip(), parts[1].strip()
+        
+        # Hvis den bruker understrek (f.eks. AG_MM_AT_AT_EMISSIONS eller AG_SM_LEACHING)
+        if '_' in fn:
+            parts = fn.split('_')
+            
+            # Tilfelle A: AG_MM_AT_AT_... (Lengre strenger)
+            if len(parts) >= 4 and parts[0] == "AG" and parts[2] in ["AT", "RW", "HY", "MP", "FS", "PR"]:
+                src = f"{parts[0]}.{parts[1]}"  # AG.MM
+                tgt = f"{parts[2]}.{parts[3]}"  # AT.AT
+                return src, tgt
+                
+            # Tilfelle B: Intern strøm AG_MM_AG_SM_...
+            if len(parts) >= 4 and parts[0] == "AG" and parts[2] == "AG":
+                src = f"{parts[0]}.{parts[1]}"  # AG.MM
+                tgt = f"{parts[2]}.{parts[3]}"  # AG.SM
+                return src, tgt
 
+            # Tilfelle C: Enklere format som f.eks. AG_MM_LEACHING (hvor mottaker må gjettes ut fra kontekst)
+            if parts[0] == "AG" and parts[1] in ["MM", "SM"]:
+                src = f"AG.{parts[1]}"
+                # Gjetter mål basert på unike nøkkelord hvis full kode mangler i navnet
+                if "LEACHING" in parts or "HY" in parts: tgt = "HY.SW"
+                elif "EMISSIONS" in parts or "AT" in parts: tgt = "AT.AT"
+                elif "PRODUCT" in parts or "MP" in parts: tgt = "MP.FP"
+                elif "EXPORT" in parts or "RW" in parts: tgt = "RW.RW"
+                elif "APPLICATION" in parts: tgt = "AG.SM"
+                elif "FODDER" in parts: tgt = "AG.MM"
+                else: tgt = "Unknown"
+                return src, tgt
+
+        # Nød-fallback: Hvis den starter med AG.MM eller AG.SM direkte (f.eks. som ren tekst)
+        if fn.startswith("AG.MM"): return "AG.MM", "Unknown"
+        if fn.startswith("AG.SM"): return "AG.SM", "Unknown"
+        
+        return "Unknown", "Unknown"
+    
 def process_and_export_mc_results(all_records):
     """
     Receives a list of dictionaries from ALL MC iterations.
@@ -695,49 +994,9 @@ def process_and_export_mc_results(all_records):
     print("\n" + "="*60)
     print("[SUCCESS] All MC iterations processed, statistics saved, and plots generated successfully.")
     
-def extract_source_target(flow_name):
-        """
-        Altetende splitter som garanterer at kilde og mottaker blir funnet,
-        uansett om det brukes bindestrek, understrek eller punktum.
-        """
-        fn = flow_name.upper().strip()
+    print("\n[PLOTTING] Generating global interactive Sankey diagram across all years...")
+    plot_global_sankey_interactive(df_balance_input, output_dir=plot_dir)
         
-        # Standard: Hvis den bruker bindestrek (f.eks. AG.MM-AT.AT-Emissions)
-        if '-' in fn:
-            parts = fn.split('-')
-            return parts[0].strip(), parts[1].strip()
-        
-        # Hvis den bruker understrek (f.eks. AG_MM_AT_AT_EMISSIONS eller AG_SM_LEACHING)
-        if '_' in fn:
-            parts = fn.split('_')
-            
-            # Tilfelle A: AG_MM_AT_AT_... (Lengre strenger)
-            if len(parts) >= 4 and parts[0] == "AG" and parts[2] in ["AT", "RW", "HY", "MP", "FS", "PR"]:
-                src = f"{parts[0]}.{parts[1]}"  # AG.MM
-                tgt = f"{parts[2]}.{parts[3]}"  # AT.AT
-                return src, tgt
-                
-            # Tilfelle B: Intern strøm AG_MM_AG_SM_...
-            if len(parts) >= 4 and parts[0] == "AG" and parts[2] == "AG":
-                src = f"{parts[0]}.{parts[1]}"  # AG.MM
-                tgt = f"{parts[2]}.{parts[3]}"  # AG.SM
-                return src, tgt
-
-            # Tilfelle C: Enklere format som f.eks. AG_MM_LEACHING (hvor mottaker må gjettes ut fra kontekst)
-            if parts[0] == "AG" and parts[1] in ["MM", "SM"]:
-                src = f"AG.{parts[1]}"
-                # Gjetter mål basert på unike nøkkelord hvis full kode mangler i navnet
-                if "LEACHING" in parts or "HY" in parts: tgt = "HY.SW"
-                elif "EMISSIONS" in parts or "AT" in parts: tgt = "AT.AT"
-                elif "PRODUCT" in parts or "MP" in parts: tgt = "MP.FP"
-                elif "EXPORT" in parts or "RW" in parts: tgt = "RW.RW"
-                elif "APPLICATION" in parts: tgt = "AG.SM"
-                elif "FODDER" in parts: tgt = "AG.MM"
-                else: tgt = "Unknown"
-                return src, tgt
-
-        # Nød-fallback: Hvis den starter med AG.MM eller AG.SM direkte (f.eks. som ren tekst)
-        if fn.startswith("AG.MM"): return "AG.MM", "Unknown"
-        if fn.startswith("AG.SM"): return "AG.SM", "Unknown"
-        
-        return "Unknown", "Unknown"
+    print("\n" + "="*60)
+    print("[SUCCESS] All MC iterations processed, statistics saved, and plots generated successfully.")
+    
