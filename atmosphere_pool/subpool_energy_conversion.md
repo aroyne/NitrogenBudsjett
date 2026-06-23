@@ -8,14 +8,6 @@ has_children: true
 
 # Subpool: Energy conversion (EF.EC)
 
-
----
-
-## Mass Balance Overview (1990-2023)
-
-The chart below illustrates the integrated nitrogen mass balance for **EF.EC**. It includes total system inflows (positive stack), total outflows (negative stack), and the net balance line with estimated uncertainty bounds (±1σ).
-
-![Mass Balance EF.EC](../output_files/plots/balance_EF_EC.png)
 This subpool includes extraction of fossil fuels from geological sources, which is a large sector in Norway. Because of this there is no mass balance for EF.EC; nitrogen bound to extracted fuels arise in the sector, and outflows are therefore significantly larger than inflows. 
 
 

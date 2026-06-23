@@ -8,14 +8,6 @@ has_children: true
 # Pool: Humans and settlements (HS)
 
 
----
-
-## Mass Balance Overview (1990-2023)
-
-The chart below illustrates the integrated nitrogen mass balance for **HS**. It includes total system inflows (positive stack), total outflows (negative stack), and the net balance line with estimated uncertainty bounds (±1σ).
-
-![Mass Balance HS](../output_files/plots/balance_HS.png)
-
 ### Flows that are zero or neglected:
 
 * **HS.HS-AT.AT-LUC emissions-NH3** is assumed negligible as no NH3 emissions are given in the CLRTAP inventory submissions.

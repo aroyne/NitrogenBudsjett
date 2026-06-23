@@ -10,14 +10,6 @@ has_children: true
 This section contains all documented nitrogen inflows and transfers originating from the Rest of the world (RW) pool. Click on the individual sub-flows in the left-hand menu to view graphs and methodological explanations.
 
 
----
-
-## Mass Balance Overview (1990-2023)
-
-The chart below illustrates the integrated nitrogen mass balance for **RW**. It includes total system inflows (positive stack), total outflows (negative stack), and the net balance line with estimated uncertainty bounds (±1σ).
-
-![Mass Balance RW](../output_files/plots/balance_RW.png)
-
 ### Flows that are zero or neglected:
 
 * **RW.RW-MP.FP-Sea fish (landings)-Nmix** is set to zero because all wild fish catch is accounted for under HY.

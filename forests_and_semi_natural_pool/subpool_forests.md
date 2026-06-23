@@ -9,14 +9,6 @@ has_children: true
 # Subpool: Forests (FS.FO)
 
 
----
-
-## Mass Balance Overview (1990-2023)
-
-The chart below illustrates the integrated nitrogen mass balance for **FS.FO**. It includes total system inflows (positive stack), total outflows (negative stack), and the net balance line with estimated uncertainty bounds (±1σ).
-
-![Mass Balance FS.FO](../output_files/plots/balance_FS_FO.png)
-
 ### Flows that are zero or neglected:
 
 * **FS.FO-AT.AT-Emissions-NOx** is neglected because no values are reported in the CRLTAP/WebDab categories 4A1 and 4A2 (forest soils).

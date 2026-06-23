@@ -4,6 +4,175 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
+import plotly.graph_objects as go
+
+def plot_pool_balance_interactive(df_flows, pool_code, output_dir="output_files/plots"):
+    """
+    Genererer et INTERAKTIVT balansediagram (HTML) for en spesifikk pool eller subpool.
+    Inngående strømmer stables oppover (positive), utgående strømmer stables nedover (negative).
+    Viser verdi, usikkerhet og fullt flomnavn når man hovrer med musen.
+    """
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # 1. Filtrer ut inngående og utgående strømmer for denne poolen
+    df_in = df_flows[df_flows['target'].str.startswith(pool_code, na=False)]
+    df_out = df_flows[df_flows['source'].str.startswith(pool_code, na=False)]
+    
+    if df_in.empty and df_out.empty:
+        print(f"[WARN] Ingen data funnet for pool-balanse: {pool_code}")
+        return None
+
+    # Sørg for at alle årstall er synkronisert
+    all_years = sorted(list(set(df_flows['year'])))
+    
+    # Grupper per år og fullt flomnavn
+    df_in_grouped = df_in.groupby(['year', 'flow_name'])['value'].sum().unstack(fill_value=0).reindex(all_years, fill_value=0)
+    df_out_grouped = df_out.groupby(['year', 'flow_name'])['value'].sum().unstack(fill_value=0).reindex(all_years, fill_value=0)
+    
+    # Hent tilhørende usikkerheter (std) i matriseformat matchet med de grupperte dataframene
+    df_in_unc = df_in.groupby(['year', 'flow_name'])['uncertainty'].sum().unstack(fill_value=0).reindex(all_years, fill_value=0)
+    df_out_unc = df_out.groupby(['year', 'flow_name'])['uncertainty'].sum().unstack(fill_value=0).reindex(all_years, fill_value=0)
+
+    # Beregn netto balanse og akkumulert usikkerhet (på tvers av alle strømmer per år)
+    df_in_total_unc = df_in.groupby('year')['uncertainty'].apply(lambda x: np.sqrt((x**2).sum())).reindex(all_years, fill_value=0)
+    df_out_total_unc = df_out.groupby('year')['uncertainty'].apply(lambda x: np.sqrt((x**2).sum())).reindex(all_years, fill_value=0)
+    
+    net_balance = df_in_grouped.sum(axis=1) - df_out_grouped.sum(axis=1)
+    combined_unc = np.sqrt(df_in_total_unc**2 + df_out_total_unc**2)
+
+    # Opprett tom Plotly-figur
+    fig = go.Figure()
+
+    # --- 2. STACK INNGÅENDE STRØMMER (Positive) ---
+    # Plotly stabler automatisk hvis vi bruker group='in' og stackgroup='positive'
+    for col in df_in_grouped.columns:
+        fig.add_trace(go.Scatter(
+            x=all_years,
+            y=df_in_grouped[col],
+            mode='lines',
+            hoveron='fills',
+            name=f"IN: {col}",
+            stackgroup='one',  # Stabler positive sammen
+            groupnorm='',      # Absolutte verdier, ikke prosent
+            hovertemplate=(
+                f"<b>{col}</b><br>" +
+                "År: %{x}<br>" +
+                "Verdi: %{y:.3f} kt N/year<br>" +
+                "<extra></extra>"  # Skjuler standard spor-navn i hoverboksen
+            ),
+            legendgroup="Inngående",
+            legendgrouptitle_text="══ SYSTEM INFLOW ══"
+        ))
+
+    # --- 3. STACK UTGÅENDE STRØMMER (Negative) ---
+    for col in df_out_grouped.columns:
+        fig.add_trace(go.Scatter(
+            x=all_years,
+            y=-df_out_grouped[col], # Negative verdier for å dytte dem nedover
+            mode='lines',
+            name=f"OUT: {col}",
+            stackgroup='two',  # Egen stackgroup for de negative
+            hovertemplate=(
+                f"<b>{col}</b><br>" +
+                "År: %{x}<br>" +
+                "Verdi: %{text:.3f} kt N/year<br>" + # Bruker original positiv verdi i hoveren
+                "<extra></extra>"
+            ),
+            text=df_out_grouped[col], # Sender med de positive verdiene som tekstvariabel
+            legendgroup="Utgående",
+            legendgrouptitle_text="══ SYSTEM OUTFLOW ══"
+        ))
+
+    # --- 4. USIKKERHETSBÅND (fill_between-ekvivalent i Plotly) ---
+    # Øvre grense
+    fig.add_trace(go.Scatter(
+        x=all_years,
+        y=net_balance + combined_unc,
+        mode='lines',
+        line=dict(width=0),
+        showlegend=False,
+        hoverinfo='skip'
+    ))
+    # Nedre grense (fyller rommet opp til forrige spor, altså øvre grense)
+    fig.add_trace(go.Scatter(
+        x=all_years,
+        y=net_balance - combined_unc,
+        mode='lines',
+        line=dict(width=0),
+        fill='tonexty',
+        fillcolor='rgba(0, 0, 0, 0.12)',
+        name='Uncertainty (±1σ)',
+        hoverinfo='skip',
+        legendgroup="Netto",
+        legendgrouptitle_text="══ NET BALANCE ══"
+    ))
+
+    # --- 5. NETTO BALANSELINJE ---
+    fig.add_trace(go.Scatter(
+        x=all_years,
+        y=net_balance,
+        mode='lines',
+        line=dict(color='black', width=3),
+        name='Net Balance (Inn - Ut)',
+        hovertemplate=(
+            "<b>Net Balance</b><br>" +
+            "År: %{x}<br>" +
+            "Netto: %{y:.3f} kt N/year<br>" +
+            "Usikkerhet: ±%{text:.3f}<br>" +
+            "<extra></extra>"
+        ),
+        text=combined_unc,
+        legendgroup="Netto"
+    ))
+
+    # --- 6. LAYOUT OG STYLING ---
+    fig.update_layout(
+        title=dict(
+            text=f"Mass Balance Overview: {pool_code}",
+            font=dict(size=16, family="Arial, sans-serif", color="black")
+        ),
+        xaxis=dict(
+            title="Year",
+            range=[1990, 2023],
+            tickmode='array',
+            tickvals=list(np.arange(1990, 2021, 5)) + [2023],
+            gridcolor='rgba(200, 200, 200, 0.4)',
+            showspikes=True,       # Legger til en tynn hjelpelinje som følger musa langs x-aksen
+            spikethickness=1,
+            spikedash="dot",
+            spikemode="across"
+        ),
+        yaxis=dict(
+            title="Nitrogen Flow (kt N / year)",
+            gridcolor='rgba(200, 200, 200, 0.4)',
+            zeroline=True,
+            zerolinecolor='gray',
+            zerolinewidth=1
+        ),
+        hovermode="x", 
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        legend=dict(
+            x=1.05,
+            y=1.0,
+            xanchor='left',
+            yanchor='top',
+            font=dict(size=10),
+            traceorder="grouped" # Sørger for at overskriftene våre skiller gruppene pent ut
+        ),
+        margin=dict(l=50, r=50, t=60, b=50),
+        width=1000,
+        height=600
+    )
+
+    # Lagre som HTML i stedet for PNG
+    plot_filename = f"balance_{pool_code.replace('.', '_')}.html"
+    filepath = os.path.join(output_dir, plot_filename)
+    fig.write_html(filepath, include_plotlyjs='cdn')
+    
+    print(f"[INFO] Interaktivt balanseplott generert for {pool_code} -> {filepath}")
+    return plot_filename
+
 
 def plot_pool_balance(df_flows, pool_code, output_dir="output_files/plots"):
     """
@@ -345,8 +514,6 @@ def process_and_export_mc_results(all_records):
         if fn.startswith("AG.SM"): return "AG.SM", "Unknown"
         return "Unknown", "Unknown"
 
-    # --- HER ER KODEN SOM MANGLER FOR Å UTVIKLE OG GENERERE PLOTTENE ---
-    
     # 1. Bruk splittefunksjonen til å tildele kilde (source), mottaker (target) og verdi/usikkerhet
     res = df_balance_input['flow_name'].apply(extract_source_target)
     df_balance_input['source'] = [r[0] for r in res]
@@ -356,7 +523,7 @@ def process_and_export_mc_results(all_records):
     df_balance_input['value'] = df_balance_input['median']
     df_balance_input['uncertainty'] = df_balance_input['std']  # Bruker standardavviket som 1σ usikkerhet
     
-# 2. Hent ut alle unike pool-koder som faktisk er til stede i dataene
+    # 2. Hent ut alle unike pool-koder som faktisk er til stede i dataene
     all_codes = set(df_balance_input['source'].unique()) | set(df_balance_input['target'].unique())
     all_codes.discard('Unknown')
     
@@ -396,6 +563,7 @@ def process_and_export_mc_results(all_records):
             df_temppool['target'] = df_temppool['target_main']
             
         plot_pool_balance(df_temppool, pool, output_dir=plot_dir)
+        plot_pool_balance_interactive(df_temppool, pool, output_dir=plot_dir)
         
     print("\n" + "="*60)
     print("[SUCCESS] All MC iterations processed, statistics saved, and plots generated successfully.")
