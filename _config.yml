@@ -20,3 +20,5 @@ scholar:
   type: :latex              # <--- Viktig! Tolker \cite, \citet, \citep i Markdown
   references_section: 
       title: References
+      
+include: [plots]

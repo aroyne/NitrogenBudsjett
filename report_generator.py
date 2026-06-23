@@ -352,7 +352,7 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
 # SPESIFIKKE FUNKSJONER FOR HVER ENKELT POOL
 # ==============================================================================
 
-def build_landing_page(output_filename, current_date_str, bib_filename):
+def build_landing_page(output_filename, current_date_str, bib_filename, target_format="html"):
     """Genererer hovedlandingssiden (index.md) med kritisk advarsel."""
     with open(output_filename, 'w', encoding='utf-8') as f:
         f.write("---\nlayout: default\ntitle: Home\nnav_order: 1\n---\n\n")
@@ -369,6 +369,22 @@ def build_landing_page(output_filename, current_date_str, bib_filename):
         f.write("Use the navigation menu on the left side to explore the individual nitrogen pools ")
         f.write("(e.g., Forests and Semi-natural Vegetation, Agriculture, Atmosphere, Hydrosphere, Rest of the World) ")
         f.write("and access detailed statistical time-series graphs, methodological explanations, and parameterizations for each specific flow.\n\n")
+        if target_format == "html":
+            f.write("### Interactive National Nitrogen Flow Map\n")
+            f.write("The diagram below illustrates the integrated nitrogen economy of Norway. "
+                    "Use the **slider at the bottom** or press **Play** to explore how the flow magnitudes "
+                    "have evolved over time. Piles are color-coded by chemical/functional type "
+                    "(e.g., gray for inert N₂, red for NOx, orange for NH₃).\n\n")
+            # Siden index.md ligger på roten, trenger vi ikke '../' foran plots/
+            f.write('<iframe src="plots/global_nitrogen_sankey.html" '
+                    'width="100%" height="800px" frameborder="0" scrolling="no"></iframe>\n\n')
+            f.write("---\n\n")
+        else:
+            # Fallback-tekst hvis man bygger en statisk PDF via Pandoc
+            f.write("> **Note on Interactive Content:** An interactive, animated Sankey diagram showing the "
+                    "evolution of national nitrogen flows from year to year is available in the web-based "
+                    "version of this report.\n\n")
+            f.write("---\n\n")
         f.write("For flows connected to the hydrosphere, and for land-relateds emissions and nitrogen deposition, "
                 "we only consider the Norwegian mainland. For emissions to air reported through the UNFCCC framework we "
                 "also include emissions from Norwegian economic activity on Svalbard (these are minor and mainly related to coal extraction, "

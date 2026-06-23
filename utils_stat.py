@@ -318,6 +318,133 @@ def plot_pool_balance(df_flows, pool_code, output_dir="output_files/plots"):
     print(f"[INFO] Balanseplott generert for {pool_code} -> {filepath}")
     return plot_filename
 
+def plot_global_sankey_interactive(df_flows, output_dir="output_files/plots"):
+    """
+    Genererer et interaktivt Sankey-diagram med en slider for å bla gjennom årstall.
+    Bredden på pilene endres dynamisk, og fargen bestemmes av nitrogentype (Nmix, N2, NOx, NH3, etc.).
+    """
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Kloner og klargjør kilde/mål-kolonner ved å bruke din eksisterende logikk
+    df = df_flows.copy()
+    res = df['flow_name'].apply(extract_source_target)
+    df['source_pool'] = [r[0] for r in res]
+    df['target_pool'] = [r[1] for r in res]
+    
+    # Filtrer bort ukjente eller interne feilstrømmer
+    df = df[(df['source_pool'] != "Unknown") & (df['target_pool'] != "Unknown")]
+    df = df[df['source_pool'] != df['target_pool']]  # Fjerner interne looper
+    
+    if df.empty:
+        print("[WARN] Ingen gyldige strømmer funnet til å generere Sankey-diagram.")
+        return None
+
+    # 1. Definer farger basert på nitrogentype i flomnavnet
+    def get_flow_color(flow_name):
+        fn = flow_name.upper()
+        if "N2" in fn and "NOX" not in fn:
+            return "rgba(180, 180, 180, 0.5)"     # Grå for inert N2
+        elif "NH3" in fn or "AMMONIA" in fn:
+            return "rgba(255, 152, 0, 0.5)"       # Oransje for NH3
+        elif "NOX" in fn or "NITRITE" in fn:
+            return "rgba(244, 67, 54, 0.5)"       # Rød for NOx
+        elif "N2O" in fn:
+            return "rgba(156, 39, 176, 0.5)"      # Lilla for N2O
+        elif "FIXATION" in fn:
+            return "rgba(76, 175, 80, 0.5)"       # Grønn for fiksering
+        else:
+            return "rgba(33, 150, 243, 0.5)"      # Blå for standard reaktivt N (Nmix / gjødsel etc)
+
+    df['color'] = df['flow_name'].apply(get_flow_color)
+
+    # 2. Map unike noder (pools) til statiske indekser (så nodene ikke hopper rundt mellom år)
+    all_nodes = sorted(list(set(df['source_pool'].unique()) | set(df['target_pool'].unique())))
+    node_indices = {node: i for i, node in enumerate(all_nodes)}
+    
+    # 3. Klargjør tidsrammer (Frames)
+    all_years = sorted(list(df['year'].unique()))
+    frames = []
+    slider_steps = []
+
+    # Vi bygger dataene for det FØRSTE året som start-state i plottet
+    first_year = all_years[0]
+    df_first = df[df['year'] == first_year]
+    
+    initial_sankey = go.Sankey(
+        node=dict(
+            pad=15, thickness=20, line=dict(color="black", width=0.5),
+            label=all_nodes, color="navy"
+        ),
+        link=dict(
+            source=[node_indices[s] for s in df_first['source_pool']],
+            target=[node_indices[t] for t in df_first['target_pool']],
+            value=df_first['value'],
+            color=df_first['color'],
+            label=df_first['flow_name']
+        )
+    )
+
+    # Bygg uavhengige 'frames' for hvert eneste år
+    for yr in all_years:
+        df_yr = df[df['year'] == yr]
+        
+        frames.append(go.Frame(
+            data=[go.Sankey(
+                link=dict(
+                    source=[node_indices[s] for s in df_yr['source_pool']],
+                    target=[node_indices[t] for t in df_yr['target_pool']],
+                    value=df_yr['value'],
+                    color=df_yr['color'],
+                    label=df_yr['flow_name']
+                )
+            )],
+            name=str(yr)
+        ))
+        
+        # Slider-instruksjoner per årstall
+        slider_steps.append(dict(
+            method="animate",
+            args=[[str(yr)], dict(mode="immediate", frame=dict(duration=200, redraw=True), transition=dict(duration=0))],
+            label=str(yr)
+        ))
+
+    # 4. Sett sammen figuren og konfigurer layout med slider
+    fig = go.Figure(data=[initial_sankey], frames=frames)
+
+    fig.update_layout(
+        title=dict(
+            text="Global Nitrogen Flow Evolution (Sankey System)",
+            font=dict(size=18, family="Arial")
+        ),
+        height=750,
+        width=1100,
+        updatemenus=[dict( # Legger til Spill av / Pause-knapper
+            type="buttons",
+            showactive=False,
+            x=0.05, y=-0.15, xanchor="right", yanchor="top",
+            buttons=[
+                dict(label="▶ Play", method="animate", args=[None, dict(frame=dict(duration=400, redraw=True), fromcurrent=True)]),
+                dict(label="⏸ Pause", method="animate", args=[[None], dict(mode="immediate", frame=dict(duration=0, redraw=True))])
+            ]
+        )],
+        sliders=[dict(
+            active=0,
+            steps=slider_steps,
+            x=0.08, y=-0.15,
+            currentvalue=dict(font=dict(size=14, color="navy"), prefix="Year: ", visible=True),
+            len=0.9
+        )]
+    )
+
+    # Lagre som HTML-fil
+    filename = "global_nitrogen_sankey.html"
+    filepath = os.path.join(output_dir, filename)
+    fig.write_html(filepath, include_plotlyjs='cdn')
+    
+    print(f"[SUCCESS] Interaktivt tidslinje-Sankey generert -> {filepath}")
+    return filename
+
+
 def process_and_export_mc_results(all_records):
     """
     Receives a list of dictionaries from ALL MC iterations.
