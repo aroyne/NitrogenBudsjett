@@ -1850,14 +1850,14 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
     # 1. Hovedlandingsside (index.md legges i rotmappen)
     build_landing_page(output_filename, current_date_str, bib_filename)
 
-    # 2. Atmosphere Pool
+    # 2. Energy and Fuels Pool
     os.makedirs(pool_folders[0], exist_ok=True)
-    process_atmosphere_pool(pool_folders[0], plot_files, plot_dir, bib_filename, target_format)
-
-    # 3. Rest of the World Pool
+    process_energy_and_fuels_pool(pool_folders[0], plot_files, plot_dir, bib_filename, target_format)
+    
+    # 3. Materials and Products Pool
     os.makedirs(pool_folders[1], exist_ok=True)
-    process_rest_of_the_world_pool(pool_folders[1], plot_files, plot_dir, bib_filename, target_format)
-
+    process_materials_pool(pool_folders[1], plot_files, plot_dir, bib_filename, target_format)
+    
     # 4. Agriculture Pool
     os.makedirs(pool_folders[2], exist_ok=True)
     process_agriculture_pool(pool_folders[2], plot_files, plot_dir, bib_filename, target_format)
@@ -1866,26 +1866,26 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
     os.makedirs(pool_folders[3], exist_ok=True)
     process_forests_pool(pool_folders[3], plot_files, plot_dir, bib_filename, target_format)
 
-    # 6. Hydrosphere Pool
+    # 6. Processing of residues Pool
     os.makedirs(pool_folders[4], exist_ok=True)
-    process_hydrosphere_pool(pool_folders[4], plot_files, plot_dir, bib_filename, target_format)
-
+    process_processing_of_residues_pool(pool_folders[4], plot_files, plot_dir, bib_filename, target_format)
+    
     # 7. Humans and Settlements Pool
     os.makedirs(pool_folders[5], exist_ok=True)
     process_humans_and_settlements_pool(pool_folders[5], plot_files, plot_dir, bib_filename, target_format)
 
-    # 8. Energy and Fuels Pool
+    # 8. Atmosphere Pool
     os.makedirs(pool_folders[6], exist_ok=True)
-    process_energy_and_fuels_pool(pool_folders[6], plot_files, plot_dir, bib_filename, target_format)
-    
-    # 9. Materials and Products Pool
+    process_atmosphere_pool(pool_folders[6], plot_files, plot_dir, bib_filename, target_format)
+
+    # 9. Hydrosphere Pool
     os.makedirs(pool_folders[7], exist_ok=True)
-    process_materials_pool(pool_folders[7], plot_files, plot_dir, bib_filename, target_format)
-    
-    # 10. Processing of residues Pool
+    process_hydrosphere_pool(pool_folders[7], plot_files, plot_dir, bib_filename, target_format)
+
+    # 3. Rest of the World Pool
     os.makedirs(pool_folders[8], exist_ok=True)
-    process_processing_of_residues_pool(pool_folders[8], plot_files, plot_dir, bib_filename, target_format)
-    
+    process_rest_of_the_world_pool(pool_folders[8], plot_files, plot_dir, bib_filename, target_format)
+
     # 11. Fikse format på referanser i ALLE mapper automatisk
     # Siden fix_all_citations_in_folder bruker os.walk(), vil "." (gjeldende mappe) 
     # gjøre at den finkjemmer både rotmappen og alle undermappene vi nettopp lagde.
