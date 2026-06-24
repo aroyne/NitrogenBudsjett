@@ -957,7 +957,7 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename, targ
         description = ""
 
         if filename.upper().startswith("HY_SW_"):
-            parent_subpool = "Surface water (HY.SW)"
+            parent_subpool = "Surface Water (HY.SW)"
             if "emissionsn2" in norm and "n2o" not in norm:
                 exact_flow_code = "HY.SW-AT.AT-Emissions-N2"
                 display_name = "N2 emissions from denitrification in surface waters"

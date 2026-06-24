@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Inflow to coastal waters
-parent: Surface water (HY.SW)
+parent: Surface Water (HY.SW)
 nav_order: 3
 ---
 

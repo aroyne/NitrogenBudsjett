@@ -50,7 +50,7 @@ def plot_pool_balance_interactive(df_flows, pool_code, output_dir="output_files/
             x=all_years,
             y=df_in_grouped[col],
             mode='lines',
-            hoveron='fills',
+            hoveron='points+fills',
             name=f"IN: {col}",
             stackgroup='one',  # Stabler positive sammen
             groupnorm='',      # Absolutte verdier, ikke prosent
@@ -150,7 +150,7 @@ def plot_pool_balance_interactive(df_flows, pool_code, output_dir="output_files/
             zerolinecolor='gray',
             zerolinewidth=1
         ),
-        hovermode="closest", 
+        hovermode="x", 
         plot_bgcolor='white',
         paper_bgcolor='white',
         legend=dict(
@@ -487,10 +487,14 @@ def plot_pool_balance(df_flows, pool_code, output_dir="output_files/plots"):
 
 
 
+import os
+import numpy as np
+import plotly.graph_objects as go
+
 def plot_global_sankey_interactive(df_flows, output_dir="output_files/plots"):
     """
     Genererer to interaktive Sankey-diagrammer på HOVED-POOL-nivå begrenset til 1990-2023:
-    Ett med alle strømmer, og ett hvor de enorme kunstgjødsel-strømmene er filtrert ut.
+    Låser den globale flytskalaen fullstendig ved bruk av en isolert skaleringsnode.
     """
     os.makedirs(output_dir, exist_ok=True)
     
@@ -544,109 +548,110 @@ def plot_global_sankey_interactive(df_flows, output_dir="output_files/plots"):
 
     df_base['color'] = df_base['flow_name'].apply(get_flow_color)
 
-    # 3. Map unike hoved-nodes til statiske indekser
-    all_nodes = sorted(list(set(df_base['source_pool'].unique()) | set(df_base['target_pool'].unique())))
+    # 3. Map unike hoved-nodes + NYE USYNLIGE SKALERINGSNODER
+    base_nodes = sorted(list(set(df_base['source_pool'].unique()) | set(df_base['target_pool'].unique())))
+    
+    # Vi legger til to kunstige noder dedikert KUN til å holde på skalaen
+    all_nodes = base_nodes + ["SCALE_SRC", "SCALE_TRG"]
     node_indices = {node: i for i, node in enumerate(all_nodes)}
     
-    # --- OPPDATERT: Unike farger med RGBA (gjennomsiktighet) for kant-nodene ---
+    # Fargemapping for reelle noder, de to skaleringsnodene gjøres 100% gjennomsiktige
     node_color_map = {
-        "AT": "rgba(26, 54, 93, 0.4)",    # Gjennomsiktig mørkeblå (Venstre kant)
-        "HY": "rgba(43, 108, 176, 0.4)",  # Gjennomsiktig klarblå (Høyre kant)
-        "RW": "rgba(74, 85, 104, 0.4)",   # Gjennomsiktig skifergrå (Høyre kant)
-        
-        # Interne lukkede pools (Beholder solid farge)
-        "AG": "#2f855a",  # Skogsgrønn
-        "EF": "#c53030",  # Mørkerød
-        "FS": "#2c7a7b",  # Sjøgrønn/Teal
-        "HS": "#744210",  # Brun
-        "PR": "#97266d",  # Vinrød/Plomme
-        "MP": "#d69e2e",  # Dempet gull
+        "AT": "rgba(26, 54, 93, 0.4)",
+        "HY": "rgba(43, 108, 176, 0.4)",
+        "RW": "rgba(74, 85, 104, 0.4)",
+        "AG": "#2f855a", "EF": "#c53030", "FS": "#2c7a7b", "HS": "#744210", "PR": "#97266d", "MP": "#d69e2e",
+        "SCALE_SRC": "rgba(0,0,0,0)", # Usynlig
+        "SCALE_TRG": "rgba(0,0,0,0)"  # Usynlig
     }
     node_colors = [node_color_map.get(node, "#bdc3c7") for node in all_nodes]
     
-    # --- NYTT: Manuell plassering av nodene (X og Y koordinater) ---
-    # x: 0 = helt venstre, 1 = helt høyre
-    # y: 0 = helt øverst, 1 = helt nederst
+    # Plassering av noder (X-koordinater). Skaleringsnodene gjemmes helt øverst i venstre/høyre hjørne
     node_x_map = {
-        "AT": 0.02,   # Kilde helt til venstre
-        "AG": 0.40,   # Senter-venstre
-        "FS": 0.40,   
-        "EF": 0.65,   # Senter-høyre
-        "PR": 0.65,   
-        "MP": 0.65,   
-        "HS": 0.65,   
-        "HY": 0.98,   # Sluk helt til høyre
-        "RW": 0.98,   # Sluk helt til høyre
+        "AT": 0.02, "AG": 0.40, "FS": 0.40, "EF": 0.65, "PR": 0.65, "MP": 0.65, "HS": 0.65, "HY": 0.98, "RW": 0.98,
+        "SCALE_SRC": 0.01,
+        "SCALE_TRG": 0.99
     }
-    
-    # Sorterer koordinatene så de matcher rekkefølgen i all_nodes
-    # Hvis en node mangler i x-mappen, setter vi den i midten (0.5) som sikkerhet
     node_x = [node_x_map.get(node, 0.5) for node in all_nodes]
     
-    # Vi lar Plotly bestemme Y-høyden (vertikal plassering) automatisk ved å IKKE sende med en y-liste.
-    # Men hvis du vil overstyre høyden også, kan du lage en 'node_y_map' på samme måte.
+    # For å hindre at de usynlige nodene dytter ned de ekte nodene, tvinger vi dem til y=0 (helt øverst)
+    node_y_map = {
+        "SCALE_SRC": 0.001,
+        "SCALE_TRG": 0.001
+    }
+    node_y = [node_y_map.get(node, None) for node in all_nodes] # None lar Plotly bestemme resten dynamisk
 
-    # Statisk node-konfigurasjon med låste X-posisjoner og gjennomsiktige farger
     static_node_config = dict(
         pad=20, 
         thickness=25, 
         line=dict(color="black", width=0.5),
-        label=all_nodes, 
+        label=[n if "SCALE" not in n else "" for n in all_nodes], # Skjul merkelappen på skaleringsnodene
         color=node_colors,
-        x=node_x,  # <--- NYTT: Låser nodene horisontalt
-        # y=node_y  # (Kan legges til hvis du vil låse dem vertikalt også)
+        x=node_x,
+        y=node_y
     )
     
-    # Vi forenkler listen til kun å inneholde kjerneordene i STORE bokstaver
-    hidden_keywords = [
-        "AMMONIA IMPORT", 
-        "AMMONIA EXPORT", 
-        "AMMONIA SYNTHESIS", 
-        "FERTILIZER EXPORT"
-    ]
-    
-    # Vi bygger en "reguler uttrykk"-streng (regex) separert med '|' (betyr ELLER)
-    # Resultatet blir: "AMMONIA IMPORT|AMMONIA EXPORT|AMMONIA SYNTHESIS|FERTILIZER EXPORT"
+    # Definer strømmene som skal skjules i versjon nr. 2
+    hidden_keywords = ["AMMONIA IMPORT", "AMMONIA EXPORT", "AMMONIA SYNTHESIS", "FERTILIZER EXPORT"]
     filter_regex = "|".join(hidden_keywords)
-    
-    # Vi bruker .str.contains() for å fjerne alle rader som inneholder ett av disse ordene
     df_filtered = df_base[~df_base['flow_name'].str.upper().str.contains(filter_regex, na=False)].copy()
 
-    # --- 4. INDRE FUNKSJON FOR Å BYGGE EN ENKELT HTML-FIGUR ---
-    def build_sankey_figure(df_data, title_suffix):
+    # --- MAKSIMAL SYSTEMKAPASITET FOR STATISK SKALERING ---
+    max_total_base = df_base.groupby('year')['value'].sum().max() * 1.05 # 5% ekstra margin
+    max_total_filtered = df_filtered.groupby('year')['value'].sum().max() * 1.05
+
+    # --- 4. INDRE FUNKSJON FOR Å BYGGE EN ENCELT HTML-FIGUR ---
+    def build_sankey_figure(df_data, title_suffix, max_scale_value):
         all_years = sorted(list(df_data['year'].unique()))
         frames = []
         slider_steps = []
 
+        def get_sankey_components(df_year_source, total_max):
+            df_yr = df_year_source.copy()
+            current_total = df_yr['value'].sum()
+            remaining_buffer = total_max - current_total
+            
+            # Konverter reelle data til lister
+            sources = [node_indices[s] for s in df_yr['source_pool']]
+            targets = [node_indices[t] for t in df_yr['target_pool']]
+            values = df_yr['value'].tolist()
+            colors = df_yr['color'].tolist()
+            labels = df_yr['flow_name'].tolist()
+            
+            # Kantlinje-konfigurasjon for de ekte strømmene
+            line_colors = ["rgba(50, 50, 50, 0.3)"] * len(values)
+            line_widths = [0.5] * len(values)
+            
+            # Hvis vi trenger å fylle opp skalaen, bruker vi de dedikerte usynlige nodene
+            if remaining_buffer > 0:
+                sources.append(node_indices["SCALE_SRC"])
+                targets.append(node_indices["SCALE_TRG"])
+                values.append(remaining_buffer)
+                colors.append("rgba(0,0,0,0)") # 100% gjennomsiktig flyt
+                labels.append("")               # Ingen tekst ved hover
+                line_colors.append("rgba(0,0,0,0)") # Ingen kantlinjefarge
+                line_widths.append(0.0)             # Ingen kantlinjebredde
+                
+            return dict(
+                source=sources, target=targets, value=values, color=colors, label=labels,
+                line=dict(color=line_colors, width=line_widths)
+            )
+
         first_year = all_years[0]
-        df_first = df_data[df_data['year'] == first_year]
+        link_config_first = get_sankey_components(df_data[df_data['year'] == first_year], max_scale_value)
         
         initial_sankey = go.Sankey(
             node=static_node_config,
-            link=dict(
-                source=[node_indices[s] for s in df_first['source_pool']],
-                target=[node_indices[t] for t in df_first['target_pool']],
-                value=df_first['value'],
-                color=df_first['color'],
-                label=df_first['flow_name'],
-                line=dict(color="rgba(50, 50, 50, 0.3)", width=0.5) # Kantlinje
-            )
+            link=link_config_first
         )
 
         for yr in all_years:
-            df_yr = df_data[df_data['year'] == yr]
+            link_config_yr = get_sankey_components(df_data[df_data['year'] == yr], max_scale_value)
             
             frames.append(go.Frame(
                 data=[go.Sankey(
                     node=static_node_config, 
-                    link=dict(
-                        source=[node_indices[s] for s in df_yr['source_pool']],
-                        target=[node_indices[t] for t in df_yr['target_pool']],
-                        value=df_yr['value'],
-                        color=df_yr['color'],
-                        label=df_yr['flow_name'],
-                        line=dict(color="rgba(50, 50, 50, 0.3)", width=0.5) # Kantlinje i alle frames
-                    )
+                    link=link_config_yr
                 )],
                 name=str(yr)
             ))
@@ -664,7 +669,7 @@ def plot_global_sankey_interactive(df_flows, output_dir="output_files/plots"):
                 font=dict(size=18, family="Arial")
             ),
             height=750,
-            width=1100,
+            margin=dict(l=20, r=20, t=60, b=20),
             updatemenus=[dict(
                 type="buttons",
                 showactive=False,
@@ -685,21 +690,20 @@ def plot_global_sankey_interactive(df_flows, output_dir="output_files/plots"):
         return fig
 
     # --- 5. GENERER OG LAGRE BEGGE FILENE ---
-    # Fil 1: Inneholder alt
-    fig_all = build_sankey_figure(df_base, "All Flows")
+    fig_all = build_sankey_figure(df_base, "All Flows", max_total_base)
     filename_all = "global_nitrogen_sankey.html"
     filepath_all = os.path.join(output_dir, filename_all)
-    fig_all.write_html(filepath_all, include_plotlyjs='cdn')
-    print(f"[SUCCESS] Komplett Sankey generert -> {filepath_all}")
+    fig_all.write_html(filepath_all, include_plotlyjs='cdn', default_width='100%')
+    print(f"[SUCCESS] Komplett Sankey med låst global skalering generert -> {filepath_all}")
     
-    # Fil 2: Isolert uten gjødsel-gigantene
-    fig_filtered = build_sankey_figure(df_filtered, "Fertilizer Trade Hidden")
+    fig_filtered = build_sankey_figure(df_filtered, "Fertilizer Trade Hidden", max_total_filtered)
     filename_filtered = "global_nitrogen_sankey_no_fertilizer.html"
     filepath_filtered = os.path.join(output_dir, filename_filtered)
-    fig_filtered.write_html(filepath_filtered, include_plotlyjs='cdn')
-    print(f"[SUCCESS] Filtrert Sankey (uten kunstgjødsel) generert -> {filepath_filtered}")
+    fig_filtered.write_html(filepath_filtered, include_plotlyjs='cdn', default_width='100%')
+    print(f"[SUCCESS] Filtrert Sankey med låst global skalering generert -> {filepath_filtered}")
     
     return filename_all
+
 
 def extract_source_target(flow_name):
         """

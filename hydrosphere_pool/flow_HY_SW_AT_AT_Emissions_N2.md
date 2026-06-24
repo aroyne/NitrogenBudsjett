@@ -1,7 +1,7 @@
 ---
 layout: default
 title: N2 emissions from denitrification in surface waters
-parent: Surface water (HY.SW)
+parent: Surface Water (HY.SW)
 nav_order: 1
 ---
 

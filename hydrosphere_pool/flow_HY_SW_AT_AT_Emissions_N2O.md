@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Surface water N2O emissions
-parent: Surface water (HY.SW)
+parent: Surface Water (HY.SW)
 nav_order: 2
 ---
 
