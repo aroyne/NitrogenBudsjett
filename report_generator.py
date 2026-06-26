@@ -1,9 +1,7 @@
 # report_generator.py
 import os
-# import shutil
 import re
 from datetime import datetime
-# from pybtex.database import parse_file
 
 # ==============================================================================
 # FELLES TEKSTBLOKKER OG HJELPEFUNKSJONER
@@ -225,7 +223,6 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
                 if key in ['url', 'doi']:
                     val = val.rstrip(']')
                 
-                # LA TIL: 'volume', 'number', 'pages' i listen over lagrede nøkler
                 if key in ['author', 'year', 'title', 'journal', 'booktitle', 'publisher', 'url', 'doi', 'volume', 'number', 'pages']:
                     references_dict[current_entry][key] = val
                     
@@ -235,7 +232,7 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
         for key in keys:
             if key in references_dict:
                 author = references_dict[key].get('author', 'Unknown')
-                short_author = get_short_author(author)  # Bruker ny logikk her
+                short_author = get_short_author(author)  
                 year = references_dict[key].get('year', 'n.d.')
                 parts.append(f"{short_author}, {year}")
             else:
@@ -379,7 +376,7 @@ def build_landing_page(output_filename, current_date_str, bib_filename, target_f
                     "have evolved over time. Flows are color-coded by chemical/functional type "
                     "(e.g., gray for inert N₂, red for NOx, orange for NH₃/RDN, green for Nmix).\n\n")
             
-            # --- NYTT: Informasjon og bryter/lenke for å se diagrammet uten kunstgjødsel ---
+            # Informasjon og bryter/lenke for å se diagrammet uten kunstgjødsel ---
             f.write("> 💡 **Tip:** The national budget is highly dominated by fertilizer production and trade. "
                     "If you want to study the smaller, internal environmental and agricultural cycles more closely, "
                     "you can view the **[Sankey Map with Fertilizer Trade Hidden](output_files/plots/global_nitrogen_sankey_no_fertilizer.html)**.\n\n")
@@ -456,7 +453,6 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename, targe
             f.write(f"# {display_name}\n\n![{exact_flow_code}](../{plot_dir}/{filename})\n\n### Flow Description\n")
 
             if exact_flow_code == "AT.AT-AG.SM-Biological N2 fixation-N2":
-                # Byttet ut [ukjent_nøkkel] med en narrativ LaTeX-sitatvariant \citet{}
                 f.write("\\citet{schappi_annexes_2025} advises using data from the EUROSTAT Gross nutrient balance, but there \
                     is an error in this dataset for Norway which is currently being corrected (as of February 2026; personal correspondence, \
                     EUROSTAT). According to the EUROSTAT metadata, the BNF in this statistic is calculated based on the area of leguminous crops and \
@@ -510,7 +506,6 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename, targe
             else:
                 f.write(f"*Flow details for {exact_flow_code}*\n\n")
 
-            # Kaller din oppdaterte versjon som kun skriver ut `{% bibliography --cited %}`
             append_bibtex_references(f, bib_filename)
 
 def process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename, target_format):
@@ -632,7 +627,6 @@ def process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename
             else:
                 f.write(f"*Flow details detected for file: `{filename}`.*\n\n")
             
-            # Legger til bibliografitaggen for den gitte siden ({% bibliography --cited %})
             append_bibtex_references(f, bib_filename)
             
             
@@ -904,7 +898,6 @@ def process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename, target_f
 
             f.write(f"# {display_name}\n\n![{exact_flow_code}](../{plot_dir}/{filename})\n\n### Flow Description\n{description}\n\n")
             
-            # Legger til bibliografitaggen {% bibliography --cited %}
             append_bibtex_references(f, bib_filename)
             
 
@@ -1024,7 +1017,6 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename, targ
     
             f.write(f"# {display_name}\n\n![{exact_flow_code}](../{plot_dir}/{filename})\n\n### Flow Description\n{description}\n\n")
             
-            # Legger til bibliografitaggen {% bibliography --cited %}
             append_bibtex_references(f, bib_filename)
 
 
@@ -1804,7 +1796,7 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
             append_bibtex_references(f, bib_filename)      
             
 # ==============================================================================
-# HOVEDFUNKSJON (ORKESTRATOR)
+# HOVEDFUNKSJON 
 # ==============================================================================
 
 def generate_github_pages_report(plot_dir='output_files/plots', output_filename='index.md', bib_filename='library.bib', target_format = 'html'):

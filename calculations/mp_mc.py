@@ -1266,6 +1266,5 @@ def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trad
             'data_sources': data_sources
         })
 
-    # Sluttkontroll mot mål-årene
     missing_years = target_years - collected_years
     report_missing_years(flow_code, missing_years, results)

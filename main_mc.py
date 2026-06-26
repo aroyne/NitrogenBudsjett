@@ -526,6 +526,14 @@ def main():
     start_time = time.time()
 
     for i in range(args.nsim):
+        if args.nsim <= 10:
+            print(i)
+        elif args.nsim <= 100:
+            if i/10-int(i/10)==0:
+                print(['Starter iterasjon ',i,' av ', args.nsim])
+        else:
+            if i/50-int(i/50)==0:
+                print(['Starter iterasjon ',i,' av ', args.nsim])
         # Nullstill tabeller til statiske verdier før hver runde
         if hasattr(base_params, '_tables'):
             base_params._tables['global_parameters'] = df_global_static.copy()

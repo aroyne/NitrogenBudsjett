@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import pandas as pd
-import numpy as np
 import openpyxl
 import warnings
 from calculations.utils import read_trade_data
@@ -12,15 +11,11 @@ warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl.workshe
 def load_all_data(selected_pools):
     
     
-    """
-    Sentral datalaster som sørger for at tunge I/O-operasjoner kun skjer ÉN gang.
-    Konfigurert deklarativt for ekstremt enkel utvidelse av nye pools og filer.
-    """
     preloaded = {}
-    print(f"\n[DATA_LOADER] Kalles med selected_pools: {selected_pools}") # <-- LEGG TIL DENNE
+    print(f"\n[DATA_LOADER] Kalles med selected_pools: {selected_pools}") 
     
     # =========================================================================
-    # 1. KONFIGURASJONSKART (Legg til nye filer eller pools her!)
+    # 1. KONFIGURASJONSKART 
     # =========================================================================
     # Format: 'preloaded_nøkkel': ( {relevante_pools}, 'filbane', 'lesemetode', {ekstra_arg} )
     DATA_MAP = {
@@ -98,7 +93,7 @@ def load_all_data(selected_pools):
         }
 
     # =========================================================================
-    # 2. TUNGE SPESIALPR_LOADS (Handelsdata)
+    # 2. HANDELSDATA
     # =========================================================================
     trade_needing_pools = {'at', 'rw', 'mp', 'pr', 'ef', 'ag'}
     if not trade_needing_pools.isdisjoint(selected_pools):
@@ -141,7 +136,6 @@ def load_all_data(selected_pools):
             elif method == 'csv':
                 df = pd.read_csv(filepath, **kwargs)
                 if key in ['faostat_fertilizer', 'fao_mineral_fertilizer', 'faostat_fertilizer_production']:
-                    # Vi tar vare på 'Element' slik at poolene kan skille mellom Import og Eksport selv
                     preloaded[key] = df[['Year', 'Element', 'Value']].copy()
                 else:
                     preloaded[key] = df                    
@@ -256,28 +250,23 @@ def load_all_data(selected_pools):
                         
             elif method == 'csv_forestry':
                 df_raw = pd.read_csv(filepath)
-                # Vi tar vare på hele filen i minnet så find_industrial_round_wood kan filtrere den lynraskt
                 preloaded[key] = df_raw
                 
             elif method == 'csv_ef_fuel':
                 df = pd.read_csv(filepath)
                 preloaded[key] = df[['year', 'value']].copy()
             elif method == 'excel_ssb_generic':
-                # Henter fane-navnet fra argumentene definert over
                 sheet_name = kwargs.get('sheet') if 'sheet' in kwargs else kwargs.get('sheet_name')
-                # Vi laster inn uten header for å beholde nøyaktig samme radindekser som i openpyxl
                 df = pd.read_excel(filepath, sheet_name=sheet_name, header=None)
                 preloaded[key] = df
                 
             elif method == 'excel_mildir_emissions':
-                # Leses med vanlig header=0 slik som i koden din
                 preloaded[key] = pd.read_excel(filepath, header=0)
 
             elif method == 'excel_industry_categories':
                 preloaded[key] = pd.read_excel(filepath)
                 
             elif method == 'excel_population':
-                # Beholder nøyaktig samme rensing som din opprinnelige kode
                 df = pd.read_excel(filepath, skiprows=2, skipfooter=42)
                 df = df.set_index('Unnamed: 0')
                 preloaded[key] = df
