@@ -6,7 +6,7 @@ Created on Tue Feb 17 11:49:52 2026
 @author: anja
 """
 import openpyxl
-import pandas as pd   # for get_table
+import pandas as pd  
 
 class NParameters:
     def __init__(self, filename="N_parameters.xlsx"):
@@ -57,13 +57,13 @@ class NParameters:
             return self.waste_fractions[category]
         raise KeyError(f"[STOPP] Avfallsfraksjon '{category}' mangler helt i waste_fractions!")
 
-    def animal_weight(self, item_name):
-        """Søker etter dyrevekt. Krasjer hvis den ikke finnes."""
-        if hasattr(self, item_name):
-            return getattr(self, item_name)
-        if item_name in self.animal_weights:
-            return self.animal_weights[item_name]
-        raise KeyError(f"[STOPP] Dyrevekt for '{item_name}' mangler helt i animal_weights!")
+#     def animal_weight(self, item_name):
+#         """Søker etter dyrevekt. Krasjer hvis den ikke finnes."""
+#         if hasattr(self, item_name):
+#             return getattr(self, item_name)
+#         if item_name in self.animal_weights:
+#             return self.animal_weights[item_name]
+#         raise KeyError(f"[STOPP] Dyrevekt for '{item_name}' mangler helt i animal_weights!")
         
     def get_table(self, sheet_name):
         """
@@ -71,34 +71,6 @@ class NParameters:
         Antar at første rad er header.
         """
         return pd.read_excel(self.filename, sheet_name=sheet_name)
-
-    def get_global_param_with_uncertainty(self, param_id):
-        """
-        Return (value, uncertainty_percent) for a scalar parameter in global_parameters.
-        """
-        df = self.get_table('global_parameters')
-        row = df.loc[df['parameter_id'] == param_id]
-        if row.empty:
-            raise KeyError(f"Parameter '{param_id}' not found in global_parameters")
-        value = float(row['value'].iloc[0])
-        unc = float(row['uncertainty'].iloc[0])
-        return value, unc
-
-    def get_global_param_uncertainty(self, param_id):
-        """
-        Convenience: just the uncertainty (%) for a scalar parameter.
-        """
-        _, unc = self.get_global_param_with_uncertainty(param_id)
-        return unc
-
-    def waste_N_frac_with_uncertainty(self, frac_id):
-        df = self.get_table('waste_fractions')
-        row = df.loc[df['waste_category'] == frac_id]
-        if row.empty:
-            raise KeyError(f"Fraction '{frac_id}' not found in waste_N_content")
-        value = float(row['N_frac'].iloc[0])
-        unc = float(row['uncertainty'].iloc[0])
-        return value, unc
     
     def get_trade_params(self):
         df = pd.read_excel(self.filename, sheet_name='trade_parameters')
@@ -127,16 +99,6 @@ class NParameters:
         """
         df = self.get_table('trade_mapping')
         return df
-
-    def get_trade_param_with_uncertainty(self, param_id):
-        """
-        Convenience: return (value, uncertainty) for a given trade param_id.
-        """
-        trade_params = self.get_trade_params()
-        if param_id not in trade_params.index:
-            raise KeyError(f"Trade N parameter '{param_id}' not found")
-        row = trade_params.loc[param_id]
-        return float(row['value']), float(row['uncertainty'])
 
     def override_global_params(self, custom_dict):
         """

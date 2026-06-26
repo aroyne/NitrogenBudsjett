@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-MC-VERSJON: Beregner nitrogenflyt for skog og utmark (FS).
-Rådata ligger i preloaded_data, mens støyfaktorer for hvert datasett sendes inn via dataset_noise.
-"""
-import pandas as pd
 import numpy as np
 
 from calculations.utils import (
@@ -32,19 +27,6 @@ def execute_calculations_fs(preloaded_data, current_params, dataset_noise):
     return results
 
 
-def _apply_dataset_noise(base_value, dataset_key, dataset_noise, caller_func):
-    """
-    Legger støy på verdi. Krasjer hardt dersom støy-nøkkel mangler.
-    """
-    if not dataset_noise or dataset_key not in dataset_noise:
-        raise KeyError(
-            f"[KRITISK FEIL] Støy-nøkkel '{dataset_key}' mangler i dataset_noise under kallet fra {caller_func.__name__}!"
-        )
-
-    noise_val = dataset_noise[dataset_key]
-    return base_value * noise_val
-
-
 def _add_fo_N2O_emissions_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'FS.FO-AT.AT-Emissions-N2O'
     collected_years = set()
@@ -52,9 +34,6 @@ def _add_fo_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
     dataset_key = 'UNFCCC_emissions'
     
     df_unfccc = preloaded_data.get('fs_unfccc_emissions_raw')
-    if df_unfccc is None:
-        raise ValueError(f"[KRITISK] Data 'fs_unfccc_emissions_raw' mangler i preloaded_data for {flow_code}!")
-
     N2O_to_N = float(current_params.get("N2O_to_N_factor"))
     
     for row in range(5, 39):  
@@ -65,9 +44,7 @@ def _add_fo_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
         noise_val = dataset_noise[dataset_key]
         perturbed_raw = raw_val * noise_val
         
-        value = perturbed_raw * N2O_to_N
-        if value < 0: value = 0.0
-        
+        value = perturbed_raw * N2O_to_N        
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
             'comment': 'ok (MC-støy lagt på)', 'data_sources': data_sources
@@ -84,9 +61,6 @@ def _add_fo_N2_emissions_mc(results, preloaded_data, current_params, dataset_noi
     dataset_key = 'UNFCCC_emissions'
 
     df_unfccc = preloaded_data.get('fs_unfccc_emissions_raw')
-    if df_unfccc is None:
-        raise ValueError(f"[KRITISK] Data 'fs_unfccc_emissions_raw' mangler i preloaded_data for {flow_code}!")
-
     N2O_to_N = float(current_params.get("N2O_to_N_factor"))
     ratio = float(current_params.get("forest_N2_to_N2O_ratio"))
 
@@ -99,7 +73,6 @@ def _add_fo_N2_emissions_mc(results, preloaded_data, current_params, dataset_noi
         perturbed_raw = raw_val * noise_val
         
         value = perturbed_raw * N2O_to_N * ratio
-        if value < 0: value = 0.0
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
@@ -118,8 +91,6 @@ def _add_fo_leaching_mc(results, preloaded_data, current_params, dataset_noise):
     
     df_kyst = preloaded_data.get('hy_kyst_tilforsel')
     df_teotil3 = preloaded_data.get('hy_teotil3_by_source')
-    if df_kyst is None or df_teotil3 is None:
-        raise ValueError(f"[KRITISK] Koblingsdata ('hy_kyst_tilforsel' eller 'hy_teotil3_by_source') mangler for {flow_code}!")
 
     frac = float(current_params.get("FO_leaching_bg_fraction"))
     
@@ -133,7 +104,6 @@ def _add_fo_leaching_mc(results, preloaded_data, current_params, dataset_noise):
         perturbed_raw = raw_val * noise_val
         
         value = perturbed_raw * frac
-        if value < 0: value = 0.0
 
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value, 
@@ -148,7 +118,6 @@ def _add_fo_leaching_mc(results, preloaded_data, current_params, dataset_noise):
         raw_val = float(df_teotil3.iloc[r, 10]) / 1000 
         noise_val = dataset_noise[dataset_key]
         value = raw_val * noise_val
-        if value < 0: value = 0.0
 
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value, 
@@ -163,7 +132,7 @@ def _add_industrial_round_wood_mc(results, preloaded_data, current_params, datas
     flow_code = 'FS.FO-MP.OP-Industrial round wood-Nmix'
     collected_years = set()   
     
-    year_values, _ = find_industrial_round_wood(preloaded_data, current_params, dataset_noise)
+    year_values = find_industrial_round_wood(preloaded_data, current_params, dataset_noise)
     
     for year, value in year_values.items():
         collected_years.add(year)
@@ -182,9 +151,6 @@ def _add_fuel_wood_for_households_mc(results, preloaded_data, current_params, da
     dataset_key = '09702'
     
     df_ved = preloaded_data.get('fs_firewood_raw')
-    if df_ved is None:
-        raise ValueError(f"[KRITISK] Data 'fs_firewood_raw' mangler i preloaded_data for {flow_code}!")
-
     N_content = float(current_params.get("firewood_N_frac"))
     
     for r in range(3, 38):  
@@ -196,7 +162,6 @@ def _add_fuel_wood_for_households_mc(results, preloaded_data, current_params, da
         perturbed_raw = raw_val * noise_val
         
         value = perturbed_raw * N_content 
-        if value < 0: value = 0.0
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value, 
@@ -214,9 +179,6 @@ def _add_ol_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
     dataset_key = 'UNFCCC_emissions'
 
     df_unfccc = preloaded_data.get('fs_unfccc_emissions_raw')
-    if df_unfccc is None:
-        raise ValueError(f"[KRITISK] Data 'fs_unfccc_emissions_raw' mangler i preloaded_data for {flow_code}!")
-
     N2O_to_N = float(current_params.get("N2O_to_N_factor"))
 
     for row in range(5, 38):
@@ -228,8 +190,6 @@ def _add_ol_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
         perturbed_raw = raw_val * noise_val
         
         value = perturbed_raw * N2O_to_N
-        if value < 0: value = 0.0
-        
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
             'comment': 'ok (MC-støy lagt på)', 'data_sources': data_sources
@@ -246,9 +206,6 @@ def _add_ol_N2_emissions_mc(results, preloaded_data, current_params, dataset_noi
     dataset_key = 'UNFCCC_emissions'
 
     df_unfccc = preloaded_data.get('fs_unfccc_emissions_raw')
-    if df_unfccc is None:
-        raise ValueError(f"[KRITISK] Data 'fs_unfccc_emissions_raw' mangler i preloaded_data for {flow_code}!")
-
     ratio = float(current_params.get("forest_N2_to_N2O_ratio"))
     N2O_to_N = float(current_params.get("N2O_to_N_factor"))
 
@@ -260,9 +217,7 @@ def _add_ol_N2_emissions_mc(results, preloaded_data, current_params, dataset_noi
         noise_val = dataset_noise[dataset_key]
         perturbed_raw = raw_val * noise_val
         
-        value = perturbed_raw * N2O_to_N * ratio
-        if value < 0: value = 0.0
-        
+        value = perturbed_raw * N2O_to_N * ratio        
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
             'comment': 'ok (MC-støy lagt på)', 'data_sources': data_sources
@@ -280,9 +235,6 @@ def _add_ol_leaching_mc(results, preloaded_data, current_params, dataset_noise):
     
     df_kyst = preloaded_data.get('hy_kyst_tilforsel')
     df_teotil3 = preloaded_data.get('hy_teotil3_by_source')
-    if df_kyst is None or df_teotil3 is None: 
-        raise ValueError(f"[KRITISK] Koblingsdata mangler i preloaded_data for {flow_code}!")
-
     frac = float(current_params.get("OL_leaching_bg_fraction"))
     
     kyst_dict = {}
@@ -301,15 +253,8 @@ def _add_ol_leaching_mc(results, preloaded_data, current_params, dataset_noise):
         if val_at_col0.lower() in ['year', 'år', 'årstall', 'nan', '']:
             continue
             
-        try:
-            year_val = int(float(val_at_col0))
-            teotil_dict[year_val] = float(row.iloc[10])
-        except (ValueError, TypeError) as e:
-            raise ValueError(
-                f"[KRITISK DATAFEIL] Kunne ikke konvertere verdi til tall i df_teotil3 på rad {idx}.\n"
-                f"Verdi i kolonne 0 (år): '{row.iloc[0]}' | Verdi i kolonne 10: '{row.iloc[10]}'\n"
-                f"Original feil: {e}"
-            )
+        year_val = int(float(val_at_col0))
+        teotil_dict[year_val] = float(row.iloc[10])
             
     for year in EXPECTED_YEARS:
         value = None
@@ -327,11 +272,7 @@ def _add_ol_leaching_mc(results, preloaded_data, current_params, dataset_noise):
             value = perturbed_raw * frac
 
         else:
-            # Året finnes ikke i filene. Vi hopper over, slik at report_missing_years fanger det opp.
             continue
-
-        if value < 0: 
-            value = 0.0
 
         collected_years.add(year)
         results.append({
@@ -367,20 +308,12 @@ def _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise):
             sau[year] = r_sau * noise_val
             lam[year] = r_lam * noise_val
             
-    # Krasj hvis beite-datasett mangler i RAM
-    required_sau_keys = ['obb_Sau1990-99_raw', 'obb_Sau2000-09_raw', 'obb_Sau2010-19_raw', 'obb_Sau2020-29_raw']
-    for k in required_sau_keys:
-        if k not in preloaded_data:
-            raise ValueError(f"[KRITISK] Mangler fil-nøkkel '{k}' i preloaded_data for saueberegning!")
-            
     extract_sau_lam(preloaded_data['obb_Sau1990-99_raw'], range(6, 100, 10), 21)
     extract_sau_lam(preloaded_data['obb_Sau2000-09_raw'], range(6, 100, 10), 22)
     extract_sau_lam(preloaded_data['obb_Sau2010-19_raw'], range(6, 100, 10), 22)
     extract_sau_lam(preloaded_data['obb_Sau2020-29_raw'], range(6, 60, 10), 13)
 
     df_sg_old = preloaded_data.get('obb_Storfe og geit1993-2019_raw')
-    if df_sg_old is None:
-        raise ValueError(f"[KRITISK] Mangler 'obb_Storfe og geit1993-2019_raw' for beiteberegning!")
         
     for col in range(4, 59, 6):
         year = int(df_sg_old.iloc[0, col])
@@ -397,8 +330,6 @@ def _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise):
         geit[year] = r_gt * noise_val
 
     df_sg_new = preloaded_data.get('obb_Storfe og geit2020-29_raw')
-    if df_sg_new is None:
-        raise ValueError(f"[KRITISK] Mangler 'obb_Storfe og geit2020-29_raw' for beiteberegning!")
         
     for col in range(6, 49, 8):
         year = int(df_sg_new.iloc[0, col])
@@ -415,23 +346,14 @@ def _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise):
         for y_back in [1990, 1991, 1992]:
             animal_dict[y_back] = a * y_back + b
 
-    # Hvis referanseår 1996 ikke finnes, kastes det en feil
-    if not (1996 in sau and 1996 in lam and 1996 in storfe and 1996 in geit):
-        raise KeyError("[KRITISK FEIL] Referanseåret 1996 mangler i et eller flere beitedatasett. Kan ikke kalkulere fu_animal!")
-
     fu_sheep = fu_sheep_1996 / sau[1996]
     fu_lamb = fu_sheep_1996 / lam[1996]
     fu_cattle = fu_cattle_1996 / storfe[1996]
     fu_goat = fu_goat_1996 / geit[1996]
 
-    for year in range(1990, 2026):
-        if not (year in sau and year in lam and year in storfe and year in geit):
-            raise KeyError(f"[KRITISK FEIL] Mangler komplette dyretall for årstallet {year}!")
-            
+    for year in range(1990, 2026):            
         collected_years.add(year)
         value = (sau[year]*fu_sheep + lam[year]*fu_lamb + storfe[year]*fu_cattle + geit[year]*fu_goat) * protein_cont / Jones
-        if value < 0: value = 0.0
-        
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value, 
             'comment': 'ok (MC-støy lagt på)', 'data_sources': data_sources

@@ -1,17 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-MC-VERSJON: Beregner nitrogenflyt for energiforsyning (EF).
-Rådata ligger i preloaded_data, mens støyfaktorer for hvert datasett sendes inn via dataset_noise.
-Massebalanse-rammer (IC_in, IC_out, EC_out) er fjernet for optimalisert ytelse.
-"""
-import pandas as pd
-import numpy as np
-
 from calculations.utils import (
     EXPECTED_YEARS,
     report_missing_years,
-    find_trade_data,
     load_crltap_emissions_to_N,
     process_generic_trade_flow
 )
@@ -25,17 +16,8 @@ CRLTAP_OE_SECTORS = ['1A4a1', '1A4aii', '1A4bi', '1A4bii', '1A4ci', '1A4cii', '1
 
 
 def execute_calculations_ef(preloaded_data, current_params, dataset_noise, current_trade_factors):
-    """
-    Hovedfunksjon for EF-poolen (MC). Mottar denne rundens støyordbok for datasett.
-    """
     results = []
     
-    # Sjekk trade_data – krasj hvis kritisk inndata mangler i RAM
-    trade_data = preloaded_data.get('compressed_trade_volume')
-    if trade_data is None:
-        raise ValueError("[KRITISK] Data for 'compressed_trade_volume' mangler i preloaded_data!")
-        
-    # Eksekverer alle flytberegninger
     _add_fuel_for_industry_mc(results, preloaded_data, dataset_noise)
     _add_fuel_for_transport_mc(results, preloaded_data, dataset_noise)
     _add_fuel_for_heating_mc(results, preloaded_data, dataset_noise)
@@ -63,8 +45,6 @@ def _add_fuel_for_industry_mc(results, preloaded_data, dataset_noise):
     dataset_key = 'UNFCCC_fuel'
     
     df = preloaded_data.get('fuel_for_industry')
-    if df is None:
-        raise ValueError(f"[KRITISK] Data 'fuel_for_industry' mangler i preloaded_data for {flow_code}!")
 
     for _, row in df.iterrows():
         year = int(row['year'])
@@ -73,8 +53,6 @@ def _add_fuel_for_industry_mc(results, preloaded_data, dataset_noise):
         noise_val = dataset_noise[dataset_key]
         value = raw_val * noise_val
 
-        if value < 0: value = 0.0
-        
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
             'comment': 'ok (MC-støy lagt på)', 'data_sources': 'UNFCCC CRT'
@@ -88,17 +66,13 @@ def _add_fuel_for_transport_mc(results, preloaded_data, dataset_noise):
     dataset_key = 'UNFCCC_fuel'
     
     df = preloaded_data.get('fuel_for_transport')
-    if df is None:
-        raise ValueError(f"[KRITISK] Data 'fuel_for_transport' mangler i preloaded_data for {flow_code}!")
 
     for _, row in df.iterrows():
-        # Try/except-blokk og passive fallbacks fjernet slik at korrupte data krasjer hardt
         year = int(row['year'])
         collected_years.add(year)
         raw_val = float(row['value'])
         noise_val = dataset_noise[dataset_key]
         value = raw_val * noise_val
-        if value < 0: value = 0.0
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
@@ -113,8 +87,6 @@ def _add_fuel_for_heating_mc(results, preloaded_data, dataset_noise):
     dataset_key = 'UNFCCC_fuel'
     
     df = preloaded_data.get('fuel_for_heating')
-    if df is None:
-        raise ValueError(f"[KRITISK] Data 'fuel_for_heating' mangler i preloaded_data for {flow_code}!")
 
     for _, row in df.iterrows():
         year = int(row['year'])
@@ -122,7 +94,6 @@ def _add_fuel_for_heating_mc(results, preloaded_data, dataset_noise):
         raw_val = float(row['value'])
         noise_val = dataset_noise[dataset_key]
         value = raw_val * noise_val
-        if value < 0: value = 0.0
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
@@ -135,12 +106,11 @@ def _add_fuel_used_as_feedstock_mc(results, preloaded_data, current_params, data
     flow_code = 'EF.EC-MP.OP-Fuel used as feedstock-Nmix'
     collected_years = set()
     
-    year_values, _ = find_feedstock_fuel(preloaded_data, current_params, dataset_noise)
+    year_values = find_feedstock_fuel(preloaded_data, current_params, dataset_noise)
     
     for year, value in year_values.items():
         year = int(year)
         collected_years.add(year)
-        if value < 0: value = 0.0
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
@@ -155,10 +125,7 @@ def _add_ec_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
     dataset_key = 'CRLTAP'
     
     conv = float(current_params.get("NOx_to_N_factor"))
-    crltap_data = preloaded_data.get('ag_crltap_raw_lines')
-    if crltap_data is None:
-        raise ValueError(f"[KRITISK] Data 'ag_crltap_raw_lines' mangler i preloaded_data for {flow_code}!")
-        
+    crltap_data = preloaded_data.get('ag_crltap_raw_lines')        
     sums = load_crltap_emissions_to_N(
         crltap_data, 
         CRLTAP_EC_SECTORS, 
@@ -172,7 +139,6 @@ def _add_ec_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
         year = int(year)
         collected_years.add(year)
         value = float(val) * noise_val
-        if value < 0: value = 0.0
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
@@ -187,9 +153,6 @@ def _add_ec_N2O_emissions_mc(results, preloaded_data, dataset_noise):
     dataset_key = 'UNFCCC_emissions'
     
     df = preloaded_data.get('n2o_ec_data')
-    if df is None:
-        raise ValueError(f"[KRITISK] Data 'n2o_ec_data' mangler i preloaded_data for {flow_code}!")
-        
     noise_val = dataset_noise[dataset_key]
 
     for _, row in df.iterrows():
@@ -197,7 +160,6 @@ def _add_ec_N2O_emissions_mc(results, preloaded_data, dataset_noise):
         collected_years.add(year)
         raw_val = float(row['value_EC'])        
         value = raw_val * noise_val
-        if value < 0: value = 0.0
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
@@ -207,18 +169,7 @@ def _add_ec_N2O_emissions_mc(results, preloaded_data, dataset_noise):
 
 
 def _add_fuel_export_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise):
-    """
-    Beregner eksport av brensel/drivstoff ved å bruke det felles handelsrammeverket.
-    Garanterer full MC-støtte og krasjer hvis kritiske data mangler.
-    """
     flow_code = 'EF.EC-RW.RW-Fuel export-Nmix'
-    
-    if 'compressed_trade_volume' not in preloaded_data:
-        raise KeyError(
-            f"[KRITISK FEIL] Nøkkelen 'compressed_trade_volume' mangler under beregning av {flow_code}. "
-            f"Sjekk at varehandelsstatistikk blir pre-loaded korrekt i data_loader.py."
-        )
-
     process_generic_trade_flow(
         results=results,
         preloaded_data=preloaded_data,
@@ -233,13 +184,9 @@ def _add_fuel_export_mc(results, preloaded_data, current_params, current_trade_f
 
 def _add_ic_NH3_emissions_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'EF.IC-AT.AT-Emissions-NH3'
-    collected_years = set()
-    
+    collected_years = set()    
     conv = float(current_params.get("NH3_to_N_factor"))
-    crltap_data = preloaded_data.get('ag_crltap_raw_lines')
-    if crltap_data is None:
-        raise ValueError(f"[KRITISK] Data 'ag_crltap_raw_lines' mangler i preloaded_data for {flow_code}!")
-        
+    crltap_data = preloaded_data.get('ag_crltap_raw_lines')        
     sums = load_crltap_emissions_to_N(
         crltap_data, 
         CRLTAP_IC_SECTORS, 
@@ -251,7 +198,6 @@ def _add_ic_NH3_emissions_mc(results, preloaded_data, current_params, dataset_no
     for year, value in sums.items():
         year = int(year)
         collected_years.add(year)
-        if value < 0: value = 0.0
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
@@ -266,8 +212,6 @@ def _add_ic_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
     
     conv = float(current_params.get("NOx_to_N_factor"))
     crltap_data = preloaded_data.get('ag_crltap_raw_lines')
-    if crltap_data is None:
-        raise ValueError(f"[KRITISK] Data 'ag_crltap_raw_lines' mangler i preloaded_data for {flow_code}!")
         
     sums = load_crltap_emissions_to_N(
         crltap_data, 
@@ -280,7 +224,6 @@ def _add_ic_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
     for year, value in sums.items():
         year = int(year)
         collected_years.add(year)
-        if value < 0: value = 0.0
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
@@ -295,15 +238,12 @@ def _add_ic_N2O_emissions_mc(results, preloaded_data, dataset_noise):
     dataset_key = 'UNFCCC_emissions'
     
     df = preloaded_data.get('n2o_ec_data')
-    if df is None:
-        raise ValueError(f"[KRITISK] Data 'n2o_ec_data' mangler i preloaded_data for {flow_code}!")
     noise_val = dataset_noise[dataset_key]
     for _, row in df.iterrows():
         year = int(row['year'])
         collected_years.add(year)
         raw_val = float(row['value_IC'])
         value = raw_val * noise_val
-        if value < 0: value = 0.0
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
@@ -318,8 +258,6 @@ def _add_tr_NH3_emissions_mc(results, preloaded_data, current_params, dataset_no
     
     conv = float(current_params.get("NH3_to_N_factor"))
     crltap_data = preloaded_data.get('ag_crltap_raw_lines')
-    if crltap_data is None:
-        raise ValueError(f"[KRITISK] Data 'ag_crltap_raw_lines' mangler i preloaded_data for {flow_code}!")
         
     sums = load_crltap_emissions_to_N(
         crltap_data, 
@@ -332,7 +270,6 @@ def _add_tr_NH3_emissions_mc(results, preloaded_data, current_params, dataset_no
     for year, value in sums.items():
         year = int(year)
         collected_years.add(year)
-        if value < 0: value = 0.0
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
@@ -347,8 +284,6 @@ def _add_tr_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
     
     conv = float(current_params.get("NOx_to_N_factor"))
     crltap_data = preloaded_data.get('ag_crltap_raw_lines')
-    if crltap_data is None:
-        raise ValueError(f"[KRITISK] Data 'ag_crltap_raw_lines' mangler i preloaded_data for {flow_code}!")
         
     sums = load_crltap_emissions_to_N(
         crltap_data, 
@@ -361,7 +296,6 @@ def _add_tr_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
     for year, value in sums.items():
         year = int(year)
         collected_years.add(year)
-        if value < 0: value = 0.0
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
@@ -375,19 +309,14 @@ def _add_tr_N2O_emissions_mc(results, preloaded_data, dataset_noise):
     collected_years = set()
     dataset_key = 'UNFCCC_emissions'
     
-    df = preloaded_data.get('n2o_ec_data')
-    
+    df = preloaded_data.get('n2o_ec_data')    
     noise_val = dataset_noise[dataset_key]
-    if df is None:
-        raise ValueError(f"[KRITISK] Data 'n2o_ec_data' mangler i preloaded_data for {flow_code}!")
 
     for _, row in df.iterrows():
         year = int(row['year'])
         collected_years.add(year)
         raw_val = float(row['value_TR'])
         value = raw_val*noise_val
-        if value < 0: value = 0.0
-        
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
             'comment': 'ok (MC-støy lagt på)', 'data_sources': 'UNFCCC CRT'
@@ -396,18 +325,7 @@ def _add_tr_N2O_emissions_mc(results, preloaded_data, dataset_noise):
 
 
 def _add_export_of_transport_fuels_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise):
-    """
-    Beregner eksport av brensel/drivstoff ved å bruke det felles handelsrammeverket.
-    Garanterer full MC-støtte og krasjer hvis kritiske data mangler.
-    """
     flow_code = 'EF.EC-RW.RW-Export of transport fuels-Nmix'
-    
-    if 'compressed_trade_volume' not in preloaded_data:
-        raise KeyError(
-            f"[KRITISK FEIL] Nøkkelen 'compressed_trade_volume' mangler under beregning av {flow_code}. "
-            f"Sjekk at varehandelsstatistikk blir pre-loaded korrekt i data_loader.py."
-        )
-
     process_generic_trade_flow(
         results=results,
         preloaded_data=preloaded_data,
@@ -426,9 +344,6 @@ def _add_oe_NH3_emissions_mc(results, preloaded_data, current_params, dataset_no
     
     conv = float(current_params.get("NH3_to_N_factor"))
     crltap_data = preloaded_data.get('ag_crltap_raw_lines')
-    if crltap_data is None:
-        raise ValueError(f"[KRITISK] Data 'ag_crltap_raw_lines' mangler i preloaded_data for {flow_code}!")
-        
     sums = load_crltap_emissions_to_N(
         crltap_data, 
         CRLTAP_OE_SECTORS, 
@@ -439,9 +354,7 @@ def _add_oe_NH3_emissions_mc(results, preloaded_data, current_params, dataset_no
     
     for year, value in sums.items():
         year = int(year)
-        collected_years.add(year)
-        if value < 0: value = 0.0
-        
+        collected_years.add(year)        
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
             'comment': 'ok (MC-støy lagt på)', 'data_sources': 'CRLTAP Inventory Submissions'
@@ -455,9 +368,6 @@ def _add_oe_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
     
     conv = float(current_params.get("NOx_to_N_factor"))
     crltap_data = preloaded_data.get('ag_crltap_raw_lines')
-    if crltap_data is None:
-        raise ValueError(f"[KRITISK] Data 'ag_crltap_raw_lines' mangler i preloaded_data for {flow_code}!")
-        
     sums = load_crltap_emissions_to_N(
         crltap_data, 
         CRLTAP_OE_SECTORS, 
@@ -469,8 +379,6 @@ def _add_oe_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
     for year, value in sums.items():
         year = int(year)
         collected_years.add(year)
-        if value < 0: value = 0.0
-        
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
             'comment': 'ok (MC-støy lagt på)', 'data_sources': 'CRLTAP Inventory Submissions'
@@ -485,16 +393,11 @@ def _add_oe_N2O_emissions_mc(results, preloaded_data, dataset_noise):
     
     df = preloaded_data.get('n2o_ec_data')
     noise_val = dataset_noise[dataset_key]
-    if df is None:
-        raise ValueError(f"[KRITISK] Data 'n2o_ec_data' mangler i preloaded_data for {flow_code}!")
-
     for _, row in df.iterrows():
         year = int(row['year'])
         collected_years.add(year)
         raw_val = float(row['value_OE'])
         value = raw_val * noise_val
-        if value < 0: value = 0.0
-        
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
             'comment': 'ok (MC-støy lagt på)', 'data_sources': 'UNFCCC CRT'
