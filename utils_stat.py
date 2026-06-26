@@ -8,9 +8,9 @@ import plotly.graph_objects as go
 
 def plot_pool_balance_interactive(df_flows, pool_code, output_dir="output_files/plots"):
     """
-    Genererer et INTERAKTIVT balansediagram (HTML) for en spesifikk pool eller subpool.
+    Genererer et INTERAKTIVT og RESPONSIVT balansediagram (HTML) for en spesifikk pool eller subpool.
     Inngående strømmer stables oppover (positive), utgående strømmer stables nedover (negative).
-    Viser verdi, usikkerhet og fullt flomnavn når man hovrer med musen.
+    Viser KUN info for strømmen musen er nærmest.
     """
     os.makedirs(output_dir, exist_ok=True)
     
@@ -29,11 +29,7 @@ def plot_pool_balance_interactive(df_flows, pool_code, output_dir="output_files/
     df_in_grouped = df_in.groupby(['year', 'flow_name'])['value'].sum().unstack(fill_value=0).reindex(all_years, fill_value=0)
     df_out_grouped = df_out.groupby(['year', 'flow_name'])['value'].sum().unstack(fill_value=0).reindex(all_years, fill_value=0)
     
-    # Hent tilhørende usikkerheter (std) i matriseformat matchet med de grupperte dataframene
-    df_in_unc = df_in.groupby(['year', 'flow_name'])['uncertainty'].sum().unstack(fill_value=0).reindex(all_years, fill_value=0)
-    df_out_unc = df_out.groupby(['year', 'flow_name'])['uncertainty'].sum().unstack(fill_value=0).reindex(all_years, fill_value=0)
-
-    # Beregn netto balanse og akkumulert usikkerhet (på tvers av alle strømmer per år)
+    # Beregn netto balanse og akkumulert usikkerhet
     df_in_total_unc = df_in.groupby('year')['uncertainty'].apply(lambda x: np.sqrt((x**2).sum())).reindex(all_years, fill_value=0)
     df_out_total_unc = df_out.groupby('year')['uncertainty'].apply(lambda x: np.sqrt((x**2).sum())).reindex(all_years, fill_value=0)
     
@@ -44,21 +40,19 @@ def plot_pool_balance_interactive(df_flows, pool_code, output_dir="output_files/
     fig = go.Figure()
 
     # --- 2. STACK INNGÅENDE STRØMMER (Positive) ---
-    # Plotly stabler automatisk hvis vi bruker group='in' og stackgroup='positive'
     for col in df_in_grouped.columns:
         fig.add_trace(go.Scatter(
             x=all_years,
             y=df_in_grouped[col],
             mode='lines',
-            hoveron='points+fills',
             name=f"IN: {col}",
-            stackgroup='one',  # Stabler positive sammen
-            groupnorm='',      # Absolutte verdier, ikke prosent
+            stackgroup='one',  
+            groupnorm='',      
             hovertemplate=(
-                f"<b>{col}</b><br>" +
+                f"<b>IN: {col}</b><br>" +
                 "År: %{x}<br>" +
                 "Verdi: %{y:.3f} kt N/year<br>" +
-                "<extra></extra>"  # Skjuler standard spor-navn i hoverboksen
+                "<extra></extra>"  
             ),
             legendgroup="Inngående",
             legendgrouptitle_text="══ SYSTEM INFLOW ══"
@@ -68,24 +62,22 @@ def plot_pool_balance_interactive(df_flows, pool_code, output_dir="output_files/
     for col in df_out_grouped.columns:
         fig.add_trace(go.Scatter(
             x=all_years,
-            y=-df_out_grouped[col], # Negative verdier for å dytte dem nedover
+            y=-df_out_grouped[col], 
             mode='lines',
-            hoveron='fills',
             name=f"OUT: {col}",
-            stackgroup='two',  # Egen stackgroup for de negative
+            stackgroup='two',  
             hovertemplate=(
-                f"<b>{col}</b><br>" +
+                f"<b>OUT: {col}</b><br>" +
                 "År: %{x}<br>" +
-                "Verdi: %{text:.3f} kt N/year<br>" + # Bruker original positiv verdi i hoveren
+                "Verdi: %{text:.3f} kt N/year<br>" + 
                 "<extra></extra>"
             ),
-            text=df_out_grouped[col], # Sender med de positive verdiene som tekstvariabel
+            text=df_out_grouped[col], 
             legendgroup="Utgående",
             legendgrouptitle_text="══ SYSTEM OUTFLOW ══"
         ))
 
-    # --- 4. USIKKERHETSBÅND (fill_between-ekvivalent i Plotly) ---
-    # Øvre grense
+    # --- 4. USIKKERHETSBÅND ---
     fig.add_trace(go.Scatter(
         x=all_years,
         y=net_balance + combined_unc,
@@ -94,7 +86,6 @@ def plot_pool_balance_interactive(df_flows, pool_code, output_dir="output_files/
         showlegend=False,
         hoverinfo='skip'
     ))
-    # Nedre grense (fyller rommet opp til forrige spor, altså øvre grense)
     fig.add_trace(go.Scatter(
         x=all_years,
         y=net_balance - combined_unc,
@@ -138,7 +129,7 @@ def plot_pool_balance_interactive(df_flows, pool_code, output_dir="output_files/
             tickmode='array',
             tickvals=list(np.arange(1990, 2021, 5)) + [2023],
             gridcolor='rgba(200, 200, 200, 0.4)',
-            showspikes=True,       # Legger til en tynn hjelpelinje som følger musa langs x-aksen
+            showspikes=True,      
             spikethickness=1,
             spikedash="dot",
             spikemode="across"
@@ -150,26 +141,27 @@ def plot_pool_balance_interactive(df_flows, pool_code, output_dir="output_files/
             zerolinecolor='gray',
             zerolinewidth=1
         ),
-        hovermode="x", 
+        # --- FIX 2: "closest" isolerer hoveren til kun det sporet du rører ---
+        hovermode="closest", 
         plot_bgcolor='white',
         paper_bgcolor='white',
         legend=dict(
-            x=1.05,
+            x=1.02, # Plassert rett utenfor plottet
             y=1.0,
             xanchor='left',
             yanchor='top',
             font=dict(size=10),
-            traceorder="grouped" # Sørger for at overskriftene våre skiller gruppene pent ut
+            traceorder="grouped" 
         ),
-        margin=dict(l=50, r=50, t=60, b=50),
-        width=1000,
+        # --- FIX 1: Fjernet width=1000, økt høyremargin (r=180) for å romme legend ---
+        margin=dict(l=60, r=180, t=60, b=50),
         height=600
     )
 
-    # Lagre som HTML i stedet for PNG
+    # Lagre med default_width='100%' for full responsivitet i iframes
     plot_filename = f"balance_{pool_code.replace('.', '_')}.html"
     filepath = os.path.join(output_dir, plot_filename)
-    fig.write_html(filepath, include_plotlyjs='cdn')
+    fig.write_html(filepath, include_plotlyjs='cdn', default_width='100%')
     
     print(f"[INFO] Interaktivt balanseplott generert for {pool_code} -> {filepath}")
     return plot_filename
