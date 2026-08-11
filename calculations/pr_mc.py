@@ -34,7 +34,7 @@ def execute_calculations_pr(preloaded_data, current_params, dataset_noise, curre
     _add_ag_biologically_treated_organic_waste_mc(results, preloaded_data, current_params, dataset_noise)
     _add_wastewater_from_landfills_mc(results, preloaded_data, current_params, dataset_noise)
     _add_hs_biologically_treated_organic_waste_mc(results, preloaded_data, current_params, dataset_noise)
-    _add_biofuels_production_wastewater_mc(results, preloaded_data, current_params, dataset_noise)
+    # _add_biofuels_production_wastewater_mc(results, preloaded_data, current_params, dataset_noise)
     _add_so_NOx_emissions_mc(results, preloaded_data, current_params, dataset_noise)
     _add_so_NH3_emissions_mc(results, preloaded_data, current_params, dataset_noise)
     _add_so_N2O_emissions_mc(results, preloaded_data, current_params, dataset_noise)
@@ -52,6 +52,12 @@ def execute_calculations_pr(preloaded_data, current_params, dataset_noise, curre
     
     return results
 
+
+def _get_value_from_results(rows, flow_name, year):
+    return next(
+        d["value"] for d in rows
+        if d.get("flow_name") == flow_name and d.get("year") == year
+    )
 
 def _calculate_scaled_waste_timeseries(tonnes_modern_dict, tonnes_10513_dict, target_year_modern, target_year_10513, noise_modern, noise_10513, noise_hist):
     final_series = {}
@@ -245,51 +251,194 @@ def _add_ag_biologically_treated_organic_waste_mc(results, preloaded_data, curre
     flow_code = 'PR.SO-AG.SM-Biologically treated organic waste-Nmix'
     collected_years = set()
     
-    noise_biogass = float(dataset_noise['Biogass_Norge'])
-    noise_12818   = float(dataset_noise['12818'])
-    noise_10513   = float(dataset_noise['10513'])
-    noise_hist    = float(dataset_noise['historical_waste'])
-
-    # =========================================================================
-    # DEL 1: 2021-2023 - DATA FRA BIOGASS NORGE (Danner basis for modern_dict)
-    # =========================================================================
-    df_biogass = preloaded_data.get('biogass_tall')
-    value_2021 = 0.0
-    tonnes_modern_dict = {}
+    # 1) find the fraction of N in input waste (excluding sewage sludge) for biological treatment from SSB 10513 (2012-2024)
+    # as well as the fraction of sewage sludge in input
+    wet_N         = float(current_params.waste_N_frac('wet_organic'))
+    park_N        = float(current_params.waste_N_frac('park_garden'))
+    wood_N        = float(current_params.waste_N_frac('wood'))
     
-    for col_idx in range(2, 6):
-        try:
-            year = int(float(str(df_biogass.iloc[6, col_idx]).strip()))
-            val_ktN = float(df_biogass.iloc[31, col_idx]) / 1000.0
-            
-            if year == 2021:
-                value_2021 = val_ktN
-                
-            # For 2021-2023 bruker vi Biogass Norge-data direkte som "modern" input
-            if 2021 <= year <= 2023:
-                tonnes_modern_dict[year] = val_ktN
-        except (ValueError, TypeError, IndexError):
-            continue
+    noise_trend = dataset_noise['trend interpolation']
+    noise_10513 = dataset_noise['10513']
+    noise_12818 = dataset_noise['12818']
+    df_10513 = preloaded_data.get('ssb_waste_10513') # given in kt
+    total_10513 = {}
+    frac_N_10513 = {}
+    frac_sludge_10513 = {}
+    for col in range(1, df_10513.shape[1], 9):
+        cell_year = str(df_10513.iloc[3, col]).strip()
+        if cell_year.replace('.0', '').isdigit():
+            year = int(float(cell_year))
+        total = ( #levert til biogassproduksjon (+2) og kompost (+3))
+            float(df_10513.iloc[6, col + 2]) + float(df_10513.iloc[6, col + 3]) +  # Våtorganisk
+            float(df_10513.iloc[7, col + 2]) +  float(df_10513.iloc[7, col + 3]) + # Park- og hage
+            float(df_10513.iloc[8, col + 2]) + float(df_10513.iloc[8, col + 2])  # Treavfall
+        )
+        frac_sludge_10513[year] = (float(df_10513.iloc[9, col + 2])+float(df_10513.iloc[9, col + 3]))/(total+float(df_10513.iloc[9, col + 2])+float(df_10513.iloc[9, col + 3]))
+        total_10513[year] = total
+        total_N = (
+            float(df_10513.iloc[6, col + 2]) * wet_N +  # Våtorganisk
+            float(df_10513.iloc[7, col + 2]) * park_N +  # Park- og hage
+            float(df_10513.iloc[8, col + 2]) * wood_N   # Treavfall
+        )
+        frac_N_10513[year] = total_N/total
 
-    # =========================================================================
-    # DEL 2: 2018-2020 - SKALERING MED SSB TABELL 12818 Inn i modern_dict
-    # =========================================================================
+    # 2) find the amount of disposed waste allocated to agriculture from SSB 12818 (2018-2023)
+    # removing sewage sludge fraction from previous step
+    df_12818 = preloaded_data.get('ssb_waste_12818') # given in kt
+    waste_ag = {}
+    for col_idx in range(1, 7):
+        year = int(float(str(df_12818.iloc[3, col_idx]).strip()))
+        kt_ag = float(df_12818.iloc[5, col_idx])
+        waste_ag[year] = kt_ag*(1-frac_sludge_10513[year])
+    
+    # 3) find the N content of that waste by using fraction N from 1)
+    N_ag = {}
+    for year in range(2018,2024):
+        N_ag[year] = waste_ag[year]*frac_N_10513[year]
+
+    # 3b) for 2012-2017, scale 2018 input amount and ag fraction using totals from 10513
+    for year in range(2012,2018):
+        N_ag[year] = N_ag[2018]/total_10513[2018]*total_10513[year]
+        
+    # 4) extrapolate constant 2012 value back to 1990
+    for year in range(1990,2012):
+        N_ag[year] = N_ag[2012]
+                      
+    for year in range(1990,2024):
+        collected_years.add(year)
+        val = N_ag[year]*noise_10513*noise_12818
+        
+        if year < 2012:
+            val *= noise_trend
+            comment_str = 'Extrapolated value from 2012'
+            source_str  = 'extrapolated'
+        elif year < 2018:
+            comment_str = 'Extrapolated fraction to agriculture from 2018'
+            source_str  = 'extrapolated/SSB'
+            
+        else:
+            comment_str = 'ok'
+            source_str  = 'SSB'
+
+        results.append({
+            'flow_name': flow_code,
+            'year': year,
+            'value': val,
+            'comment': comment_str,
+            'data_sources': source_str
+        })
+
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+    
+    
+def _add_hs_biologically_treated_organic_waste_mc(results, preloaded_data, current_params, dataset_noise):
+    flow_code = 'PR.SO-HS.HS-Biologically treated organic waste-Nmix'
+    collected_years = set()
+    
+    # 1) find the fraction of N in input waste (excluding sewage sludge) for biological treatment from SSB 10513 (2012-2024)
+    # as well as the fraction of sewage sludge in input
+    wet_N         = float(current_params.waste_N_frac('wet_organic'))
+    park_N        = float(current_params.waste_N_frac('park_garden'))
+    wood_N        = float(current_params.waste_N_frac('wood'))
+    
+    noise_trend = dataset_noise['trend interpolation']
+    noise_10513 = dataset_noise['10513']
+    noise_12818 = dataset_noise['12818']
+    df_10513 = preloaded_data.get('ssb_waste_10513') # given in kt
+    total_10513 = {}
+    frac_N_10513 = {}
+    frac_sludge_10513 = {}
+    for col in range(1, df_10513.shape[1], 9):
+        cell_year = str(df_10513.iloc[3, col]).strip()
+        if cell_year.replace('.0', '').isdigit():
+            year = int(float(cell_year))
+        total = ( #levert til biogassproduksjon (+2) og kompost (+3))
+            float(df_10513.iloc[6, col + 2]) + float(df_10513.iloc[6, col + 3]) +  # Våtorganisk
+            float(df_10513.iloc[7, col + 2]) +  float(df_10513.iloc[7, col + 3]) + # Park- og hage
+            float(df_10513.iloc[8, col + 2]) + float(df_10513.iloc[8, col + 2])  # Treavfall
+        )
+        frac_sludge_10513[year] = (float(df_10513.iloc[9, col + 2])+float(df_10513.iloc[9, col + 3]))/(total+float(df_10513.iloc[9, col + 2])+float(df_10513.iloc[9, col + 3]))
+        total_10513[year] = total
+        total_N = (
+            float(df_10513.iloc[6, col + 2]) * wet_N +  # Våtorganisk
+            float(df_10513.iloc[7, col + 2]) * park_N +  # Park- og hage
+            float(df_10513.iloc[8, col + 2]) * wood_N   # Treavfall
+        )
+        frac_N_10513[year] = total_N/total
+
+    # 2) find the amount of disposed waste allocated to HS ("grøntareal" + "levert jordprodusent") from SSB 12818 (2018-2023)
+    # removing sewage sludge fraction from previous step
+    df_12818 = preloaded_data.get('ssb_waste_12818') # given in kt
+    waste_hs = {}
+    for col_idx in range(1, 7):
+        year = int(float(str(df_12818.iloc[3, col_idx]).strip()))
+        kt_hs = float(df_12818.iloc[6, col_idx]) + float(df_12818.iloc[7, col_idx])
+        waste_hs[year] = kt_hs*(1-frac_sludge_10513[year])
+    
+    # 3) find the N content of that waste by using fraction N from 1)
+    N_hs = {}
+    for year in range(2018,2024):
+        N_hs[year] = waste_hs[year]*frac_N_10513[year]
+
+    # 3b) for 2012-2017, scale 2018 input amount and ag fraction using totals from 10513
+    for year in range(2012,2018):
+        N_hs[year] = N_hs[2018]/total_10513[2018]*total_10513[year]
+        
+    # 4) extrapolate constant 2012 value back to 1990
+    for year in range(1990,2012):
+        N_hs[year] = N_hs[2012]
+                      
+    for year in range(1990,2024):
+        collected_years.add(year)
+        val = N_hs[year]*noise_10513*noise_12818
+        
+        if year < 2012:
+            val *= noise_trend
+            comment_str = 'Extrapolated value from 2012'
+            source_str  = 'extrapolated'
+        elif year < 2018:
+            comment_str = 'Extrapolated fraction to agriculture from 2018'
+            source_str  = 'extrapolated/SSB'
+            
+        else:
+            comment_str = 'ok'
+            source_str  = 'SSB'
+
+        results.append({
+            'flow_name': flow_code,
+            'year': year,
+            'value': val,
+            'comment': comment_str,
+            'data_sources': source_str
+        })
+
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+
+
+
+    compost_old_N = float(current_params.waste_N_frac('compost_old'))
+    wet_N         = float(current_params.waste_N_frac('wet_organic'))
+    park_N        = float(current_params.waste_N_frac('park_garden'))
+    sludge_N      = float(current_params.waste_N_frac('sludge'))
+    
+    compost_N_loss = float(current_params.waste_N_frac('compost_N_loss'))
+
     df_12818 = preloaded_data.get('ssb_waste_12818')
-    tonnes_2021_basis = float(df_12818.iloc[5, 4])
-    for col_idx in range(1, 4):
+    noise_12818 = dataset_noise['12818']
+    tonnes_modern_dict = {}
+    for col_idx in range(1, 8):
         try:
-            year = int(float(str(df_12818.iloc[3, col_idx]).strip()))
-            tonnes_year = float(df_12818.iloc[5, col_idx])
+            year = int(float(str(df_12818.iloc[3, col_idx]).strip())) # Rad 4 i excel
             
-            # Beregn skalert verdi for 2018-2020 basert på 2021-forholdet
-            val_scaled = tonnes_year * (value_2021 / tonnes_2021_basis)
-            tonnes_modern_dict[year] = val_scaled
+            val_row7 = float(df_12818.iloc[5, col_idx])
+            val_row8 = float(df_12818.iloc[6, col_idx])
+            
+            tonnes_modern_dict[year] = (val_row7 + val_row8) * compost_old_N
         except (ValueError, TypeError, IndexError):
             continue
 
-    # =========================================================================
-    # DEL 3: 2012-2017 - SAMLE RÅMENGDER FRA TABELL 10513
-    # =========================================================================
     df_10513 = preloaded_data.get('ssb_waste_10513')
     noise_10513 = dataset_noise['10513']
     tonnes_10513_dict = {}
@@ -300,58 +449,57 @@ def _add_ag_biologically_treated_organic_waste_mc(results, preloaded_data, curre
             year = int(float(cell_year))
             
             try:
-                # For AG.SM skalerer vi basert på den *totale råavfallsmengden* (tonn) i tabell 10513
-                total_tonnes = (
-                    float(df_10513.iloc[6, col + 2]) +  # Våtorganisk
-                    float(df_10513.iloc[7, col + 2]) +  # Park- og hage
-                    float(df_10513.iloc[8, col + 2]) +  # Treavfall
-                    float(df_10513.iloc[9, col + 2])    # Slam
+                n_val = (
+                    float(df_10513.iloc[6, col + 2]) * wet_N +
+                    float(df_10513.iloc[7, col + 2]) * park_N +
+                    float(df_10513.iloc[9, col + 2]) * sludge_N
                 )
-                tonnes_10513_dict[year] = total_tonnes
+                
+                tonnes_10513_dict[year] = n_val * (1.0 - compost_N_loss)
             except (ValueError, TypeError, IndexError):
                 continue
 
-    # =========================================================================
-    # DEL 4: KJØR BEREGNING VIA DEN FELLES MOTOREN
-    # =========================================================================
-    final_values = _calculate_scaled_waste_timeseries(
+    clean_values = _calculate_scaled_waste_timeseries(
         tonnes_modern_dict = tonnes_modern_dict,
         tonnes_10513_dict  = tonnes_10513_dict,
         target_year_modern = 2018,
         target_year_10513  = 2018,
-        noise_modern       = noise_biogass, 
-        noise_10513        = noise_10513,
-        noise_hist         = noise_hist
+        noise_modern       = 1.0,
+        noise_10513        = 1.0,
+        noise_hist         = 1.0
     )
-
-    for year in range(2018, 2021):
-        if year in tonnes_modern_dict:
-            raw_val = tonnes_modern_dict[year]
-            final_values[year] = raw_val*noise_12818
-
-    # =========================================================================
-    # GENERER REKORDS TIL RESULTS
-    # =========================================================================
-    for year in sorted(final_values.keys()):
-        if year >= 1990:
-            collected_years.add(year)
-            val = final_values[year]
-            
-            if year < 2012:
-                comment_str = 'Ekstrapolert trend fra 2012'
-                source_str  = 'extrapolated'
-            else:
-                comment_str = 'ok (Felles skaleringsmotor)'
-                source_str  = 'Biogass Norge / SSB (Tabell 12818 / 10513)'
     
-            results.append({
-                'flow_name': flow_code,
-                'year': year,
-                'value': val,
-                'comment': comment_str,
-                'data_sources': source_str
-            })
-
+    noise_hist = dataset_noise['historical_waste']
+    noise_trend = dataset_noise['trend interpolation']
+    for year in sorted(clean_values.keys()):
+        collected_years.add(year)
+        raw_val = clean_values[year]
+        
+        if year >= 2012:
+            if year >= 2018:
+                val = raw_val*noise_12818
+            else:
+                val = raw_val*noise_10513
+        else:
+            val = raw_val * noise_hist
+        
+        if year < 2012:
+            val *= noise_trend
+        
+        if year < 2012:
+            comment_str = 'Ekstrapolert trend fra 2012'
+            source_str  = 'extrapolated'
+        else:
+            comment_str = 'ok (MC-støy påført sentralt)'
+            source_str  = 'SSB (Tabell 12818 / 10513)'
+    
+        results.append({
+            'flow_name': flow_code,
+            'year': year,
+            'value': val,
+            'comment': comment_str,
+            'data_sources': source_str
+        })
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
     
@@ -447,204 +595,203 @@ def _add_wastewater_from_landfills_mc(results, preloaded_data, current_params, d
     report_missing_years(flow_code, missing_years, results)
     
     
-def _add_hs_biologically_treated_organic_waste_mc(results, preloaded_data, current_params, dataset_noise):
-    flow_code = 'PR.SO-HS.HS-Biologically treated organic waste-Nmix'
+def _add_so_leaching_mc(results, preloaded_data, current_params, dataset_noise):
+    flow_code = 'PR.SO-HY.SW-Leaching-Nmix'
     collected_years = set()
-    
-    compost_old_N = float(current_params.waste_N_frac('compost_old'))
-    wet_N         = float(current_params.waste_N_frac('wet_organic'))
-    park_N        = float(current_params.waste_N_frac('park_garden'))
-    sludge_N      = float(current_params.waste_N_frac('sludge'))
-    
-    compost_N_loss = float(current_params.waste_N_frac('compost_N_loss'))
+    comment = 'ok'
+    noise_mildir = float(dataset_noise['norskeutslipp'])
 
-    df_12818 = preloaded_data.get('ssb_waste_12818')
-    noise_12818 = dataset_noise['12818']
-    tonnes_modern_dict = {}
-    for col_idx in range(1, 8):
-        try:
-            year = int(float(str(df_12818.iloc[3, col_idx]).strip())) # Rad 4 i excel
-            
-            val_row7 = float(df_12818.iloc[5, col_idx])
-            val_row8 = float(df_12818.iloc[6, col_idx])
-            
-            tonnes_modern_dict[year] = (val_row7 + val_row8) * compost_old_N
-        except (ValueError, TypeError, IndexError):
+    uts_raw = preloaded_data.get('deponi_utslipp')
+    tilk_raw = preloaded_data.get('deponi_tilkobling')
+
+    tilk_ja = set()
+    tilk_nei = set()
+    
+    for idx, row in tilk_raw.iterrows():
+        if idx == 0 and ("anlegg" in str(row.iloc[0]).lower() or "tilkoblet" in str(row.iloc[1]).lower()):
             continue
-
-    df_10513 = preloaded_data.get('ssb_waste_10513')
-    noise_10513 = dataset_noise['10513']
-    tonnes_10513_dict = {}
-    
-    for col in range(1, df_10513.shape[1], 9):
-        cell_year = str(df_10513.iloc[3, col]).strip()
-        if cell_year.replace('.0', '').isdigit():
-            year = int(float(cell_year))
             
-            try:
-                n_val = (
-                    float(df_10513.iloc[6, col + 2]) * wet_N +
-                    float(df_10513.iloc[7, col + 2]) * park_N +
-                    float(df_10513.iloc[9, col + 2]) * sludge_N
-                )
-                
-                tonnes_10513_dict[year] = n_val * (1.0 - compost_N_loss)
-            except (ValueError, TypeError, IndexError):
-                continue
+        name_clean = str(row.iloc[0]).strip().lower() # Kolonne 0: anleggsnavn
+        status = str(row.iloc[1]).strip().lower()    # Kolonne 1: status
+        
+        if 'ja' in status:
+            tilk_ja.add(name_clean)
+        elif 'nei' in status:
+            tilk_nei.add(name_clean)
 
-    clean_values = _calculate_scaled_waste_timeseries(
-        tonnes_modern_dict = tonnes_modern_dict,
-        tonnes_10513_dict  = tonnes_10513_dict,
-        target_year_modern = 2018,
-        target_year_10513  = 2018,
-        noise_modern       = 1.0,
-        noise_10513        = 1.0,
-        noise_hist         = 1.0
-    )
+    real_years_data = {}
     
-    noise_hist = dataset_noise['historical_waste']
-    noise_trend = dataset_noise['trend interpolation']
-    for year in sorted(clean_values.keys()):
-        collected_years.add(year)
-        raw_val = clean_values[year]
-        
-        if year >= 2012:
-            if year >= 2018:
-                val = raw_val*noise_12818
-            else:
-                val = raw_val*noise_10513
-        else:
-            val = raw_val * noise_hist
-        
-        if year < 2012:
-            val *= noise_trend
-        
-        if year < 2012:
-            comment_str = 'Ekstrapolert trend fra 2012'
-            source_str  = 'extrapolated'
-        else:
-            comment_str = 'ok (MC-støy påført sentralt)'
-            source_str  = 'SSB (Tabell 12818 / 10513)'
-    
-        results.append({
-            'flow_name': flow_code,
-            'year': year,
-            'value': val,
-            'comment': comment_str,
-            'data_sources': source_str
-        })
-    missing_years = EXPECTED_YEARS - collected_years
-    report_missing_years(flow_code, missing_years, results)
-    
-    
-def _add_biofuels_production_wastewater_mc(results, preloaded_data, current_params, dataset_noise):
-    flow_code = 'PR.SO-PR.WW-Biofuels production wastewater-Nmix'
-    collected_years = set()
-    
-    noise_biogass = float(dataset_noise['Biogass'])
-    noise_10513   = float(dataset_noise['10513'])
-    noise_12359   = float(dataset_noise['12359'])
-
-    paper_N    = float(current_params.waste_N_frac("paper"))
-    plastic_N  = float(current_params.waste_N_frac("plastic"))
-    wood_N     = float(current_params.waste_N_frac("wood"))
-    textile_N  = float(current_params.waste_N_frac("textiles"))
-    wet_N      = float(current_params.waste_N_frac("wet_organic"))
-    sludge_N   = float(current_params.waste_N_frac("sludge"))
-    other_N    = float(current_params.waste_N_frac("other_materials"))
-    haz_N      = float(current_params.waste_N_frac("hazardous"))
-    contam_N   = float(current_params.waste_N_frac("contaminated_masses"))
-    mixed_N    = float(current_params.waste_N_frac("mixed_waste"))
-    rubber_N   = float(current_params.waste_N_frac("rubber"))
-    park_N     = float(current_params.waste_N_frac("park_garden"))
-    
-    manure_N    = float(current_params.get("manure_N_frac"))
-    fish_N      = float(current_params.get("animal_waste_N_frac"))
-    loss_factor = float(current_params.get("digestate_loss_fraction"))
-
-    df_manure = preloaded_data.get('biogass_manure')
-        
-    year_values_manure = {}
-    for r in range(2, 14):
-        try:
-            year = int(float(str(df_manure.iloc[r, 3]).strip())) 
-            val_raw = float(df_manure.iloc[r, 7])                
-            year_values_manure[year] = (val_raw / 1000.0) * manure_N * noise_biogass
-        except (ValueError, TypeError, IndexError):
+    for idx, row in uts_raw.iterrows():
+        if idx == 0 and "anlegg" in str(row.iloc[0]).lower():
             continue
-
-    df_fish = preloaded_data.get('ssb_waste_12359')
-        
-    year_values_fish = {}
-    for col in range(3, df_fish.shape[1]):
+            
         try:
-            year_val = str(df_fish.iloc[2, col]).strip() 
+            year_val = str(row.iloc[3]).strip() # Kolonne 3: År
             if not year_val.replace('.0', '').isdigit():
                 continue
+                
             year = int(float(year_val))
-            val_raw = float(df_fish.iloc[28, col])
-            year_values_fish[year] = val_raw * fish_N * noise_12359
+            
+            if 2011 <= year <= 2025:
+                anlegg_name = str(row.iloc[0]).strip().lower() # Kolonne 0: Anleggsnavn
+                raw_value = float(row.iloc[4])                 # Kolonne 4: Årlig utslipp til vann
+                
+                if any(ja_name in anlegg_name or anlegg_name in ja_name for ja_name in tilk_ja):
+                    weight = 0.0  # Tilkoblet -> Skal IKKE regnes som sigevann direkte til natur
+                elif any(nei_name in anlegg_name or anlegg_name in nei_name for nei_name in tilk_nei):
+                    weight = 1.0  # Ikke tilkoblet -> Går 100% til natur (sigevann)
+                else:# ukjent
+                    weight = 0.5
+                
+                n_leachate_tN = raw_value * weight
+                
+                if year not in real_years_data:
+                    real_years_data[year] = 0.0
+                    
+                real_years_data[year] += (n_leachate_tN / 1000.0) * noise_mildir
+                
         except (ValueError, TypeError, IndexError):
             continue
 
-    df_10513 = preloaded_data.get('ssb_waste_10513')
+    valid_years = [y for y in real_years_data.keys() if 2011 <= y <= 2025]
+    
+    mean_unconnected_kt = sum(real_years_data[y] for y in valid_years) / len(valid_years)
 
     final_values = {}
+    
+    for year in range(1990, 2011):
+        final_values[year] = mean_unconnected_kt
 
-    for col in range(1, 110, 9):
-        if col >= df_10513.shape[1]:
-            break
-            
-        cell_year = str(df_10513.iloc[3, col]).strip() 
-        if cell_year.replace('.0', '').isdigit():
-            year = int(float(cell_year))
-            collected_years.add(year)
-            
-            try:
-                v_10513 = 0.0
-                v_10513 += float(df_10513.iloc[6, col + 2]) * wet_N       
-                v_10513 += float(df_10513.iloc[7, col + 2]) * park_N      
-                v_10513 += float(df_10513.iloc[8, col + 2]) * wood_N      
-                v_10513 += float(df_10513.iloc[9, col + 2]) * sludge_N    
-                v_10513 += float(df_10513.iloc[10, col + 2]) * paper_N    
-                v_10513 += float(df_10513.iloc[16, col + 2]) * plastic_N  
-                v_10513 += float(df_10513.iloc[17, col + 2]) * rubber_N   
-                v_10513 += float(df_10513.iloc[18, col + 2]) * textile_N  
-                v_10513 += float(df_10513.iloc[21, col + 2]) * haz_N      
-                v_10513 += float(df_10513.iloc[22, col + 2]) * mixed_N    
-                v_10513 += float(df_10513.iloc[23, col + 2]) * other_N    
-                v_10513 += float(df_10513.iloc[24, col + 2]) * contam_N   
-                
-                value = v_10513 * noise_10513
-                
-                if year > 2012:
-                    value += year_values_manure.get(year, 0.0)
-                    
-                if year > 2016:
-                    value += year_values_fish.get(year, 0.0)
-                
-                final_values[year] = value * loss_factor
-                
-            except (ValueError, TypeError, IndexError):
-                final_values[year] = 0.0
+    for year in range(2011, 2026):
+        final_values[year] = real_years_data.get(year, 0.0)
 
-    for year in range(1984, 2012):
-        collected_years.add(year)
+    for year in range(1984, 1990):
         final_values[year] = 0.0
 
     for year in sorted(final_values.keys()):
+        collected_years.add(year)
         val = final_values[year]
         
         results.append({
             'flow_name': flow_code,
             'year': year,
             'value': val,
-            'comment': 'ok (Sammensatt avfallsstrøm med MC-støy)' if year >= 2012 else 'Satt til 0 før 2012',
-            'data_sources': 'SSB, Landbruksdirektoratet, Biogass Norge' if year >= 2012 else 'Ingen data før 2012'
+            'comment': comment,
+            'data_sources': 'Utslipp_deponi.xlsx (Mildir)' if year >= 2011 else 'extrapolated'
         })
 
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
+    
+
+# def _add_biofuels_production_wastewater_mc(results, preloaded_data, current_params, dataset_noise):
+#     flow_code = 'PR.SO-PR.WW-Biofuels production wastewater-Nmix'
+#     collected_years = set()
+    
+#     noise_biogass = float(dataset_noise['Biogass'])
+#     noise_10513   = float(dataset_noise['10513'])
+#     noise_12359   = float(dataset_noise['12359'])
+
+#     paper_N    = float(current_params.waste_N_frac("paper"))
+#     plastic_N  = float(current_params.waste_N_frac("plastic"))
+#     wood_N     = float(current_params.waste_N_frac("wood"))
+#     textile_N  = float(current_params.waste_N_frac("textiles"))
+#     wet_N      = float(current_params.waste_N_frac("wet_organic"))
+#     sludge_N   = float(current_params.waste_N_frac("sludge"))
+#     other_N    = float(current_params.waste_N_frac("other_materials"))
+#     haz_N      = float(current_params.waste_N_frac("hazardous"))
+#     contam_N   = float(current_params.waste_N_frac("contaminated_masses"))
+#     mixed_N    = float(current_params.waste_N_frac("mixed_waste"))
+#     rubber_N   = float(current_params.waste_N_frac("rubber"))
+#     park_N     = float(current_params.waste_N_frac("park_garden"))
+    
+#     manure_N    = float(current_params.get("manure_N_frac"))
+#     fish_N      = float(current_params.get("animal_waste_N_frac"))
+#     loss_factor = float(current_params.get("digestate_loss_fraction"))
+
+#     df_manure = preloaded_data.get('biogass_manure')
+        
+#     year_values_manure = {}
+#     for r in range(2, 14):
+#         try:
+#             year = int(float(str(df_manure.iloc[r, 3]).strip())) 
+#             val_raw = float(df_manure.iloc[r, 7])                
+#             year_values_manure[year] = (val_raw / 1000.0) * manure_N * noise_biogass
+#         except (ValueError, TypeError, IndexError):
+#             continue
+
+#     df_fish = preloaded_data.get('ssb_waste_12359')
+        
+#     year_values_fish = {}
+#     for col in range(3, df_fish.shape[1]):
+#         try:
+#             year_val = str(df_fish.iloc[2, col]).strip() 
+#             if not year_val.replace('.0', '').isdigit():
+#                 continue
+#             year = int(float(year_val))
+#             val_raw = float(df_fish.iloc[28, col])
+#             year_values_fish[year] = val_raw * fish_N * noise_12359
+#         except (ValueError, TypeError, IndexError):
+#             continue
+
+#     df_10513 = preloaded_data.get('ssb_waste_10513')
+
+#     final_values = {}
+
+#     for col in range(1, 110, 9):
+#         if col >= df_10513.shape[1]:
+#             break
+            
+#         cell_year = str(df_10513.iloc[3, col]).strip() 
+#         if cell_year.replace('.0', '').isdigit():
+#             year = int(float(cell_year))
+#             collected_years.add(year)
+            
+#             try:
+#                 v_10513 = 0.0
+#                 v_10513 += float(df_10513.iloc[6, col + 2]) * wet_N       
+#                 v_10513 += float(df_10513.iloc[7, col + 2]) * park_N      
+#                 v_10513 += float(df_10513.iloc[8, col + 2]) * wood_N      
+#                 v_10513 += float(df_10513.iloc[9, col + 2]) * sludge_N    
+#                 v_10513 += float(df_10513.iloc[10, col + 2]) * paper_N    
+#                 v_10513 += float(df_10513.iloc[16, col + 2]) * plastic_N  
+#                 v_10513 += float(df_10513.iloc[17, col + 2]) * rubber_N   
+#                 v_10513 += float(df_10513.iloc[18, col + 2]) * textile_N  
+#                 v_10513 += float(df_10513.iloc[21, col + 2]) * haz_N      
+#                 v_10513 += float(df_10513.iloc[22, col + 2]) * mixed_N    
+#                 v_10513 += float(df_10513.iloc[23, col + 2]) * other_N    
+#                 v_10513 += float(df_10513.iloc[24, col + 2]) * contam_N   
+                
+#                 value = v_10513 * noise_10513
+                
+#                 if year > 2012:
+#                     value += year_values_manure.get(year, 0.0)
+                    
+#                 if year > 2016:
+#                     value += year_values_fish.get(year, 0.0)
+                
+#                 final_values[year] = value * loss_factor
+                
+#             except (ValueError, TypeError, IndexError):
+#                 final_values[year] = 0.0
+
+#     for year in range(1984, 2012):
+#         collected_years.add(year)
+#         final_values[year] = 0.0
+
+#     for year in sorted(final_values.keys()):
+#         val = final_values[year]
+        
+#         results.append({
+#             'flow_name': flow_code,
+#             'year': year,
+#             'value': val,
+#             'comment': 'ok (Sammensatt avfallsstrøm med MC-støy)' if year >= 2012 else 'Satt til 0 før 2012',
+#             'data_sources': 'SSB, Landbruksdirektoratet, Biogass Norge' if year >= 2012 else 'Ingen data før 2012'
+#         })
+
+#     missing_years = EXPECTED_YEARS - collected_years
+#     report_missing_years(flow_code, missing_years, results)
     
 def _add_so_NOx_emissions_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'PR.SO-AT.AT-Emissions-NOx'
@@ -754,95 +901,6 @@ def _add_so_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
     report_missing_years(flow_code, missing_years, results)
 
 
-def _add_so_leaching_mc(results, preloaded_data, current_params, dataset_noise):
-    flow_code = 'PR.SO-HY.SW-Leaching-Nmix'
-    collected_years = set()
-    comment = 'ok (Robust posisjonsindeksert mapping og MC-støy)'
-    noise_mildir = float(dataset_noise['norskeutslipp'])
-
-    uts_raw = preloaded_data.get('deponi_utslipp')
-    tilk_raw = preloaded_data.get('deponi_tilkobling')
-
-    tilk_ja = set()
-    tilk_nei = set()
-    
-    for idx, row in tilk_raw.iterrows():
-        if idx == 0 and ("anlegg" in str(row.iloc[0]).lower() or "tilkoblet" in str(row.iloc[1]).lower()):
-            continue
-            
-        name_clean = str(row.iloc[0]).strip().lower() # Kolonne 0: anleggsnavn
-        status = str(row.iloc[1]).strip().lower()    # Kolonne 1: status
-        
-        if 'ja' in status:
-            tilk_ja.add(name_clean)
-        elif 'nei' in status:
-            tilk_nei.add(name_clean)
-
-    real_years_data = {}
-    
-    for idx, row in uts_raw.iterrows():
-        if idx == 0 and "anlegg" in str(row.iloc[0]).lower():
-            continue
-            
-        try:
-            year_val = str(row.iloc[3]).strip() # Kolonne 3: År
-            if not year_val.replace('.0', '').isdigit():
-                continue
-                
-            year = int(float(year_val))
-            
-            if 2011 <= year <= 2025:
-                anlegg_name = str(row.iloc[0]).strip().lower() # Kolonne 0: Anleggsnavn
-                raw_value = float(row.iloc[4])                 # Kolonne 4: Årlig utslipp til vann
-                
-                if any(ja_name in anlegg_name or anlegg_name in ja_name for ja_name in tilk_ja):
-                    weight = 0.0  # Tilkoblet -> Skal IKKE regnes som sigevann direkte til natur
-                elif any(nei_name in anlegg_name or anlegg_name in nei_name for nei_name in tilk_nei):
-                    weight = 1.0  # Ikke tilkoblet -> Går 100% til natur (sigevann)
-                else:# ukjent
-                    weight = 0.5
-                
-                n_leachate_tN = raw_value * weight
-                
-                if year not in real_years_data:
-                    real_years_data[year] = 0.0
-                    
-                real_years_data[year] += (n_leachate_tN / 1000.0) * noise_mildir
-                
-        except (ValueError, TypeError, IndexError):
-            continue
-
-    valid_years = [y for y in real_years_data.keys() if 2011 <= y <= 2025]
-    
-    mean_unconnected_kt = sum(real_years_data[y] for y in valid_years) / len(valid_years)
-
-    final_values = {}
-    
-    for year in range(1990, 2011):
-        final_values[year] = mean_unconnected_kt
-
-    for year in range(2011, 2026):
-        final_values[year] = real_years_data.get(year, 0.0)
-
-    for year in range(1984, 1990):
-        final_values[year] = 0.0
-
-    for year in sorted(final_values.keys()):
-        collected_years.add(year)
-        val = final_values[year]
-        
-        results.append({
-            'flow_name': flow_code,
-            'year': year,
-            'value': val,
-            'comment': comment,
-            'data_sources': 'Utslipp_deponi.xlsx (Mildir)' if year >= 2011 else 'extrapolated'
-        })
-
-    missing_years = EXPECTED_YEARS - collected_years
-    report_missing_years(flow_code, missing_years, results)
-    
-
 def _add_export_for_recycling_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise):
     flow_code = 'PR.SO-RW.RW-Export for recycling-Nmix'
     data_sources = 'SSB'
@@ -899,115 +957,18 @@ def _add_export_for_reuse_mc(results, preloaded_data, current_params, current_tr
     report_missing_years(flow_code, missing_years, results)
 
     
-def _add_ww_N2O_emissions_mc(results, preloaded_data, current_params, dataset_noise):
-    flow_code = 'PR.WW-AT.AT-Emissions-N2O'
-    collected_years = set()
-    comment = 'ok (MC-støy lagt på)'
-    data_sources = 'UNFCCC CRT'
-
-    conv_N2O = float(current_params.get("N2O_to_N_factor"))
-    key_n2o = 'UNFCCC_emissions'
-    noise_val = dataset_noise[key_n2o]
-
-    df_ww_emissions = preloaded_data.get('n2o_ww_raw')
-    for index, row in df_ww_emissions.iterrows():
-        year_val = row['year']
-        n2o_val = row['value']  # Kolonnenavnet i csv er 'value'
-        
-        if pd.isna(year_val) or pd.isna(n2o_val):
-            continue
-            
-        year = int(year_val)
-        if year not in EXPECTED_YEARS:
-            continue
-            
-        collected_years.add(year)
-        
-        base_value = float(n2o_val) * conv_N2O
-        value = base_value * noise_val
- 
-        results.append({
-            'flow_name': flow_code, 
-            'year': year, 
-            'value': float(value),
-            'comment': comment, 
-            'data_sources': data_sources
-        })
-        
-    missing_years = EXPECTED_YEARS - collected_years
-    report_missing_years(flow_code, missing_years, results)
-    
-    
-def _add_solid_waste_export_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise):
-    flow_code = 'PR.SO-RW.RW-Solid waste export-Nmix'
-    collected_years = set()
-    comment = 'ok (Generisk handelsløsning med MC-støy)'
-    data_sources = 'SSB tab 08801'
-
-    trade_results = []
-    process_generic_trade_flow(
-        results=trade_results, 
-        preloaded_data=preloaded_data, 
-        current_params=current_params,
-        current_trade_factors=current_trade_factors, 
-        flow_code=flow_code,
-        target_types=['kommunalt_avfall', 'farlig_avfall', 'annet_avfall'],
-        is_import=False,  # Eksport (tilsvarer impeks = 2)
-        dataset_noise=dataset_noise
-    )
-
-    trade_years_dict = {row['year']: row['value'] for row in trade_results}
-
-    for year in sorted(EXPECTED_YEARS):
-        # Vi forholder oss til tidslinjen fra opprinnelig funksjon (f.eks. fra 1988 og utover)
-        if year < 1988:
-            continue
-            
-        collected_years.add(year)
-
-        if 1988 <= year <= 2001:
-            value = 0.0
-            current_comment = comment
-        else:
-            # Hent den beregnede MC-verdien fra handelsfunksjonen (default til 0.0 hvis år mangler)
-            value = float(trade_years_dict.get(year, 0.0))
-            current_comment = comment
-
-        # Sikre mot eventuelle NaN-verdier eller negative avvik fra støyen
-        if value < 0 or pd.isna(value):
-            value = 0.0
-
-        results.append({
-            'flow_name': flow_code,
-            'year': year,
-            'value': value,
-            'comment': current_comment,
-            'data_sources': data_sources
-        })
-
-    # 4. Sjekk om alle forventede år ble samlet inn
-    missing_years = EXPECTED_YEARS - collected_years
-    report_missing_years(flow_code, missing_years, results)
-    
 def _add_ag_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params, dataset_noise):
-    """
-    MC-VERSJON: Avløpsslam til jordbruk (PR.WW-AG.SM-Sewage sludge fertilizer-Nmix).
-    Synkronisert med faktiske Pandas-indekser fra SSB tab 05279.
-    """
     flow_code = 'PR.WW-AG.SM-Sewage sludge fertilizer-Nmix'
     dataset_key = '05279'
     noise_val = dataset_noise[dataset_key]
     collected_years = set()
-    comment = 'ok (MC-støy påført aktivitetsnivå og slam-N)'
-    
-    # Strikt parameterhenting (krasjer hvis mangler)
+    comment = 'ok'
     N_content = float(current_params.waste_N_frac('sludge'))
     df_modern = preloaded_data['sewage_sludge_modern']
     df_hist = preloaded_data['sewage_sludge_historical']
     
     # 2002-2024 
     data_sources = 'SSB tab 05279'
-    
     for col_idx in range(2, len(df_modern.columns)):
         year_val = df_modern.iloc[2, col_idx]
         if year_val is None or pd.isna(year_val):
@@ -1168,6 +1129,96 @@ def _add_hs_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
     report_missing_years(flow_code, missing_years, results)
 
 
+def _add_ww_N2O_emissions_mc(results, preloaded_data, current_params, dataset_noise):
+    flow_code = 'PR.WW-AT.AT-Emissions-N2O'
+    collected_years = set()
+    comment = 'ok (MC-støy lagt på)'
+    data_sources = 'UNFCCC CRT'
+
+    conv_N2O = float(current_params.get("N2O_to_N_factor"))
+    key_n2o = 'UNFCCC_emissions'
+    noise_val = dataset_noise[key_n2o]
+
+    df_ww_emissions = preloaded_data.get('n2o_ww_raw')
+    for index, row in df_ww_emissions.iterrows():
+        year_val = row['year']
+        n2o_val = row['value']  # Kolonnenavnet i csv er 'value'
+        
+        if pd.isna(year_val) or pd.isna(n2o_val):
+            continue
+            
+        year = int(year_val)
+        if year not in EXPECTED_YEARS:
+            continue
+            
+        collected_years.add(year)
+        
+        base_value = float(n2o_val) * conv_N2O
+        value = base_value * noise_val
+ 
+        results.append({
+            'flow_name': flow_code, 
+            'year': year, 
+            'value': float(value),
+            'comment': comment, 
+            'data_sources': data_sources
+        })
+        
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+    
+    
+def _add_solid_waste_export_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise):
+    flow_code = 'PR.SO-RW.RW-Solid waste export-Nmix'
+    collected_years = set()
+    comment = 'ok (Generisk handelsløsning med MC-støy)'
+    data_sources = 'SSB tab 08801'
+
+    trade_results = []
+    process_generic_trade_flow(
+        results=trade_results, 
+        preloaded_data=preloaded_data, 
+        current_params=current_params,
+        current_trade_factors=current_trade_factors, 
+        flow_code=flow_code,
+        target_types=['kommunalt_avfall', 'farlig_avfall', 'annet_avfall'],
+        is_import=False,  # Eksport (tilsvarer impeks = 2)
+        dataset_noise=dataset_noise
+    )
+
+    trade_years_dict = {row['year']: row['value'] for row in trade_results}
+
+    for year in sorted(EXPECTED_YEARS):
+        # Vi forholder oss til tidslinjen fra opprinnelig funksjon (f.eks. fra 1988 og utover)
+        if year < 1988:
+            continue
+            
+        collected_years.add(year)
+
+        if 1988 <= year <= 2001:
+            value = 0.0
+            current_comment = comment
+        else:
+            # Hent den beregnede MC-verdien fra handelsfunksjonen (default til 0.0 hvis år mangler)
+            value = float(trade_years_dict.get(year, 0.0))
+            current_comment = comment
+
+        # Sikre mot eventuelle NaN-verdier eller negative avvik fra støyen
+        if value < 0 or pd.isna(value):
+            value = 0.0
+
+        results.append({
+            'flow_name': flow_code,
+            'year': year,
+            'value': value,
+            'comment': current_comment,
+            'data_sources': data_sources
+        })
+
+    # 4. Sjekk om alle forventede år ble samlet inn
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+    
 def _add_sewage_sludge_landfill_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'PR.WW-PR.SO-Sewage sludge landfill-Nmix'
     collected_years = set()

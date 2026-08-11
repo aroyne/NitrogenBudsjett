@@ -8,7 +8,7 @@ from datetime import datetime
 # ==============================================================================
 
 DEPOSITION_TEXT = (
-    "Atmospheric deposition was calculated using data from NILU which gives gridded "
+    "Atmospheric deposition was calculated using data from NILU (described in \\\\citet{blake_deposition_2023}) which gives gridded "
     "deposition data for both oxidized and reduced N as averages for periods 1983-1987, "
     "1988-1992, 1997-2001, 2002-2006, 2007-2011 and 2012-2016. For 2017-2021 we use "
     "total NILU data for that period and scale with the distribution across land classes "
@@ -1494,7 +1494,9 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                 description = (
                     "**MP.OP-HY.SW-Untreated wastewater-Nmix** is found using data from Miljødirektoratet (personal communication, 2026) on emissions to water "
                     "from individual industries, where industries are categorized as belonging to OP or FP based on the information given in the statistic, and counting "
-                    "those that are not reported to be connected to municipal wastewater treatment. These emissions are also reported by Miljødirektoratet \\\\citep{miljodirektoratet_norske_2025}, but "
+                    "those that are not reported to be connected to municipal wastewater treatment. In OP we include industries that process petroleum products that "
+                    "could arguably also have been designated as a separate flow in the EF pool."
+                    "These emissions are also reported by Miljødirektoratet \\\\citep{miljodirektoratet_norske_2025}, but "
                     "as of February 2026 the publicly available data did not include information on connection to municipal wastewater. The database does not distinguish "
                     "between emissions to surface and coastal waters, so even though several large industries discharge their wastewater to the coast, we assign this entire "
                     "flow to SW in order to avoid double counting."
@@ -1706,13 +1708,13 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
                     "the resulting emissions have been split evenly between the leaching and wastewater flows from landfills. As no data are available before 2009 "
                     "we have extrapolated using the average value. This probably underestimates the real value because landfilling was more prevalent in previous years."
                 )
-            elif "prww" in norm and "biofuels" in norm:
-                exact_flow_code = "PR.SO-PR.WW-Biofuels production wastewater-Nmix"
-                display_name = "Biofuels Production Wastewater"
-                flow_description = (
-                    f"**{exact_flow_code}** is found by assuming that the incoming N to biofuel production not retained in digestate ends "
-                    "up in the wastewater. Values before 2012 are set to zero. IN PROGRESS"
-                )
+            # elif "prww" in norm and "biofuels" in norm:
+            #     exact_flow_code = "PR.SO-PR.WW-Biofuels production wastewater-Nmix"
+            #     display_name = "Biofuels Production Wastewater"
+            #     flow_description = (
+            #         f"For **{exact_flow_code}** is found by assuming that the incoming N to biofuel production not retained in digestate ends "
+            #         "up in the wastewater. Values before 2012 are set to zero. IN PROGRESS"
+            #     )
             elif "mpop" in norm and "recycling" in norm:
                 exact_flow_code = "PR.SO-MP.OP-Recycling-Nmix"
                 display_name = "Material Recycling"
