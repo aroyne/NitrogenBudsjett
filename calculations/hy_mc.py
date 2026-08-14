@@ -250,7 +250,7 @@ def _add_wild_fish_catch(results, preloaded_data, current_params, dataset_noise)
         if year in EXPECTED_YEARS:
             collected_years.add(year)
             val = 0.0
-            for r_idx in [15, 20, 26, 38, 41]:
+            for r_idx in [15, 20, 26, 38]:
                 if not pd.isna(df_art.iloc[r_idx, col]):
                     val += float(df_art.iloc[r_idx, col])
                     
@@ -302,7 +302,7 @@ def _add_aquaculture_internal_flows(results, aquaculture_production_dict, curren
             
             # 2. Fôrspill og fekalier til kystvann
             total_feed_N = (fish_harvested_N / prot_ret) if prot_ret > 0 else 0.0
-            waste_val = total_feed_N * feed_waste / (1.0 - feed_waste) if feed_waste < 1 else 0.0
+            waste_val = total_feed_N * feed_waste
             
             results.append({
                 'flow_name': flow_waste, 'year': year, 'value': max(0.0, waste_val),

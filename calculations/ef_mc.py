@@ -122,24 +122,22 @@ def _add_fuel_used_as_feedstock_mc(results, preloaded_data, current_params, data
 def _add_ec_NOx_emissions_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'EF.EC-AT.AT-Emissions-NOx'
     collected_years = set()
-    dataset_key = 'CRLTAP'
-    
+
     conv = float(current_params.get("NOx_to_N_factor"))
-    crltap_data = preloaded_data.get('ag_crltap_raw_lines')        
+    crltap_data = preloaded_data.get('ag_crltap_raw_lines')
     sums = load_crltap_emissions_to_N(
-        crltap_data, 
-        CRLTAP_EC_SECTORS, 
-        'NOx', 
-        conv, 
+        crltap_data,
+        CRLTAP_EC_SECTORS,
+        'NOx',
+        conv,
         dataset_noise
     )
-    noise_val = dataset_noise[dataset_key]
-    
+
     for year, val in sums.items():
         year = int(year)
         collected_years.add(year)
-        value = float(val) * noise_val
-        
+        value = float(val)
+
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
             'comment': 'ok (MC-støy lagt på)', 'data_sources': 'CRLTAP Inventory Submissions'

@@ -53,36 +53,6 @@ def execute_calculations_pr(preloaded_data, current_params, dataset_noise, curre
     return results
 
 
-def _get_value_from_results(rows, flow_name, year):
-    return next(
-        d["value"] for d in rows
-        if d.get("flow_name") == flow_name and d.get("year") == year
-    )
-
-def _calculate_scaled_waste_timeseries(tonnes_modern_dict, tonnes_10513_dict, target_year_modern, target_year_10513, noise_modern, noise_10513, noise_hist):
-    final_series = {}
-
-    for year, val in tonnes_modern_dict.items():
-        final_series[year] = val * noise_modern
-
-    value_modern_basis = tonnes_modern_dict.get(target_year_modern, 0.0)
-    tonnes_basis_10513 = tonnes_10513_dict.get(target_year_10513, 0.0)
-
-    # 2. Skaler 2012-2017 bakover basert på forholdet mellom tabellene
-    for year in range(2012, 2018):        
-        tonnes_year = tonnes_10513_dict[year]
-        # Formel: Moderne_Basis * (Mengde_År / Mengde_Basis_10513)
-        val_scaled = value_modern_basis * (tonnes_year / tonnes_basis_10513)
-        final_series[year] = val_scaled * noise_10513
-
-    # 3. Ekstrapoler 2012-verdien bakover til 1984
-    value_2012_clean = value_modern_basis * (tonnes_10513_dict.get(2012, 0.0) / tonnes_basis_10513)
-    
-    for year in range(1984, 2012):
-        final_series[year] = value_2012_clean * noise_hist
-
-    return final_series
-
 def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'PR.SO-EF.EC-Waste to energy-Nmix'
     collected_years = set()
@@ -417,93 +387,6 @@ def _add_hs_biologically_treated_organic_waste_mc(results, preloaded_data, curre
     report_missing_years(flow_code, missing_years, results)
 
 
-
-    compost_old_N = float(current_params.waste_N_frac('compost_old'))
-    wet_N         = float(current_params.waste_N_frac('wet_organic'))
-    park_N        = float(current_params.waste_N_frac('park_garden'))
-    sludge_N      = float(current_params.waste_N_frac('sludge'))
-    
-    compost_N_loss = float(current_params.waste_N_frac('compost_N_loss'))
-
-    df_12818 = preloaded_data.get('ssb_waste_12818')
-    noise_12818 = dataset_noise['12818']
-    tonnes_modern_dict = {}
-    for col_idx in range(1, 8):
-        try:
-            year = int(float(str(df_12818.iloc[3, col_idx]).strip())) # Rad 4 i excel
-            
-            val_row7 = float(df_12818.iloc[5, col_idx])
-            val_row8 = float(df_12818.iloc[6, col_idx])
-            
-            tonnes_modern_dict[year] = (val_row7 + val_row8) * compost_old_N
-        except (ValueError, TypeError, IndexError):
-            continue
-
-    df_10513 = preloaded_data.get('ssb_waste_10513')
-    noise_10513 = dataset_noise['10513']
-    tonnes_10513_dict = {}
-    
-    for col in range(1, df_10513.shape[1], 9):
-        cell_year = str(df_10513.iloc[3, col]).strip()
-        if cell_year.replace('.0', '').isdigit():
-            year = int(float(cell_year))
-            
-            try:
-                n_val = (
-                    float(df_10513.iloc[6, col + 2]) * wet_N +
-                    float(df_10513.iloc[7, col + 2]) * park_N +
-                    float(df_10513.iloc[9, col + 2]) * sludge_N
-                )
-                
-                tonnes_10513_dict[year] = n_val * (1.0 - compost_N_loss)
-            except (ValueError, TypeError, IndexError):
-                continue
-
-    clean_values = _calculate_scaled_waste_timeseries(
-        tonnes_modern_dict = tonnes_modern_dict,
-        tonnes_10513_dict  = tonnes_10513_dict,
-        target_year_modern = 2018,
-        target_year_10513  = 2018,
-        noise_modern       = 1.0,
-        noise_10513        = 1.0,
-        noise_hist         = 1.0
-    )
-    
-    noise_hist = dataset_noise['historical_waste']
-    noise_trend = dataset_noise['trend interpolation']
-    for year in sorted(clean_values.keys()):
-        collected_years.add(year)
-        raw_val = clean_values[year]
-        
-        if year >= 2012:
-            if year >= 2018:
-                val = raw_val*noise_12818
-            else:
-                val = raw_val*noise_10513
-        else:
-            val = raw_val * noise_hist
-        
-        if year < 2012:
-            val *= noise_trend
-        
-        if year < 2012:
-            comment_str = 'Ekstrapolert trend fra 2012'
-            source_str  = 'extrapolated'
-        else:
-            comment_str = 'ok (MC-støy påført sentralt)'
-            source_str  = 'SSB (Tabell 12818 / 10513)'
-    
-        results.append({
-            'flow_name': flow_code,
-            'year': year,
-            'value': val,
-            'comment': comment_str,
-            'data_sources': source_str
-        })
-    missing_years = EXPECTED_YEARS - collected_years
-    report_missing_years(flow_code, missing_years, results)
-    
-    
 def _add_wastewater_from_landfills_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'PR.SO-PR.WW-Wastewater from landfills-Nmix'
     collected_years = set()
@@ -907,7 +790,7 @@ def _add_export_for_recycling_mc(results, preloaded_data, current_params, curren
     collected_years = set()
     
     year_values = find_export_for_recycling(
-        results=results,
+        results=None,
         preloaded_data=preloaded_data,
         current_params=current_params,
         current_trade_factors=current_trade_factors,
@@ -935,7 +818,7 @@ def _add_export_for_reuse_mc(results, preloaded_data, current_params, current_tr
     collected_years = set()
     
     year_values = find_export_for_reuse(
-        results=results,
+        results=None,
         preloaded_data=preloaded_data,
         current_params=current_params,
         current_trade_factors=current_trade_factors,

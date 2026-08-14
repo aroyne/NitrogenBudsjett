@@ -98,9 +98,9 @@ def plot_flows_time_series(
         s_val = s_val[~s_val.index.duplicated(keep='last')]
 
         # --- Usikkerhet per år (beregn sigma) ---
-        # relativ usikkerhet i prosent -> sigma_abs = |Value| * Uncertainty (given as fraction)
+        # relativ usikkerhet i prosent -> sigma_abs = |Value| * Uncertainty / 100
         sigma_series = (sub.set_index(year_col)[value_col].abs() *
-                        sub.set_index(year_col)[unc_col])
+                        sub.set_index(year_col)[unc_col] / 100.0)
         sigma_series = sigma_series.sort_index()
         sigma_series = sigma_series[~sigma_series.index.duplicated(keep='last')]
 

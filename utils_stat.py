@@ -791,7 +791,7 @@ def process_and_export_mc_results(all_records):
             print(f"  [ALARM / ERROR] Flow '{flow}' has missing data gaps in years: {sorted(list(missing_years))}")
         
         df_trimmed = df_flow[(df_flow['year'] >= start_year) & (df_flow['year'] <= end_year)].copy()
-        # df_trimmed['value'] = df_trimmed['value'].fillna(0.0)
+        df_trimmed['value'] = df_trimmed['value'].fillna(0.0)
         
         trimmed_chunks.append(df_trimmed)
 
