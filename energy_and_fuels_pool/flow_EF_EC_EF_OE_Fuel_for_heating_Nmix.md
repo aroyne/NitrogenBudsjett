@@ -10,7 +10,7 @@ nav_order: 4
 ![EF.EC-EF.OE-Fuel for heating-Nmix](../output_files/plots/EF_EC_EF_OE_Fuel_for_heating_Nmix.png)
 
 ### Flow Description
-EF.EC-EF.IC-Fuel for industry-Nmix: As advised by Schäppi et al. (2025), we have found this in the UNFCCC Common reporting tables (Table 1) which gives amount of energy consumed in TJ, together with net caloric values from Table 1.2 in Garg et al. (2006) and nitrogen contents from Table 15 in Schäppi et al. (2025).
+**EF.EC-EF.OE-Fuel for heating-Nmix**: As advised by Schäppi et al. (2025), we have found this in the UNFCCC Common reporting tables (Table 1) which gives amount of energy consumed in TJ, together with net caloric values from Table 1.2 in Garg et al. (2006) and nitrogen contents from Table 15 in Schäppi et al. (2025).
 
 ### References
 

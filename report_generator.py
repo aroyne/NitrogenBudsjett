@@ -1033,7 +1033,7 @@ def process_humans_and_settlements_pool(hs_folder, plot_files, plot_dir, bib_fil
         f.write("* **HS.HS-AT.AT-LUC emissions-NOx** is set to zero because none is reported in UNFCCC Common reporting tables, Table 4.\n")
         f.write("* **HS.HS-HY.SW-Untreated wastewater-Nmix** and **HS.HS-HY.CW-Untreated wastewater-Nmix** are set to zero because wastewater treatment is mandated by law.\n")
         f.write("* **HS.HS-PR.SO-Organic waste biofuel substrate-Nmix** and **HS.HS-PR.SO-Organic waste for composting-Nmix** are not given as separate flows; instead they are included in the flow **HS.HS-PR.SO-Household waste-Nmix** because official statistics do not clearly indicate what origin waste flows end up in different end uses.\n")
-        f.write("* **HS.HS-MP.OP-Recycling-Nmix** is not reported here because the flow of wastes from all origins to recycling is assigned to the PR.OS subpool to better reflect the Norwegian waste management and statistics structure.\n")
+        f.write("* **HS.HS-MP.OP-Recycling-Nmix** is not reported here because the flow of wastes from all origins to recycling is assigned to the PR.SO subpool to better reflect the Norwegian waste management and statistics structure.\n")
         append_bibtex_references(f, bib_filename)
 
     hs_menu_counter = 1
@@ -1164,7 +1164,7 @@ def process_energy_and_fuels_pool(ef_folder, plot_files, plot_dir, bib_filename,
         display_name = "Unknown Energy and fuels Flow"
         parent_subpool = ""
         description = ""
-        description_fuels = ("EF.EC-EF.IC-Fuel for industry-Nmix: As advised by \\\\citet{schappi_annexes_2025}, "
+        description_fuels = ("As advised by \\\\citet{schappi_annexes_2025}, "
             "we have found this in the UNFCCC Common reporting tables (Table 1) which gives "
             "amount of energy consumed in TJ, together with net caloric values from Table 1.2 "
             "in \\citet{garg_chapter_2006} and nitrogen contents from Table 15 in \\\\citet{schappi_annexes_2025}.")
@@ -1184,19 +1184,19 @@ def process_energy_and_fuels_pool(ef_folder, plot_files, plot_dir, bib_filename,
             elif "fuel" in norm and "industry" in norm:
                 exact_flow_code = "EF.EC-EF.IC-Fuel for industry-Nmix"
                 display_name = "Fuel for industry"
-                description = description_fuels
+                description = f"**{exact_flow_code}**: " + description_fuels
             elif "fuel" in norm and "heating" in norm:
                 exact_flow_code = "EF.EC-EF.OE-Fuel for heating-Nmix"
                 display_name = "Fuel for heating"
-                description = description_fuels
+                description = f"**{exact_flow_code}**: " + description_fuels
             elif "fuel" in norm and "transport" in norm:
                 exact_flow_code = "EF.EC-EF.TR-Fuel for transport-Nmix"
                 display_name = "Fuel for transport"
-                description = description_fuels
+                description = f"**{exact_flow_code}**: " + description_fuels
             elif "feedstock" in norm:
                 exact_flow_code = "EF.EC-MP.OP-Fuel used as feedstock-Nmix"
                 display_name = "Fuel used as feedstock"
-                description = description_fuels + "Other minor feedstock categories listed in the guidelines are neglected as advised by \\citet{schappi_annexes_2025}.  "
+                description = f"**{exact_flow_code}**: " + description_fuels + " Other minor feedstock categories listed in the guidelines are neglected as advised by \\citet{schappi_annexes_2025}."
             elif "export" in norm and "transport" not in norm:
                 exact_flow_code = "EF.EC-RW.RW-Fuel export-Nmix"
                 display_name = "Fuel export"
