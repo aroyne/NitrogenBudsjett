@@ -96,6 +96,9 @@ def append_bibtex_references(file_handle, bib_filename=None):
                 # Fjern krøllparenteser, hermetegn og komma på slutten
                 val = re.sub(r'[{"},\s]+$', '', val.strip())
                 val = re.sub(r'^[{"\s]+', '', val)
+                # BibTeX bruker ofte {Ord}-beskyttelse rundt enkeltord inni verdien
+                # (for å bevare stor forbokstav); disse skal aldri vises til leseren.
+                val = val.replace('{', '').replace('}', '')
                 if key in ['author', 'title', 'year', 'journal', 'booktitle']:
                     references_dict[current_entry][key] = val
 
@@ -219,9 +222,13 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
                 
                 val = re.sub(r'[{"},\s]+$', '', val.strip())
                 val = re.sub(r'^[{"\s]+', '', val)
-                
+
                 if key in ['url', 'doi']:
                     val = val.rstrip(']')
+                else:
+                    # BibTeX bruker ofte {Ord}-beskyttelse rundt enkeltord inni verdien
+                    # (for å bevare stor forbokstav); disse skal aldri vises til leseren.
+                    val = val.replace('{', '').replace('}', '')
                 
                 if key in ['author', 'year', 'title', 'journal', 'booktitle', 'publisher', 'url', 'doi', 'volume', 'number', 'pages']:
                     references_dict[current_entry][key] = val
@@ -491,7 +498,7 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename, targe
                         "In the Swedish NNB \\citep{moldan_where_2025}, N2 fixation in the OL compartment was considered negligible.")
             elif exact_flow_code == "AT.AT-HY.SW-N2 fixation-N2":
                 f.write(f"**{exact_flow_code}**\n\n" + "According to NIBIO \\citep{nibio_arealbarometer_2026}, the surface water area is 20 457 km2 "
-                        "https://arealbarometer.nibio.no/nb/norge/. According to  \\citep{{schappi_annexes_2025}}, the biological fixation rate can vary "
+                        "https://arealbarometer.nibio.no/nb/norge/. According to \\citep{schappi_annexes_2025}, the biological fixation rate can vary "
                         "between < 0.1 tN/km2 in ologotrophic and mesotrophic lakes to up to 10 tN/km2 in eutrophic lakes. Most lakes in Norway are not "
                         "eutrophic and we use a median value of 0.1 tN/km2, with highest and lowest values of 0 and 2 tN/km2.")
             elif exact_flow_code == "AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2":
@@ -1211,11 +1218,11 @@ def process_energy_and_fuels_pool(ef_folder, plot_files, plot_dir, bib_filename,
             elif "emissions" in norm and "nh3" in norm:
                 exact_flow_code = "EF.IC-AT.AT-Emissions-NH3"
                 display_name = "Industrial emissions (NH3)"
-                description = "EF.IC-AT.AT-Emissions-NH3 denotes ammonia emissions from fuel combustion in industry. We have used data from CLRTAP Inventory Submissions \\citet{emep_official_2025} as advised by \\citet{schappi_annexes_2025}, using the categories given in Table 12.  "
+                description = "EF.IC-AT.AT-Emissions-NH3 denotes ammonia emissions from fuel combustion in industry. We have used data from CLRTAP Inventory Submissions \\citet{emep_officially_2025} as advised by \\citet{schappi_annexes_2025}, using the categories given in Table 12.  "
             elif "emissions" in norm and "nox" in norm:
                 exact_flow_code = "EF.IC-AT.AT-Emissions-NOx"
                 display_name = "Industrial emissions (NOx)"
-                description = "EF.IC-AT.AT-Emissions-NOxdenotes NOx emissions from fuel combustion in industry. We have used data from CLRTAP Inventory Submissions \\citet{emep_official_2025} as advised by \\citet{schappi_annexes_2025}, using the categories given in Table 12.  "
+                description = "EF.IC-AT.AT-Emissions-NOx denotes NOx emissions from fuel combustion in industry. We have used data from CLRTAP Inventory Submissions \\citet{emep_officially_2025} as advised by \\citet{schappi_annexes_2025}, using the categories given in Table 12.  "
 
         elif upper.startswith("EF_TR_"):
             parent_subpool = "Transportation (EF.TR)"
@@ -1226,11 +1233,11 @@ def process_energy_and_fuels_pool(ef_folder, plot_files, plot_dir, bib_filename,
             elif "emissions" in norm and "nh3" in norm:
                 exact_flow_code = "EF.TR-AT.AT-Emissions-NH3"
                 display_name = "Transport emissions (NH3)"
-                description = "EF.TR-AT.AT-Emissions-NH3 denotes ammonia emissions from fuel combustion. We have used data from CLRTAP Inventory Submissions \\citet{emep_official_2025}} as advised by \\citet{schappi_annexes_2025}, using the categories given in Table 13. "
+                description = "EF.TR-AT.AT-Emissions-NH3 denotes ammonia emissions from fuel combustion. We have used data from CLRTAP Inventory Submissions \\citet{emep_officially_2025} as advised by \\citet{schappi_annexes_2025}, using the categories given in Table 13. "
             elif "emissions" in norm and "nox" in norm:
                 exact_flow_code = "EF.TR-AT.AT-Emissions-NOx"
                 display_name = "Transport emissions (NOx)"
-                description = "EF.TR-AT.AT-Emissions-NOx denotes NOx emissions from fuel combustion. We have used data from CLRTAP Inventory Submissions \\citet{emep_official_2025}} as advised by \\citet{schappi_annexes_2025}, using the categories given in Table 13. "
+                description = "EF.TR-AT.AT-Emissions-NOx denotes NOx emissions from fuel combustion. We have used data from CLRTAP Inventory Submissions \\citet{emep_officially_2025} as advised by \\citet{schappi_annexes_2025}, using the categories given in Table 13. "
             elif "export" in norm or "transportfuel" in norm:
                 exact_flow_code = "EF.TR-RW.RW-Export of transport fuels-Nmix"
                 display_name = "Export of transport fuels"
@@ -1245,11 +1252,11 @@ def process_energy_and_fuels_pool(ef_folder, plot_files, plot_dir, bib_filename,
             elif "emissions" in norm and "nh3" in norm:
                 exact_flow_code = "EF.OE-AT.AT-Emissions-NH3"
                 display_name = "Other energy emissions (NH3)"
-                description = "EF.OE-AT.AT-Emissions-NH3 is ammonia emissions from fuel combustion in residential, commercial and other sectors that are not already covered. We have used data from CLRTAP Inventory Submissions \\citet{emep_official_2025}} as advised by \\citet{schappi_annexes_2025}, using the categories given in Table 14. "
+                description = "EF.OE-AT.AT-Emissions-NH3 is ammonia emissions from fuel combustion in residential, commercial and other sectors that are not already covered. We have used data from CLRTAP Inventory Submissions \\citet{emep_officially_2025} as advised by \\citet{schappi_annexes_2025}, using the categories given in Table 14. "
             elif "emissions" in norm and "nox" in norm:
                 exact_flow_code = "EF.OE-AT.AT-Emissions-NOx"
                 display_name = "Other energy emissions (NOx)"
-                description = "EF.OE-AT.AT-Emissions-NOx is NOx emissions from fuel combustion in residential, commercial and other sectors that are not already covered. We have used data from CLRTAP Inventory Submissions \\citet{emep_official_2025}} as advised by \\citet{schappi_annexes_2025}, using the categories given in Table 14. "
+                description = "EF.OE-AT.AT-Emissions-NOx is NOx emissions from fuel combustion in residential, commercial and other sectors that are not already covered. We have used data from CLRTAP Inventory Submissions \\citet{emep_officially_2025} as advised by \\citet{schappi_annexes_2025}, using the categories given in Table 14. "
 
         with open(full_flow_path, 'w', encoding='utf-8') as f:
             f.write(f"---\nlayout: default\ntitle: {display_name}\nparent: {parent_subpool}\n")
@@ -1323,11 +1330,11 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                 description = (
                     "**MP.FP-AG.MM-Farm animal feed-Nmix** is feed to farm animals. We have used data on domestic feed supply from Landbruksdirektoratet "
                     "\\\\citep{landbruksdirektoratet_kraftforstatistikk_2025} and used the detailed composition of animal feed given in \\\\citet{eidem_for-_2022} together with protein contents "
-                    "from \\\\citet{fao_annex_2021} and specific Jones factors from \\\\citet{fao_chapter_2023} to get nitrogen contents.\\n\\n"
+                    "from \\\\citet{fao_annex_2021} and specific Jones factors from \\\\citet{fao_chapter_2023} to get nitrogen contents.\n\n"
                     "Based on the Landbruksdirektoratet data, the N content of the total amount of feed is 0.02 kgN/kg feed. NIBIO Totalkalkylen "
                     "gives statistics for total amount of feed to Norwegian farm animals between 1959 and 2026. Table 6.10 in \\\\citet{bruholt_jordbruksstatistikk_1994} "
                     "gives the domestically produced fraction of farm animal feed between 1985 and 1994. We combine these data to find values before 2000, "
-                    "using an average import fraction for 1995-1999.\n\\n"
+                    "using an average import fraction for 1995-1999.\n\n"
                     "\\\\citet{hohmann-marriott_nitrogen_2025} found the domestic supply of animal feed in 2010 to be around 35 ktN, based on FAO statistics of production, "
                     "export and import of seed cake, which is a dominant ingredient in farm animal feed. This is less than we found when combining domestic and imported animal feed. "
                     "*(Note: This estimate might be too low, as it leads to a surplus here and a deficit in the AG.MM pool).*"
@@ -1349,10 +1356,10 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                     "gives a bit more than 40 ktN per year. We have chosen to use data on food sales to consumers from SSB (table 13695: Næringsinnhald per dag frå "
                     "selde mat- og drikkevarer 2018 – 2023, table 10249: Forbrukte mengder av mat- og drikkevarer per person per år, etter varegruppe (kg/liter) (avslutta serie) "
                     "1999 – 2012 and table 06376: Forbrukte mengder av mat- og drikkevarer per person per år, etter varegruppe (kg/liter) (avslutta serie) 1958-1959 - 1996-1998). "
-                    "The latter series gives values for 3 year averages, and we have assigned the averages to each individual year.\n\\n"
+                    "The latter series gives values for 3 year averages, and we have assigned the averages to each individual year.\n\n"
                     "From 2018 the statistics are given in terms of protein content. Previous to this, the amounts of various food categories are given, and we have used "
                     "protein contents found in Matvaretabellen \\\\citep{mattilsynet_matvaretabellen_2006} as this reflects common foods found in Norwegian retail. Population data are taken from SSB "
-                    "and we have used the Jones factor of 6.25 for nitrogen content in protein.\n\\n"
+                    "and we have used the Jones factor of 6.25 for nitrogen content in protein.\n\n"
                     "For pet food, we have assumed (based on available statistics) that cats and dogs consume > 90 % of pet food. Horses are accounted for under the agriculture pool. "
                     "The nitrogen intake per animal per year is taken from Table 19 in \\\\citet{schappi_annexes_2025} and the number of cats and dogs between 1985 and 2025 is assumed using "
                     "a trendline based on available statistics from a variety of sources."
@@ -1363,7 +1370,7 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                 description = (
                     "**MP.FP-HY.AC-Feed to coastal aquaculture-Nmix**: the amount of feed per ton of produced fish is found by assuming an "
                     "average protein (N) retention of 35.37 % based on values from \\\\citet{aas_utilization_2022}. The amount of produced fish is found by using data "
-                    "from Fiskeridirektoratet \\\\citep{fiskeridirektoratet_06002_2025} on sold farmed fish.\n\\n"
+                    "from Fiskeridirektoratet \\\\citep{fiskeridirektoratet_06002_2025} on sold farmed fish.\n\n"
                     "\\\\citet{hohmann-marriott_nitrogen_2025} found the nitrogen content in aquaculture feed in 2020 to be 124 ktN, which is very similar to our results."
                 )
             elif "untreated" in norm and "fp" in norm:
@@ -1374,7 +1381,7 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                     "from individual industries, where industries are categorized as belonging to OP or FP, and their connection status to the municipal wastewater, "
                     "based on the information given in the statistic. If no information on connection status was given we have assigned the values to Untreated wastewater. "
                     "The database does not distinguish between emissions to surface and coastal waters, so even though several large industries discharge their wastewater "
-                    "to the coast, we assign this entire flow to SW in order to avoid double counting.\n\\n"
+                    "to the coast, we assign this entire flow to SW in order to avoid double counting.\n\n"
                     "The values reported before for 1989-1992 are significantly lower than for later years. We therefore extrapolate back to 1990 using the mean value for 1994-1998."
                 )
             elif "wastewater" in norm and "fp" in norm:
@@ -1442,9 +1449,9 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                     "**MP.OP-EF.IC-Industrial waste fuels-Nmix** is wood waste used as biofuel in the industries where the waste originates, reported as "
                     "\"egentilvirket bioenergi\" in the SSB statistic (table 08205). Producers of wood and paper products obtain a significant fraction of their "
                     "energy through this source. “Egentilvirket bioenergi” encompasses “black liquor” as well as wood waste. For lack of better compositional details "
-                    "we have assumed values for the entire flow corresponding to wood, although this brings significant uncertainty.\\n\\n"
+                    "we have assumed values for the entire flow corresponding to wood, although this brings significant uncertainty.\n\n"
                     "The net caloric value of 15.6 for conversion is taken from table 1.2 in \\\\citet{garg_chapter_2006} and we assume a mean N content of 4.0 kg/t "
-                    "(between coniferous and non-coniferous wood; see FS.FO-MP.OP-Industrial round wood-Nmix).\n\\n"
+                    "(between coniferous and non-coniferous wood; see FS.FO-MP.OP-Industrial round wood-Nmix).\n\n"
                     "SSB has not reported data on this energy category before 1998, but the size of these industries was relatively constant through the period 1991-2001 "
                     "\\\\citep{spilde_energibruk_2004}. For years 1990-1997 we have therefore used the average for the next 10 years (1998-2007)."
                 )
@@ -1463,8 +1470,8 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                 description = (
                     "**MP.OP-HS.HS-Consumer goods-Nmix** is calculated by mass balance, assuming that all incoming flows to OP that are not accounted for "
                     "in outgoing flows end up in domestic consumer goods. We have excluded N2 fixation for ammonia synthesis, and mineral fertilizer flows. "
-                    "We also exclude emissions to air from the balance because they result mainly from fertilizer production.\n\\n"
-                    "**Incoming flows:**\\n"
+                    "We also exclude emissions to air from the balance because they result mainly from fertilizer production.\n\n"
+                    "**Incoming flows:**\n"
                     "* AG.SM-MP.OP-Crop products for industrial use-Nmix\n"
                     "* AG.MM-MP.OP-Non-edible animal products-Nmix\n"
                     "* PR.SO-MP.OP-Recycling-Nmix\n"
@@ -1679,11 +1686,11 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
                 flow_description = (
                     f"**{exact_flow_code}** includes all forms of organic waste except sewage sludge that is organically treated "
                     "and used in agricultural soils. Biological treatment of organic waste includes both composting and biogas production, "
-                    "but in Norway, most of the waste composted in the municipal waste sector is used on the private sector, not in agriculture.\\n\\n"
+                    "but in Norway, most of the waste composted in the municipal waste sector is used on the private sector, not in agriculture.\n\n"
                     "SSB statistics on composted organic waste also includes some composted wastewater sludge, but there is no exact statistics "
                     "on the amount.\n\n"
                     "From 2018, we use data on the disposal of biologically produced waste from SSB table 12818 assuming a typical N content "
-                    "of compost, although a smaller fraction is also biogas digestate.\\n\\n"
+                    "of compost, although a smaller fraction is also biogas digestate.\n\n"
                     "For 2012-2017, we use data on composted organic waste from SSB table 10513 “Avfallsregnskap for Norge (1 000 tonn) and "
                     "scale the nitrogen value in 2018 for consistency.\n\n"
                     "There are no official data prior to 2012, but we know that there was organic waste composted and used in the private sector. "
@@ -1693,7 +1700,7 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
                 exact_flow_code = "PR.SO-HY.SW-Leaching-Nmix"
                 display_name = "Leaching from Landfills"
                 flow_description = (
-                    "**{exact_flow_code}** Nmix is taken from \\citet{miljodirektoratet_norske_2026}, emissions to water from landfills, where we "
+                    f"**{exact_flow_code}** is taken from \\citet{{miljodirektoratet_norske_2026}}, emissions to water from landfills, where we "
                     "have categorized landfills as being connected to municipal wastewater or not based on publicly available data. Where the categorization "
                     "was not possible, the resulting emissions have been split evenly between the leaching and wastewater flows from landfills. As no data are "
                     "available before 2009 we have extrapolated using the average value. This probably underestimates the real value because landfilling was "
@@ -1703,7 +1710,7 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
                 exact_flow_code = "PR.SO-PR.WW-Wastewater from landfills-Nmix"
                 display_name = "Wastewater from Landfills"
                 flow_description = (
-                    "**{exact_flow_code}** is taken from \\citet{miljodirektoratet_norske_2026}, emissions to water from landfills, where we have categorized "
+                    f"**{exact_flow_code}** is taken from \\citet{{miljodirektoratet_norske_2026}}, emissions to water from landfills, where we have categorized "
                     "landfills as being connected to municipal wastewater or not based on publicly available data. Where the categorization was not possible, "
                     "the resulting emissions have been split evenly between the leaching and wastewater flows from landfills. As no data are available before 2009 "
                     "we have extrapolated using the average value. This probably underestimates the real value because landfilling was more prevalent in previous years."
@@ -1721,9 +1728,9 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
                 flow_description = (
                     f"**{exact_flow_code}** is found from SSB tables 05281 “Avfallsregnskap for Norge (1 000 tonn), etter statistikkvariabel, "
                     "behandlingsmåte, materialtype og år “ (1995-2011) and 10513 “Avfallsregnskap for Norge (1 000 tonn), etter materialtype, "
-                    "statistikkvariabel, år og behandlingsmåte” (2012-2023)), using N content values from in \/citet{schappi_annexes_2025}. "
+                    "statistikkvariabel, år og behandlingsmåte” (2012-2023), using N content values from \\citet{schappi_annexes_2025}. "
                     "We have not included the categories sludge, garden waste and wet organic material reported as being assigned to material "
-                    "recycling, because this use is rather for soild production or fertilizer and does not belong in the MP.OP subpool. "
+                    "recycling, because this use is rather for solid production or fertilizer and does not belong in the MP.OP subpool. "
                 )
             elif "rwrw" in norm and "recycling" in norm:
                 exact_flow_code = "PR.SO-RW.RW-Export for recycling-Nmix"

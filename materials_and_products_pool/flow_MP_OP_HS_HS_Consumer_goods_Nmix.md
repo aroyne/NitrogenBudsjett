@@ -11,7 +11,9 @@ nav_order: 7
 
 ### Flow Description
 **MP.OP-HS.HS-Consumer goods-Nmix** is calculated by mass balance, assuming that all incoming flows to OP that are not accounted for in outgoing flows end up in domestic consumer goods. We have excluded N2 fixation for ammonia synthesis, and mineral fertilizer flows. We also exclude emissions to air from the balance because they result mainly from fertilizer production.
-\n**Incoming flows:**\n* AG.SM-MP.OP-Crop products for industrial use-Nmix
+
+**Incoming flows:**
+* AG.SM-MP.OP-Crop products for industrial use-Nmix
 * AG.MM-MP.OP-Non-edible animal products-Nmix
 * PR.SO-MP.OP-Recycling-Nmix
 * EF.EC-MP.OP-Fuel used as feedstock-Nmix
