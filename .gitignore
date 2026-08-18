@@ -188,3 +188,9 @@ data_files/
 *.xlsx
 *.xls
 *.csv
+
+# Litteratur (lokal mappe, ikke synces)
+litteratur/
+
+# Claude-tekst (lokal mappe, ikke synces)
+claude_tekst/
