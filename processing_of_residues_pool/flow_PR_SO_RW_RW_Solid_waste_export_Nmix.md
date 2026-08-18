@@ -2,7 +2,7 @@
 layout: default
 title: Solid Waste Export
 parent: Solid Waste (PR.SO)
-nav_order: 13
+nav_order: 12
 ---
 
 # Solid Waste Export

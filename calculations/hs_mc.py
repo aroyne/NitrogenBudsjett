@@ -92,8 +92,8 @@ def _add_nh3_human_emissions_mc(results, preloaded_data, current_params, dataset
 
     df_pop = data.copy()
     df_pop.columns = ['Gender', 'AgeGroup', 'Year', 'Value']
-    df_pop['Gender'] = df_pop['Gender'].fillna(method='ffill')
-    df_pop['AgeGroup'] = df_pop['AgeGroup'].fillna(method='ffill')
+    df_pop['Gender'] = df_pop['Gender'].ffill()
+    df_pop['AgeGroup'] = df_pop['AgeGroup'].ffill()
     
     age_0 = df_pop[df_pop['AgeGroup'] == '0 år'].groupby('Year')['Value'].sum().reset_index()
     age_1_3 = df_pop[df_pop['AgeGroup'].isin(['1 år', '2 år', '3 år'])].groupby('Year')['Value'].sum().reset_index()

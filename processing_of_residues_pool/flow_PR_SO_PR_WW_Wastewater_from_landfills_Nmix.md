@@ -2,7 +2,7 @@
 layout: default
 title: Wastewater from Landfills
 parent: Solid Waste (PR.SO)
-nav_order: 10
+nav_order: 9
 ---
 
 # Wastewater from Landfills

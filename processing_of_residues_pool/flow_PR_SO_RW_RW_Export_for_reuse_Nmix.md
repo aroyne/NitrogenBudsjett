@@ -2,7 +2,7 @@
 layout: default
 title: Export for Reuse
 parent: Solid Waste (PR.SO)
-nav_order: 12
+nav_order: 11
 ---
 
 # Export for Reuse

@@ -367,7 +367,7 @@ def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise
 
     # 1999-2012 (Tabell 10249) ---
     mengde_10249 = df_10249.set_index(0).iloc[4:, 0::2].dropna(how='all')
-    mengde_10249 = mengde_10249.astype(str).applymap(lambda s: s.replace(',','.') if pd.notna(s) else s)
+    mengde_10249 = mengde_10249.astype(str).map(lambda s: s.replace(',','.') if pd.notna(s) else s)
     mengde_10249 = mengde_10249.apply(pd.to_numeric, errors='coerce')
     
     # 2. Beregn protein og nitrogen per person
@@ -400,7 +400,7 @@ def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise
     # 1984-1998 (Tabell 06376) ---
     # 1. Start på iloc[4:] for å kaste tekst/intervallsrader ut av matvaremengdene
     mengde_06376 = df_06376.set_index(0).iloc[4:, 0::2]
-    mengde_06376 = mengde_06376.astype(str).applymap(lambda s: s.replace(',','.') if pd.notna(s) else s)
+    mengde_06376 = mengde_06376.astype(str).map(lambda s: s.replace(',','.') if pd.notna(s) else s)
     mengde_06376 = mengde_06376.apply(pd.to_numeric, errors='coerce')
     
     # 2. Beregn protein og nitrogen per person
