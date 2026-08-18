@@ -323,7 +323,7 @@ def _add_N2O_emissions_soil_management_mc(results, preloaded_data, current_param
     noise_val = dataset_noise[key_n2o]
     df_unfccc = preloaded_data.get('unfccc_ark1_raw')
 
-    for r_idx in range(4, 37):
+    for r_idx in range(4, 38):
         year_val = df_unfccc.iloc[r_idx, 0]
         ton_val = df_unfccc.iloc[r_idx, 2]
 

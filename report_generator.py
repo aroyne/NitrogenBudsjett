@@ -746,11 +746,11 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename, targ
                     "13 000 grass samples from all over Norway by Tine/NorFor, and 15 % N in protein (FAO, 2003). \n\n"
                     "\citet{hohmann-marriott_nitrogen_2025} used similar data sources but arrived at a smaller N flow (40-45 ktN) using a protein content "
                     "of 8 % and N content in protein of 15 % (Table S2).  ")
-            elif "emissionsn2" in norm:
+            elif "emissionsn2" in norm and "n2o" not in norm:
                 exact_flow_code = "AG.SM-AT.AT-Emissions-N2"
                 display_name = "N2 emissions from denitrification"
-                description = "\\\\citet{schappi_annexes_2025} recommends using a value of 14 kgN/ha/year for denitrification if no other data are available. "
-                "Together with a total agricultural area of 1 132 693 ha (NIBIO, 2026) this gives around 16 ktN/year."
+                description = ("\\\\citet{schappi_annexes_2025} recommends using a value of 14 kgN/ha/year for denitrification if no other data are available. "
+                "Together with a total agricultural area of 1 132 693 ha (NIBIO, 2026) this gives around 16 ktN/year.")
             elif "emissionsn2o" in norm:
                 exact_flow_code = "AG.SM-AT.AT-Emissions-N2O"
                 display_name = "N2O emissions from denitrification"
@@ -758,13 +758,13 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename, targ
             elif "emissionsnox" in norm:
                 exact_flow_code = "AG.SM-AT.AT-Emissions-NOx"
                 display_name = "NOx emissions from soil management"
-                description = "We have used data from CLRTAP Inventory Submissions \\citet{emep_officially_2025} as advised by \\\\citet{schappi_annexes_2025}, using the categories "
-                "given in Table 30. "
+                description = ("We have used data from CLRTAP Inventory Submissions \\citet{emep_officially_2025} as advised by \\\\citet{schappi_annexes_2025}, using the categories "
+                "given in Table 30. ")
             elif "emissionsnh3" in norm:
                 exact_flow_code = "AG.SM-AT.AT-Emissions-NH3"
                 display_name = "NH3 emissions"
-                description = "We have used data from CLRTAP Inventory Submissions \\citet{emep_officially_2025} as advised by \\\\citet{schappi_annexes_2025}, using the categories "
-                "given in Table 30. "
+                description = ("We have used data from CLRTAP Inventory Submissions \\citet{emep_officially_2025} as advised by \\\\citet{schappi_annexes_2025}, using the categories "
+                "given in Table 30. ")
             elif "leaching" in norm:
                 exact_flow_code = "AG.SM-HY.SW-Leaching-Nmix"
                 display_name = "Leaching from soil management"
@@ -937,6 +937,13 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename, targ
         f.write("---\nlayout: default\ntitle: Aquaculture (HY.AC)\nparent: Hydrosphere (HY)\nnav_order: 3\nhas_children: true\n---\n\n")
         f.write("# Subpool: Aquaculture (HY.AC)\n\n")
         f.write(get_balance_image_markdown("HY.AC", plot_files, plot_dir, relative_depth="../", target_format=target_format))
+        f.write("\n**Methodological note:** The conversion from feed N to fish production N (and the resulting waste feed "
+            "and excretion, `HY.AC-HY.SW-Waste feed-Nmix` and `HY.AC-HY.SW-Excretia-Nmix`) uses a single, constant N-retention "
+            "factor applied uniformly across the entire 1990–2023 period, rather than a value that varies by year. This does "
+            "not capture the well-documented improvement in feed conversion efficiency in Norwegian aquaculture over this "
+            "period, and may therefore misrepresent the feed input (and associated waste/excretion) implied by production "
+            "figures in earlier vs. later years. This is a possible methodological weakness that should be followed up, "
+            "e.g. by introducing a time-varying retention factor if suitable historical data can be found.\n")
         f.write("\n### Flows that are zero or neglected:\n\n* **HY.AC-MP.FP-Freshwater fish and seafood-Nmix**, **HY.AC-HY.SW-Waste feed-Nmix** and **HY.AC-HY.SW-Excretia-Nmix** are set to zero...\n* **HY.AC-AT.AT-Emissions-NH3** is set to zero assuming negligible ammonia emissions from these coastal marine cages.\n")
         append_bibtex_references(f, bib_filename)
         

@@ -10,7 +10,7 @@ nav_order: 2
 ![AG.SM-AT.AT-Emissions-N2](../output_files/plots/AG_SM_AT_AT_Emissions_N2.png)
 
 ### Flow Description
-Schäppi et al. (2025) recommends using a value of 14 kgN/ha/year for denitrification if no other data are available.
+Schäppi et al. (2025) recommends using a value of 14 kgN/ha/year for denitrification if no other data are available. Together with a total agricultural area of 1 132 693 ha (NIBIO, 2026) this gives around 16 ktN/year.
 
 ### References
 
