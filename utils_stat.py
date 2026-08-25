@@ -999,4 +999,5 @@ def process_and_export_mc_results(all_records):
         
     print("\n" + "="*60)
     print("[SUCCESS] All MC iterations processed, statistics saved, and plots generated successfully.")
-    
+
+    return summary_df

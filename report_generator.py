@@ -853,7 +853,10 @@ def process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename, target_f
             elif "households" in norm or "fuelwood" in norm:
                 exact_flow_code = "FS.FO-EF.OE-Fuel wood for households-Nmix"
                 display_name = "Fuel Wood for Households"
-                description = "Taken from SSB table 09702 'Energibalansen. Vedforbruk i boliger og fritidsboliger 1990 – 2024' and we assume a mean N content of 4.0 kg/t (between coniferous and non-coniferous wood; see **FS.FO-MP.OP-Industrial round wood-Nmix**)."
+                description = ("Taken from SSB table 09702 'Energibalansen. Vedforbruk i boliger og fritidsboliger 1990 – 2024' and we "
+                "assume a mean N content of 4.0 kg/t, based on the whole-tree N-content values from UNECE/EPNB Annex 4 (3.4 kg/t "
+                "coniferous, 4.3 kg/t non-coniferous) — the same whole-tree value the Swedish NNB uses for fuel wood, as opposed to "
+                "the lower stem-only value used for industrial roundwood.")
             elif "leaching" in norm:
                 exact_flow_code = "FS.FO-HY.SW-Leaching-Nmix"
                 display_name = "Forest Leaching"
@@ -861,12 +864,13 @@ def process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename, target_f
             elif "roundwood" in norm or "industrial" in norm:
                 exact_flow_code = "FS.FO-MP.OP-Industrial round wood-Nmix"
                 display_name = "Industrial Round Wood"
-                description = ("Taken from FAOSTAT Forestry production and trade: industrial roundwood, which gives values under bark."
+                description = ("Taken from FAOSTAT Forestry production and trade: industrial roundwood, which gives values under bark. "
                     "The values given here are very close to those reported in SSB table 08979 “Avvirkning for salg (1 000 m³) 1996 – 2024”. "
                     "We have also compared with data in Eurostat, which gives total amount of round removed (over or under bark) including use for "
-                    "firewood in households and industry. Following the Swedish NBB \\citep{moldan_where_2025}, we use an average wood density "
-                    "of 0.45 t/m3 for all wood categories, and N-contents of 3.4 kg/t for coniferous and 4.3 kg/t for non-coniferous trees. "
-                    "ktN/mill m3 wood harvested. IN PROGRESS")
+                    "firewood in households and industry. Following the Swedish NBB \\citep{jutterstrom_swedish_2020}, we use an average wood density "
+                    "of 0.45 t/m3 for all wood categories, and stem-only N-contents of 1.2 kg/t for coniferous and 1.4 kg/t for non-coniferous trees, "
+                    "since roundwood removals consist mainly of stem wood, not foliage, branches and roots. The whole-tree value is instead used for "
+                    "fuel wood (see FS.FO-EF.OE-Fuel wood for households-Nmix).")
 
         elif filename.upper().startswith("FS_OL_"):
             parent_subpool = "Other Land (FS.OL)"
@@ -1458,7 +1462,8 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                     "energy through this source. “Egentilvirket bioenergi” encompasses “black liquor” as well as wood waste. For lack of better compositional details "
                     "we have assumed values for the entire flow corresponding to wood, although this brings significant uncertainty.\n\n"
                     "The net caloric value of 15.6 for conversion is taken from table 1.2 in \\\\citet{garg_chapter_2006} and we assume a mean N content of 4.0 kg/t "
-                    "(between coniferous and non-coniferous wood; see FS.FO-MP.OP-Industrial round wood-Nmix).\n\n"
+                    "the same whole-tree average used for fuel wood (see FS.FO-EF.OE-Fuel wood for households-Nmix), since industrial waste wood (bark, sawdust, "
+                    "black liquor) is closer in composition to whole-tree biomass than to clean stem wood.\n\n"
                     "SSB has not reported data on this energy category before 1998, but the size of these industries was relatively constant through the period 1991-2001 "
                     "\\\\citep{spilde_energibruk_2004}. For years 1990-1997 we have therefore used the average for the next 10 years (1998-2007)."
                 )
