@@ -1,0 +1,109 @@
+Data sources used by the current model pipeline
+
+data_files/ is excluded from this git repository (see .gitignore), since most sources are third-party data that should not be redistributed. This file documents the data files that data_loader.py and the calculations/ modules actually load, so the folder can be reconstructed from public sources. It supplements data_files/README.txt, which documents a wider set of files (including some no longer used) and is kept locally only.
+
+12818_20260526-110921.xlsx
+SSB table 12818: Biologisk avfall (1 000 tonn), etter avfallsdisponering og år
+downloaded 26.05.2026
+
+akvakultur_1984_1994.xlsx
+Historical aquaculture production compilation, 1984-1994 (tonnes), used to extend the modern Fiskeridirektoratet series backward
+values read from Figure 1.1 in Grefsrud, S. (2025). Risikorapport for norsk fiskeoppdrett 2025. Havforskningsinstituttet.
+
+egentilvirket_bioenergi_industri.xlsx
+Historical self-produced bioenergy in the pulp/paper industry, used to backfill SSB table 08205 before 1998
+data from Spilde, D. & Aasestad, K. (2004). Energibruk i norsk industri: 1991-2001. Statistisk Sentralbyrå
+
+fiske_1990_2000.xlsx
+Historical wild catch compilation (pelagic fish, bottom fish, crustaceans, seaweed), 1990-2000, used to extend the modern Fiskeridirektoratet series backward
+values read from Fiskeridirektoratet: Økonomiske og biologiske nøkkeltal frå dei norske fiskeria, Table 1
+
+grovfor_før_2000.xlsx
+Historical hay and silage crop yield, pre-2000
+data from Jordbruksstatistikk 2000 (SSB), Table 2.1
+
+kommunalt_avfall_1985_1995.xlsx
+Historical municipal and industry waste compilation, 1985-1995 (quantities, incineration/recycling shares, material-specific recycling)
+source: Figur 4.3, Naturressurser og miljø 1997, SSB
+
+N2O_EC.csv
+Compilation of N2O emissions from combustion, split by EC/IC/TR/OE
+data taken from CRT (common reporting tables) for Norway under UNFCCC, https://unfccc.int/documents/644485
+data compilation done with script N2O_EC.ipynb
+
+N2O_NOx_HS_FS.xlsx
+Compilation of N2O and NOx emissions from HS and FS land-use change (LUC)
+data taken from CRT (common reporting tables) for Norway under UNFCCC, https://unfccc.int/documents/644485, Table 4
+
+N_fuel_for_heating.csv
+Compilation of N flows from fuel used for heating
+data derived from CLRTAP inventory submissions (webdabData1863365.txt)
+data compilation done with script N_fuel_for_heating.ipynb
+
+N_fuel_for_industry.csv
+Compilation of N flows from fuel used in industry
+data derived from CLRTAP inventory submissions (webdabData1863365.txt)
+data compilation done with script N_fuel_for_industry.ipynb
+
+N_fuel_for_transport.csv
+Compilation of N flows from fuel used for transport
+data derived from CLRTAP inventory submissions (webdabData1863365.txt)
+data compilation done with script N_fuel_for_transport.ipynb
+
+N_parameters.xlsx
+Central model parameter file: global N-content and density factors, trade N-content factors, HS-code trade mapping (from SSB table 08801's classification), and food/protein-content coding
+most values sourced from Schäppi et al. (2025), UNECE/EPNB Annex to the Guidance Document on National Nitrogen Budgets
+manually maintained, updated on an ongoing basis
+
+NibioStatistics-4.xlsx
+NIBIO Totalkalkylen: purchased concentrate feed (tonnes, price, domestically produced fraction)
+domestically produced fraction from SSB Jordbruksstatistikk 1994, Table 6.10
+
+nitrogenrensing_avløp.xlsx
+Nitrogen removal efficiency at named major Norwegian wastewater treatment plants (VEAS, Bekkelaget, NRVA, etc.)
+downloaded from norskeutslipp.no 11.05.2026
+VEAS: reported removal-rate figures used where available (2002-2015), assumed 70% otherwise
+Bekkelaget: https://vannforeningen.no/wp-content/uploads/2016/05/04-Eliassen.pdf, supplemented with figures from egenkontrollrapporter (self-monitoring reports) to Statsforvalteren
+NRVA: removal rate assumed 70% where figures are missing
+
+OBB_Fylke_1970-2025.xlsx
+Landbruksdirektoratet, Organisert beitebruk (organised grazing): sheep, lambs, cattle and goats released/lost on outfield pasture, per county, 1970-2025
+downloaded from Landbruksdirektoratet's statistics
+
+skoggjødsling_før_1995.xlsx
+Historical forest fertilization area, pre-1995
+values read from Figure 2 in Landbruksdirektoratet (2021). Vurdering av tilskuddsordning for gjødsling av skog. Rapport nr. 36/2021
+
+slamdisponering.xlsx
+Historical sewage sludge disposal (green area / agriculture / landfill shares), pre-modern-SSB-table era
+data from Naturressurser og miljø 1997, SSB
+
+Tab_08801_1988_2024.csv
+SSB table 08801: UTENRIKSHANDEL ETTER LAND OG VAREKODE (HS). Full Norwegian import/export statistics 1988-2024, all countries and HS commodity codes
+https://www.ssb.no/utenriksokonomi/utenrikshandel/artikler/import-og-eksport-alle-land-og-varenummer
+
+Tilførsel av nitrogen til kystområdene fordelt på kilder.xlsx
+Nitrogen loading to Norwegian coastal areas by source (aquaculture, sewage, background, built-up area, industry, agriculture)
+https://www.miljodirektoratet.no/ansvarsomrader/overvaking-arealplanlegging/miljoovervaking/overvakingsprogrammer/forurensning-og-klimagasser/teotil/
+downloaded 06.11.2025
+
+Utslipp_deponi.xlsx
+Annual emissions to water from Norwegian landfills, plus whether each site is connected to municipal sewage
+copied from norskeutslipp.no (Excel export did not work)
+
+utslipp_avløp.xlsx
+Historical wastewater treatment plant emissions time series
+data from Naturressurser og miljø, SSB
+
+webdabData1863365.txt
+Downloaded from https://webdab01.umweltbundesamt.at/cgi-bin/wedb2_scaled_choose_sector.pl
+directed from https://www.ceip.at/webdab-emission-database/emissions-as-used-in-emep-models
+as suggested by Schäppi2025Ann: CLRTAP Inventory Submissions for emission data on NOx
+
+Årlig råvareforbruk.xlsx
+Landbruksdirektoratets kraftfôrstatistikk: domestic and imported consumption of carbohydrate, protein, fat and mineral/vitamin raw materials in concentrate feed
+https://www.landbruksdirektoratet.no/nb/statistikk-og-utviklingstrekk/utvikling-i-jordbruket/kraftforstatistikk
+
+Årlig utslipp til vann - Landbasert 02-02-2026.xlsx
+Emissions data for land-based industry, including connection to municipal sewage network
+received by email from Miljødirektoratet 2.2.2026
