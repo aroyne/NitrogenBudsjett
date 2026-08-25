@@ -2,7 +2,7 @@
 layout: default
 title: Fuel export
 parent: Energy conversion (EF.EC)
-nav_order: 8
+nav_order: 7
 ---
 
 # Fuel export

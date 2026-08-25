@@ -56,7 +56,7 @@ def _add_food_crop_products_flow_mc(results, preloaded_data, current_params, dat
     flow_code = 'AG.SM-MP.FP-Food crop products-Nmix'
     collected_years = set()
     data_sources = 'Eurostat Gross nutrient balance'
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
 
     workbook = preloaded_data.get('ag_gnb_workbook')
     dataset_key = 'Gross nutrient balance'
@@ -138,7 +138,7 @@ def _add_industrial_crop_products_flow_mc(results, preloaded_data, current_param
     flow_code = 'AG.SM-MP.OP-Crop products for industrial use-Nmix'
     collected_years = set()
     data_sources = 'Eurostat Gross nutrient balance, Nutrient removal by harvest of industrial crops'
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
 
     df_gnb_sheet30 = preloaded_data.get('gnb_sheet30_raw')
     year_values = find_industrial_crop_products(df_gnb_sheet30, dataset_noise)
@@ -162,7 +162,7 @@ def _add_industrial_crop_products_flow_mc(results, preloaded_data, current_param
 def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'AG.SM-AG.MM-Fodder crops-Nmix'
     collected_years = set()
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
 
     fodder_prot = float(current_params.get("fodder_protein_frac"))
     Jones = float(current_params.get("Jones_factor"))
@@ -248,7 +248,7 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
 def _add_NH3_emissions_soil_management_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'AG.SM-AT.AT-Emissions-NH3'
     collected_years = set()
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
     data_sources = 'CRLTAP Inventory Submissions'
 
     conv = float(current_params.get("NH3_to_N_factor"))
@@ -282,7 +282,7 @@ def _add_NH3_emissions_soil_management_mc(results, preloaded_data, current_param
 def _add_NOx_emissions_soil_management_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'AG.SM-AT.AT-Emissions-NOx'
     collected_years = set()
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
     data_sources = 'CRLTAP Inventory Submissions'
 
     conv = float(current_params.get("NOx_to_N_factor"))
@@ -315,7 +315,7 @@ def _add_NOx_emissions_soil_management_mc(results, preloaded_data, current_param
 def _add_N2O_emissions_soil_management_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'AG.SM-AT.AT-Emissions-N2O'
     collected_years = set()
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
     data_sources = 'UNFCCC CRT'
 
     conv_N2O = float(current_params.get("N2O_to_N_factor"))
@@ -351,7 +351,7 @@ def _add_leaching_soil_management_mc(results, preloaded_data, current_params, da
     flow_code = 'AG.SM-HY.SW-Leaching-Nmix'
     collected_years = set()
     data_sources = 'UNFCCC CRT'
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
 
     key_leach = 'UNFCCC_emissions'
     noise_val = dataset_noise[key_leach]
@@ -385,7 +385,7 @@ def _add_leaching_manure_management_mc(results, preloaded_data, current_params, 
     flow_code = 'AG.MM-HY.SW-Leaching-Nmix'
     collected_years = set()
     data_sources = 'UNFCCC CRT'
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
 
     key_leach = 'UNFCCC_emissions'
     noise_val = dataset_noise[key_leach]
@@ -419,7 +419,7 @@ def _add_animal_products_flow_mc(results, preloaded_data, current_params, datase
     flow_code = 'AG.MM-MP.FP-Animal products-Nmix'
     collected_years = set()
     data_sources = 'FAOSTAT Crops and livestock products'
-    comment = 'ok (MC-støy lagt på unikt per produkt)'
+    comment = 'ok'
 
     df_fao = preloaded_data.get('fao_animal_production_clean')
     key_fao = 'Crops and livestock products'
@@ -463,7 +463,7 @@ def _add_animal_products_flow_mc(results, preloaded_data, current_params, datase
 def _add_non_edible_animal_products_flow_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'AG.MM-MP.OP-Non-edible animal products-Nmix'
     collected_years = set()
-    comment = 'ok (MC-støy lagt på parametere og kildedata)'
+    comment = 'ok'
 
     df_hides_clean = preloaded_data.get('fao_hides_clean')
     df_wool = preloaded_data.get('wool_production')
@@ -499,7 +499,7 @@ def _add_non_edible_animal_products_flow_mc(results, preloaded_data, current_par
 def _add_manure_application_flow_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'AG.MM-AG.SM-Manure application-Nmix'
     collected_years = set()
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
     
     df_sheet12 = preloaded_data.get('gnb_sheet12_raw')
     key_gnb = 'Gross nutrient balance'
@@ -582,7 +582,7 @@ def _add_manure_application_flow_mc(results, preloaded_data, current_params, dat
 def _add_NH3_emissions_manure_management_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'AG.MM-AT.AT-Emissions-NH3'
     collected_years = set()
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
     data_sources = 'CRLTAP Inventory Submissions'
 
     conv = float(current_params.get("NH3_to_N_factor"))
@@ -614,7 +614,7 @@ def _add_NH3_emissions_manure_management_mc(results, preloaded_data, current_par
 def _add_NOx_emissions_manure_management_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'AG.MM-AT.AT-Emissions-NOx'
     collected_years = set()
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
     data_sources = 'CRLTAP Inventory Submissions'
 
     conv = float(current_params.get("NOx_to_N_factor"))
@@ -646,7 +646,7 @@ def _add_NOx_emissions_manure_management_mc(results, preloaded_data, current_par
 def _add_N2O_emissions_manure_management_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'AG.MM-AT.AT-Emissions-N2O'
     collected_years = set()
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
     data_sources = 'UNFCCC CRT'
 
     conv_N2O = float(current_params.get("N2O_to_N_factor"))
@@ -681,7 +681,7 @@ def _add_N2O_emissions_manure_management_mc(results, preloaded_data, current_par
 def _add_live_animal_export_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'AG.MM-RW.RW-Live animal export-Nmix'
     collected_years = set()
-    comment = 'ok (MC-støy ferdig beregnet sentralt)'
+    comment = 'ok'
     data_sources = 'FAOSTAT Crops and livestock products'
     
     final_data = preloaded_data.get('fao_live_animals_export')
@@ -733,7 +733,7 @@ def _add_live_animal_export_mc(results, preloaded_data, current_params, dataset_
 def _add_N2_emissions_soil_management_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'AG.SM-AT.AT-Emissions-N2'
     collected_years = set()
-    comment = 'ok (MC-støy lagt på global parameter)'
+    comment = 'ok'
     data_sources = 'Schäppi2025Ann + NIBIO'
     
     val_param = current_params.get("denitrification_AG_N2")        

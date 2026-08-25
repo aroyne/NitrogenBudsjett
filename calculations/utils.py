@@ -195,7 +195,7 @@ def process_generic_trade_flow(preloaded_data, current_params, current_trade_fac
                     'flow_name': flow_code,
                     'year': year,
                     'value': float(flow_dict[year]), 
-                    'comment': 'ok (MC-støy påført mengde og N-fraksjon)',
+                    'comment': 'ok',
                     'data_sources': data_sources
                 })
         report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)

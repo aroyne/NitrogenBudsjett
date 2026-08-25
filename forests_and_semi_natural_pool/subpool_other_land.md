@@ -20,3 +20,8 @@ Hover over the chart to inspect specific streams, or click legend items to toggl
 ### Flows that are zero or neglected:
 
 * **FS.OL-AT.AT-Emissions-NOx** is neglected because no values are reported in the CRLTAP/WebDab categories 4F1 and 4F2 (wetlands / other land NOx).
+* Following Swedish NBB (Jutterström et al., 2020), we also consider denitrification in the OL pool to be negligible and therefore neglect **FS.OL-AT.AT-Emissions-N2** and **FS.OL-AT.AT-Emissions-N2O**.
+
+### References
+
+* Jutterström, S., Stadmark, J., & Moldan, F. (2020). *Swedish National Nitrogen Budget – Forest and semi-natural vegetation*.

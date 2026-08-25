@@ -160,7 +160,7 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
             
         year_values[year] = {
             'value': max(0.0, v_base * noise_10514),
-            'comment': 'ok (SSB Tabell 10514)',
+            'comment': 'ok',
             'data_sources': 'SSB'
         }
 
@@ -202,7 +202,7 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
             
         year_values[year] = {
             'value': max(0.0, v_scaled * noise_05282),
-            'comment': 'ok (Skalert SSB Tabell 05282)',
+            'comment': 'ok',
             'data_sources': 'SSB'
         }
 

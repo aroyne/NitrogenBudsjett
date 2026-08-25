@@ -803,12 +803,14 @@ def process_and_export_mc_results(all_records):
 
     # 2. Calculate statistics across all sim_ids
     print("[STATISTICS] Calculating medians and 95% confidence intervals...")
-    summary_df = df_all_trimmed.groupby(['flow_name', 'year'])['value'].agg(
-        median=np.median,
-        mean=np.mean,
-        p2_5=lambda x: np.percentile(x, 2.5),
-        p97_5=lambda x: np.percentile(x, 97.5),
-        std=np.std
+    summary_df = df_all_trimmed.groupby(['flow_name', 'year']).agg(
+        median=('value', np.median),
+        mean=('value', np.mean),
+        p2_5=('value', lambda x: np.percentile(x, 2.5)),
+        p97_5=('value', lambda x: np.percentile(x, 97.5)),
+        std=('value', np.std),
+        comment=('comment', 'first'),
+        data_sources=('data_sources', 'first')
     ).reset_index()
 
     # 3. Calculate uncertainty metrics

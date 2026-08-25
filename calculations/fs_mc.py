@@ -19,8 +19,8 @@ def execute_calculations_fs(preloaded_data, current_params, dataset_noise):
     _add_fo_leaching_mc(results, preloaded_data, current_params, dataset_noise)
     _add_industrial_round_wood_mc(results, preloaded_data, current_params, dataset_noise)  # Går via shared parameter-MC
     _add_fuel_wood_for_households_mc(results, preloaded_data, current_params, dataset_noise)
-    _add_ol_N2O_emissions_mc(results, preloaded_data, current_params, dataset_noise)
-    _add_ol_N2_emissions_mc(results, preloaded_data, current_params, dataset_noise)
+    # _add_ol_N2O_emissions_mc(results, preloaded_data, current_params, dataset_noise)
+    # _add_ol_N2_emissions_mc(results, preloaded_data, current_params, dataset_noise)
     _add_ol_leaching_mc(results, preloaded_data, current_params, dataset_noise)
     _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise)
 
@@ -47,7 +47,7 @@ def _add_fo_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
         value = perturbed_raw * N2O_to_N        
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': data_sources
+            'comment': 'ok', 'data_sources': data_sources
         })
             
     missing_years = EXPECTED_YEARS - collected_years
@@ -76,7 +76,7 @@ def _add_fo_N2_emissions_mc(results, preloaded_data, current_params, dataset_noi
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': data_sources
+            'comment': 'ok', 'data_sources': data_sources
         })
 
     missing_years = EXPECTED_YEARS - collected_years
@@ -107,7 +107,7 @@ def _add_fo_leaching_mc(results, preloaded_data, current_params, dataset_noise):
 
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value, 
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': data_sources
+            'comment': 'ok', 'data_sources': data_sources
         })
             
     # Nyere år (TEOTIL3)
@@ -121,7 +121,7 @@ def _add_fo_leaching_mc(results, preloaded_data, current_params, dataset_noise):
 
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value, 
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': data_sources
+            'comment': 'ok', 'data_sources': data_sources
         })
             
     missing_years = EXPECTED_YEARS - collected_years
@@ -138,7 +138,7 @@ def _add_industrial_round_wood_mc(results, preloaded_data, current_params, datas
         collected_years.add(year)
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på via parametere)', 'data_sources': 'FAOSTAT'
+            'comment': 'ok', 'data_sources': 'FAOSTAT'
         })
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
@@ -165,66 +165,66 @@ def _add_fuel_wood_for_households_mc(results, preloaded_data, current_params, da
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value, 
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': data_sources
+            'comment': 'ok', 'data_sources': data_sources
         })
             
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
 
 
-def _add_ol_N2O_emissions_mc(results, preloaded_data, current_params, dataset_noise):
-    flow_code = 'FS.OL-AT.AT-Emissions-N2O'
-    collected_years = set()
-    data_sources = 'UNFCCC CRT'
-    dataset_key = 'UNFCCC_emissions'
+# def _add_ol_N2O_emissions_mc(results, preloaded_data, current_params, dataset_noise):
+#     flow_code = 'FS.OL-AT.AT-Emissions-N2O'
+#     collected_years = set()
+#     data_sources = 'UNFCCC CRT'
+#     dataset_key = 'UNFCCC_emissions'
 
-    df_unfccc = preloaded_data.get('fs_unfccc_emissions_raw')
-    N2O_to_N = float(current_params.get("N2O_to_N_factor"))
+#     df_unfccc = preloaded_data.get('fs_unfccc_emissions_raw')
+#     N2O_to_N = float(current_params.get("N2O_to_N_factor"))
 
-    for row in range(5, 38):
-        year = int(df_unfccc.iloc[row, 0])
-        collected_years.add(year)
+#     for row in range(5, 38):
+#         year = int(df_unfccc.iloc[row, 0])
+#         collected_years.add(year)
         
-        raw_val = float(df_unfccc.iloc[row, 7])
-        noise_val = dataset_noise[dataset_key]
-        perturbed_raw = raw_val * noise_val
+#         raw_val = float(df_unfccc.iloc[row, 7])
+#         noise_val = dataset_noise[dataset_key]
+#         perturbed_raw = raw_val * noise_val
         
-        value = perturbed_raw * N2O_to_N
-        results.append({
-            'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': data_sources
-        })
+#         value = perturbed_raw * N2O_to_N
+#         results.append({
+#             'flow_name': flow_code, 'year': year, 'value': value,
+#             'comment': 'ok', 'data_sources': data_sources
+#         })
 
-    missing_years = EXPECTED_YEARS - collected_years
-    report_missing_years(flow_code, missing_years, results)
+#     missing_years = EXPECTED_YEARS - collected_years
+#     report_missing_years(flow_code, missing_years, results)
 
 
-def _add_ol_N2_emissions_mc(results, preloaded_data, current_params, dataset_noise):
-    flow_code = 'FS.OL-AT.AT-Emissions-N2'
-    collected_years = set()
-    data_sources = 'UNFCCC CRT + Butterbach-Bahl et al. (2013)'
-    dataset_key = 'UNFCCC_emissions'
+# def _add_ol_N2_emissions_mc(results, preloaded_data, current_params, dataset_noise):
+#     flow_code = 'FS.OL-AT.AT-Emissions-N2'
+#     collected_years = set()
+#     data_sources = 'UNFCCC CRT + Butterbach-Bahl et al. (2013)'
+#     dataset_key = 'UNFCCC_emissions'
 
-    df_unfccc = preloaded_data.get('fs_unfccc_emissions_raw')
-    ratio = float(current_params.get("forest_N2_to_N2O_ratio"))
-    N2O_to_N = float(current_params.get("N2O_to_N_factor"))
+#     df_unfccc = preloaded_data.get('fs_unfccc_emissions_raw')
+#     ratio = float(current_params.get("forest_N2_to_N2O_ratio"))
+#     N2O_to_N = float(current_params.get("N2O_to_N_factor"))
 
-    for row in range(5, 38):
-        year = int(df_unfccc.iloc[row, 0])
-        collected_years.add(year)
+#     for row in range(5, 38):
+#         year = int(df_unfccc.iloc[row, 0])
+#         collected_years.add(year)
         
-        raw_val = float(df_unfccc.iloc[row, 7])
-        noise_val = dataset_noise[dataset_key]
-        perturbed_raw = raw_val * noise_val
+#         raw_val = float(df_unfccc.iloc[row, 7])
+#         noise_val = dataset_noise[dataset_key]
+#         perturbed_raw = raw_val * noise_val
         
-        value = perturbed_raw * N2O_to_N * ratio        
-        results.append({
-            'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': data_sources
-        })
+#         value = perturbed_raw * N2O_to_N * ratio        
+#         results.append({
+#             'flow_name': flow_code, 'year': year, 'value': value,
+#             'comment': 'ok', 'data_sources': data_sources
+#         })
 
-    missing_years = EXPECTED_YEARS - collected_years
-    report_missing_years(flow_code, missing_years, results)
+#     missing_years = EXPECTED_YEARS - collected_years
+#     report_missing_years(flow_code, missing_years, results)
 
     
 def _add_ol_leaching_mc(results, preloaded_data, current_params, dataset_noise):
@@ -277,7 +277,7 @@ def _add_ol_leaching_mc(results, preloaded_data, current_params, dataset_noise):
         collected_years.add(year)
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value, 
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': data_sources
+            'comment': 'ok', 'data_sources': data_sources
         })
             
     missing_years = EXPECTED_YEARS - collected_years
@@ -356,7 +356,7 @@ def _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise):
         value = (sau[year]*fu_sheep + lam[year]*fu_lamb + storfe[year]*fu_cattle + geit[year]*fu_goat) * protein_cont / Jones
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value, 
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': data_sources
+            'comment': 'ok', 'data_sources': data_sources
         })
 
     missing_years = EXPECTED_YEARS - collected_years

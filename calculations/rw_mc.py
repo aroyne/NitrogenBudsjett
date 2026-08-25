@@ -39,7 +39,7 @@ def _add_fuel_import(results, preloaded_data, current_params, current_trade_fact
 def _add_transport_fuel_import(results, preloaded_data, current_params, current_trade_factors, dataset_noise):
     process_generic_trade_flow(
         results=results, preloaded_data=preloaded_data, current_params=current_params,
-        current_trade_factors=current_trade_factors, flow_code='RW.RW-EF.EC-Transport fuel import-Nmix',
+        current_trade_factors=current_trade_factors, flow_code='RW.RW-EF.TR-Import of transport fuel-Nmix',
         target_types='transport_fuel', is_import=True, dataset_noise = dataset_noise
     )        
 
@@ -119,7 +119,7 @@ def _add_animal_feed_import_mc(results, preloaded_data, current_params, dataset_
                 
             results.append({
                 'flow_name': flow_code, 'year': year, 'value': imported_feed_N,
-                'comment': 'ok (MC-støy lagt på)',
+                'comment': 'ok',
                 'data_sources': 'Landbruksdirektoratets kraftfôrstatistikk'
             })
             
@@ -146,12 +146,12 @@ def _add_animal_feed_import_mc(results, preloaded_data, current_params, dataset_
             if 'dom_frac' not in row or pd.isna(row['dom_frac']):
                 if year >= 1995:
                     dom_frac = global_dom_frac_fallback
-                    comment = f'interpolated (Mangler dom_frac i kilde, satt til perturbert parameter {param_key_dom_frac})'
+                    comment = 'ok'
                 else:
                     raise ValueError(f"År {year} mangler 'dom_frac' i kilde og faller utenfor gyldig tidsintervall for parameter-fallback.")
             else:
                 dom_frac = float(row['dom_frac'])
-                comment = 'ok (MC-støy lagt på)' if year < 1995 else 'interpolated (MC-støy lagt på)'
+                comment = 'ok'
             
             value_kt_N = feed_tonn * 1e-3 * N_cont_before_2000 * (1 - dom_frac)
             value_kt_N = max(0.0, value_kt_N)
@@ -190,7 +190,7 @@ def _add_aquaculture_feed_import_mc(results, preloaded_data, current_params, dat
             
         results.append({
             'flow_name': flow_code, 'year': year, 'value': float(imported_feed_N),
-            'comment': 'ok (MC-støy beregnet via felles produksjonsmatrise)', 'data_sources': 'Fiskeridirektoratet'
+            'comment': 'ok', 'data_sources': 'Fiskeridirektoratet'
         })
         
     missing_years = EXPECTED_YEARS - collected_years
@@ -231,7 +231,7 @@ def _add_live_animal_import_mc(results, preloaded_data, current_params, dataset_
             val = max(0.0, total_N_per_year[year])
             results.append({
                 'flow_name': flow_code, 'year': year, 'value': float(val),
-                'comment': 'ok (MC-støy ferdig beregnet sentralt, uvesentlige arter satt til 0.0)', 'data_sources': 'FAOSTAT'
+                'comment': 'ok', 'data_sources': 'FAOSTAT'
             })
             
     missing_years = EXPECTED_YEARS - collected_years
@@ -261,7 +261,7 @@ def _add_mineral_fertilizer_import_mc(results, preloaded_data, current_params, d
                 
             results.append({
                 'flow_name': flow_code, 'year': year, 'value': value_kt,
-                'comment': 'ok (MC-støy ferdig beregnet sentralt)', 'data_sources': 'FAOSTAT'
+                'comment': 'ok', 'data_sources': 'FAOSTAT'
             })
             
     missing_years = EXPECTED_YEARS - collected_years
@@ -271,7 +271,7 @@ def _add_mineral_fertilizer_import_mc(results, preloaded_data, current_params, d
 def _add_rw_outflow_oxn_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'RW.RW-AT.AT-Atmospheric inflow-OXN'
     collected_years = set()
-    comment = 'ok (MC-støy lagt på basert på kildens usikkerhetstype)'
+    comment = 'ok'
     
     df_rw = preloaded_data.get('atm_in_out')
 
@@ -310,7 +310,7 @@ def _add_rw_outflow_oxn_mc(results, preloaded_data, current_params, dataset_nois
 def _add_rw_outflow_rdn_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'RW.RW-AT.AT-Atmospheric inflow-RDN'
     collected_years = set()
-    comment = 'ok (MC-støy lagt på basert på kildens usikkerhetstype)'
+    comment = 'ok'
     
     df_rw = preloaded_data.get('atm_in_out')
     

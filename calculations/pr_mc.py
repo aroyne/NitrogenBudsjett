@@ -106,7 +106,7 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
 
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på 05281)', 'data_sources': data_sources
+            'comment': 'ok', 'data_sources': data_sources
         })
 
     # =========================================================================
@@ -138,7 +138,7 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
 
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på 10513)', 'data_sources': data_sources
+            'comment': 'ok', 'data_sources': data_sources
         })
         
     # =========================================================================
@@ -173,7 +173,7 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
             comment_str = 'extrapolated (MC-støy lagt på basisdata)'
         else:
             inc_frac = float(df_hist.iloc[r_iloc, 1]) / 100
-            comment_str = 'ok (MC-støy lagt på basisdata)'
+            comment_str = 'ok'
             r_iloc += 1
             
         raw_val = waste * inc_frac        
@@ -210,7 +210,7 @@ def _add_recycling_mc(results, preloaded_data, current_params, dataset_noise, cu
             'flow_name': flow_code,
             'year': year,
             'value': value,
-            'comment': 'ok (MC-støy integrert i datagrunnlag)',
+            'comment': 'ok',
             'data_sources': data_sources
         })
 
@@ -280,10 +280,10 @@ def _add_ag_biologically_treated_organic_waste_mc(results, preloaded_data, curre
         
         if year < 2012:
             val *= noise_trend
-            comment_str = 'Extrapolated value from 2012'
+            comment_str = 'ok'
             source_str  = 'extrapolated'
         elif year < 2018:
-            comment_str = 'Extrapolated fraction to agriculture from 2018'
+            comment_str = 'ok'
             source_str  = 'extrapolated/SSB'
             
         else:
@@ -365,10 +365,10 @@ def _add_hs_biologically_treated_organic_waste_mc(results, preloaded_data, curre
         
         if year < 2012:
             val *= noise_trend
-            comment_str = 'Extrapolated value from 2012'
+            comment_str = 'ok'
             source_str  = 'extrapolated'
         elif year < 2018:
-            comment_str = 'Extrapolated fraction to agriculture from 2018'
+            comment_str = 'ok'
             source_str  = 'extrapolated/SSB'
             
         else:
@@ -470,7 +470,7 @@ def _add_wastewater_from_landfills_mc(results, preloaded_data, current_params, d
             'flow_name': flow_code,
             'year': year,
             'value': val,
-            'comment': 'ok (Robust posisjonsindeksert mapping og MC-støy)',
+            'comment': 'ok',
             'data_sources': 'Utslipp_deponi.xlsx (Mildir)' if year >= 2011 else 'extrapolated'
         })
 
@@ -669,7 +669,7 @@ def _add_so_leaching_mc(results, preloaded_data, current_params, dataset_noise):
 #             'flow_name': flow_code,
 #             'year': year,
 #             'value': val,
-#             'comment': 'ok (Sammensatt avfallsstrøm med MC-støy)' if year >= 2012 else 'Satt til 0 før 2012',
+#             'comment': 'ok' if year >= 2012 else 'Satt til 0 før 2012',
 #             'data_sources': 'SSB, Landbruksdirektoratet, Biogass Norge' if year >= 2012 else 'Ingen data før 2012'
 #         })
 
@@ -679,7 +679,7 @@ def _add_so_leaching_mc(results, preloaded_data, current_params, dataset_noise):
 def _add_so_NOx_emissions_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'PR.SO-AT.AT-Emissions-NOx'
     collected_years = set()
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
     data_sources = 'CRLTAP Inventory Submissions'
 
     conv = float(current_params.get("NOx_to_N_factor"))    
@@ -714,7 +714,7 @@ def _add_so_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
 def _add_so_NH3_emissions_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'PR.SO-AT.AT-Emissions-NH3'
     collected_years = set()
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
     data_sources = 'CRLTAP Inventory Submissions'
 
     conv = float(current_params.get("NH3_to_N_factor"))
@@ -749,7 +749,7 @@ def _add_so_NH3_emissions_mc(results, preloaded_data, current_params, dataset_no
 def _add_so_N2O_emissions_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'PR.SO-AT.AT-Emissions-N2O'
     collected_years = set()
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
     data_sources = 'UNFCCC CRT'
 
     conv_N2O = float(current_params.get("N2O_to_N_factor"))
@@ -804,7 +804,7 @@ def _add_export_for_recycling_mc(results, preloaded_data, current_params, curren
             'flow_name': flow_code,
             'year': year,
             'value': value,
-            'comment': 'ok (MC-støy integrert i datagrunnlag)',
+            'comment': 'ok',
             'data_sources': data_sources
         })
 
@@ -832,7 +832,7 @@ def _add_export_for_reuse_mc(results, preloaded_data, current_params, current_tr
             'flow_name': flow_code,
             'year': year,
             'value': value,
-            'comment': 'ok (MC-støy integrert i datagrunnlag)',
+            'comment': 'ok',
             'data_sources': data_sources
         })
 
@@ -926,7 +926,7 @@ def _add_hs_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
     flow_code = 'PR.WW-HS.HS-Sewage sludge fertilizer-Nmix'
     dataset_key = '05279'
     collected_years = set()
-    comment = 'ok (MC-støy påført aktivitetsnivå og slam-N)'
+    comment = 'ok'
     
     N_content = float(current_params.waste_N_frac('sludge'))
     
@@ -1015,7 +1015,7 @@ def _add_hs_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
 def _add_ww_N2O_emissions_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'PR.WW-AT.AT-Emissions-N2O'
     collected_years = set()
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
     data_sources = 'UNFCCC CRT'
 
     conv_N2O = float(current_params.get("N2O_to_N_factor"))
@@ -1054,7 +1054,7 @@ def _add_ww_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
 def _add_solid_waste_export_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise):
     flow_code = 'PR.SO-RW.RW-Solid waste export-Nmix'
     collected_years = set()
-    comment = 'ok (Generisk handelsløsning med MC-støy)'
+    comment = 'ok'
     data_sources = 'SSB tab 08801'
 
     trade_results = []
@@ -1105,7 +1105,7 @@ def _add_solid_waste_export_mc(results, preloaded_data, current_params, current_
 def _add_sewage_sludge_landfill_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'PR.WW-PR.SO-Sewage sludge landfill-Nmix'
     collected_years = set()
-    comment = 'ok (MC-støy påført aktivitetsnivå og slam-N)'
+    comment = 'ok'
     
     N_content = float(current_params.waste_N_frac('sludge'))
     
@@ -1195,7 +1195,7 @@ def _add_sewage_sludge_landfill_mc(results, preloaded_data, current_params, data
 def _add_ww_N2_emissions_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'PR.WW-AT.AT-Emissions-N2'
     collected_years = set()
-    comment = 'ok (MC-støy påført renseanlegg og rensegrader)'
+    comment = 'ok'
     data_sources = 'treatment plant reports (norskeutslipp.no / veas.nu)'
     dataset_key = 'nitrogenrensing_avlop'
     noise_val = dataset_noise[dataset_key]
@@ -1407,7 +1407,7 @@ def _add_treated_ww_discharge_mc(results, preloaded_data, current_params, datase
     flow_code = 'PR.WW-HY.CW-Treated wastewater discharge-Nmix'
     dataset_key = '05280'
     collected_years = set()
-    comment = 'ok (MC-støy påført aktivitetsnivå)'
+    comment = 'ok'
     
     df_modern = preloaded_data['hy_ssb_05280_raw']
     df_hist = preloaded_data['avlop_utslipp_historical']

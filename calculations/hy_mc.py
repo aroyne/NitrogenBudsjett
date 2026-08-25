@@ -68,7 +68,7 @@ def _add_inflow_to_coastal_waters(results, preloaded_data, current_params, datas
             
             results.append({
                 'flow_name': flow_code, 'year': year, 'value': val,
-                'comment': 'ok (Tidlig tidsserie, MC-støy lagt på)',
+                'comment': 'ok',
                 'data_sources': 'Miljødirektoratet / TEOTIL'
             })
 
@@ -97,11 +97,11 @@ def _add_inflow_to_coastal_waters(results, preloaded_data, current_params, datas
             existing_posts = [p for p in results if p['flow_name'] == flow_code and p['year'] == year]
             if existing_posts:
                 existing_posts[0]['value'] = val
-                existing_posts[0]['comment'] = 'ok (Overstyrt med nyere TEOTIL3, korrigert for avløp)'
+                existing_posts[0]['comment'] = 'ok'
             else:
                 results.append({
                     'flow_name': flow_code, 'year': year, 'value': val,
-                    'comment': 'ok (TEOTIL3 matrise, korrigert for avløp)',
+                    'comment': 'ok',
                     'data_sources': 'NIVA TEOTIL3'
                 })
 
@@ -142,7 +142,7 @@ def _add_wild_shellfish_and_macroalgae(results, preloaded_data, current_params, 
                 
             results.append({
                 'flow_name': flow_code, 'year': year, 'value': max(0.0, val * noise_fisk),
-                'comment': 'ok (MC-støy lagt på)', 'data_sources': 'Fiskeridirektoratet'
+                'comment': 'ok', 'data_sources': 'Fiskeridirektoratet'
             })
 
     # Historiske data (før 1994)
@@ -160,7 +160,7 @@ def _add_wild_shellfish_and_macroalgae(results, preloaded_data, current_params, 
             
             results.append({
                 'flow_name': flow_code, 'year': year, 'value': max(0.0, val * noise_fisk),
-                'comment': 'ok (Historiske data, MC-støy lagt på)', 'data_sources': 'Fiskeridirektoratet'
+                'comment': 'ok', 'data_sources': 'Fiskeridirektoratet'
             })
 
     missing_years = EXPECTED_YEARS - collected_years
@@ -201,9 +201,9 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
             base_ret_val = (float(df_t3_ret.iloc[r, 1]) / 1000.0) * noise_teotil
             
             results.append({'flow_name': flow_n2, 'year': year, 'value': max(0.0, base_ret_val * (1.0 - fraction_N2O)),
-                            'comment': 'ok (TEOTIL3 retensjonsmatrise)', 'data_sources': 'NIVA TEOTIL3'})
+                            'comment': 'ok', 'data_sources': 'NIVA TEOTIL3'})
             results.append({'flow_name': flow_n2o, 'year': year, 'value': max(0.0, base_ret_val * fraction_N2O),
-                            'comment': 'ok (TEOTIL3 retensjonsmatrise)', 'data_sources': 'NIVA TEOTIL3'})
+                            'comment': 'ok', 'data_sources': 'NIVA TEOTIL3'})
 
     # 2. Historiske år (1990 - 2012): Bruk baklengs kalkyle basert på outflow_tracker
     noise_interp = dataset_noise[key_interp]
@@ -222,9 +222,9 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
             hist_ret_val *= noise_interp
             
             results.append({'flow_name': flow_n2, 'year': year, 'value': max(0.0, hist_ret_val * (1.0 - fraction_N2O)),
-                            'comment': 'modeled (Fast retensjonsbrøk + interpoleringsstøy)', 'data_sources': 'Beregningsmodell'})
+                            'comment': 'ok', 'data_sources': 'Beregningsmodell'})
             results.append({'flow_name': flow_n2o, 'year': year, 'value': max(0.0, hist_ret_val * fraction_N2O),
-                            'comment': 'modeled (Fast retensjonsbrøk + interpoleringsstøy)', 'data_sources': 'Beregningsmodell'})
+                            'comment': 'ok', 'data_sources': 'Beregningsmodell'})
 
     # Sluttkontroll (kun for år fra 1990 og oppover)
     expected_from_1990 = {y for y in EXPECTED_YEARS if y >= 1990}
@@ -257,7 +257,7 @@ def _add_wild_fish_catch(results, preloaded_data, current_params, dataset_noise)
             val_kt_N = (val / 1000.0) * fish_N_frac * noise_fisk
             results.append({
                 'flow_name': flow_code, 'year': year, 'value': max(0.0, val_kt_N),
-                'comment': 'ok (MC-støy lagt på)', 'data_sources': 'Fiskeridirektoratet'
+                'comment': 'ok', 'data_sources': 'Fiskeridirektoratet'
             })
 
     # Historiske data (før 2000)
@@ -273,7 +273,7 @@ def _add_wild_fish_catch(results, preloaded_data, current_params, dataset_noise)
             
             results.append({
                 'flow_name': flow_code, 'year': year, 'value': max(0.0, val),
-                'comment': 'ok (Historiske data, MC-støy lagt på)', 'data_sources': 'Fiskeridirektoratet'
+                'comment': 'ok', 'data_sources': 'Fiskeridirektoratet'
             })
 
 
@@ -297,7 +297,7 @@ def _add_aquaculture_internal_flows(results, aquaculture_production_dict, curren
             # 1. Slaktefisk ut av poolen
             results.append({
                 'flow_name': flow_harvest, 'year': year, 'value': max(0.0, fish_harvested_N),
-                'comment': 'ok (Beregnet fra felles shared flow produksjon)', 'data_sources': 'Fiskeridirektoratet'
+                'comment': 'ok', 'data_sources': 'Fiskeridirektoratet'
             })
             
             # 2. Fôrspill og fekalier til kystvann
@@ -306,14 +306,14 @@ def _add_aquaculture_internal_flows(results, aquaculture_production_dict, curren
             
             results.append({
                 'flow_name': flow_waste, 'year': year, 'value': max(0.0, waste_val),
-                'comment': 'ok (Beregnet ut fra retensjonsfaktorer)', 'data_sources': 'Mass balanse'
+                'comment': 'ok', 'data_sources': 'Mass balanse'
             })
             
             # 3. Metabolsk ekskresjon (oppløst N) til kystvann
             excretia_val = total_feed_N * (1.0 - prot_ret - feed_waste)
             results.append({
                 'flow_name': flow_excretia, 'year': year, 'value': max(0.0, excretia_val),
-                'comment': 'ok (Beregnet ut fra retensjonsfaktorer)', 'data_sources': 'Mass balanse'
+                'comment': 'ok', 'data_sources': 'Mass balanse'
             })
 
     missing_years = EXPECTED_YEARS - collected_years

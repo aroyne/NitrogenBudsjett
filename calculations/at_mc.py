@@ -83,7 +83,7 @@ def _deposition_flow_mc(results, flow_code, class4, poll, preloaded_data, curren
     value_last = None
     
     for year in sorted(EXPECTED_YEARS):
-        comment = 'ok (MC-støy lagt på basert på uncertainty_type)'
+        comment = 'ok'
         
         if year < 2017:
             period = period_for_year(year)
@@ -152,11 +152,11 @@ def _add_OP_N2_fixation_mc(results, preloaded_data, current_params, ammonia_impo
             value = perturbed_faostat - ammonia_import_dict[year] + ammonia_export_dict.get(year, 0.0)
             
             if value < 0:
-                comment = 'ok (Negativ verdi pga. MC-støy i massebalanse)'
+                comment = 'ok'
             elif value == 0:
-                comment = 'ok (Nullverdi pga. MC-støy)'
+                comment = 'ok'
             else:
-                comment = 'ok (MC-støy lagt på)'
+                comment = 'ok'
             
             results.append({
                 'flow_name': flow_code,
@@ -171,7 +171,7 @@ def _add_OP_N2_fixation_mc(results, preloaded_data, current_params, ammonia_impo
 
 def _add_AG_N2_fixation_mc(results, current_params):
     flow_code = 'AT.AT-AG.SM-Biological N2 fixation-N2'
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
     data_sources = 'Bleken & Bakken'
     
     val_param = current_params.get("AG_biological_fixation_N2")
@@ -189,7 +189,7 @@ def _add_AG_N2_fixation_mc(results, current_params):
 
 def _add_FO_N2_fixation_mc(results, current_params):
     flow_code = 'AT.AT-FS.FO-N2 fixation-N2'
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
     data_sources = 'Moldan (2025) and SSB'
     
     fixation_rate = float(current_params.get("FO_biological_fixation_N2"))
@@ -209,7 +209,7 @@ def _add_FO_N2_fixation_mc(results, current_params):
 
 def _add_OL_N2_fixation_mc(results, current_params):
     flow_code = 'AT.AT-FS.OL-N2 fixation-N2'
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
     data_sources = 'CORINE land cover inventory and REddy & DeLaune (2008)'
     
     fixation_marshes = float(current_params.get("N2_fixation_freshwater_marshes"))
@@ -233,7 +233,7 @@ def _add_OL_N2_fixation_mc(results, current_params):
 
 def _add_SW_N2_fixation_mc(results, current_params):
     flow_code = 'AT.AT-HY.SW-N2 fixation-N2'
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
     data_sources = 'NIBIO and Reddy & DeLaune (2008)'
     
     fixation_SW = float(current_params.get("N2_fixation_SW"))
@@ -254,7 +254,7 @@ def _add_SW_N2_fixation_mc(results, current_params):
 def _add_atmospheric_outflow_oxn_mc(results, df_atm, current_params, dataset_noise):
     flow_code = 'AT.AT-RW.RW-Atmospheric outflow-OXN'
     collected_years = set()
-    comment = 'ok (MC-støy lagt på basert på uncertainty_type)'
+    comment = 'ok'
     
     for r in range(5, 45):
         if r >= len(df_atm):
@@ -294,7 +294,7 @@ def _add_atmospheric_outflow_oxn_mc(results, df_atm, current_params, dataset_noi
 def _add_atmospheric_outflow_rdn_mc(results, df_atm, current_params, dataset_noise):
     flow_code = 'AT.AT-RW.RW-Atmospheric outflow-RDN'
     collected_years = set()
-    comment = 'ok (MC-støy lagt på basert på uncertainty_type)'
+    comment = 'ok'
     
     for r in range(5, 45): 
         if r >= len(df_atm):

@@ -55,7 +55,7 @@ def _add_fuel_for_industry_mc(results, preloaded_data, dataset_noise):
 
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': 'UNFCCC CRT'
+            'comment': 'ok', 'data_sources': 'UNFCCC CRT'
         })
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
 
@@ -76,7 +76,7 @@ def _add_fuel_for_transport_mc(results, preloaded_data, dataset_noise):
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': 'UNFCCC CRT'
+            'comment': 'ok', 'data_sources': 'UNFCCC CRT'
         })
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
 
@@ -97,7 +97,7 @@ def _add_fuel_for_heating_mc(results, preloaded_data, dataset_noise):
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': 'UNFCCC CRT'
+            'comment': 'ok', 'data_sources': 'UNFCCC CRT'
         })
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
 
@@ -114,7 +114,7 @@ def _add_fuel_used_as_feedstock_mc(results, preloaded_data, current_params, data
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på via parametere)', 'data_sources': 'SSB table 11561'
+            'comment': 'ok', 'data_sources': 'SSB table 11561'
         })
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
 
@@ -140,7 +140,7 @@ def _add_ec_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
 
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': 'CRLTAP Inventory Submissions'
+            'comment': 'ok', 'data_sources': 'CRLTAP Inventory Submissions'
         })
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
 
@@ -161,7 +161,7 @@ def _add_ec_N2O_emissions_mc(results, preloaded_data, dataset_noise):
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': 'UNFCCC CRT'
+            'comment': 'ok', 'data_sources': 'UNFCCC CRT'
         })
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
 
@@ -199,7 +199,7 @@ def _add_ic_NH3_emissions_mc(results, preloaded_data, current_params, dataset_no
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': 'CRLTAP Inventory Submissions'
+            'comment': 'ok', 'data_sources': 'CRLTAP Inventory Submissions'
         })
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
 
@@ -225,7 +225,7 @@ def _add_ic_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': 'CRLTAP Inventory Submissions'
+            'comment': 'ok', 'data_sources': 'CRLTAP Inventory Submissions'
         })
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
 
@@ -245,7 +245,7 @@ def _add_ic_N2O_emissions_mc(results, preloaded_data, dataset_noise):
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': 'UNFCCC CRT'
+            'comment': 'ok', 'data_sources': 'UNFCCC CRT'
         })
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
 
@@ -271,7 +271,7 @@ def _add_tr_NH3_emissions_mc(results, preloaded_data, current_params, dataset_no
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': 'CRLTAP Inventory Submissions'
+            'comment': 'ok', 'data_sources': 'CRLTAP Inventory Submissions'
         })
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
 
@@ -297,7 +297,7 @@ def _add_tr_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': 'CRLTAP Inventory Submissions'
+            'comment': 'ok', 'data_sources': 'CRLTAP Inventory Submissions'
         })
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
 
@@ -317,13 +317,13 @@ def _add_tr_N2O_emissions_mc(results, preloaded_data, dataset_noise):
         value = raw_val*noise_val
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': 'UNFCCC CRT'
+            'comment': 'ok', 'data_sources': 'UNFCCC CRT'
         })
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
 
 
 def _add_export_of_transport_fuels_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise):
-    flow_code = 'EF.EC-RW.RW-Export of transport fuels-Nmix'
+    flow_code = 'EF.TR-RW.RW-Export of transport fuels-Nmix'
     process_generic_trade_flow(
         results=results,
         preloaded_data=preloaded_data,
@@ -355,7 +355,7 @@ def _add_oe_NH3_emissions_mc(results, preloaded_data, current_params, dataset_no
         collected_years.add(year)        
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': 'CRLTAP Inventory Submissions'
+            'comment': 'ok', 'data_sources': 'CRLTAP Inventory Submissions'
         })
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
 
@@ -379,7 +379,7 @@ def _add_oe_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
         collected_years.add(year)
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': 'CRLTAP Inventory Submissions'
+            'comment': 'ok', 'data_sources': 'CRLTAP Inventory Submissions'
         })
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
 
@@ -398,6 +398,6 @@ def _add_oe_N2O_emissions_mc(results, preloaded_data, dataset_noise):
         value = raw_val * noise_val
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': 'UNFCCC CRT'
+            'comment': 'ok', 'data_sources': 'UNFCCC CRT'
         })
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)

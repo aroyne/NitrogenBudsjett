@@ -823,6 +823,7 @@ def process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename, target_f
         f.write("# Subpool: Other land (FS.OL)\n\n")
         f.write(get_balance_image_markdown("FS.OL", plot_files, plot_dir, relative_depth="../", target_format=target_format))
         f.write("\n### Flows that are zero or neglected:\n\n* **FS.OL-AT.AT-Emissions-NOx** is neglected because no values are reported in the CRLTAP/WebDab categories 4F1 and 4F2 (wetlands / other land NOx).\n")
+        f.write("* Following Swedish NBB \\citep{jutterstrom_swedish_2020}, we also consider denitrification in the OL pool to be negligible and therefore neglect **FS.OL-AT.AT-Emissions-N2** and **FS.OL-AT.AT-Emissions-N2O**.")
 
     fs_fo_counter, fs_ol_counter = 1, 1
 
@@ -880,15 +881,6 @@ def process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename, target_f
                 description = ("Calculated using data from NIBIO on organised grazing \\\\citep{nibio_beitestatistikk_2025} together with "
                     "estimated fodder intake for different animal groups taken from Table 1.2 in \\citep{hegrenes_verdi_2006}, "
                     "assuming an average protein content of 150 g pr FEm and the standard Jones factor for the nitrogen content of protein. ")
-            elif "emissionsn2" in norm and "n2o" not in norm:
-                exact_flow_code = "FS.OL-AT.AT-Emissions-N2"
-                display_name = "Other Land Emissions (N2)"
-                description = ("Calculated from N2O emissions from UNFCCC Common reporting tables, Table 4, assuming a mean N2:N2O ratio of 19.5 "
-                    "as has been calculated from studies of forest ecosystems, as discussed in \\\\citet{schappi_annexes_2025}. IN PROGRESS")
-            elif "emissionsn2o" in norm:
-                exact_flow_code = "FS.OL-AT.AT-Emissions-N2O"
-                display_name = "Other Land Emissions (N2O)"
-                description = "Taken from UNFCCC Common reporting tables, Table 4, where the only reported values are from wetlands."
             elif "leaching" in norm:
                 exact_flow_code = "FS.OL-HY.SW-Leaching-Nmix"
                 display_name = "Other Land Leaching"

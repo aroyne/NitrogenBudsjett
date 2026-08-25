@@ -77,7 +77,7 @@ def _add_seeds_and_planting_material_mc(results, preloaded_data, current_params,
     flow_code = 'MP.FP-AG.SM-Seeds and planting material -Nmix'
     collected_years = set()
     data_sources = 'NIBIO Totalkalkylen'
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
     
     seed_cereal_prot  = float(current_params.get("seed_cereal_protein_frac"))
     seed_cereal_fac   = float(current_params.get("seed_cereal_protein_to_N"))
@@ -237,7 +237,7 @@ def _add_farm_animal_feed_mc(results, preloaded_data, current_params, dataset_no
             
             final_yearly_values[gap_year] = {
                 'value': max(0.0, final_interpolated_value),
-                'comment': 'interpolated',
+                'comment': 'ok',
                 'data_sources': 'Interpolert'
             }
 
@@ -307,7 +307,7 @@ def _add_food_industry_wastewater_mc(results, preloaded_data, current_params, da
                 'flow_name': flow_code,
                 'year': year,
                 'value': value_noisy,
-                'comment': 'ok (MC-støy lagt på)',
+                'comment': 'ok',
                 'data_sources': data_sources
             })
 
@@ -524,11 +524,11 @@ def _add_fp_untreated_wastewater_mc(results, preloaded_data, current_params, dat
     for year in sorted(list(target_years)):
         if year < 1994:
             val = calculated_mean
-            comment = 'ok (ekstrapolert fra 1994-1998 med MC-støy)'
+            comment = 'ok'
             src = 'Ekstrapolert / Historisk snitt'
         elif year in found_values_94_23:
             val = found_values_94_23[year]
-            comment = 'ok (MC-støy lagt på)'
+            comment = 'ok'
             src = data_sources
         else:
             continue
@@ -573,7 +573,7 @@ def _add_aquaculture_feed_mc(results, preloaded_data, current_params, dataset_no
             'flow_name': flow_code,
             'year': year,
             'value': float(domestic_feed_N),
-            'comment': 'ok (MC-støy beregnet via felles produksjonsmatrise)',
+            'comment': 'ok',
             'data_sources': 'Fiskeridirektoratet'
         })
         
@@ -745,7 +745,7 @@ def _add_other_industry_wastewater_mc(results, preloaded_data, current_params, d
                 'flow_name': flow_code,
                 'year': year,
                 'value': value_noisy,
-                'comment': 'ok (MC-støy lagt på)',
+                'comment': 'ok',
                 'data_sources': data_sources
             })
 
@@ -756,7 +756,7 @@ def _add_hs_mineral_fertilizer_mc(results, preloaded_data, current_params, datas
     flow_code = 'MP.OP-HS.HS-Mineral fertilizer-Nmix'
     collected_years = set()
     data_sources = 'FAOSTAT Fertilizer by nutrient'
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
     
     nonag_share = float(current_params.get("fert_nonag_share_of_total_use"))
     ag_share = 1.0 - nonag_share        
@@ -818,7 +818,7 @@ def _add_fo_mineral_fertilizer_mc(results, preloaded_data, current_params, datas
                 
                 final_yearly_values[year] = {
                     'value': value_kt_N * noise_ssb,
-                    'comment': 'ok (MC-støy lagt på)',
+                    'comment': 'ok',
                     'data_sources': 'SSB tabell 05543'
                 }
         except (ValueError, TypeError, IndexError):
@@ -842,7 +842,7 @@ def _add_fo_mineral_fertilizer_mc(results, preloaded_data, current_params, datas
                 
                 final_yearly_values[year] = {
                     'value': max(0.0, value_kt_N_hist * noise_hist),
-                    'comment': 'ok (historisk data, MC-støy lagt på)',
+                    'comment': 'ok',
                     'data_sources': 'Skoggjødsling før 1995'
                 }
         except (ValueError, TypeError, IndexError):
@@ -886,7 +886,7 @@ def _add_fo_mineral_fertilizer_mc(results, preloaded_data, current_params, datas
 def _add_op_NH3_emissions_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'MP.OP-AT.AT-Emissions-NH3'
     collected_years = set()
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
     data_sources = 'CRLTAP Inventory Submissions'
 
     conv = float(current_params.get("NH3_to_N_factor"))
@@ -919,7 +919,7 @@ def _add_op_NH3_emissions_mc(results, preloaded_data, current_params, dataset_no
 def _add_op_NOx_emissions_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'MP.OP-AT.AT-Emissions-NOx'
     collected_years = set()
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
     data_sources = 'CRLTAP Inventory Submissions'
 
     conv = float(current_params.get("NOx_to_N_factor"))
@@ -952,7 +952,7 @@ def _add_op_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
 def _add_op_N2O_emissions_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'MP.OP-AT.AT-Emissions-N2O'
     collected_years = set()
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
     data_sources = 'UNFCCC CRT'
 
     conv_N2O = float(current_params.get("N2O_to_N_factor"))
@@ -1022,7 +1022,7 @@ def _add_op_untreated_wastewater_mc(results, preloaded_data, current_params, dat
                 'flow_name': flow_code,
                 'year': year,
                 'value': value_noisy,
-                'comment': 'ok (MC-støy lagt på)',
+                'comment': 'ok',
                 'data_sources': data_sources
             })
 
@@ -1033,7 +1033,7 @@ def _add_op_untreated_wastewater_mc(results, preloaded_data, current_params, dat
 def _add_mineral_fertilizer_export_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'MP.OP-RW.RW-Mineral fertilizer export-Nmix'
     collected_years = set()
-    comment = 'ok (MC-støy lagt på)'
+    comment = 'ok'
     data_sources = 'FAOSTAT Fertilizer by Nutrient'
 
     key_gjødsel = 'Fertilizer by nutrient'
@@ -1251,12 +1251,12 @@ def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trad
             value = in_val - out_val
             if value < 0:
                 print(f"  [MERK] Negativ balanse i {year}: {value:.4f} kt N (Blir klippet til 0.0)")
-            comment = 'ok (MC-balanse komplett)'
+            comment = 'ok'
             data_sources = 'Massebalanse (Inflows - Outflows)'
         else:
             value = 0.0
-            comment = f'Ufullstendig: fant {n_in}/{N_IN} inputs og {n_out}/{N_OUT} outputs'
-            data_sources = 'Manglende ledd i massebalanse'
+            comment = f'not done'
+            data_sources = 'Missing items in mass balance: found {n_in}/{N_IN} inputs and {n_out}/{N_OUT} outputs'
 
         results.append({
             'flow_name': flow_code,

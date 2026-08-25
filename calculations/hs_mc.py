@@ -33,7 +33,7 @@ def _add_mixed_household_waste_mc(results, preloaded_data, current_params, datas
         collected_years.add(year)
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (Beregnet fra SSB-tabeller med MC-støy)', 'data_sources': 'SSB'
+            'comment': 'ok', 'data_sources': 'SSB'
         })
         
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)    
@@ -70,7 +70,7 @@ def _add_municipal_wastewater_mc(results, preloaded_data, current_params, datase
             
             results.append({
                 'flow_name': flow_code, 'year': year, 'value': value,
-                'comment': 'ok (MC-støy lagt på)', 'data_sources': 'SSB table 06913'
+                'comment': 'ok', 'data_sources': 'SSB table 06913'
             })
             
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
@@ -126,7 +126,7 @@ def _add_nh3_human_emissions_mc(results, preloaded_data, current_params, dataset
         value = emissions_tN / 1000.0
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': 'SSB table 07459 & 05307'
+            'comment': 'ok', 'data_sources': 'SSB table 07459 & 05307'
         })
             
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
@@ -155,7 +155,7 @@ def _add_luc_N2O_emissions_mc(results, preloaded_data, current_params, dataset_n
         value = value * conv
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok (MC-støy lagt på)', 'data_sources': 'UNFCCC CRT'
+            'comment': 'ok', 'data_sources': 'UNFCCC CRT'
         })
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
 
@@ -219,7 +219,7 @@ def _add_overland_flow_urban_mc(results, preloaded_data, current_params, dataset
                 
                 results.append({
                     'flow_name': flow_code, 'year': year, 'value': max(0.0, value),
-                    'comment': 'ok (TEOTIL3)', 'data_sources': 'TEOTIL3'
+                    'comment': 'ok', 'data_sources': 'TEOTIL3'
                 })
                 
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)

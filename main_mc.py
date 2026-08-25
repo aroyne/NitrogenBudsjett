@@ -623,7 +623,7 @@ def main():
 
     # 3. STATISTISK ANALYSE, EXCEL-EKSPORT OG PLOTTING
     summary_df = process_and_export_mc_results(all_mc_records)
-    
+
     if args.no_excel:
         print("[INFO] Kjører UTEN å skrive til offisiell Excel-mal (--no-excel er aktiv).")
     else:
