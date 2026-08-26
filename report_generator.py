@@ -775,7 +775,7 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename, targ
                 display_name = "Food crop products"
                 description = ("Food crop products are  taken from EUROSTAT Gross nutrient balance as advised by \\\\citet{schappi_annexes_2025}: «Nutrient "
                     "removal by harvest of crops» minus «Industrial crops». «Ornamenal crops», which should also be removed, are negligible in Norway. "
-                    "For years with missing data, we have filled in the average of all other years. ")
+                    "For the 2017-2019 gap in the source data, we linearly interpolate between the 2016 and 2020 values. ")
             elif "industrial" in norm:
                 exact_flow_code = "AG.SM-MP.OP-Crop products for industrial use-Nmix"
                 display_name = "Crop products for industrial use"
