@@ -194,3 +194,6 @@ litteratur/
 
 # Claude-tekst (lokal mappe, ikke synces)
 claude_tekst/
+
+# Claude-instruks for kodegjennomgang (lokal, ikke synces)
+CLAUDE.md

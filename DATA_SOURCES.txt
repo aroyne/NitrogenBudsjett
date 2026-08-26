@@ -10,9 +10,17 @@ akvakultur_1984_1994.xlsx
 Historical aquaculture production compilation, 1984-1994 (tonnes), used to extend the modern Fiskeridirektoratet series backward
 values read from Figure 1.1 in Grefsrud, S. (2025). Risikorapport for norsk fiskeoppdrett 2025. Havforskningsinstituttet.
 
+atm_in_out.xlsx
+Compilation of source-receptor data for Norway
+downloaded from https://www.emep.int/mscw/mscw_srdata.html, november 2025
+
 egentilvirket_bioenergi_industri.xlsx
 Historical self-produced bioenergy in the pulp/paper industry, used to backfill SSB table 08205 before 1998
 data from Spilde, D. & Aasestad, K. (2004). Energibruk i norsk industri: 1991-2001. Statistisk Sentralbyrå
+
+FAOSTAT_data_en_11-25-2025.csv
+Fertiliser by nutrient, domestic production
+downloaded 25.11.2025
 
 fiske_1990_2000.xlsx
 Historical wild catch compilation (pelagic fish, bottom fish, crustaceans, seaweed), 1990-2000, used to extend the modern Fiskeridirektoratet series backward
