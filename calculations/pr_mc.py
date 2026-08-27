@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sun Jun 14 14:50:01 2026
-
-@author: anja
+Products and residuals (PR) pool: solid waste (PR.SO - incineration,
+biological treatment, landfill, recycling, export) and wastewater (PR.WW -
+sewage sludge use/disposal, treatment plant emissions and discharge).
 """
 
-import pandas as pd  
+import pandas as pd
 from calculations.shared_flow_calculations import (
     find_export_for_recycling,
     find_export_for_reuse,
@@ -20,10 +20,18 @@ from calculations.utils import (
     process_generic_trade_flow,
 )
 
+# CRLTAP category codes for PR.SO's NH3/NOx emissions, combining Schäppi et
+# al. (2025) Table 48 ("solid waste": 1A1a public electricity/heat from waste
+# incineration, 5A biological treatment/solid waste disposal on land, 5C1a-vi
+# incineration variants, 5E other waste) and Table 31 ("biofuel production
+# and composting": 5B1 composting, 5B2 anaerobic digestion/biogas).
 PR_SO_CRLTAP_SECTORS = [
-    '1A1a', '5A', '5B1', '5B2', '5C1a', '5C1bi', 
+    '1A1a', '5A', '5B1', '5B2', '5C1a', '5C1bi',
     '5C1bii', '5C1biii', '5C1biv', '5C1bv', '5C1bvi', '5E'
 ]
+# CRLTAP category codes for PR.WW's NH3/NOx emissions, per Schäppi et al.
+# (2025) Table 49 ("wastewater"): 5D1 domestic wastewater handling, 5D2
+# industrial wastewater handling, 5D3 other wastewater handling.
 PR_WW_CRLTAP_SECTORS = ['5D1', '5D2', '5D3']
 
 def execute_calculations_pr(preloaded_data, current_params, dataset_noise, current_trade_factors):
@@ -72,9 +80,12 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
     park_N    = float(current_params.waste_N_frac('park_garden'))
 
     # =========================================================================
-    # 1. PERIODE 1995-2011: SSB Tabell 05281 (Nøkkel: ssb_waste_05281)
+    # 1. PERIOD 1995-2011: SSB table 05281
     # =========================================================================
     dataset_key_05281 = '05281'
+    # 'ssb_waste_05281' <- 05281_20260121-140338.xlsx (data_loader.py
+    # DATA_MAP): SSB table 05281, waste accounts by statistical variable,
+    # treatment method, material type and year
     df_05281 = preloaded_data.get('ssb_waste_05281')
     noise_05281 = dataset_noise[dataset_key_05281]
 
@@ -110,9 +121,12 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
         })
 
     # =========================================================================
-    # 2. PERIODE 2012-2023: SSB Tabell 10513 (Nøkkel: ssb_waste_10513)
+    # 2. PERIOD 2012-2023: SSB table 10513
     # =========================================================================
     dataset_key_10513 = '10513'
+    # 'ssb_waste_10513' <- 10513_20260212-104227.xlsx (data_loader.py
+    # DATA_MAP): SSB table 10513, waste accounts by material type,
+    # statistical variable, year and treatment method (2012-2023)
     df_10513 = preloaded_data.get('ssb_waste_10513')
     noise_10513 = dataset_noise[dataset_key_10513]
 
@@ -142,9 +156,12 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
         })
         
     # =========================================================================
-    # 3. PERIODE 1990-1994: Historisk ekstrapolering (Nøkkel: waste_historical_fractions)
+    # 3. PERIOD 1990-1994: historical extrapolation
     # =========================================================================
     dataset_key_hist = 'historical_waste'
+    # 'waste_historical_fractions' <- kommunalt_avfall_1985_1995.xlsx
+    # (data_loader.py DATA_MAP): historical municipal and industry waste
+    # compilation, 1985-1995 (quantities, incineration/recycling shares)
     df_hist = preloaded_data.get('waste_historical_fractions')
     noise_hist = dataset_noise[dataset_key_hist]
     noise_trend = dataset_noise['trend interpolation']
@@ -170,7 +187,7 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
         
         if year < 1992:
             inc_frac = inc_frac_1985 + change_per_year * (year - 1985)
-            comment_str = 'extrapolated (MC-støy lagt på basisdata)'
+            comment_str = 'ok'
         else:
             inc_frac = float(df_hist.iloc[r_iloc, 1]) / 100
             comment_str = 'ok'
@@ -238,23 +255,26 @@ def _add_ag_biologically_treated_organic_waste_mc(results, preloaded_data, curre
         cell_year = str(df_10513.iloc[3, col]).strip()
         if cell_year.replace('.0', '').isdigit():
             year = int(float(cell_year))
-        total = ( #levert til biogassproduksjon (+2) og kompost (+3))
-            float(df_10513.iloc[6, col + 2]) + float(df_10513.iloc[6, col + 3]) +  # Våtorganisk
-            float(df_10513.iloc[7, col + 2]) +  float(df_10513.iloc[7, col + 3]) + # Park- og hage
-            float(df_10513.iloc[8, col + 2]) + float(df_10513.iloc[8, col + 2])  # Treavfall
+        total = ( # delivered to biogas production (+2) and composting (+3)
+            float(df_10513.iloc[6, col + 2]) + float(df_10513.iloc[6, col + 3]) +  # wet organic
+            float(df_10513.iloc[7, col + 2]) +  float(df_10513.iloc[7, col + 3]) + # park and garden
+            float(df_10513.iloc[8, col + 2]) + float(df_10513.iloc[8, col + 3])  # wood waste
         )
         frac_sludge_10513[year] = (float(df_10513.iloc[9, col + 2])+float(df_10513.iloc[9, col + 3]))/(total+float(df_10513.iloc[9, col + 2])+float(df_10513.iloc[9, col + 3]))
         total_10513[year] = total
         total_N = (
-            float(df_10513.iloc[6, col + 2]) * wet_N +  # Våtorganisk
-            float(df_10513.iloc[7, col + 2]) * park_N +  # Park- og hage
-            float(df_10513.iloc[8, col + 2]) * wood_N   # Treavfall
+            float(df_10513.iloc[6, col + 2]) * wet_N +  # wet organic
+            float(df_10513.iloc[7, col + 2]) * park_N +  # park and garden
+            float(df_10513.iloc[8, col + 2]) * wood_N   # wood waste
         )
         frac_N_10513[year] = total_N/total
 
     # 2) find the amount of disposed waste allocated to agriculture from SSB 12818 (2018-2023)
     # removing sewage sludge fraction from previous step
-    df_12818 = preloaded_data.get('ssb_waste_12818') # given in kt
+    # 'ssb_waste_12818' <- 12818_20260526-110921.xlsx (data_loader.py
+    # DATA_MAP): SSB table 12818, biological waste by disposal method and
+    # year (given in kt)
+    df_12818 = preloaded_data.get('ssb_waste_12818')
     waste_ag = {}
     for col_idx in range(1, 7):
         year = int(float(str(df_12818.iloc[3, col_idx]).strip()))
@@ -323,23 +343,26 @@ def _add_hs_biologically_treated_organic_waste_mc(results, preloaded_data, curre
         cell_year = str(df_10513.iloc[3, col]).strip()
         if cell_year.replace('.0', '').isdigit():
             year = int(float(cell_year))
-        total = ( #levert til biogassproduksjon (+2) og kompost (+3))
-            float(df_10513.iloc[6, col + 2]) + float(df_10513.iloc[6, col + 3]) +  # Våtorganisk
-            float(df_10513.iloc[7, col + 2]) +  float(df_10513.iloc[7, col + 3]) + # Park- og hage
-            float(df_10513.iloc[8, col + 2]) + float(df_10513.iloc[8, col + 2])  # Treavfall
+        total = ( # delivered to biogas production (+2) and composting (+3)
+            float(df_10513.iloc[6, col + 2]) + float(df_10513.iloc[6, col + 3]) +  # wet organic
+            float(df_10513.iloc[7, col + 2]) +  float(df_10513.iloc[7, col + 3]) + # park and garden
+            float(df_10513.iloc[8, col + 2]) + float(df_10513.iloc[8, col + 3])  # wood waste
         )
         frac_sludge_10513[year] = (float(df_10513.iloc[9, col + 2])+float(df_10513.iloc[9, col + 3]))/(total+float(df_10513.iloc[9, col + 2])+float(df_10513.iloc[9, col + 3]))
         total_10513[year] = total
         total_N = (
-            float(df_10513.iloc[6, col + 2]) * wet_N +  # Våtorganisk
-            float(df_10513.iloc[7, col + 2]) * park_N +  # Park- og hage
-            float(df_10513.iloc[8, col + 2]) * wood_N   # Treavfall
+            float(df_10513.iloc[6, col + 2]) * wet_N +  # wet organic
+            float(df_10513.iloc[7, col + 2]) * park_N +  # park and garden
+            float(df_10513.iloc[8, col + 2]) * wood_N   # wood waste
         )
         frac_N_10513[year] = total_N/total
 
     # 2) find the amount of disposed waste allocated to HS ("grøntareal" + "levert jordprodusent") from SSB 12818 (2018-2023)
     # removing sewage sludge fraction from previous step
-    df_12818 = preloaded_data.get('ssb_waste_12818') # given in kt
+    # 'ssb_waste_12818' <- 12818_20260526-110921.xlsx (data_loader.py
+    # DATA_MAP): SSB table 12818, biological waste by disposal method and
+    # year (given in kt)
+    df_12818 = preloaded_data.get('ssb_waste_12818')
     waste_hs = {}
     for col_idx in range(1, 7):
         year = int(float(str(df_12818.iloc[3, col_idx]).strip()))
@@ -392,65 +415,67 @@ def _add_wastewater_from_landfills_mc(results, preloaded_data, current_params, d
     collected_years = set()
     
     noise_mildir = float(dataset_noise['norskeutslipp'])
+    # 'deponi_utslipp' and 'deponi_tilkobling' <- Utslipp_deponi.xlsx
+    # (data_loader.py DATA_MAP, sheets 'Utslipp'/'tilkobling'): annual
+    # emissions to water from Norwegian landfills, plus whether each site is
+    # connected to the municipal sewage network
     uts_raw = preloaded_data.get('deponi_utslipp')
     tilk_raw = preloaded_data.get('deponi_tilkobling')
 
     tilk_ja = set()
     tilk_nei = set()
-    
+
     for idx, row in tilk_raw.iterrows():
-        # Hopp over header-raden hvis den dukker opp som første datalinje
+        # Skip the header row if it shows up as the first data line.
         if idx == 0 and ("anlegg" in str(row.iloc[0]).lower() or "tilkoblet" in str(row.iloc[1]).lower()):
             continue
             
-        name_clean = str(row.iloc[0]).strip().lower() # Kolonne 0: anleggsnavn
-        status = str(row.iloc[1]).strip().lower()    # Kolonne 1: status
-        
+        name_clean = str(row.iloc[0]).strip().lower() # column 0: plant name
+        status = str(row.iloc[1]).strip().lower()    # column 1: connection status
+
         if 'ja' in status:
             tilk_ja.add(name_clean)
         elif 'nei' in status:
             tilk_nei.add(name_clean)
 
     real_years_data = {}
-    
+
     for idx, row in uts_raw.iterrows():
-        # Hopp over header-raden hvis den dukker opp som første datalinje
+        # Skip the header row if it shows up as the first data line.
         if idx == 0 and "anlegg" in str(row.iloc[0]).lower():
             continue
-            
+
         try:
-            year_val = str(row.iloc[3]).strip() # Kolonne 3: År
+            year_val = str(row.iloc[3]).strip() # column 3: year
             if not year_val.replace('.0', '').isdigit():
                 continue
-                
+
             year = int(float(year_val))
-            
+
             if 2011 <= year <= 2025:
-                anlegg_name = str(row.iloc[0]).strip().lower() # Kolonne 0: Anleggsnavn
-                raw_value = float(row.iloc[4])                 # Kolonne 4: Årlig utslipp til vann
-                
-                # Sjekk om navnet matcher helt eller delvis
+                anlegg_name = str(row.iloc[0]).strip().lower() # column 0: plant name
+                raw_value = float(row.iloc[4])                 # column 4: annual emission to water
+
+                # Match plant names exactly or as a substring either way.
                 if any(ja_name in anlegg_name or anlegg_name in ja_name for ja_name in tilk_ja):
                     weight = 1.0
                 elif any(nei_name in anlegg_name or anlegg_name in nei_name for nei_name in tilk_nei):
                     weight = 0.0
-                else: # ukjent
+                else: # unknown connection status
                     weight = 0.5
-                    
-                
-                # Beregn N-mengde koblet til avløp
+
+                # N routed to wastewater treatment (connected plants only).
                 n_leachate_tN = raw_value * weight
-                
+
                 if year not in real_years_data:
                     real_years_data[year] = 0.0
-                    
-                # Akkumuler i ktN (tN / 1000.0) og legg på rundens MC-støy
+
                 real_years_data[year] += (n_leachate_tN / 1000.0) * noise_mildir
-                
+
         except (ValueError, TypeError, IndexError):
             continue
 
-    # ekstrapolere historisk (1990-2010)
+    # Extrapolate backward to 1990 using the mean of the reported years.
     valid_years = [y for y in real_years_data.keys() if 2011 <= y <= 2025]
     mean_connected_kt = sum(real_years_data[y] for y in valid_years) / len(valid_years)
 
@@ -484,60 +509,62 @@ def _add_so_leaching_mc(results, preloaded_data, current_params, dataset_noise):
     comment = 'ok'
     noise_mildir = float(dataset_noise['norskeutslipp'])
 
+    # 'deponi_utslipp'/'deponi_tilkobling': see _add_wastewater_from_landfills_mc above.
     uts_raw = preloaded_data.get('deponi_utslipp')
     tilk_raw = preloaded_data.get('deponi_tilkobling')
 
     tilk_ja = set()
     tilk_nei = set()
-    
+
     for idx, row in tilk_raw.iterrows():
         if idx == 0 and ("anlegg" in str(row.iloc[0]).lower() or "tilkoblet" in str(row.iloc[1]).lower()):
             continue
-            
-        name_clean = str(row.iloc[0]).strip().lower() # Kolonne 0: anleggsnavn
-        status = str(row.iloc[1]).strip().lower()    # Kolonne 1: status
-        
+
+        name_clean = str(row.iloc[0]).strip().lower() # column 0: plant name
+        status = str(row.iloc[1]).strip().lower()    # column 1: connection status
+
         if 'ja' in status:
             tilk_ja.add(name_clean)
         elif 'nei' in status:
             tilk_nei.add(name_clean)
 
     real_years_data = {}
-    
+
     for idx, row in uts_raw.iterrows():
         if idx == 0 and "anlegg" in str(row.iloc[0]).lower():
             continue
-            
+
         try:
-            year_val = str(row.iloc[3]).strip() # Kolonne 3: År
+            year_val = str(row.iloc[3]).strip() # column 3: year
             if not year_val.replace('.0', '').isdigit():
                 continue
-                
+
             year = int(float(year_val))
-            
+
             if 2011 <= year <= 2025:
-                anlegg_name = str(row.iloc[0]).strip().lower() # Kolonne 0: Anleggsnavn
-                raw_value = float(row.iloc[4])                 # Kolonne 4: Årlig utslipp til vann
-                
+                anlegg_name = str(row.iloc[0]).strip().lower() # column 0: plant name
+                raw_value = float(row.iloc[4])                 # column 4: annual emission to water
+
                 if any(ja_name in anlegg_name or anlegg_name in ja_name for ja_name in tilk_ja):
-                    weight = 0.0  # Tilkoblet -> Skal IKKE regnes som sigevann direkte til natur
+                    weight = 0.0  # connected -> should NOT count as leachate straight to nature
                 elif any(nei_name in anlegg_name or anlegg_name in nei_name for nei_name in tilk_nei):
-                    weight = 1.0  # Ikke tilkoblet -> Går 100% til natur (sigevann)
-                else:# ukjent
+                    weight = 1.0  # not connected -> 100% goes to nature as leachate
+                else:  # unknown connection status
                     weight = 0.5
-                
+
                 n_leachate_tN = raw_value * weight
-                
+
                 if year not in real_years_data:
                     real_years_data[year] = 0.0
-                    
+
                 real_years_data[year] += (n_leachate_tN / 1000.0) * noise_mildir
-                
+
         except (ValueError, TypeError, IndexError):
             continue
 
+    # Extrapolate backward to 1990 using the mean of the reported years.
     valid_years = [y for y in real_years_data.keys() if 2011 <= y <= 2025]
-    
+
     mean_unconnected_kt = sum(real_years_data[y] for y in valid_years) / len(valid_years)
 
     final_values = {}
@@ -756,10 +783,13 @@ def _add_so_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
     key_n2o = 'UNFCCC_emissions'
     noise_val = dataset_noise[key_n2o]
 
+    # 'n2o_so_raw' <- N2O_SO.csv (data_loader.py DATA_MAP): N2O emissions from
+    # solid waste, compiled from the UNFCCC CRT (common reporting tables) for
+    # Norway, Table 4
     df_so_emissions = preloaded_data.get('n2o_so_raw')
     for index, row in df_so_emissions.iterrows():
         year_val = row['year']
-        n2o_val = row['value']  # Kolonnenavnet i csv er 'value'
+        n2o_val = row['value']  # the CSV's column name is 'value'
         
         if pd.isna(year_val) or pd.isna(n2o_val):
             continue
@@ -847,9 +877,16 @@ def _add_ag_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
     collected_years = set()
     comment = 'ok'
     N_content = float(current_params.waste_N_frac('sludge'))
+    # 'sewage_sludge_modern' <- 05279_20260121-103739.xlsx (data_loader.py
+    # DATA_MAP): SSB table 05279, sewage sludge by statistical variable,
+    # disposal method and year (2002 onward)
+    # 'sewage_sludge_historical' <- slamdisponering.xlsx (data_loader.py
+    # DATA_MAP): historical sewage sludge disposal (green area / agriculture
+    # / landfill shares), pre-modern-SSB-table era (1993-2001)
     df_modern = preloaded_data['sewage_sludge_modern']
     df_hist = preloaded_data['sewage_sludge_historical']
-    
+
+
     # 2002-2024 
     data_sources = 'SSB tab 05279'
     for col_idx in range(2, len(df_modern.columns)):
@@ -914,7 +951,7 @@ def _add_ag_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
             'flow_name': flow_code,
             'year': year,
             'value': mean_val, 
-            'comment': 'Ekstrapolert snitt (1993-1995) med MC-støy',
+            'comment': 'ok',
             'data_sources': data_sources_ext
         })    
         
@@ -929,7 +966,9 @@ def _add_hs_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
     comment = 'ok'
     
     N_content = float(current_params.waste_N_frac('sludge'))
-    
+
+    # 'sewage_sludge_modern'/'sewage_sludge_historical': see
+    # _add_ag_sewage_sludge_fertilizer_mc above.
     df_modern = preloaded_data['sewage_sludge_modern']
     df_hist = preloaded_data['sewage_sludge_historical']
     noise_modern = dataset_noise[dataset_key]
@@ -1004,7 +1043,7 @@ def _add_hs_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
             'flow_name': flow_code,
             'year': year,
             'value': mean_val, 
-            'comment': 'Ekstrapolert snitt (1993-1995) med MC-støy',
+            'comment': 'ok',
             'data_sources': data_sources_ext
         })    
         
@@ -1022,6 +1061,9 @@ def _add_ww_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
     key_n2o = 'UNFCCC_emissions'
     noise_val = dataset_noise[key_n2o]
 
+    # 'n2o_ww_raw' <- N2O_WW.csv (data_loader.py DATA_MAP): N2O emissions from
+    # wastewater treatment, compiled from the UNFCCC CRT (common reporting
+    # tables) for Norway, Table 5
     df_ww_emissions = preloaded_data.get('n2o_ww_raw')
     for index, row in df_ww_emissions.iterrows():
         year_val = row['year']
@@ -1108,10 +1150,12 @@ def _add_sewage_sludge_landfill_mc(results, preloaded_data, current_params, data
     comment = 'ok'
     
     N_content = float(current_params.waste_N_frac('sludge'))
-    
+
+    # 'sewage_sludge_modern'/'sewage_sludge_historical': see
+    # _add_ag_sewage_sludge_fertilizer_mc above.
     df_modern = preloaded_data['sewage_sludge_modern']
     df_hist = preloaded_data['sewage_sludge_historical']
-    
+
     # 1. 2002-2024
     data_sources = 'SSB table 05279'
     noise_05279 = dataset_noise['05279']
@@ -1134,6 +1178,9 @@ def _add_sewage_sludge_landfill_mc(results, preloaded_data, current_params, data
         perturbed_cover = tonnage_cover*noise_05279
         value = (perturbed_cover / 1000) * N_content
         
+        # The 'Slamdeponi' column sometimes holds SSB's '..' (suppressed/not
+        # available) placeholder instead of a number, which pd.isna() doesn't
+        # catch (it's a real string, not NaN) - hence the isinstance check.
         if val_landfill is not None and not isinstance(val_landfill, str) and not pd.isna(val_landfill):
             perturbed_landfill = val_landfill*noise_05279
             value += (perturbed_landfill / 1000) * N_content
@@ -1184,7 +1231,7 @@ def _add_sewage_sludge_landfill_mc(results, preloaded_data, current_params, data
             'flow_name': flow_code,
             'year': year,
             'value': mean_val, 
-            'comment': 'Ekstrapolert snitt (1993-1995) med MC-støy',
+            'comment': 'ok',
             'data_sources': data_sources_ext
         })    
         
@@ -1193,6 +1240,14 @@ def _add_sewage_sludge_landfill_mc(results, preloaded_data, current_params, data
     
     
 def _add_ww_N2_emissions_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    N2 from denitrification during wastewater treatment, from named major
+    Norwegian treatment plants' own reported removal efficiency (falling back
+    to the sector-wide default rate for plants/years without one). Which
+    plants are covered, and whether each uses its own reported value or the
+    long-run mean, changes by year as plants started reporting to
+    norskeutslipp.no/veas.nu at different times - see _plant_spec below.
+    """
     flow_code = 'PR.WW-AT.AT-Emissions-N2'
     collected_years = set()
     comment = 'ok'
@@ -1200,7 +1255,11 @@ def _add_ww_N2_emissions_mc(results, preloaded_data, current_params, dataset_noi
     dataset_key = 'nitrogenrensing_avlop'
     noise_val = dataset_noise[dataset_key]
 
-    removal_default = float(current_params.get("avlop_removal_default_rate")) 
+    removal_default = float(current_params.get("avlop_removal_default_rate"))
+
+    # 'avlop_sewage_cleaning' <- nitrogenrensing_avløp.xlsx (data_loader.py
+    # DATA_MAP): N removal efficiency at named major Norwegian wastewater
+    # treatment plants (VEAS, Bekkelaget, NRVA, etc.)
     N_released_df = preloaded_data.get('avlop_sewage_cleaning')
     df = N_released_df.copy()
     num_cols = [col for col in df.columns if col != 'år']
@@ -1214,194 +1273,129 @@ def _add_ww_N2_emissions_mc(results, preloaded_data, current_params, dataset_noi
             return 0.0
         return float(val)
 
-    mean_Lillehammer = df["Lillehammer"].mean() 
-    
-    mask_veas = (df["år"] >= 2002) & (df["år"] <= 2003)
-    mean_Veas = df.loc[mask_veas, "VEAS"].mean()
-    
-    mean_NordreFollo = df["Nordre Follo"].mean()
-    
-    mask_gard = (df["år"] >= 2002) & (df["år"] <= 2009)
-    mean_Gardermoen = df.loc[mask_gard, "Gardermoen"].mean()
-    
-    mean_NRVA = df["NRVA"].mean()
+    # Long-run means, used as a stand-in for plants/years without an
+    # individually reported figure.
+    plant_means = {
+        "Lillehammer": df["Lillehammer"].mean(),
+        "VEAS": df.loc[(df["år"] >= 2002) & (df["år"] <= 2003), "VEAS"].mean(),
+        "Nordre Follo": df["Nordre Follo"].mean(),
+        "Gardermoen": df.loc[(df["år"] >= 2002) & (df["år"] <= 2009), "Gardermoen"].mean(),
+        "NRVA": df["NRVA"].mean(),
+    }
 
-    # Faktor-funksjon for renseeffekt: r / (1 - r)
     def _factor(r):
+        """Convert a fractional removal rate r to N_removed / N_remaining."""
         return r / (1.0 - r)
+
+    def _contribution(plant, year, mode='actual', rensegrad_col=None):
+        """
+        mode='actual' reads the plant's own column for `year`; mode='mean'
+        uses its long-run mean instead; an integer mode reads year+mode's
+        actual value (Nordre Follo has no reported 2002 figure, so 2002
+        borrows 2003's). rensegrad_col, if given, uses that year's reported
+        removal rate for the plant when one was actually reported that year,
+        falling back to removal_default otherwise.
+        """
+        if mode == 'mean':
+            base_val = plant_means[plant]
+        else:
+            lookup_year = year + mode if isinstance(mode, int) else year
+            base_val = _get_val(plant, lookup_year)
+
+        rate = removal_default
+        if rensegrad_col:
+            reported_rate = _get_val(rensegrad_col, year) * 1000.0  # reverse the kt-scaling applied to all columns above
+            if reported_rate > 0:
+                rate = reported_rate
+
+        return base_val * _factor(rate)
+
+    def _plant_spec(year):
+        """(plant, mode, rensegrad_column) triples covering `year`, or None
+        before any plant reports (pre-1995)."""
+        if year < 1995:
+            return None
+        if year < 1997:  # 1995-1996: Lillehammer only
+            return [("Lillehammer", 'mean', None)]
+        if year < 1998:  # 1997: + VEAS, Nordre Follo
+            return [("Lillehammer", 'mean', None), ("VEAS", 'mean', None), ("Nordre Follo", 'mean', None)]
+        if year < 2002:  # 1998-2001: + Gardermoen
+            return [("Lillehammer", 'mean', None), ("VEAS", 'mean', None),
+                    ("Nordre Follo", 'mean', None), ("Gardermoen", 'mean', None)]
+        if year == 2002:  # Nordre Follo's own 2002 figure is missing; borrow 2003's
+            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', None),
+                    ("Nordre Follo", 1, None), ("Gardermoen", 'actual', None),
+                    ("Bekkelaget", 'actual', 'rensegrad Bekkelaget')]
+        if year == 2003:  # NRVA handled separately below (see comment there)
+            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', None),
+                    ("Nordre Follo", 'actual', None), ("Gardermoen", 'actual', None),
+                    ("Bekkelaget", 'actual', 'rensegrad Bekkelaget')]
+        if year in (2004, 2005):
+            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', None),
+                    ("Nordre Follo", 'mean', None), ("Gardermoen", 'actual', None),
+                    ("Bekkelaget", 'actual', 'rensegrad Bekkelaget'), ("NRVA", 'actual', None)]
+        if year == 2006:
+            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', None),
+                    ("Nordre Follo", 'mean', None), ("Gardermoen", 'actual', None),
+                    ("Bekkelaget", 'actual', 'rensegrad Bekkelaget'), ("NRVA", 'mean', None)]
+        if year in (2007, 2008) or 2009 <= year <= 2011 or 2013 <= year <= 2015:
+            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', None),
+                    ("Nordre Follo", 'actual', None), ("Gardermoen", 'actual', None),
+                    ("Bekkelaget", 'actual', 'rensegrad Bekkelaget'), ("NRVA", 'actual', None)]
+        if year == 2012:  # Nordre Follo has no reported figure this year; use the mean instead
+            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', None),
+                    ("Nordre Follo", 'mean', None), ("Gardermoen", 'actual', None),
+                    ("Bekkelaget", 'actual', 'rensegrad Bekkelaget'), ("NRVA", 'actual', None)]
+        if year == 2016:  # no rensegrad column reported for any plant this year
+            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', None),
+                    ("Nordre Follo", 'actual', None), ("Gardermoen", 'actual', None),
+                    ("Bekkelaget", 'actual', None), ("NRVA", 'actual', None)]
+        if year in (2017, 2018):
+            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', None),
+                    ("Nordre Follo", 'actual', None), ("Gardermoen", 'actual', None),
+                    ("Bekkelaget", 'actual', None), ("NRVA", 'actual', 'rensegrad NRVA')]
+        if year in (2019, 2020) or year in (2022, 2023, 2024):
+            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', None),
+                    ("Nordre Follo", 'actual', None), ("Gardermoen", 'actual', None),
+                    ("Bekkelaget", 'actual', 'rensegrad Bekkelaget'), ("NRVA", 'actual', 'rensegrad NRVA')]
+        if year == 2021:  # no rensegrad column reported for NRVA this year
+            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', None),
+                    ("Nordre Follo", 'actual', None), ("Gardermoen", 'actual', None),
+                    ("Bekkelaget", 'actual', 'rensegrad Bekkelaget'), ("NRVA", 'actual', None)]
+        # 2025 onward: as above, plus Hokksund
+        return [("Lillehammer", 'actual', None), ("VEAS", 'actual', None),
+                ("Nordre Follo", 'actual', None), ("Gardermoen", 'actual', None),
+                ("Bekkelaget", 'actual', 'rensegrad Bekkelaget'), ("NRVA", 'actual', 'rensegrad NRVA'),
+                ("Hokksund", 'actual', None)]
 
     for year in EXPECTED_YEARS:
         collected_years.add(year)
-        
-        if year < 1995:
+        spec = _plant_spec(year)
+
+        if spec is None:
             value = 0.0
-            
-        elif year < 1997:  # Kun Lillehammer
-            value = mean_Lillehammer * _factor(removal_default)
-            
-        elif year < 1998:  # + VEAS og Nordre Follo
-            value = (mean_Lillehammer + mean_Veas + mean_NordreFollo) * _factor(removal_default)
-            
-        elif year < 2002:  # + Gardermoen
-            value = (mean_Lillehammer + mean_Veas + mean_NordreFollo + mean_Gardermoen) * _factor(removal_default)
-            
-        elif year == 2002:
-            value = _get_val("Lillehammer", year) * _factor(removal_default)
-            value += _get_val("VEAS", year) * _factor(removal_default)
-            value += _get_val("Nordre Follo", year + 1) * _factor(removal_default)  # Ekstrapolert fra neste år
-            value += _get_val("Gardermoen", year) * _factor(removal_default)
-            
-            rem_bekk = _get_val("rensegrad Bekkelaget", year) * 1000.0  # Reverser ktN-deling for rensegrad-prosent
-            value += _get_val("Bekkelaget", year) * _factor(rem_bekk if rem_bekk > 0 else removal_default)
-            
-        elif year == 2003:  # + NRVA
-            value = _get_val("Lillehammer", year) * _factor(removal_default)
-            value += _get_val("VEAS", year) * _factor(removal_default)
-            value += _get_val("Nordre Follo", year) * _factor(removal_default)
-            value += _get_val("Gardermoen", year) * _factor(removal_default)
-            
-            rem_bekk = _get_val("rensegrad Bekkelaget", year) * 1000.0
-            value += _get_val("Bekkelaget", year) * _factor(rem_bekk if rem_bekk > 0 else removal_default)
-            value += mean_NRVA * removal_default  # Beholder din originale formel for akkurat dette leddet
-            
-        elif year in [2004, 2005]:
-            value = _get_val("Lillehammer", year) * _factor(removal_default)
-            value += _get_val("VEAS", year) * _factor(removal_default)
-            value += mean_NordreFollo * _factor(removal_default)
-            value += _get_val("Gardermoen", year) * _factor(removal_default)
-            
-            rem_bekk = _get_val("rensegrad Bekkelaget", year) * 1000.0
-            value += _get_val("Bekkelaget", year) * _factor(rem_bekk if rem_bekk > 0 else removal_default)
-            value += _get_val("NRVA", year) * _factor(removal_default)
-            
-        elif year == 2006:
-            value = _get_val("Lillehammer", year) * _factor(removal_default)
-            value += _get_val("VEAS", year) * _factor(removal_default)
-            value += mean_NordreFollo * _factor(removal_default)
-            value += _get_val("Gardermoen", year) * _factor(removal_default)
-            
-            rem_bekk = _get_val("rensegrad Bekkelaget", year) * 1000.0
-            value += _get_val("Bekkelaget", year) * _factor(rem_bekk if rem_bekk > 0 else removal_default)
-            value += mean_NRVA * _factor(removal_default)
-            
-        elif year in [2007, 2008]:
-            value = _get_val("Lillehammer", year) * _factor(removal_default)
-            value += _get_val("VEAS", year) * _factor(removal_default)
-            value += _get_val("Nordre Follo", year) * _factor(removal_default)
-            value += _get_val("Gardermoen", year) * _factor(removal_default)
-            
-            rem_bekk = _get_val("rensegrad Bekkelaget", year) * 1000.0
-            value += _get_val("Bekkelaget", year) * _factor(rem_bekk if rem_bekk > 0 else removal_default)
-            value += _get_val("NRVA", year) * _factor(removal_default)
-            
-        elif year in range(2009, 2012):
-            value = _get_val("Lillehammer", year) * _factor(removal_default)
-            value += _get_val("VEAS", year) * _factor(removal_default)
-            value += _get_val("Nordre Follo", year) * _factor(removal_default)
-            value += _get_val("Gardermoen", year) * _factor(removal_default)
-            
-            rem_bekk = _get_val("rensegrad Bekkelaget", year) * 1000.0
-            value += _get_val("Bekkelaget", year) * _factor(rem_bekk if rem_bekk > 0 else removal_default)
-            value += _get_val("NRVA", year) * _factor(removal_default)
-            
-        elif year == 2012:
-            value = _get_val("Lillehammer", year) * _factor(removal_default)
-            value += _get_val("VEAS", year) * _factor(removal_default)
-            value += mean_NordreFollo * _factor(removal_default)
-            value += _get_val("Gardermoen", year) * _factor(removal_default)
-            
-            rem_bekk = _get_val("rensegrad Bekkelaget", year) * 1000.0
-            value += _get_val("Bekkelaget", year) * _factor(rem_bekk if rem_bekk > 0 else removal_default)
-            value += _get_val("NRVA", year) * _factor(removal_default)
-            
-        elif year in range(2013, 2016):
-            value = _get_val("Lillehammer", year) * _factor(removal_default)
-            value += _get_val("VEAS", year) * _factor(removal_default)
-            value += _get_val("Nordre Follo", year) * _factor(removal_default)
-            value += _get_val("Gardermoen", year) * _factor(removal_default)
-            
-            rem_bekk = _get_val("rensegrad Bekkelaget", year) * 1000.0
-            value += _get_val("Bekkelaget", year) * _factor(rem_bekk if rem_bekk > 0 else removal_default)
-            value += _get_val("NRVA", year) * _factor(removal_default)
-            
-        elif year == 2016:
-            value = _get_val("Lillehammer", year) * _factor(removal_default)
-            value += _get_val("VEAS", year) * _factor(removal_default)
-            value += _get_val("Nordre Follo", year) * _factor(removal_default)
-            value += _get_val("Gardermoen", year) * _factor(removal_default)
-            value += _get_val("Bekkelaget", year) * _factor(removal_default)
-            value += _get_val("NRVA", year) * _factor(removal_default)
-            
-        elif year in [2017, 2018]:
-            value = _get_val("Lillehammer", year) * _factor(removal_default)
-            value += _get_val("VEAS", year) * _factor(removal_default)
-            value += _get_val("Nordre Follo", year) * _factor(removal_default)
-            value += _get_val("Gardermoen", year) * _factor(removal_default)
-            value += _get_val("Bekkelaget", year) * _factor(removal_default)
-            
-            rem_nrva = _get_val("rensegrad NRVA", year) * 1000.0
-            value += _get_val("NRVA", year) * _factor(rem_nrva if rem_nrva > 0 else removal_default)
-            
-        elif year in [2019, 2020]:
-            value = _get_val("Lillehammer", year) * _factor(removal_default)
-            value += _get_val("VEAS", year) * _factor(removal_default)
-            value += _get_val("Nordre Follo", year) * _factor(removal_default)
-            value += _get_val("Gardermoen", year) * _factor(removal_default)
-            
-            rem_bekk = _get_val("rensegrad Bekkelaget", year) * 1000.0
-            value += _get_val("Bekkelaget", year) * _factor(rem_bekk if rem_bekk > 0 else removal_default)
-            
-            rem_nrva = _get_val("rensegrad NRVA", year) * 1000.0
-            value += _get_val("NRVA", year) * _factor(rem_nrva if rem_nrva > 0 else removal_default)
-            
-        elif year == 2021:
-            value = _get_val("Lillehammer", year) * _factor(removal_default)
-            value += _get_val("VEAS", year) * _factor(removal_default)
-            value += _get_val("Nordre Follo", year) * _factor(removal_default)
-            value += _get_val("Gardermoen", year) * _factor(removal_default)
-            
-            rem_bekk = _get_val("rensegrad Bekkelaget", year) * 1000.0
-            value += _get_val("Bekkelaget", year) * _factor(rem_bekk if rem_bekk > 0 else removal_default)
-            value += _get_val("NRVA", year) * _factor(removal_default)
-            
-        elif year < 2025:
-            value = _get_val("Lillehammer", year) * _factor(removal_default)
-            value += _get_val("VEAS", year) * _factor(removal_default)
-            value += _get_val("Nordre Follo", year) * _factor(removal_default)
-            value += _get_val("Gardermoen", year) * _factor(removal_default)
-            
-            rem_bekk = _get_val("rensegrad Bekkelaget", year) * 1000.0
-            value += _get_val("Bekkelaget", year) * _factor(rem_bekk if rem_bekk > 0 else removal_default)
-            
-            rem_nrva = _get_val("rensegrad NRVA", year) * 1000.0
-            value += _get_val("NRVA", year) * _factor(rem_nrva if rem_nrva > 0 else removal_default)
-            
-        else:  # 2025 og fremover (inkluderer Hokksund)
-            value = _get_val("Lillehammer", year) * _factor(removal_default)
-            value += _get_val("VEAS", year) * _factor(removal_default)
-            value += _get_val("Nordre Follo", year) * _factor(removal_default)
-            value += _get_val("Gardermoen", year) * _factor(removal_default)
-            
-            rem_bekk = _get_val("rensegrad Bekkelaget", year) * 1000.0
-            value += _get_val("Bekkelaget", year) * _factor(rem_bekk if rem_bekk > 0 else removal_default)
-            
-            rem_nrva = _get_val("rensegrad NRVA", year) * 1000.0
-            value += _get_val("NRVA", year) * _factor(rem_nrva if rem_nrva > 0 else removal_default)
-            value += _get_val("Hokksund", year) * _factor(removal_default)
+        else:
+            value = sum(_contribution(plant, year, mode, rensegrad_col) for plant, mode, rensegrad_col in spec)
+            if year == 2003:
+                # NRVA's first reporting year: uses the sector-wide mean
+                # multiplied directly by removal_default, not run through
+                # _factor() like every other plant/year here.
+                value += plant_means["NRVA"] * removal_default
 
         value *= noise_val
 
         results.append({
             'flow_name': flow_code,
             'year': year,
-            'value': float(value),  
+            'value': float(value),
             'comment': comment,
             'data_sources': data_sources
         })
 
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
-    
+
+
     
 def _add_treated_ww_discharge_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'PR.WW-HY.CW-Treated wastewater discharge-Nmix'
@@ -1409,10 +1403,15 @@ def _add_treated_ww_discharge_mc(results, preloaded_data, current_params, datase
     collected_years = set()
     comment = 'ok'
     
+    # 'hy_ssb_05280_raw' <- 05280_20251113-113329.xlsx (data_loader.py
+    # DATA_MAP, 'openpyxl_sewage' method): SSB table 05280, total emissions of
+    # phosphorus and nitrogen from the wastewater sector
     df_modern = preloaded_data['hy_ssb_05280_raw']
+    # 'avlop_utslipp_historical' <- utslipp_avløp.xlsx (data_loader.py
+    # DATA_MAP): historical wastewater treatment plant emissions time series
     df_hist = preloaded_data['avlop_utslipp_historical']
-    
-    # 1. Nyere data: 2002 til 2024 
+
+    # 1. Newer data: 2002 to 2024
     noise_val = dataset_noise[dataset_key]
     data_sources = 'SSB table 05280'
     max_col = min(26, df_modern.shape[1])
@@ -1439,7 +1438,7 @@ def _add_treated_ww_discharge_mc(results, preloaded_data, current_params, datase
             'data_sources': data_sources
         })
         
-    # 2. Historiske data: 1997 til 2001 
+    # 2. Historical data: 1997 to 2001
     noise_val = dataset_noise['utslipp_avløp']
     value_1997 = None
     for r in range(1, 6):
@@ -1468,7 +1467,7 @@ def _add_treated_ww_discharge_mc(results, preloaded_data, current_params, datase
         if year == 1997:
             value_1997 = perturbed_tonnage
 
-    # 3. Ekstrapolering bakover: 1990 til 1996 (Konstant basert på perturbert 1997-verdi)
+    # 3. Extrapolate backward: 1990 to 1996 (constant, based on the perturbed 1997 value)
     data_sources_ext = 'extrapolated'
     for year in range(1990, 1997):  
         collected_years.add(year)
@@ -1476,7 +1475,7 @@ def _add_treated_ww_discharge_mc(results, preloaded_data, current_params, datase
             'flow_name': flow_code,
             'year': year,
             'value': value_1997, 
-            'comment': 'Ekstrapolert verdi basert på 1997 med MC-støy',
+            'comment': 'ok',
             'data_sources': data_sources_ext
         })    
         

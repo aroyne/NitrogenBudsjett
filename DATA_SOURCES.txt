@@ -6,9 +6,17 @@ data_files/ is excluded from this git repository (see .gitignore), since most so
 SSB table 03710: Husdyr (livestock), by animal type, year and statistical variable
 only the number of sheep (vinterfôra sauer) is used
 
+05279_20260121-103739.xlsx
+SSB table 05279: Avløpsslam (sewage sludge), by statistical variable, disposal method and year
+downloaded 21.01.2026
+
 05280_20251113-113329.xlsx
 SSB table 05280: total emissions of phosphorus and nitrogen from the wastewater sector, by statistical variable, region, emission type and year
 downloaded 13.11.2025
+
+05281_20260121-140338.xlsx
+SSB table 05281: Avfallsregnskap for Norge (waste accounts for Norway, 1000 tonnes), by statistical variable, treatment method, material type and year
+downloaded 21.01.2026
 
 05282_20260211-091021.xlsx
 SSB table 05282: Avfallsregnskap for Norge (waste accounts for Norway, 1000 tonnes), by material type, statistical variable, year and source (1995-2011)
@@ -49,6 +57,10 @@ downloaded 20.11.2025
 10249_20260129-155747.xlsx
 SSB table 10249: food/drink amounts consumed per person per year (kg/liter), by item group, year and statistical variable (1999-2012, with 2010-2011 missing from the source)
 downloaded 29.01.2026
+
+10513_20260212-104227.xlsx
+SSB table 10513: waste accounts for Norway (1000 tonnes), by material type, statistical variable, year and treatment method (2012-2023)
+downloaded 12.02.2026
 
 10514_20260211-094101.xlsx
 SSB table 10514: Avfallsregnskap for Norge (waste accounts for Norway, 1000 tonnes), by source, material type, statistical variable and year; includes all categories
@@ -153,6 +165,14 @@ data taken from CRT (common reporting tables) for Norway under UNFCCC, https://u
 N2O_NOx_OP.csv
 Compilation of N2O and NOx from other producing industry (OP)
 data taken from CRT (common reporting tables) for Norway under UNFCCC, https://unfccc.int/documents/644485, Table 2
+
+N2O_SO.csv
+Compilation of N2O emissions from solid waste (SO)
+data taken from CRT (common reporting tables) for Norway under UNFCCC, https://unfccc.int/documents/644485, Table 4
+
+N2O_WW.csv
+Compilation of N2O emissions from wastewater treatment (WW)
+data taken from CRT (common reporting tables) for Norway under UNFCCC, https://unfccc.int/documents/644485, Table 5
 
 N_fuel_for_heating.csv
 Compilation of N flows from fuel used for heating
