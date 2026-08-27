@@ -6,13 +6,37 @@ data_files/ is excluded from this git repository (see .gitignore), since most so
 SSB table 03710: Husdyr (livestock), by animal type, year and statistical variable
 only the number of sheep (vinterfôra sauer) is used
 
+05280_20251113-113329.xlsx
+SSB table 05280: total emissions of phosphorus and nitrogen from the wastewater sector, by statistical variable, region, emission type and year
+downloaded 13.11.2025
+
+05282_20260211-091021.xlsx
+SSB table 05282: Avfallsregnskap for Norge (waste accounts for Norway, 1000 tonnes), by material type, statistical variable, year and source (1995-2011)
+downloaded 11.02.2026
+
+05307_20251119-152214.xlsx
+SSB table 05307: Dagligrøykere og av-og-til-røykere (daily and occasional smokers, age 16-79), by gender, age, year and statistical variable
+downloaded 19.11.2025
+
 05772_20251210-142618.xlsx
 SSB table 05772: Avling i jordbruket (agricultural yield, 1000 tonnes), by statistical variable and year
 data for 2000-2020
 
+06913_20251113-124117.xlsx
+SSB table 06913: Befolkning og endringer (population and changes), by year and statistical variable
+downloaded 13.11.2025
+
+07459_20251119-151434.xlsx
+SSB table 07459: Befolkning (population), by gender, age, year and statistical variable
+downloaded 19.11.2025
+
 09702_20251120-133716.xlsx
 SSB table 09702: Energibalansen (energy balance), firewood consumption in residences and holiday homes, by year and statistical variable
 downloaded 20.11.2025
+
+10514_20260211-094101.xlsx
+SSB table 10514: Avfallsregnskap for Norge (waste accounts for Norway, 1000 tonnes), by source, material type, statistical variable and year; includes all categories
+downloaded 11.02.2026
 
 11561_20251113-154607.xlsx
 SSB table 11561: Energibalansen (energy balance). Supply and consumption by energy balance item, energy product, year and statistical variable
@@ -26,6 +50,10 @@ downloaded 26.05.2026
 SSB table 13648: Avling i jordbruket (agricultural yield, 1000 tonnes, and yield per decare), by crop, statistical variable and year
 downloaded 17.11.2025
 
+A.06.002_20251111-140559.xlsx
+Fiskeridirektoratet table A.06.002 Akvakultur (aquaculture). Matfisk (food fish): sales of salmon, rainbow trout and trout, by county, species, year and statistical variable
+downloaded 11.11.2025
+
 aei_pr_gnb__custom_18744910_spreadsheet.xlsx
 Eurostat Gross nutrient balance
 downloaded 04.11.2025
@@ -33,6 +61,11 @@ downloaded 04.11.2025
 akvakultur_1984_1994.xlsx
 Historical aquaculture production compilation, 1984-1994 (tonnes), used to extend the modern Fiskeridirektoratet series backward
 values read from Figure 1.1 in Grefsrud, S. (2025). Risikorapport for norsk fiskeoppdrett 2025. Havforskningsinstituttet.
+
+art.xlsx
+Fiskeridirektoratet catch statistics by species ("Fangst fordelt på art"), official statistics
+https://www.fiskeridir.no/statistikk-tall-og-analyse/data-og-statistikk-om-yrkesfiske/fangst/fangst-fordelt-pa-art-offisiell-statistikk
+downloaded 11.11.2025
 
 atm_in_out.xlsx
 Compilation of source-receptor data for Norway

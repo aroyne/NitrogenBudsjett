@@ -21,7 +21,18 @@ from calculations.shared_flow_calculations import (
     find_non_edible_animal_products
     )
 
-MP_OP_CRLTAP_SECTORS = ['2A', '2B', '2C', '2D', '2G', '2H']
+# CRLTAP category 2 (Industrial Processes and Product Use) subsectors used by
+# MP.OP: 2A Mineral Industry, 2B Chemical Industry, 2C Metal Industry,
+# 2D Non-Energy Products from Fuels and Solvent Use, 2G Other Product
+# Manufacture and Use, 2H Other. The CRLTAP inventory only reports these at
+# their sub-code level (e.g. 2A1, 2D3a) except 2G, which has no sub-codes.
+MP_OP_CRLTAP_SECTORS = [
+    '2A1', '2A2', '2A3', '2A5a', '2A5b', '2A5c', '2A6',
+    '2B1', '2B10a', '2B10b', '2B2', '2B3', '2B5', '2B6', '2B7',
+    '2C1', '2C2', '2C3', '2C4', '2C5', '2C6', '2C7a', '2C7b', '2C7c', '2C7d',
+    '2D3a', '2D3b', '2D3c', '2D3d', '2D3e', '2D3f', '2D3g', '2D3h', '2D3i',
+    '2G', '2H1', '2H2', '2H3',
+]
 
 
 def protein_per_group(current_params, mapping_sheet, group_index):
@@ -1078,28 +1089,16 @@ def _add_other_goods_export_mc(results, preloaded_data, current_params, current_
         current_trade_factors=current_trade_factors, 
         flow_code='MP.OP-RW.RW-Other goods export-Nmix',
         target_types=[
-            'organisk materiale', 'blomster', 'frø', 'kjemikalier', 'såpe', 
-            'industrielt protein', 'plastprodukter', 'gummi', 'skinn', 'lærprodukter', 
-            'tre', 'silke', 'ull', 'bomull', 'nylon', 'tekstil', 'møbler', 
-            'plast', 'leker'
+            'organisk materiale', 'blomster', 'frø', 'kjemikalier', 'såpe',
+            'industrielt protein', 'plastprodukter', 'gummi', 'skinn', 'lærprodukter',
+            'tre', 'silke', 'ull', 'bomull', 'nylon', 'tekstil', 'møbler',
+            'plast', 'leker', 'NH3'
         ],
-        is_import=False, 
+        is_import=False,
         dataset_noise=dataset_noise
     )
-    
-def _add_ammonia_export_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise):
-    process_generic_trade_flow(
-        results=results, 
-        preloaded_data=preloaded_data, 
-        current_params=current_params,
-        current_trade_factors=current_trade_factors, 
-        flow_code='MP.OP-RW.RW-Ammonia export-NH3',
-        target_types=['NH3'],
-        is_import=False, 
-        dataset_noise=dataset_noise
-    )
-    
-    
+
+
 def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise):
     flow_code = 'MP.OP-HS.HS-Consumer goods-Nmix'
     collected_years = set()
@@ -1223,19 +1222,16 @@ def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trad
         'MP.OP-EF.IC-Industrial waste fuels-Nmix'
     ]
 
-    # Verifiser og legg til alle 5
+    # Each of these must already be in `results` - i.e. its _add_*_mc function
+    # must run before this one in execute_calculations_mp - or the lookup
+    # below raises KeyError naturally.
     for out_code in required_outflows:
-        if out_code not in existing_outflows:
-            raise ValueError(
-                f"[KRITISK FEIL] Utstrømmen '{out_code}' ble ikke funnet i 'results'. "
-                f"Denne må beregnes og legges til FØR _add_consumer_goods_mc kjøres."
-            )
         for year, val in existing_outflows[out_code].items():
             add_flow(year, val, outflow_totals, outflow_count)
 
 
     # =========================================================================
-    # --- NET CONSUMER GOODS PER YEAR (MED FEILSØKINGSPRINT) ------------------
+    # --- NET CONSUMER GOODS PER YEAR -----------------------------------------
     # =========================================================================
     
     for year in sorted(list(target_years)):
@@ -1249,15 +1245,18 @@ def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trad
 
         if n_in == N_IN and n_out == N_OUT:
             value = in_val - out_val
-            if value < 0:
-                print(f"  [MERK] Negativ balanse i {year}: {value:.4f} kt N (Blir klippet til 0.0)")
             comment = 'ok'
             data_sources = 'Massebalanse (Inflows - Outflows)'
         else:
             value = 0.0
             comment = f'not done'
-            data_sources = 'Missing items in mass balance: found {n_in}/{N_IN} inputs and {n_out}/{N_OUT} outputs'
+            data_sources = f'Missing items in mass balance: found {n_in}/{N_IN} inputs and {n_out}/{N_OUT} outputs'
 
+        # value is a residual of 6 independently-sourced inflows minus 5
+        # independently-sourced outflows, so - unlike most clamps in this
+        # codebase - it isn't provably non-negative by construction. Floored
+        # at 0.0 as an intentional domain floor (a negative N flow has no
+        # physical meaning), not proven dead code.
         results.append({
             'flow_name': flow_code,
             'year': year,

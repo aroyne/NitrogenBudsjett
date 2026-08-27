@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+Human settlements (HS) pool: household waste, municipal wastewater N load,
+NH3 emissions from human metabolism and smoking, N2O emissions from HS/FS
+land-use change, and urban overland flow to surface water.
+"""
 import pandas as pd
 
 from calculations.utils import (
@@ -47,27 +52,30 @@ def _add_municipal_wastewater_mc(results, preloaded_data, current_params, datase
     
     val_param = current_params.get("per_capita_WW_N_load_kg")
     N_amount = float(val_param)
+    # 'hs_pop_size_06913' <- 06913_20251113-124117.xlsx (data_loader.py DATA_MAP):
+    # SSB table 06913, population and changes, by year and statistical variable
     df_pop = preloaded_data.get('hs_pop_size_06913')
 
+    # Row index = year - 1948 in this sheet, so rows 36-77 are exactly the years
+    # 1984 (start_year) through 2025 (end_year); years outside EXPECTED_YEARS are
+    # filtered out below regardless.
     for row_idx in range(36, 78):
-        if row_idx >= len(df_pop): 
+        if row_idx >= len(df_pop):
             break
         row_data = df_pop.iloc[row_idx]
-        
+
         year_val = row_data.iloc[0]
         pop_val = row_data.iloc[1]
-        
+
         if pd.notna(year_val) and pd.notna(pop_val):
             year = int(year_val)
             if year not in EXPECTED_YEARS:
                 continue
             collected_years.add(year)
-            
+
             perturbed_pop = float(pop_val)*noise_val
             value = perturbed_pop * N_amount * 1e-6
-            if value < 0: 
-                value = 0.0
-            
+
             results.append({
                 'flow_name': flow_code, 'year': year, 'value': value,
                 'comment': 'ok', 'data_sources': 'SSB table 06913'
@@ -87,7 +95,13 @@ def _add_nh3_human_emissions_mc(results, preloaded_data, current_params, dataset
     cig_daily = float(current_params.get("daily_smoker_cigs_per_year"))
     cig_occ = float(current_params.get("occasional_smoker_cigs_per_year"))
 
+    # 'hs_pop_age_groups_07459' <- 07459_20251119-151434.xlsx (data_loader.py
+    # DATA_MAP): SSB table 07459, population by gender, age, year and
+    # statistical variable
     data = preloaded_data.get('hs_pop_age_groups_07459')
+    # 'hs_smoking_stats_05307' <- 05307_20251119-152214.xlsx (data_loader.py
+    # DATA_MAP): SSB table 05307, daily and occasional smokers (age 16-79) by
+    # gender, age, year and statistical variable
     smoking = preloaded_data.get('hs_smoking_stats_05307')
 
     df_pop = data.copy()
@@ -138,10 +152,15 @@ def _add_luc_N2O_emissions_mc(results, preloaded_data, current_params, dataset_n
     dataset_key = 'UNFCCC_emissions'
     noise_val = dataset_noise[dataset_key]
     conv = float(current_params.get("N2O_to_N_factor"))
+    # 'hs_unfccc_n2o_raw' <- N2O_NOx_HS_FS.xlsx (data_loader.py DATA_MAP): N2O
+    # and NOx emissions from HS and FS land-use change, compiled from the
+    # UNFCCC CRT (common reporting tables) for Norway, Table 4
     df_n2o = preloaded_data.get('hs_unfccc_n2o_raw')
 
-    for row_idx in range(5, 38):
-        if row_idx >= len(df_n2o): 
+    # Rows 5-38 hold years 2023 down to 1990 (one row per year, descending);
+    # row 38 (1990) is the earliest year in the sheet and must be included.
+    for row_idx in range(5, 39):
+        if row_idx >= len(df_n2o):
             break
         row_data = df_n2o.iloc[row_idx]
         
@@ -167,59 +186,67 @@ def _add_overland_flow_urban_mc(results, preloaded_data, current_params, dataset
     ret = float(current_params.get("HS_urban_retention_fraction"))
     noise_data = dataset_noise[dataset_key]
     noise_interp = dataset_noise['trend interpolation']
-    
-    # 1. Hent historisk data og TEOTIL3
+
+    # 'hy_kyst_tilforsel' <- Tilførsel av nitrogen til kystområdene fordelt på
+    # kilder.xlsx (data_loader.py DATA_MAP): Miljødirektoratet N loading to
+    # Norwegian coastal areas by source, 1990-2023
     df_kyst = preloaded_data.get('hy_kyst_tilforsel')
+    # 'hy_teotil3_by_source' <- teotil3_n_summary.xlsx (data_loader.py
+    # DATA_MAP): relevant N flows extracted from the TEOTIL model, 2013 onward
     df_t3 = preloaded_data.get('hy_teotil3_by_source')
 
-    # 2. Historisk periode
+    # Historical period (Miljødirektoratet), 1990-2023.
     if df_kyst is not None:
         for idx, row in df_kyst.iterrows():
             val_at_col0 = str(row.iloc[0]).strip()
-            
-            # Hopp over rene tekst-headere hvis filen har blitt feillest
+
+            # Skip text header rows if the sheet layout shifts on reload.
             if val_at_col0.lower() in ['year', 'år', 'årstall', 'nan', '']:
                 continue
-                
+
             year = int(float(val_at_col0))
-            raw_val = row.iloc[4]
-            
+            raw_val = row.iloc[4]  # 'Bebygd' (built-up/urban) column
+
             if pd.notna(raw_val) and year in EXPECTED_YEARS:
                 collected_years.add(year)
                 val_p = float(raw_val)*noise_data*noise_interp
                 value = (val_p / 1000.0) * (1.0 - ret)
                 results.append({
-                    'flow_name': flow_code, 'year': year, 'value': max(0.0, value),
+                    'flow_name': flow_code, 'year': year, 'value': value,
                     'comment': 'ok', 'data_sources': 'Miljødirektoratet'
                 })
 
-    # 3. Nyere periode (TEOTIL3) - overskriver eldre data dersom overlapp
+    # Newer period (TEOTIL3), 2013 onward - takes precedence over the
+    # historical source for overlapping years. Both sources are joined by
+    # (flow_name, year) downstream in process_and_export_mc_results, which
+    # can't tell two rows for the same year apart within one simulation, so
+    # any historical row for a year TEOTIL3 also covers must be removed here
+    # rather than left to be summed/averaged alongside it.
     if df_t3 is not None:
         for idx, row in df_t3.iterrows():
             val_at_col0 = str(row.iloc[0]).strip()
-            
-            # Hopp over rene tekst-headere hvis filen har blitt feillest
+
+            # Skip text header rows if the sheet layout shifts on reload.
             if val_at_col0.lower() in ['year', 'år', 'årstall', 'nan', '']:
                 continue
-                
+
             year = int(float(val_at_col0))
-            raw_val = row.iloc[9]  # Kolonne-indeks 9 for verdiene
-            
+            raw_val = row.iloc[9]  # 'urban_totn_tonnes' column
+
             if pd.notna(raw_val):
                 if year not in EXPECTED_YEARS:
                     continue
-                
-                # Slett duplikater fra historisk kilde dersom samme år finnes i TEOTIL3
+
                 if year in collected_years:
                     results[:] = [x for x in results if not (x['flow_name'] == flow_code and x['year'] == year)]
-                
+
                 collected_years.add(year)
                 val_p = float(raw_val)*noise_data
                 value = (val_p / 1000.0) * (1.0 - ret)
-                
+
                 results.append({
-                    'flow_name': flow_code, 'year': year, 'value': max(0.0, value),
+                    'flow_name': flow_code, 'year': year, 'value': value,
                     'comment': 'ok', 'data_sources': 'TEOTIL3'
                 })
-                
+
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)

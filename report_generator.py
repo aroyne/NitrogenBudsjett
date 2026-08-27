@@ -972,14 +972,19 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename, targ
                 exact_flow_code = "HY.SW-AT.AT-Emissions-N2O"
                 display_name = "Surface water N2O emissions"
                 description = ("Uses data on N retention in surface waters supplied by NIVA, produced in the TEOTIL3 model \\citet{sample_teotil3_2024}, "
-                               "and assuming that all N retained in SW is lost to denitrification, with an assumed fraction 1 % as N2O and the rest as N2.")
+                               "and assuming that all N retained in SW is lost to denitrification, with an assumed fraction 1 % as N2O and the rest as N2. "
+                               "For years prior to 2013, the same 7 % retention rate is applied to **HY.SW-HY.CW-Inflow to coastal waters-Nmix** as for "
+                               "the N2 flow, with the N2O fraction taken from the resulting denitrification amount.")
             elif "inflow" in norm:
                 exact_flow_code = "HY.SW-HY.CW-Inflow to coastal waters-Nmix"
                 display_name = "Inflow to coastal waters"
-                description = ("Found from data supplied by NIVA, produced in the TEOTIL3 model \\citet{sample_teotil3_2024}. Before 2013 we have "
-                    "used values from table 7.2 in \\citet{sample_kildefordelte_2025}. These values includes wastewater discharge, so to avoid double "
-                    "counting we subtract the flow *PR.WW-HY.CW-Treated wastewater discharge-Nmix* where we have already assigned all treated "
-                    "wastewater discharge to CW. ")
+                description = ("Found from data supplied by NIVA, produced in the TEOTIL3 model \\citet{sample_teotil3_2024}, from 2013 onward. "
+                    "TEOTIL3's total N-to-coast figure includes both aquaculture and treated wastewater discharge, so to avoid double counting "
+                    "with the dedicated aquaculture and wastewater flows, we subtract TEOTIL3's aquaculture component and the flow "
+                    "*PR.WW-HY.CW-Treated wastewater discharge-Nmix* (which already assigns all treated wastewater discharge to CW). Before 2013, "
+                    "we use values from table 7.2 in \\citet{sample_kildefordelte_2025}, which is already broken down by source category, so only "
+                    "the background, built-up area, industry and agriculture columns are summed - aquaculture and sewage are excluded directly "
+                    "rather than subtracted.")
         elif filename.upper().startswith("HY_CW_"):
             parent_subpool = "Coastal Water (HY.CW)"
             if "wildcatch" in norm:
@@ -987,12 +992,19 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename, targ
                 display_name = "Wild fish catch"
                 description = ("found using data from \\citet{fiskeridirektoratet_fangst_2025} on total wild fish catch. According to "
                     "\\\\citet{schappi_annexes_2025}, p254: N content in fish and shellfish: 2.8% according to UNECE Guidance, Annex 6 Table 12. "
+                    "For 1990-1999, this is extended backward using a historical compilation of pelagic and bottom fish catch from the same "
+                    "source. The flow sums all \"true fish\" catch categories (pelagic, cod-family, other bottom/deep-water fish, skates and "
+                    "sharks) and explicitly excludes shellfish and seaweed, which are reported separately (see below). "
                     "Our results are very close to those of \\citet{hohmann-marriott_nitrogen_2025} (also when looking at shellfish and aquaculture). ")
             elif "shellfish" in norm:
                 exact_flow_code = "HY.CW-MP.FP-Shellfish-Nmix"
                 display_name = "Shellfish"
-                description = ("We use data from \\citet{fiskeridirektoratet_fangst_2025} on total wild fish catch. According to "
-                    "\\\\citet{schappi_annexes_2025}, p254: N content in fish and shellfish: 2.8% according to UNECE Guidance, Annex 6 Table 12. ")
+                description = ("This flow combines shellfish/crustacean catch (2.8% N content, according to \\\\citet{schappi_annexes_2025}, p254, "
+                    "UNECE Guidance Annex 6 Table 12) and wild-harvested macroalgae/seaweed (4% N content, \\\\citet{schappi_annexes_2025}, table 21), "
+                    "both from \\citet{fiskeridirektoratet_fangst_2025}. For 1990-2000, both components are taken from a historical compilation; "
+                    "from 2001 onward we switch to the modern source for shellfish. The modern source has no macroalgae figures before 2011, so "
+                    "for 2001-2010 the seaweed component is linearly interpolated between the last historical figure (2000) and the first modern "
+                    "one (2011).")
         else:
             parent_subpool = "Aquaculture (HY.AC)"
             if "excretia" in norm:
@@ -1008,9 +1020,8 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename, targ
             elif "coastalfish" in norm:
                 exact_flow_code = "HY.AC-MP.FP-Coastal fish and seafood-Nmix"
                 display_name = "Aquaculture production"
-                description = ("Calculated using data from \\citet{fiskeridirektoratet_06002_2025} on sold farmed fish, assuming average "
-                    "protein (N) retention of 35,75 % \\citet{aas_utilization_2022}, 2.8 % nitrogen content in fish and shellfish "
-                    "(\\\\citet{schappi_annexes_2025}, p. 254) and 3% feed waste \\citet{wang_chemical_2013}.")
+                description = ("Calculated using data from \\citet{fiskeridirektoratet_06002_2025} on sold farmed fish (extended back to 1984 "
+                    "using a historical compilation), assuming 2.8 % nitrogen content in fish and shellfish (\\\\citet{schappi_annexes_2025}, p. 254).")
             
                 
         with open(full_flow_path, 'w', encoding='utf-8') as f:
@@ -1063,10 +1074,11 @@ def process_humans_and_settlements_pool(hs_folder, plot_files, plot_dir, bib_fil
             exact_flow_code = "HS.HS-AT.AT-Emissions-NH3"
             display_name = "Ammonia Body Emissions"
             description = (
-                "**HS.HS-AT.AT-Emissions-NH3** are ammonia emissions from the human body. We use population data from SSB "
-                "together with SSB data on smoking (table 05307) and assume that daily smokers smoke 750 cigarettes per year, "
-                "while occasional smokers smoke 100 per year. This data is used with equation 46 in \\\\citet{schappi_annexes_2025}, taken from Sutton (2000), "
-                "which relates ammonia emissions to age and cigarette smoking."
+                "**HS.HS-AT.AT-Emissions-NH3** are ammonia emissions from the human body. We use population data from SSB table 07459, "
+                "broken down by age, together with SSB data on smoking (table 05307), and assume that daily smokers smoke 750 cigarettes per year, "
+                "while occasional smokers smoke 100 per year. Emissions are calculated with equation 46 in \\\\citet{schappi_annexes_2025}, taken from Sutton (2000), "
+                "using separate emission factors for the total population, infants under 1 year, and children aged 1-3, plus an additional factor "
+                "per cigarette smoked."
             )
         elif "luc" in norm and "n2o" in norm:
             exact_flow_code = "HS.HS-AT.AT-LUC emissions-N2O"
@@ -1076,12 +1088,12 @@ def process_humans_and_settlements_pool(hs_folder, plot_files, plot_dir, bib_fil
             exact_flow_code = "HS.HS-HY.SW-Overland flow-Nmix"
             display_name = "Urban Overland Flow"
             description = (
-                "**HS.HS-HY.SW-Overland flow-Nmix** is a flow that has been added to account for runoff from urban areas. "
+                "**HS.HS-HY.SW-Overland flow-Nmix** is a flow that has been added to account for runoff from urban (built-up) areas. "
                 "Some of this may actually end up directly in CW, but we have not been able to separate the two. "
-                "Data are supplied by NIVA, produced in the TEOTIL3 model \\\\citep{sample_teotil3_2024}. For the period 1990-2013, "
-                "we have used TEOTIL data \\\\citep{sample_kildefordelte_2025} for nitrogen from urban areas that reach the coast, and used a "
-                "retention rate of 5% which is consistent (with a 7% standard deviation) with the TEOTIL3 data from NIVA. "
-                "The constant values for 1990-2012 is what is reported by Miljødirektoratet."
+                "For 1990-2012, we use the 'Bebygd' (built-up area) column of the Miljødirektoratet compilation of coastal N loading by source "
+                "\\\\citep{sample_kildefordelte_2025}. From 2013 onward, we switch to the 'urban' component of the TEOTIL3 model outputs from NIVA "
+                "\\\\citep{sample_teotil3_2024}, which supersedes the Miljødirektoratet figures where the two overlap. In both periods, a retention "
+                "fraction is applied to account for N retained before reaching surface water (5% most likely, ranging 0-20%, following TEOTIL3)."
             )
         elif "household" in norm and "waste" in norm:
             exact_flow_code = "HS.HS-PR.SO-Household waste-Nmix"
@@ -1103,7 +1115,7 @@ def process_humans_and_settlements_pool(hs_folder, plot_files, plot_dir, bib_fil
             exact_flow_code = "HS.HS-PR.WW-Municipal wastewater-Nmix"
             display_name = "Municipal Wastewater"
             description = (
-                "**HS.HS-PR.WW-Municipal wastewater-Nmix** are based on population data from SSB and assuming an average value "
+                "**HS.HS-PR.WW-Municipal wastewater-Nmix** are based on population data from SSB table 06913 and assuming an average value "
                 "of 4.56 kg N / person / year for municipal wastewater as advised by \\\\citet{schappi_annexes_2025}. This corresponds to "
                 "12.5 g N / person / day."
             )
