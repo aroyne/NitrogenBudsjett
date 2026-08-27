@@ -1,62 +1,55 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue May  5 10:13:27 2026
-
-@author: anja
+Flow calculations shared across two or more pools (e.g. aquaculture
+production feeds both HY and MP/RW; household/industry waste composition
+feeds both HS and MP/PR), kept here so each pool module doesn't reimplement
+the same source-data parsing.
 """
 import pandas as pd
 import numpy as np
 import openpyxl
 
-from calculations.n_params import NParameters
 from calculations.utils import (
     EXPECTED_YEARS,
-    # find_trade_flow,
-    read_trade_data,
     process_generic_trade_flow
 )
 
-params = NParameters("data_files/N_parameters.xlsx")
-waste_fracs = params.get_table('waste_fractions').set_index('waste_category')
-trade_data = read_trade_data('data_files/Tab_08801_1988_2024.csv')
 
-
-def find_aquaculture_production(df_aqua_modern, df_aqua_old, current_params, dataset_noise=None):
+def find_aquaculture_production(df_aqua_modern, df_aqua_old, current_params, dataset_noise):
+    """
+    Computes N in aquaculture production (salmon/trout) from Fiskeridirektoratet
+    sales data, used across HY, MP and RW for flows built on aquaculture output
+    (e.g. HY.CW-HY.MM-Aquaculture production-Nmix). df_aqua_modern (1994
+    onward, one column per year) and df_aqua_old (1984-1993) are both already
+    cleaned to numeric dtypes at load time in data_loader.py.
+    """
     aquaculture_production = {}
-    
+
     fish_N_frac = float(current_params.get('fish_N_frac'))
     key_fisk = 'Fiskeridirektoratet'
     noise_aqua = dataset_noise[key_fisk]
 
-    # --- DEL 1: Moderne data (fra 1994 og utover) ---
+    # --- Modern data (1994 onward) ---
     for col in df_aqua_modern.columns:
-        try:
-            year = int(col)
-            col_data = pd.to_numeric(df_aqua_modern[col], errors='coerce').fillna(0)
-            value_tonn = col_data.sum()
-            
-            # Formel: (Tonn / 1000 -> kt rundvekt) * N-fraksjon * aktivitetsstøy = kt N
-            val_kt_N = (value_tonn / 1000) * fish_N_frac * noise_aqua
-            
-            aquaculture_production[year] = val_kt_N
-            
-        except ValueError:
-            continue
+        year = int(col)
+        col_data = pd.to_numeric(df_aqua_modern[col], errors='coerce').fillna(0)
+        value_tonn = col_data.sum()
 
-    # --- DEL 2: Gamle data (før 1994) ---
+        # tonnes / 1000 -> kt round weight, times N fraction and activity noise
+        val_kt_N = (value_tonn / 1000) * fish_N_frac * noise_aqua
+
+        aquaculture_production[year] = val_kt_N
+
+    # --- Historical data (1984-1993) ---
     for _, row in df_aqua_old.iterrows():
-        try:
-            year = int(float(row.iloc[0]))
-            value_base = float(row.iloc[1])
-            
-            # Formel: kt rundvekt * N-fraksjon * aktivitetsstøy = kt N
-            val_kt_N = value_base * fish_N_frac * noise_aqua
-            
-            aquaculture_production[year] = val_kt_N
-            
-        except (ValueError, TypeError):
-            continue
+        year = int(row.iloc[0])
+        value_base = float(row.iloc[1])
+
+        # kt round weight * N fraction * activity noise
+        val_kt_N = value_base * fish_N_frac * noise_aqua
+
+        aquaculture_production[year] = val_kt_N
 
     return aquaculture_production
 
@@ -68,7 +61,7 @@ def find_export_for_recycling(results, preloaded_data, current_params, current_t
         current_trade_factors=current_trade_factors, 
         flow_code='PR.SO-RW.RW-Export for recycling-Nmix',
         target_types=['plastavfall', 'papiravfall', 'tekstilavfall'],
-        is_import=False,  # Eksport
+        is_import=False,
         dataset_noise=dataset_noise,
         results=results, 
     )
@@ -83,7 +76,7 @@ def find_export_for_reuse(results, preloaded_data, current_params, current_trade
         current_trade_factors=current_trade_factors, 
         flow_code='PR.SO-RW.RW-Export for reuse-Nmix',
         target_types=['tekstil_brukt'],
-        is_import=False,  # Eksport
+        is_import=False,
         dataset_noise=dataset_noise,
         results=results, 
     )
@@ -91,10 +84,19 @@ def find_export_for_reuse(results, preloaded_data, current_params, current_trade
     return year_values
 
 def find_feedstock_fuel(preloaded_data, current_params, dataset_noise):
+    """
+    Computes N in fossil fuel used as chemical feedstock rather than burned
+    for energy (used for EF.EC-MP.OP-Fuel used as feedstock-Nmix in ef_mc.py,
+    and folded into the consumer-goods mass balance in mp_mc.py). Reads the
+    "11 Netto innenlands forbruk som råstoff" (net domestic consumption as
+    feedstock) section of SSB table 11561, which breaks the feedstock total
+    down by energy product - this row selection deliberately targets only
+    that section, not the table's overall consumption figures.
+    """
     year_values = {}
-    
+
     noise_energy = float(dataset_noise['11561'])
-    
+
     GWh_to_TJ_factor = float(current_params.get('GWh_to_TJ_factor'))
     coal_NCV         = float(current_params.get('coal_feedstock_NCV'))
     oil_NCV          = float(current_params.get('oil_feedstock_NCV'))
@@ -102,28 +104,28 @@ def find_feedstock_fuel(preloaded_data, current_params, dataset_noise):
     oil_N_frac       = float(current_params.get('oil_feedstock_N_frac'))
 
     df_energy = preloaded_data.get('ssb_energy_balance_11561')
-    
-    # --- KULL OG KULLPRODUKTER ---
+
+    # --- Coal and coal products (rows 38-72, 1990-2024) ---
     for row_idx in range(38, 73):
-        if row_idx >= len(df_energy): 
+        if row_idx >= len(df_energy):
             break
         row_data = df_energy.iloc[row_idx]
-        year_val = row_data.iloc[2]   # Kolonne C
-        value_val = row_data.iloc[3]  # Kolonne D
-        
+        year_val = row_data.iloc[2]
+        value_val = row_data.iloc[3]
+
         if pd.notna(year_val) and pd.notna(value_val) and value_val != '-':
             year = int(year_val)
             value = float(value_val) / (GWh_to_TJ_factor * coal_NCV) * coal_N_frac
             year_values[year] = year_values.get(year, 0.0) + (value * noise_energy)
 
-    # --- OLJE OG OLJEPRODUKTER ---
+    # --- Oil and oil products, excl. bio (rows 108-142, 1990-2024) ---
     for row_idx in range(108, 143):
-        if row_idx >= len(df_energy): 
+        if row_idx >= len(df_energy):
             break
         row_data = df_energy.iloc[row_idx]
-        year_val = row_data.iloc[2]   # Kolonne C
-        value_val = row_data.iloc[3]  # Kolonne D
-        
+        year_val = row_data.iloc[2]
+        value_val = row_data.iloc[3]
+
         if pd.notna(year_val) and pd.notna(value_val) and value_val != '-':
             year = int(year_val)
             value = float(value_val) / (GWh_to_TJ_factor * oil_NCV) * oil_N_frac
@@ -132,32 +134,47 @@ def find_feedstock_fuel(preloaded_data, current_params, dataset_noise):
     return year_values
 
 def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
+    """
+    Computes N in food industry waste (used by mp_mc.py for
+    MP.FP-PR.SO-Food industry waste-Nmix) from the "wet organic" waste
+    category (row 14 in 05282 / row 7 in 10514) for the mining, manufacturing
+    and other/unspecified-industry sectors - the same sector selection as
+    find_other_industry_waste, since 'wet organic' is assumed to be entirely
+    food-industry-related.
+
+    Table 05282 (1995-2011) does not report an equivalent 2012 baseline, so
+    the older values are scaled by the ratio of the 2012 value (from 10514)
+    to the function's own 2011 value (from 05282), rather than combined
+    directly - this keeps the two tables' differing category definitions
+    from creating a level jump at the boundary the way the unscaled
+    'mixed waste' transition does elsewhere in this file.
+    """
     year_values = {}
     wet_org_N = float(current_params.get('wet_organic'))
-    
+
     noise_05282 = float(dataset_noise['05282'])
     noise_10514 = float(dataset_noise['10514'])
     noise_trend = float(dataset_noise['trend interpolation'])
-    
+
     value_2012_base = 0.0
 
-    # --- DEL 1: Årene 2012-2023 (Tabell 10514) ---
-    for col in range(2, 115, 10):  
-        p_col = col - 1  # Konverter til Pandas 0-basert kolonneindeks
-        year_val = df_10514.iloc[3, p_col]  # row 4 -> indeks 3
+    # --- PART 1: years 2012-2023 (table 10514) ---
+    for col in range(2, 115, 10):
+        p_col = col - 1  # convert to pandas' 0-based column index
+        year_val = df_10514.iloc[3, p_col]
         if pd.isna(year_val):
             continue
         year = int(float(year_val))
-        
-        # row 7 -> indeks 6
+
+        # Wet organic waste (row 7 -> index 6), Bergverk/Industri/Annen-uspesifisert sectors
         v_base = 0.0
         v_base += float(df_10514.iloc[6, p_col+1]) * wet_org_N
         v_base += float(df_10514.iloc[6, p_col+3]) * wet_org_N
         v_base += float(df_10514.iloc[6, p_col+8]) * wet_org_N
-        
+
         if year == 2012:
             value_2012_base = v_base
-            
+
         year_values[year] = {
             'value': max(0.0, v_base * noise_10514),
             'comment': 'ok',
@@ -167,54 +184,49 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
     if value_2012_base == 0.0:
         raise ValueError("[KRITISK] Fant ikke basisverdi for år 2012 i Tabell 10514. Skalering umulig!")
 
-    # --- DEL 2: Årene 1995-2011 (Tabell 05282) ---
+    # --- PART 2: years 1995-2011 (table 05282), scaled to match 2012's level ---
     p_col_2011 = 162 - 1
     value_2011_base = float(df_05282.iloc[13, p_col_2011+1]) * wet_org_N
     value_2011_base += float(df_05282.iloc[13, p_col_2011+3]) * wet_org_N
     value_2011_base += float(df_05282.iloc[13, p_col_2011+8]) * wet_org_N
 
-    if value_2011_base == 0.0:
-        value_2011_base = 1.0
-
     mean_val_accumulator = 0.0
     mean_year_count = 0
 
-    # I openpyxl: range(2, 170, 10)
-    for col in range(2, 170, 10):  
+    for col in range(2, 170, 10):
         p_col = col - 1
-        year_val = df_05282.iloc[3, p_col]  # row 4 -> indeks 3
+        year_val = df_05282.iloc[3, p_col]
         if pd.isna(year_val):
             continue
         year = int(float(year_val))
-        
-        # row 14 -> indeks 13
+
+        # Wet organic waste (row 14 -> index 13), same three sectors as above
         v_base = 0.0
         v_base += float(df_05282.iloc[13, p_col+1]) * wet_org_N
         v_base += float(df_05282.iloc[13, p_col+3]) * wet_org_N
         v_base += float(df_05282.iloc[13, p_col+8]) * wet_org_N
-        
-        # Skaler verdien bakover i tid
+
         v_scaled = v_base * (value_2012_base / value_2011_base)
-        
+
         if 1995 <= year < 2000:
             mean_val_accumulator += v_scaled
             mean_year_count += 1
-            
+
         year_values[year] = {
             'value': max(0.0, v_scaled * noise_05282),
             'comment': 'ok',
             'data_sources': 'SSB'
         }
 
-    # --- DEL 3: Ekstrapolering for årene 1990-1994 ---
+    # --- PART 3: 1990-1994, extrapolated as the mean of the scaled 1995-1999 values ---
     final_mean = (mean_val_accumulator / mean_year_count) if mean_year_count > 0 else 0.0
     for year in range(1990, 1995):
         year_values[year] = {
             'value': max(0.0, final_mean * noise_05282 * noise_trend),
-            'comment': 'extrapolated (added trend interpolation noise)',
+            'comment': 'ok',
             'data_sources': 'extrapolated'
         }
-        
+
     return year_values
 
 
@@ -237,7 +249,7 @@ def find_household_waste(preloaded_data, current_params, dataset_noise):
     mixed_N   = float(current_params.waste_N_frac('mixed_waste'))
 
     # =========================================================================
-    # TABELL 05281 / 05282 (1995-2011)
+    # TABLE 05281 / 05282 (1995-2011)
     # =========================================================================
     # Sectors summed here: Bygge- og anleggsvirksomhet (construction),
     # Tjenesteytende næringer (services), Private husholdninger (households).
@@ -280,28 +292,28 @@ def find_household_waste(preloaded_data, current_params, dataset_noise):
     for col_idx, year in col_to_year.items():
         val_year = 0.0
         
-        # Papir (Excel rad 7 -> indeks 6)
+        # Paper (row 7 -> index 6)
         for c in [5, 6, 9]:
             if col_idx + c < width_05282: val_year += float(df_05282.iloc[6, col_idx + c]) * paper_N
-        # Plast (Excel rad 9 -> indeks 8)
+        # Plastic (row 9 -> index 8)
         for c in [5, 6, 9]:
             if col_idx + c < width_05282: val_year += float(df_05282.iloc[8, col_idx + c]) * plastic_N
-        # Treavfall (Excel rad 12 -> indeks 11)
+        # Wood waste (row 12 -> index 11)
         for c in [5, 6, 9]:
             if col_idx + c < width_05282: val_year += float(df_05282.iloc[11, col_idx + c]) * wood_N
-        # Tekstiler (Excel rad 13 -> indeks 12)
+        # Textiles (row 13 -> index 12)
         for c in [5, 6, 9]:
             if col_idx + c < width_05282: val_year += float(df_05282.iloc[12, col_idx + c]) * textile_N
-        # Våtorganisk (Excel rad 14 -> indeks 13)
+        # Wet organic (row 14 -> index 13)
         for c in [5, 6, 9]:
             if col_idx + c < width_05282: val_year += float(df_05282.iloc[13, col_idx + c]) * wet_N
-        # Andre (Excel rad 17 -> indeks 16)
+        # Other materials (row 17 -> index 16)
         for c in [5, 6, 9]:
             if col_idx + c < width_05282: val_year += float(df_05282.iloc[16, col_idx + c]) * other_N
-        # Farlig (Excel rad 18 -> indeks 17)
+        # Hazardous waste (row 18 -> index 17)
         for c in [5, 6, 9]:
             if col_idx + c < width_05282: val_year += float(df_05282.iloc[17, col_idx + c]) * haz_N
-        # Forurenset (Excel rad 19 -> indeks 18)
+        # Contaminated masses (row 19 -> index 18)
         for c in [5, 6, 9]:
             if col_idx + c < width_05282: val_year += float(df_05282.iloc[18, col_idx + c]) * contam_N
 
@@ -310,7 +322,7 @@ def find_household_waste(preloaded_data, current_params, dataset_noise):
             value_1995 = household_waste[year]
 
     # =========================================================================
-    # TABELL 10513 / 10514 (2012-2023)
+    # TABLE 10513 / 10514 (2012-2023)
     # =========================================================================
     df_10514 = preloaded_data['ssb_10514']
     width_10514 = df_10514.shape[1]
@@ -350,7 +362,7 @@ def find_household_waste(preloaded_data, current_params, dataset_noise):
         household_waste[year] = val_year * noise_10514
 
     # =========================================================================
-    # EKSTRAPOLERING 1990-1994
+    # EXTRAPOLATION, 1990-1994
     # =========================================================================
     inhabitants_1990 = 4233116
     inhabitants_1995 = 4348410
@@ -372,8 +384,18 @@ def find_household_waste(preloaded_data, current_params, dataset_noise):
 
 def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params, dataset_noise):
     """
-    MC-OPTIMALISERT: Beregner nitrogen i øvrig industriavfall ved hjelp av NumPy.
-    Ingen tause try-excepts. Krasjer hardt ved string/NaN-feil i SSB-tabellene.
+    Computes N in other industry waste (used by mp_mc.py for
+    MP.OP-PR.SO-Other industry waste-Nmix), combining SSB tables 05282
+    (1995-2011) and 10514 (2012-2023) for the mining, manufacturing and
+    other/unspecified-industry sectors, plus a pre-1995 linear extrapolation
+    calibrated against df_hist_waste's 1992/1995 totals.
+
+    Table 10514 introduces a 'Blandet avfall' (mixed waste) category with no
+    equivalent in 05282 (the same table-transition issue documented in
+    find_household_waste above), but here the deliberately lower N-content
+    parameter for 'other_materials' relative to 'mixed_waste' keeps the
+    1995-2011-to-2012-2023 transition continuous for these sectors - unlike
+    household waste, where the same transition is not compensated.
     """
     industry_waste = {}
     
@@ -395,102 +417,114 @@ def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params,
     
     base_value_1995 = 0.0
 
-    # --- DEL 1: ÅRENE 1995-2011 (Tabell 05282) ---
+    # --- PART 1: YEARS 1995-2011 (table 05282) ---
+    # c offsets 2, 3, 8 select the Bergverk (mining), Industri (manufacturing) and
+    # Annen eller uspesifisert næring (other/unspecified industry) sector columns.
     for col in range(1, 169, 10):
         year = int(arr_05282[3, col])
-            
+
         value_base = 0.0
-        # Papir (Rad 7 -> indeks 6)
+        # Paper (row 7 -> index 6)
         for c in [2, 3, 8]: value_base += float(arr_05282[6, col + c]) * paper_N
-        # Plast (Rad 9 -> indeks 8)
+        # Plastic (row 9 -> index 8)
         for c in [2, 3, 8]: value_base += float(arr_05282[8, col + c]) * plastic_N
-        # Treavfall (Rad 12 -> indeks 11)
+        # Wood waste (row 12 -> index 11)
         for c in [2, 3, 8]: value_base += float(arr_05282[11, col + c]) * wood_N
-        # Tekstiler (Rad 13 -> indeks 12)
+        # Textiles (row 13 -> index 12)
         for c in [2, 3, 8]: value_base += float(arr_05282[12, col + c]) * textiles_N
-        # Våtorganisk (Rad 14 -> indeks 13) - Bare fra bergverk (c=2)
+        # Wet organic (row 14 -> index 13) - mining sector only (c=2)
         for c in [2]:       value_base += float(arr_05282[13, col + c]) * wet_org_N
-        # Andre materialer (Rad 17 -> indeks 16)
+        # Other materials (row 17 -> index 16)
         for c in [2, 3, 8]: value_base += float(arr_05282[16, col + c]) * other_mat_N
-        # Farlig avfall (Rad 18 -> indeks 17)
+        # Hazardous waste (row 18 -> index 17)
         for c in [2, 3, 8]: value_base += float(arr_05282[17, col + c]) * hazardous_N
 
         if year == 1995:
             base_value_1995 = value_base
-            
+
         industry_waste[year] = value_base * noise_05282
 
-    # --- DEL 2: ÅRENE 2012-2023 (Tabell 10514) ---
+    # --- PART 2: YEARS 2012-2023 (table 10514) ---
+    # Same c offsets 2, 3, 8 select the same three sectors in this table, even
+    # though it splits power/water supply into two extra columns not used here.
     for col in range(1, 114, 10):
         year = int(arr_10514[3, col])
-            
+
         value_base = 0.0
-        # Våtorganisk (Rad 7 -> indeks 6)
+        # Wet organic (row 7 -> index 6)
         for c in [2]:       value_base += float(arr_10514[6, col + c]) * wet_org_N
-        # Treavfall (Rad 9 -> indeks 8)
+        # Wood waste (row 9 -> index 8)
         for c in [2, 3, 8]: value_base += float(arr_10514[8, col + c]) * wood_N
-        # Papir (Rad 11 -> indeks 10)
+        # Paper (row 11 -> index 10)
         for c in [2, 3, 8]: value_base += float(arr_10514[10, col + c]) * paper_N
-        # Plast (Rad 17 -> indeks 16)
+        # Plastic (row 17 -> index 16)
         for c in [2, 3, 8]: value_base += float(arr_10514[16, col + c]) * plastic_N
-        # Tekstiler (Rad 19 -> indeks 18)
+        # Textiles (row 19 -> index 18)
         for c in [2, 3, 8]: value_base += float(arr_10514[18, col + c]) * textiles_N
-        # Andre materialer (Rad 24 -> indeks 23)
+        # Other materials (row 24 -> index 23)
         for c in [2, 3, 8]: value_base += float(arr_10514[23, col + c]) * other_mat_N
-        # Farlig avfall (Rad 22 -> indeks 21)
+        # Hazardous waste (row 22 -> index 21)
         for c in [2, 3, 8]: value_base += float(arr_10514[21, col + c]) * hazardous_N
-        # Blandet avfall (Rad 23 -> indeks 22)
+        # Mixed waste (row 23 -> index 22)
         for c in [2, 3, 8]: value_base += float(arr_10514[22, col + c]) * mixed_N
 
         industry_waste[year] = value_base * noise_10514
 
-    # --- DEL 3: LINEÆR EKSTRAPOLERING TILBAKE TIL 1990 ---
+    # --- PART 3: LINEAR EXTRAPOLATION BACK TO 1990 ---
     waste_kt_1992 = float(df_hist_waste.iloc[1, 2])
     waste_kt_1995 = float(df_hist_waste.iloc[2, 2])
 
-
-    # Beregner basert på RÅDATA uten støy for å unngå dobbel støy-forvridning
+    # Calibrated on raw (noise-free) 1995 data so noise isn't compounded twice.
     N_frac = base_value_1995 / waste_kt_1995
     base_value_1992 = waste_kt_1992 * N_frac
     change_per_year = (base_value_1995 - base_value_1992) / 3
-    
+
     step = 0
     for year in range(1990, 1995):
         base_value_extrapolated = base_value_1992 + (change_per_year * step)
         step += 1
-        # Påfører støy lineært KUN én gang på slutten
+        # Noise applied once, at the end, not to the raw calibration inputs above.
         industry_waste[year] = base_value_extrapolated * noise_05282 * noise_trend
 
     return industry_waste
 
 
 def find_industrial_crop_products(df_gnb_sheet30, dataset_noise):
+    """
+    Computes N in crop products for industrial use (used by mp_mc.py for
+    AG.SM-MP.OP-Crop products for industrial use-Nmix) from the Eurostat
+    Gross Nutrient Balance sheet's year/value row pair.
+    """
     year_values = {}
-    
+
     key_gnb = 'Gross nutrient balance'
     noise_gnb_val = dataset_noise[key_gnb]
-    
+
     key_interp = 'trend interpolation'
     noise_interp_val = dataset_noise[key_interp]
-    
+
     year_row = df_gnb_sheet30.iloc[8]
     value_row = df_gnb_sheet30.iloc[10]
-    
+
     for col_idx in range(1, len(df_gnb_sheet30.columns)):
         year_val = year_row.iloc[col_idx]
         val_val = value_row.iloc[col_idx]
-        
+
         if pd.notna(year_val) and pd.notna(val_val) and val_val != '-':
+            # Eurostat marks 2017-2019 as missing with ':' rather than leaving
+            # the cell blank, which float() can't parse - those years are the
+            # ones filled in by the interpolation block below.
             try:
                 year = int(year_val)
                 base_value = float(val_val) * 1.0e-3  # kg -> kt
                 value = base_value * noise_gnb_val
-                
+
                 year_values[year] = value
             except ValueError:
                 continue
 
-    # --- 4. Ekstrapolering for hull i tidsserien (2017-2019) ---
+    # Eurostat reports no data at all for 2017-2019; fill the gap with the
+    # mean of all other years.
     if year_values:
         mean_value = float(np.mean(list(year_values.values())))
         
@@ -502,15 +536,23 @@ def find_industrial_crop_products(df_gnb_sheet30, dataset_noise):
     return year_values
 
 def find_industrial_round_wood(preloaded_data, current_params, dataset_noise):
+    """
+    Computes N in industrial round wood (used by fs_mc.py for
+    FS.FO-MP.OP-Industrial round wood-Nmix) from FAOSTAT forestry production
+    volumes, converted to mass via wood density and split into conifer/
+    non-conifer N content.
+    """
     year_values = {}
-    
+
     noise_faostat = dataset_noise['Forestry production and trade']
     wood_density  = float(current_params.get('wood_density'))
     conifer_N     = float(current_params.get('conifer_N_frac'))
     nonconifer_N   = float(current_params.get('nonconifer_N_frac'))
-    
+
+    # 'faostat_forestry' <- FAOSTAT_data_en_2-20-2026.csv (data_loader.py DATA_MAP):
+    # FAOSTAT forestry production and trade.
     data = preloaded_data.get('faostat_forestry')
-    
+
     filtered_data = data[(data['Element'] == 'Production') & (data['Value'] != 0)].copy()
     
     items_conifer = ['Industrial roundwood, coniferous']
@@ -527,77 +569,92 @@ def find_industrial_round_wood(preloaded_data, current_params, dataset_noise):
     final_data.loc[mask_conifer, 'N_kg_per_kg'] = conifer_N
     final_data.loc[mask_nonconifer, 'N_kg_per_kg'] = nonconifer_N
     
-    # Tonn * kg N/tonn / 1e3 -> kt N
+    # tonnes * kg N/tonne / 1e3 -> kt N
     final_data['N_amount'] = final_data['tonnes'] * final_data['N_kg_per_kg'] / 1e3
-    
+
     total_N_per_year = final_data.groupby('Year')['N_amount'].sum().to_dict()
-    
-    # 4. Fyll year_values og legg på kildestøyen (noise_faostat)
+
     for year in EXPECTED_YEARS:
         value = total_N_per_year.get(year, 0.0)
         if value > 0:
-            # Ganger med kildestøyen (Forestry proc) som har blitt generert for denne iterasjonen
             year_values[year] = value * noise_faostat
-            
+
     return year_values
 
 def find_industrial_waste_fuels(df_bio_08205, df_bio_hist, current_params, dataset_noise):
+    """
+    Computes N in industrial waste fuels (used by mp_mc.py for
+    MP.OP-EF.IC-Industrial waste fuels-Nmix) from SSB table 08205 bioenergy
+    volumes (2003-2024) plus an older historical series (1998-2002), with
+    1990-1997 extrapolated from the average of all pre-2008 years.
+    """
     year_values = {}
-    
+
     noise_08205 = float(dataset_noise['08205'])
     noise_trend = float(dataset_noise['trend interpolation'])
 
     NCV              = float(current_params.get('firewood_NCV'))
     N_content        = float(current_params.get('firewood_N_frac'))
-    GWh_to_TJ_factor = float(current_params.get('GWh_to_TJ_factor'))    
-    
+    GWh_to_TJ_factor = float(current_params.get('GWh_to_TJ_factor'))
+
     arr_08205 = df_bio_08205.values
     arr_hist = df_bio_hist.values
-    
+
     raw_sum_pre_2008 = 0.0
-    
-    # --- DEL 1: SSB Tabell 08205 (Nyere data) ---
-    
+
+    # --- PART 1: SSB table 08205 (2003-2024) ---
     for col in range(3, 25):
         year_val = arr_08205[2, col]
         value_val = arr_08205[9, col]
-            
+
         year = int(year_val)
-        # Konvertering: GWh til TJ, del på NCV til kt brensel, gang med N_content til ktN
+        # GWh -> TJ, divide by NCV for kt of fuel, multiply by N_content for kt N
         value_raw = float(value_val) / GWh_to_TJ_factor / NCV * N_content
-            
+
         year_values[year] = value_raw * noise_08205
-                # Akkumuler RÅ verdi til gjennomsnittet hvis året er før 2008
         if year < 2008:
             raw_sum_pre_2008 += value_raw
 
-    # --- DEL 2: Historiske data 1998-2002 (df_bio_hist) ---
+    # --- PART 2: historical series, 1998-2002 (df_bio_hist) ---
+    # df_bio_hist predates table 08205 and has no uncertainty entry of its own;
+    # it is reused here since both are SSB bioenergy accounting series.
     for r in range(1, 6):
         year_val = arr_hist[r, 0]
         val_col2 = arr_hist[r, 1]
         val_col3 = arr_hist[r, 2]
-            
+
         year = int(year_val)
         value_raw = (float(val_col2) + float(val_col3)) / GWh_to_TJ_factor / NCV * N_content
-            
+
         year_values[year] = value_raw * noise_08205
-        
+
         if year < 2008:
             raw_sum_pre_2008 += value_raw
 
-    # --- DEL 3: Gjennomsnitt for årene 1990-1997 (Ekstrapolering) ---
+    # --- PART 3: 1990-1997, extrapolated as the mean of all pre-2008 years ---
     mean_value_raw = raw_sum_pre_2008 / 10.0
-    
+
     for year in range(1990, 1998):
-        # Påfør ekstrapoleringsstøy på det rå gjennomsnittet
         year_values[year] = mean_value_raw * noise_trend
 
     return year_values
 
 
 def find_non_edible_animal_products(df_hides_clean, df_wool, df_sheep, current_params, dataset_noise):
+    """
+    Computes N in non-edible animal products (hides and wool) for
+    AG.MM-MP.OP-Non-edible animal products-Nmix. Hides come from FAOSTAT
+    throughout; wool switches from directly reported Landbruksdirektoratet
+    data (from 2005) to an SSB sheep-count-based extrapolation for earlier
+    years, with 2001 interpolated from 2000 and 2002 due to a gap in
+    ssb_sheep_numbers.
+
+    This branching is duplicated in ag_mc.py's
+    _add_non_edible_animal_products_flow_mc, which must build a matching
+    data_sources string for each year - keep the two in sync.
+    """
     year_values = {}
-    
+
     noise_faostat = dataset_noise['Crops and livestock products']
     noise_ssb = dataset_noise['03710']
     noise_wool = dataset_noise['Landbruksdirektoratet_wool']
@@ -606,28 +663,28 @@ def find_non_edible_animal_products(df_hides_clean, df_wool, df_sheep, current_p
     N_content_hides = current_params.get('prod_Raw hides and skins')
     wool_pr_sheep = current_params.get('wool_per_sheep')
     N_content_wool = current_params.get('wool_N_frac')
-    
+
     df_hides = df_hides_clean.copy()
     df_hides['N_amount'] = df_hides['Value'] * float(N_content_hides) * 1e-5 * float(noise_faostat)
     total_N_per_year = df_hides.groupby('Year')['N_amount'].sum().to_dict()
 
     for year in range(1990, 2024):
         value = total_N_per_year.get(year, 0.0)
-        
-        if year > 2004 and year != 2001:
-            # Bruk rapporterte ulldata + kildestøy
+
+        if year > 2004:
+            # Reported wool deliveries (Landbruksdirektoratet)
             wool_row = df_wool[df_wool['år'] == year]
             if not wool_row.empty:
                 value += float(wool_row['ull'].iloc[0]) * float(N_content_wool) * float(noise_wool)
-                
+
         elif year != 2001:
-            # Bruk ekstrapolerte ulldata basert på SSB-sauetall + ssb-kildestøy
+            # Wool extrapolated from SSB sheep counts
             sheep_row = df_sheep[df_sheep['År'] == year]
             if not sheep_row.empty:
                 value += float(sheep_row['Husdyr (sau)'].iloc[0]) * float(wool_pr_sheep) * float(N_content_wool) * 1e-6 * float(noise_ssb)
-                
+
         else:
-            # Interpolering for 2001 + ssb-støy * trendstøy
+            # 2001 interpolated from the surrounding years' sheep counts
             sheep_prev = df_sheep[df_sheep['År'] == year-1]
             sheep_next = df_sheep[df_sheep['År'] == year+1]
             if not sheep_prev.empty and not sheep_next.empty:
@@ -642,17 +699,6 @@ def find_non_edible_animal_products(df_hides_clean, df_wool, df_sheep, current_p
     return year_values
 
     
-def find_other_industry_wastewater(prepared_wastewater_dict, current_params):
-    year_values = {}
-    
-    noise_norskeutslipp = float(current_params.get('norskeutslipp'))
-    
-    for year, base_value in prepared_wastewater_dict.items():
-        year_values[year] = base_value * noise_norskeutslipp
-        
-    return year_values
-
-
 def find_recycling(preloaded_data, current_params, current_trade_factors, dataset_noise, 
                     prepared_trade_recycling, prepared_trade_reuse, trade_params):
     year_values = {y: 0.0 for y in range(1990, 2024)}
@@ -671,9 +717,16 @@ def find_recycling(preloaded_data, current_params, current_trade_factors, datase
     rubber_N  = float(current_params.waste_N_frac('rubber'))
     contam_N  = float(current_params.waste_N_frac('contaminated_masses'))
 
+    # 'Blandet avfall' (mixed waste) has no matching row text in table 05281 below -
+    # it is a new SSB reporting category introduced with table 10513 in 2012, not a
+    # reclassification of tonnage recorded under another name before (see the fuller
+    # reconciliation in find_household_waste's comment above, which covers the same
+    # table transition). Recycling captures two of the largest 'Blandet avfall'
+    # contributions, so this flow's 2011-to-2012 jump is even larger than household
+    # waste's: roughly 3.45 kt N in 2011 to 5.6 kt N in 2012, about +62%.
     df_05281 = preloaded_data.get('ssb_waste_05281')
     value_1995 = 0.0
-    
+
     col_to_year_05281 = {}
     for col_idx in range(3,20):
         val = str(df_05281.iloc[2, col_idx]).strip()
@@ -776,46 +829,42 @@ def find_recycling(preloaded_data, current_params, current_trade_factors, datase
     return year_values
 
 
-def find_treated_wastewater_discharge(df_05280, df_utslipp, current_params, dataset_noise=None, expected_years=None):
+def find_treated_wastewater_discharge(df_05280, df_utslipp, dataset_noise):
+    """
+    Computes N discharged from treated municipal wastewater (used by
+    hy_mc.py's _add_inflow_to_coastal_waters), combining SSB table 05280
+    (2002-2023) with an older historical series (1997-2001), with 1990-1996
+    held flat at the 1997 value.
+    """
     ww_discharge = {}
-    
+
     key_ssb = '05280'
     noise_ww = dataset_noise[key_ssb]
 
     value_1997 = 0.0
 
-    # --- DEL 1: Nyere data (SSB 05280) ---
-    if df_05280 is not None and df_05280.shape[0] > 3:
-        years_row = df_05280.iloc[2]
-        values_row = df_05280.iloc[3]
-        
-        for col_idx in range(3, min(26, df_05280.shape[1])):
-            try:
-                year = int(years_row.iloc[col_idx])
-                val_t = float(values_row.iloc[col_idx])
-                val_kt_N = (val_t / 1000.0) * noise_ww
-                ww_discharge[year] = max(0.0, val_kt_N)
-            except (ValueError, TypeError):
-                continue
+    # --- PART 1: SSB table 05280 (2002-2023) ---
+    years_row = df_05280.iloc[2]
+    values_row = df_05280.iloc[3]
 
-    # --- DEL 2: Historiske data 1997-2001 (utslipp_avløp.xlsx) ---
-    if df_utslipp is not None:
-        for r_idx in range(1, min(6, len(df_utslipp))):
-            try:
-                year = int(df_utslipp.iloc[r_idx, 0])
-                val_kt_N = float(df_utslipp.iloc[r_idx, 1]) * noise_ww
-                ww_discharge[year] = max(0.0, val_kt_N)
-                
-                if year == 1997:
-                    value_1997 = val_kt_N
-            except (ValueError, TypeError):
-                continue
+    for col_idx in range(3, min(26, df_05280.shape[1])):
+        year = int(years_row.iloc[col_idx])
+        val_t = float(values_row.iloc[col_idx])
+        val_kt_N = (val_t / 1000.0) * noise_ww
+        ww_discharge[year] = max(0.0, val_kt_N)
 
-    # --- DEL 3: Ekstrapolering 1990-1996 ---
-    # Bruker 1997-verdien som flat linje bakover hvis den ble funnet
-    if value_1997 > 0.0:
-        for year in range(1990, 1997):
-            ww_discharge[year] = value_1997
-            
+    # --- PART 2: historical series, 1997-2001 (utslipp_avløp.xlsx) ---
+    for r_idx in range(1, min(6, len(df_utslipp))):
+        year = int(df_utslipp.iloc[r_idx, 0])
+        val_kt_N = float(df_utslipp.iloc[r_idx, 1]) * noise_ww
+        ww_discharge[year] = max(0.0, val_kt_N)
+
+        if year == 1997:
+            value_1997 = val_kt_N
+
+    # --- PART 3: 1990-1996, held flat at the 1997 value ---
+    for year in range(1990, 1997):
+        ww_discharge[year] = value_1997
+
     return ww_discharge
 

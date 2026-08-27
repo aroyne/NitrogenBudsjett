@@ -1746,6 +1746,8 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
                     "statistikkvariabel, år og behandlingsmåte” (2012-2023), using N content values from \\citet{schappi_annexes_2025}. "
                     "We have not included the categories sludge, garden waste and wet organic material reported as being assigned to material "
                     "recycling, because this use is rather for solid production or fertilizer and does not belong in the MP.OP subpool. "
+                    "Table 10513 introduces a new, large \"mixed waste\" (blandet avfall) reporting category from 2012 with no equivalent in "
+                    "the earlier table 05281, which shows up as a jump in this flow from about 3.5 kt N in 2011 to about 5.6 kt N in 2012."
                 )
             elif "rwrw" in norm and "recycling" in norm:
                 exact_flow_code = "PR.SO-RW.RW-Export for recycling-Nmix"

@@ -57,9 +57,7 @@ def _add_inflow_to_coastal_waters(results, preloaded_data, current_params, datas
     ww_discharge_dict = find_treated_wastewater_discharge(
         df_05280=preloaded_data.get('hy_ssb_05280_raw'),
         df_utslipp=preloaded_data.get('hy_utslipp_avlop_raw'),
-        current_params=current_params,
-        dataset_noise=dataset_noise,
-        expected_years=EXPECTED_YEARS
+        dataset_noise=dataset_noise
     )
 
     # Earlier years (1990-2012): Miljødirektoratet's coastal N-loading compilation.
