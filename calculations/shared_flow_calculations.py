@@ -239,6 +239,32 @@ def find_household_waste(preloaded_data, current_params, dataset_noise):
     # =========================================================================
     # TABELL 05281 / 05282 (1995-2011)
     # =========================================================================
+    # Sectors summed here: Bygge- og anleggsvirksomhet (construction),
+    # Tjenesteytende næringer (services), Private husholdninger (households).
+    # Unlike the 2012+ block below, this period does NOT include the
+    # power/water supply or water/sewage/waste-management sectors - 05282
+    # doesn't group them the same way 10514 does, and no attempt is made to
+    # reconstruct an equivalent. This is a real (small) source of
+    # under-coverage for 1995-2011 relative to 2012+.
+    #
+    # 'Blandet avfall' (mixed waste) has no equivalent row in this table at
+    # all. Verified this isn't hidden elsewhere: 05282's own row totals for
+    # these sectors are fully reconciled by metal + glass + concrete + sludge
+    # (the rows deliberately excluded here) - there's no unaccounted tonnage.
+    # 'Blandet avfall' is a new SSB reporting category that starts with table
+    # 10514 in 2012, persistently large (~2300-2400 kt/year in these sectors,
+    # not a one-off), not a reclassification of tonnage that existed before
+    # under another name. This means 1995-2011 household waste is likely a
+    # real undercount of the true total relative to 2012 onward, not a
+    # double-counting or calibration artifact in this function - visible as a
+    # ~40% jump in the computed flow between 2011 and 2012.
+    #
+    # Separately, 2009 shows a real dip (should not be corrected): this
+    # table's own footnote states industries are classified under SN2007 from
+    # 2008 (SN2002 before), and the dip is entirely in the construction and
+    # services sectors specifically - private households alone shows no dip
+    # and grows smoothly throughout. Consistent with the 2008-2009 financial
+    # crisis, the classification change, or both.
     df_05282 = preloaded_data['ssb_05282']
     value_1995 = 0.0
     width_05282 = df_05282.shape[1]

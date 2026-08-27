@@ -1109,7 +1109,10 @@ def process_humans_and_settlements_pool(hs_folder, plot_files, plot_dir, bib_fil
                 "Detailed data are not available prior to 1995, but trends in municipal and other waste are described by \\\\citet{ssb_naturressurser_1997}. "
                 "Household waste per inhabitant increased from about 200 kg/person to 289 kg/person in 1995 Figure 4.1 in \\\\citep{ssb_naturressurser_1997}, "
                 "with an assumed linear increase in the years between. Based on this we assume a constant N content per unit mass "
-                "and extrapolate from 1995 values back to 1990."
+                "and extrapolate from 1995 values back to 1990. Power/water supply and water/sewage/waste-management sources are "
+                "only included from 2012 onward, and table 10514 introduces a new, large \"mixed waste\" (blandet avfall) reporting "
+                "category from 2012 with no equivalent in the earlier table - both mean 1995-2011 values likely understate total "
+                "household waste N relative to 2012 onward by a substantial margin."
             )
         elif "wastewater" in norm or "municipal" in norm:
             exact_flow_code = "HS.HS-PR.WW-Municipal wastewater-Nmix"
