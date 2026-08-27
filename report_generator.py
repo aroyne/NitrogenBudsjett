@@ -554,10 +554,10 @@ def process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename
             description = (
                 "Data on imported animal feed is taken from Landbruksdirektoratet and we have used the detailed "
                 "composition of animal feed together with protein contents from FAO and specific Jones factors to get nitrogen contents.\n\n "
-                "Based on the Landbruksdirektoratet data, the N content of the total amount of feed is 0.02 kgN/kg feed. "
-                "NIBIO Totalkalkylen gives statistics for total amount of feed to Norwegian farm animals between 1959 and 2026Table 6.10 in "
-                "\\citep{bruholt_jordbruksstatistikk_1994} gives the domestically produced fraction of farm animal feed between 1985 and 1994. "
-                "We combine these data to find values before 2000, using an average import fraction for 1995-1999"
+                "N content is applied separately by raw-material type: 0.0197 kgN/kg for carbohydrate raw materials and 0.0648 kgN/kg for "
+                "protein raw materials. NIBIO Totalkalkylen gives statistics for total amount of feed to Norwegian farm animals between 1959 "
+                "and 2026. Table 6.10 in \\citep{bruholt_jordbruksstatistikk_1994} gives the domestically produced fraction of farm animal feed "
+                "between 1985 and 1994. We combine these data to find values before 2000, using an average import fraction for 1995-1999"
             )
         elif "live" in norm and "animal" in norm:
             exact_flow_code = "RW.RW-AG.MM-Live animal import-Nmix"
@@ -572,7 +572,7 @@ def process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename
             description = (
                 "Is taken from FAOSTAT Fertilizer by nutrient \\citet{fao_fertilizer_2025}. Because anhydrous "
                 "ammonia is not used directly as fertilizer in Norway, it is not counted as a fertilizer in this particular FAO statistic. "
-                "We therefore include NH3 import in the flow **RW.RW-MP.OP-Other goods import-Nmix**."
+                "We therefore account for NH3 import in the flow **RW.RW-MP.OP-Ammonia import-Nmix**."
             )
         elif "inflow" in norm and "oxn" in norm:
             exact_flow_code = "RW.RW-AT.AT-Atmospheric inflow-OXN"
@@ -621,7 +621,7 @@ def process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename
             exact_flow_code = "RW.RW-PR.SO-Solid waste import-Nmix"
             display_name = "Solid Waste Import"
             description = (
-                "Is taken from trade data, SSB table 08801. We include imports of municipal waste, wastewater sludge, "
+                "Is taken from trade data, SSB table 08801. We include imports of municipal waste, other waste, wastewater sludge, "
                 "hazardous waste, plastic, paper and textile waste."
             )
 
