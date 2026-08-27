@@ -40,92 +40,28 @@ def get_balance_image_markdown(pool_code, plot_files, plot_dir, relative_depth="
                 f"Hover over the chart to inspect specific streams, or click legend items to toggle visibility.\n\n"
                 f'<iframe src="{relative_depth}{plot_dir}/{balance_file}" '
                 f'width="100%" height="600px" frameborder="0" scrolling="no"></iframe>\n'            )
-    print(balance_file)
-    print(plot_files)
     return ""
 
 
 def append_bibtex_references(file_handle, bib_filename=None):
     """
-    Skanner filen for siteringer (\citep{key}), leser bib-filen,
-    og genererer en ren Markdown-referanseliste som fungerer på GitHub Pages.
+    Writes a placeholder References section. The real, APA7-formatted
+    reference list (and inline \\citep/\\citet replacement) is built once for
+    every page at the end of the whole run, by fix_all_citations_in_folder -
+    this only needs to handle the case where no bib file is available at all,
+    since fix_all_citations_in_folder skips its pass entirely in that case.
     """
     if not bib_filename or not os.path.exists(bib_filename):
         file_handle.write("\n### References\n\nNo bibliography file provided or found.\n")
         return
 
-    # 1. Gå til starten av filen og les alt som er skrevet hittil for å finne siteringsnøkler
     file_handle.flush()
-    try:
-        with open(file_handle.name, 'r', encoding='utf-8') as f_read:
-            content = f_read.read()
-    except Exception:
-        # Hvis filen ikke kan leses (f.eks. hvis den er låst/i skrivemodus),
-        # legger vi til en fallback-tagg eller melding
-        file_handle.write("\n### References\n\n(References dynamically generated via Python require file readability)\n")
-        return
+    with open(file_handle.name, 'r', encoding='utf-8') as f_read:
+        content = f_read.read()
 
-    # Finn alle nøkler inni \citep{nøkkel} eller \citet{nøkkel}
-    # Støtter også kommaseparerte lister, f.eks. \citep{key1,key2}
-    raw_keys = re.findall(r'\\cite[pt]\{\s*([^}]+)\s*\}', content)
-    cited_keys = set()
-    for k_group in raw_keys:
-        for k in k_group.split(','):
-            cited_keys.add(k.strip())
+    if '\\citep' in content or '\\citet' in content:
+        file_handle.write("\n### References\n\n")
 
-    if not cited_keys:
-        return  # Ingen referanser ble brukt på denne siden, trenger ikke referanse-overskrift
-
-    # 2. Enkel parsing av .bib-filen for å hente ut forfatter, år og tittel
-    references_dict = {}
-    current_entry = None
-    
-    with open(bib_filename, 'r', encoding='utf-8') as bib_file:
-        for line in bib_file:
-            line_stripped = line.strip()
-            # Finn starten på en entry, f.eks. @article{malik_drivers_2022,
-            match_start = re.match(r'@\w+\{\s*([^,]+),', line_stripped)
-            if match_start:
-                current_entry = match_start.group(1).strip()
-                references_dict[current_entry] = {}
-                continue
-            
-            if current_entry and '=' in line_stripped:
-                key, val = line_stripped.split('=', 1)
-                key = key.strip().lower()
-                # Fjern krøllparenteser, hermetegn og komma på slutten
-                val = re.sub(r'[{"},\s]+$', '', val.strip())
-                val = re.sub(r'^[{"\s]+', '', val)
-                # BibTeX bruker ofte {Ord}-beskyttelse rundt enkeltord inni verdien
-                # (for å bevare stor forbokstav); disse skal aldri vises til leseren.
-                val = val.replace('{', '').replace('}', '')
-                if key in ['author', 'title', 'year', 'journal', 'booktitle']:
-                    references_dict[current_entry][key] = val
-
-    # 3. Bygg referanselisten (i tilnærmet APA-stil) for akkurat de kildene som er brukt
-    file_handle.write("\n### References\n\n")
-    
-    formatted_refs = []
-    for key in sorted(cited_keys):
-        if key in references_dict:
-            entry = references_dict[key]
-            author = entry.get('author', 'Unknown Author')
-            year = entry.get('year', 'n.d.')
-            title = entry.get('title', 'Untitled')
-            source = entry.get('journal') or entry.get('booktitle') or ""
-            
-            ref_str = f"* {author} ({year}). *{title}*."
-            if source:
-                ref_str += f" {source}."
-            formatted_refs.append(ref_str)
-        else:
-            # Hvis nøkkelen ikke ble funnet i .bib-filen
-            formatted_refs.append(f"* Missing reference data for key: `{key}`")
-
-    # Skriv listen til filen
-    for ref in formatted_refs:
-        file_handle.write(f"{ref}\n")
-    
 def format_apa_authors(author_str):
     """
     Tar en BibTeX author-streng (f.eks. 'Winiwarter, Wilfried and Hayashi, Kentaro')
@@ -1915,7 +1851,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
     os.makedirs(pool_folders[7], exist_ok=True)
     process_hydrosphere_pool(pool_folders[7], plot_files, plot_dir, bib_filename, target_format)
 
-    # 3. Rest of the World Pool
+    # 10. Rest of the World Pool
     os.makedirs(pool_folders[8], exist_ok=True)
     process_rest_of_the_world_pool(pool_folders[8], plot_files, plot_dir, bib_filename, target_format)
 
@@ -1926,12 +1862,13 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
     fix_all_citations_in_folder(".", bib_filename)
 
     print("[RAPPORT] Portalbygging fullført suksessfullt!")
-'''
-Du kan slå sammen og konvertere Markdown-filene dine til en ferdig PDF ved å kjøre følgende i terminalen:
-pandoc pool_rest_of_the_world.md flow_*.md \
-  --citeproc \
-  --bibliography=references.bib \
-  --csl=apa.csl \
-  -V geometry:margin=1in \
-  -o nitrogen_rapport.pdf
-'''
+
+# You can merge and convert the generated Markdown files into a finished PDF
+# by running the following in the terminal:
+#
+# pandoc pool_rest_of_the_world.md flow_*.md \
+#   --citeproc \
+#   --bibliography=references.bib \
+#   --csl=apa.csl \
+#   -V geometry:margin=1in \
+#   -o nitrogen_rapport.pdf
