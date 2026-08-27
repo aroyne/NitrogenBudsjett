@@ -1,23 +1,32 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+Loads every source data file the calculations/ modules need, gated by which
+pools are requested (selected_pools). Most entries in DATA_MAP go through the
+generic per-method loading loop below and end up under their own dict key,
+but a handful of methods load one workbook and split it into several output
+keys instead - for those, the DATA_MAP key itself (e.g. 'ag_gnb', 'ag_grovfor',
+'aqua_data', 'avlop_sewage', 'hy_teotil3', 'fs_obb_grazing',
+'fao_live_animals_all', 'ag_faostat_production_all') exists only to gate
+loading by pool membership and is never read back; the actual data lives
+under the differently-named keys set inside that method's branch.
+"""
 import pandas as pd
 import openpyxl
 import warnings
 from calculations.utils import read_trade_data
 
-# Undertrykk openpyxl sin spesifikke header/footer-advarsel
+# Suppresses openpyxl's specific header/footer warning.
 warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl.worksheet.header_footer")
 
 def load_all_data(selected_pools):
-    
-    
     preloaded = {}
-    print(f"\n[DATA_LOADER] Kalles med selected_pools: {selected_pools}") 
-    
+    print(f"\n[DATA_LOADER] Kalles med selected_pools: {selected_pools}")
+
     # =========================================================================
-    # 1. KONFIGURASJONSKART 
+    # 1. CONFIGURATION MAP
     # =========================================================================
-    # Format: 'preloaded_nøkkel': ( {relevante_pools}, 'filbane', 'lesemetode', {ekstra_arg} )
+    # Format: 'preloaded_key': ( {relevant_pools}, 'filepath', 'load_method', {extra_kwargs} )
     DATA_MAP = {
         'atm_in_out': ({'at', 'rw'}, 'data_files/atm_in_out.xlsx', 'excel', {'sheet_name': 'Ark1', 'header': None}),
         'faostat_fertilizer_production': ({'at'}, 'data_files/FAOSTAT_data_en_11-25-2025.csv', 'csv', {}),
@@ -34,7 +43,7 @@ def load_all_data(selected_pools):
         'hy_fiske_old_raw': ({'hy'}, 'data_files/fiske_1990_2000.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Ark1'}),
         'avlop_sewage': ({'hy', 'pr'}, 'data_files/05280_20251113-113329.xlsx', 'openpyxl_sewage', {}),
         'ag_gnb': ({'ag','mp'}, 'data_files/aei_pr_gnb__custom_18744910_spreadsheet.xlsx', 'openpyxl_gnb', {}),
-        'ag_grovfor': ({'ag'}, 'grovfor_filer_samling', 'excel_grovfor', {}), # Spesialhåndtert
+        'ag_grovfor': ({'ag'}, 'grovfor_filer_samling', 'excel_grovfor', {}),  # filepath unused - method loads 3 fixed files directly
         'ag_crltap_raw_lines': ({'ag','ef','mp','pr'}, 'data_files/webdabData1863365.txt', 'text_lines', {}),
         'unfccc_ark1_raw': ({'ag'}, 'data_files/N2O_NOx_AG.xlsx', 'openpyxl_single_sheet_df', {'sheet_name': 'Ark1'}),        
         'ag_leaching_csv': ({'ag'}, 'data_files/Nr_AG--HY.csv', 'csv', {}),
@@ -93,185 +102,176 @@ def load_all_data(selected_pools):
         }
 
     # =========================================================================
-    # 2. HANDELSDATA
+    # 2. TRADE DATA
     # =========================================================================
     trade_needing_pools = {'at', 'rw', 'mp', 'pr', 'ef', 'ag'}
     if not trade_needing_pools.isdisjoint(selected_pools):
         print("[I/O] Pre-loader komplett varehandelsstatistikk...")
-        try:
-            df_trade_raw = read_trade_data('data_files/Tab_08801_1988_2024.csv')
-            from calculations.n_params import NParameters
-            df_mapping = NParameters("data_files/N_parameters.xlsx").get_trade_mapping()
-            if 'konv' not in df_mapping.columns:
-                df_mapping = df_mapping.reset_index()
-            
-            df_trade_raw['HS_code_str'] = df_trade_raw['HS_code'].astype(str).str.strip()
-            v_col = 'Varenr' if 'Varenr' in df_mapping.columns else 'varenr'
-            df_mapping['varenr_str'] = df_mapping[v_col].astype(str).str.strip()
-            
-            df_prepared_all = df_trade_raw.merge(
-                df_mapping[[v_col, 'konv', 'type', 'varenr_str']],
-                left_on='HS_code_str', right_on='varenr_str', how='inner'
-            )
-            preloaded['compressed_trade_volume'] = df_prepared_all.groupby(['year', 'impeks', 'type', 'konv'])['amount'].sum().reset_index()
-        except Exception as e:
-            print(f"[KRITISK FEIL] Kunne ikke pre-loade den generelle handelsdataen: {e}")
+        df_trade_raw = read_trade_data('data_files/Tab_08801_1988_2024.csv')
+        from calculations.n_params import NParameters
+        df_mapping = NParameters("data_files/N_parameters.xlsx").get_trade_mapping()
+        if 'konv' not in df_mapping.columns:
+            df_mapping = df_mapping.reset_index()
+
+        df_trade_raw['HS_code_str'] = df_trade_raw['HS_code'].astype(str).str.strip()
+        v_col = 'Varenr' if 'Varenr' in df_mapping.columns else 'varenr'
+        df_mapping['varenr_str'] = df_mapping[v_col].astype(str).str.strip()
+
+        df_prepared_all = df_trade_raw.merge(
+            df_mapping[[v_col, 'konv', 'type', 'varenr_str']],
+            left_on='HS_code_str', right_on='varenr_str', how='inner'
+        )
+        preloaded['compressed_trade_volume'] = df_prepared_all.groupby(['year', 'impeks', 'type', 'konv'])['amount'].sum().reset_index()
 
     # =========================================================================
-    # 3. AUTOMATISK GENERISK INNLESING BASERT PÅ KARTET
+    # 3. GENERIC LOADING, DRIVEN BY THE MAP ABOVE
     # =========================================================================
     for key, (pools, filepath, method, kwargs) in DATA_MAP.items():
         if pools.isdisjoint(selected_pools):
-            continue  # Ingen av de valgte poolene trenger denne filen
+            continue  # none of the selected pools need this file
             
         print(f"[I/O] Pre-loader data for {key} ({filepath.split('/')[-1] if '/' in filepath else filepath})...")
-        try:
-            if method == 'excel':
-                preloaded[key] = pd.read_excel(filepath, **kwargs)
-                if key == 'wool_production':
-                    preloaded[key] = preloaded[key][['år', 'ull']].copy()
-                elif key == 'ssb_sheep_numbers':
-                    preloaded[key] = preloaded[key][['År', 'Husdyr (sau)']].copy()
-                    
-            elif method == 'csv':
-                df = pd.read_csv(filepath, **kwargs)
-                if key in ['faostat_fertilizer', 'fao_mineral_fertilizer', 'faostat_fertilizer_production']:
-                    preloaded[key] = df[['Year', 'Element', 'Value']].copy()
-                else:
-                    preloaded[key] = df                    
-            elif method == 'text_lines':
-                with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
-                    preloaded[key] = f.readlines()
+        if method == 'excel':
+            preloaded[key] = pd.read_excel(filepath, **kwargs)
+            if key == 'wool_production':
+                preloaded[key] = preloaded[key][['år', 'ull']].copy()
+            elif key == 'ssb_sheep_numbers':
+                preloaded[key] = preloaded[key][['År', 'Husdyr (sau)']].copy()
 
-            elif method == 'openpyxl_single_sheet':
-                wb = openpyxl.load_workbook(filepath, data_only=True)
-                preloaded[key] = pd.DataFrame(list(wb[kwargs['sheet_name']].values))
-
-            elif method == 'openpyxl_single_sheet_df':
-                wb = openpyxl.load_workbook(filepath, data_only=True)
-                preloaded[key] = pd.DataFrame(list(wb[kwargs['sheet_name']].values))
-
-            elif method == 'excel_feed_raavarer_norsk':
-                df = pd.read_excel(filepath, sheet_name='Varegrupper')
-                preloaded[key] = pd.DataFrame({
-                    'year': df.iloc[3:28, 0].astype(int),
-                    'value_carb': df.iloc[3:28, 1].astype(float),  # Kolonne B (Indeks 1) = Norsk Karbohydrat
-                    'value_prot': df.iloc[3:28, 7].astype(float)   # Kolonne H (Indeks 7) = Norsk Protein
-                }).reset_index(drop=True)
-
-            elif method == 'excel_feed_raavarer_import':
-                df = pd.read_excel(filepath, sheet_name='Varegrupper')
-                preloaded[key] = pd.DataFrame({
-                    'year': df.iloc[3:28, 0].astype(int),
-                    'value_carb': df.iloc[3:28, 2].astype(float),  # Kolonne C (Indeks 2) = Importert Karbohydrat
-                    'value_prot': df.iloc[3:28, 8].astype(float)   # Kolonne I (Indeks 8) = Importert Protein
-                }).reset_index(drop=True)
-                
-            elif method == 'excel_feed_totalkalkyle':
-                df = pd.read_excel(filepath, sheet_name='Sum innkjøpt kraftfôr ukorr.')
-                preloaded[key] = pd.DataFrame({
-                    'year': df.iloc[26:41, 0].astype(int),
-                    'value': df.iloc[26:41, 1].astype(float),
-                    'dom_frac': df.iloc[26:41, 4].astype(float)
-                }).reset_index(drop=True)
-
-            elif method == 'excel_aquaculture':
-                df_modern = pd.read_excel(filepath, sheet_name='A.06.002', header=None)
-                years_modern = df_modern.iloc[2, 2:].astype(int).tolist()
-                df_cells = df_modern.iloc[4:43, 2:].replace('-', 0).astype(float)
-                df_cells.columns = years_modern
-                preloaded['aqua_modern'] = df_cells
-
-                df_old = pd.read_excel('data_files/akvakultur_1984_1994.xlsx', sheet_name='Ark1', header=None)
-                preloaded['aqua_old'] = pd.DataFrame({
-                    'year': df_old.iloc[1:11, 0].astype(int),
-                    'value': df_old.iloc[1:11, 1].astype(float)
-                }).reset_index(drop=True)
-
-            elif method == 'csv_live_animals':
-                df_fao_raw = pd.read_csv(filepath)
-                preloaded['fao_live_animals'] = df_fao_raw[(df_fao_raw['Element'] == 'Import quantity') & (df_fao_raw['Value'] != 0)][['Item', 'Year', 'Unit', 'Value']].copy()
-                preloaded['fao_live_animals_export'] = df_fao_raw[(df_fao_raw['Element'] == 'Export quantity') & (df_fao_raw['Value'] != 0)][['Item', 'Year', 'Unit', 'Value']].copy()
-
-            elif method == 'csv_fertilizer_import':
-                df_fert = pd.read_csv(filepath)
-                preloaded[key] = df_fert[(df_fert['Element'] == 'Import quantity') & (df_fert['Value'] != 0)][['Year', 'Value']].copy()
-
-            elif method == 'openpyxl_teotil':
-                wb = openpyxl.load_workbook(filepath, data_only=True)
-                preloaded['hy_teotil3_to_coast'] = pd.DataFrame(list(wb['totn_to_coast'].values))
-                preloaded['hy_teotil3_by_source'] = pd.DataFrame(list(wb['totn_by_source'].values))
-                preloaded['hy_teotil3_retention'] = pd.DataFrame(list(wb['totn_retention'].values))
-
-            elif method == 'openpyxl_sewage':
-                wb_05280 = openpyxl.load_workbook(filepath, data_only=True)
-                preloaded['hy_ssb_05280_raw'] = pd.DataFrame(list(wb_05280['Nitrogen'].values))
-                wb_utslipp = openpyxl.load_workbook('data_files/utslipp_avløp.xlsx', data_only=True)
-                preloaded['hy_utslipp_avlop_raw'] = pd.DataFrame(list(wb_utslipp['Ark1'].values))
-
-            elif method == 'openpyxl_gnb':
-                wb_gnb = openpyxl.load_workbook(filepath, data_only=True)
-                preloaded['ag_gnb_workbook'] = wb_gnb
-                preloaded['gnb_sheet30_raw'] = pd.DataFrame(list(wb_gnb['Sheet 30'].values))
-                if 'Sheet 12' in wb_gnb.sheetnames:
-                    preloaded['gnb_sheet12_raw'] = pd.DataFrame(list(wb_gnb['Sheet 12'].values))
-
-            elif method == 'excel_grovfor':
-                wb_13648 = openpyxl.load_workbook('data_files/13648_20251117-154625.xlsx', data_only=True)
-                wb_05772 = openpyxl.load_workbook('data_files/05772_20251210-142618.xlsx', data_only=True)
-                wb_old = openpyxl.load_workbook('data_files/grovfor_før_2000.xlsx', data_only=True)
-                preloaded['ag_ssb_13648'] = wb_13648
-                preloaded['ag_ssb_05772'] = wb_05772
-                preloaded['ag_grovfor_old'] = wb_old
-                preloaded['ssb_13648_raw'] = pd.DataFrame(list(wb_13648['Avling'].values))
-                preloaded['ssb_05772_raw'] = pd.DataFrame(list(wb_05772['Gronfor'].values))
-                preloaded['grovfor_old_raw'] = pd.DataFrame(list(wb_old['Ark1'].values))
-
-            elif method == 'csv_faostat_production':
-                df_fao = pd.read_csv(filepath)
-                preloaded['ag_faostat_production'] = df_fao
-                preloaded['fao_animal_production_clean'] = df_fao[(df_fao['Element'] == 'Production') & (df_fao['Value'] != 0) & (~df_fao['Item'].str.contains('hides', case=False, na=False))][['Item', 'Year', 'Value']].copy()
-                preloaded['fao_hides_clean'] = df_fao[(df_fao['Element'] == 'Production') & (df_fao['Value'] != 0) & (df_fao['Item'].str.contains('hides', case=False, na=False))][['Item', 'Year', 'Value']].copy()
-
-            elif method == 'openpyxl_obb_grazing':
-                # Konverterer alle de relevante fanene fra organisert beitebruk til DataFrames med en gang
-                wb_obb = openpyxl.load_workbook(filepath, data_only=True)
-                preloaded['fs_obb_workbook'] = wb_obb # Beholder workbook hvis nødvendig
-                
-                target_sheets = [
-                    'Sau1990-99', 'Sau2000-09', 'Sau2010-19', 'Sau2020-29', 
-                    'Storfe og geit1993-2019', 'Storfe og geit2020-29'
-                ]
-                for sheet_name in target_sheets:
-                    if sheet_name in wb_obb.sheetnames:
-                        preloaded[f"obb_{sheet_name}_raw"] = pd.DataFrame(list(wb_obb[sheet_name].values))
-                    else:
-                        print(f"[ADVARSEL] Beite-fane mangler i OBB-filen: {sheet_name}")
-                        
-            elif method == 'csv_forestry':
-                df_raw = pd.read_csv(filepath)
-                preloaded[key] = df_raw
-                
-            elif method == 'csv_ef_fuel':
-                df = pd.read_csv(filepath)
-                preloaded[key] = df[['year', 'value']].copy()
-            elif method == 'excel_ssb_generic':
-                sheet_name = kwargs.get('sheet') if 'sheet' in kwargs else kwargs.get('sheet_name')
-                df = pd.read_excel(filepath, sheet_name=sheet_name, header=None)
+        elif method == 'csv':
+            df = pd.read_csv(filepath, **kwargs)
+            if key in ['faostat_fertilizer', 'fao_mineral_fertilizer', 'faostat_fertilizer_production']:
+                preloaded[key] = df[['Year', 'Element', 'Value']].copy()
+            else:
                 preloaded[key] = df
-                
-            elif method == 'excel_mildir_emissions':
-                preloaded[key] = pd.read_excel(filepath, header=0)
+        elif method == 'text_lines':
+            with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+                preloaded[key] = f.readlines()
 
-            elif method == 'excel_industry_categories':
-                preloaded[key] = pd.read_excel(filepath)
-                
-            elif method == 'excel_population':
-                df = pd.read_excel(filepath, skiprows=2, skipfooter=42)
-                df = df.set_index('Unnamed: 0')
-                preloaded[key] = df
+        elif method == 'openpyxl_single_sheet':
+            wb = openpyxl.load_workbook(filepath, data_only=True)
+            preloaded[key] = pd.DataFrame(list(wb[kwargs['sheet_name']].values))
 
-        except Exception as e:
-            print(f"[KRITISK FEIL] Kunne ikke laste {key}: {e}")
+        elif method == 'openpyxl_single_sheet_df':
+            wb = openpyxl.load_workbook(filepath, data_only=True)
+            preloaded[key] = pd.DataFrame(list(wb[kwargs['sheet_name']].values))
+
+        elif method == 'excel_feed_raavarer_norsk':
+            df = pd.read_excel(filepath, sheet_name='Varegrupper')
+            preloaded[key] = pd.DataFrame({
+                'year': df.iloc[3:28, 0].astype(int),
+                'value_carb': df.iloc[3:28, 1].astype(float),  # column B (index 1) = domestic carbohydrate raw materials
+                'value_prot': df.iloc[3:28, 7].astype(float)   # column H (index 7) = domestic protein raw materials
+            }).reset_index(drop=True)
+
+        elif method == 'excel_feed_raavarer_import':
+            df = pd.read_excel(filepath, sheet_name='Varegrupper')
+            preloaded[key] = pd.DataFrame({
+                'year': df.iloc[3:28, 0].astype(int),
+                'value_carb': df.iloc[3:28, 2].astype(float),  # column C (index 2) = imported carbohydrate raw materials
+                'value_prot': df.iloc[3:28, 8].astype(float)   # column I (index 8) = imported protein raw materials
+            }).reset_index(drop=True)
+
+        elif method == 'excel_feed_totalkalkyle':
+            df = pd.read_excel(filepath, sheet_name='Sum innkjøpt kraftfôr ukorr.')
+            preloaded[key] = pd.DataFrame({
+                'year': df.iloc[26:41, 0].astype(int),
+                'value': df.iloc[26:41, 1].astype(float),
+                'dom_frac': df.iloc[26:41, 4].astype(float)
+            }).reset_index(drop=True)
+
+        elif method == 'excel_aquaculture':
+            df_modern = pd.read_excel(filepath, sheet_name='A.06.002', header=None)
+            years_modern = df_modern.iloc[2, 2:].astype(int).tolist()
+            df_cells = df_modern.iloc[4:43, 2:].replace('-', 0).astype(float)
+            df_cells.columns = years_modern
+            preloaded['aqua_modern'] = df_cells
+
+            df_old = pd.read_excel('data_files/akvakultur_1984_1994.xlsx', sheet_name='Ark1', header=None)
+            preloaded['aqua_old'] = pd.DataFrame({
+                'year': df_old.iloc[1:11, 0].astype(int),
+                'value': df_old.iloc[1:11, 1].astype(float)
+            }).reset_index(drop=True)
+
+        elif method == 'csv_live_animals':
+            df_fao_raw = pd.read_csv(filepath)
+            preloaded['fao_live_animals'] = df_fao_raw[(df_fao_raw['Element'] == 'Import quantity') & (df_fao_raw['Value'] != 0)][['Item', 'Year', 'Unit', 'Value']].copy()
+            preloaded['fao_live_animals_export'] = df_fao_raw[(df_fao_raw['Element'] == 'Export quantity') & (df_fao_raw['Value'] != 0)][['Item', 'Year', 'Unit', 'Value']].copy()
+
+        elif method == 'csv_fertilizer_import':
+            df_fert = pd.read_csv(filepath)
+            preloaded[key] = df_fert[(df_fert['Element'] == 'Import quantity') & (df_fert['Value'] != 0)][['Year', 'Value']].copy()
+
+        elif method == 'openpyxl_teotil':
+            wb = openpyxl.load_workbook(filepath, data_only=True)
+            preloaded['hy_teotil3_to_coast'] = pd.DataFrame(list(wb['totn_to_coast'].values))
+            preloaded['hy_teotil3_by_source'] = pd.DataFrame(list(wb['totn_by_source'].values))
+            preloaded['hy_teotil3_retention'] = pd.DataFrame(list(wb['totn_retention'].values))
+
+        elif method == 'openpyxl_sewage':
+            wb_05280 = openpyxl.load_workbook(filepath, data_only=True)
+            preloaded['hy_ssb_05280_raw'] = pd.DataFrame(list(wb_05280['Nitrogen'].values))
+            wb_utslipp = openpyxl.load_workbook('data_files/utslipp_avløp.xlsx', data_only=True)
+            preloaded['hy_utslipp_avlop_raw'] = pd.DataFrame(list(wb_utslipp['Ark1'].values))
+
+        elif method == 'openpyxl_gnb':
+            wb_gnb = openpyxl.load_workbook(filepath, data_only=True)
+            preloaded['ag_gnb_workbook'] = wb_gnb
+            preloaded['gnb_sheet30_raw'] = pd.DataFrame(list(wb_gnb['Sheet 30'].values))
+            if 'Sheet 12' in wb_gnb.sheetnames:
+                preloaded['gnb_sheet12_raw'] = pd.DataFrame(list(wb_gnb['Sheet 12'].values))
+
+        elif method == 'excel_grovfor':
+            wb_13648 = openpyxl.load_workbook('data_files/13648_20251117-154625.xlsx', data_only=True)
+            wb_05772 = openpyxl.load_workbook('data_files/05772_20251210-142618.xlsx', data_only=True)
+            wb_old = openpyxl.load_workbook('data_files/grovfor_før_2000.xlsx', data_only=True)
+            preloaded['ag_ssb_13648'] = wb_13648
+            preloaded['ag_ssb_05772'] = wb_05772
+            preloaded['ag_grovfor_old'] = wb_old
+            preloaded['ssb_13648_raw'] = pd.DataFrame(list(wb_13648['Avling'].values))
+            preloaded['ssb_05772_raw'] = pd.DataFrame(list(wb_05772['Gronfor'].values))
+            preloaded['grovfor_old_raw'] = pd.DataFrame(list(wb_old['Ark1'].values))
+
+        elif method == 'csv_faostat_production':
+            df_fao = pd.read_csv(filepath)
+            preloaded['ag_faostat_production'] = df_fao
+            preloaded['fao_animal_production_clean'] = df_fao[(df_fao['Element'] == 'Production') & (df_fao['Value'] != 0) & (~df_fao['Item'].str.contains('hides', case=False, na=False))][['Item', 'Year', 'Value']].copy()
+            preloaded['fao_hides_clean'] = df_fao[(df_fao['Element'] == 'Production') & (df_fao['Value'] != 0) & (df_fao['Item'].str.contains('hides', case=False, na=False))][['Item', 'Year', 'Value']].copy()
+
+        elif method == 'openpyxl_obb_grazing':
+            # Converts every relevant sheet from the organised-grazing workbook to a
+            # DataFrame in one pass; fs_mc.py indexes each obb_<sheet>_raw key directly.
+            wb_obb = openpyxl.load_workbook(filepath, data_only=True)
+            preloaded['fs_obb_workbook'] = wb_obb
+
+            target_sheets = [
+                'Sau1990-99', 'Sau2000-09', 'Sau2010-19', 'Sau2020-29',
+                'Storfe og geit1993-2019', 'Storfe og geit2020-29'
+            ]
+            for sheet_name in target_sheets:
+                preloaded[f"obb_{sheet_name}_raw"] = pd.DataFrame(list(wb_obb[sheet_name].values))
+
+        elif method == 'csv_forestry':
+            df_raw = pd.read_csv(filepath)
+            preloaded[key] = df_raw
+
+        elif method == 'csv_ef_fuel':
+            df = pd.read_csv(filepath)
+            preloaded[key] = df[['year', 'value']].copy()
+        elif method == 'excel_ssb_generic':
+            sheet_name = kwargs.get('sheet') if 'sheet' in kwargs else kwargs.get('sheet_name')
+            df = pd.read_excel(filepath, sheet_name=sheet_name, header=None)
+            preloaded[key] = df
+
+        elif method == 'excel_mildir_emissions':
+            preloaded[key] = pd.read_excel(filepath, header=0)
+
+        elif method == 'excel_industry_categories':
+            preloaded[key] = pd.read_excel(filepath)
+
+        elif method == 'excel_population':
+            df = pd.read_excel(filepath, skiprows=2, skipfooter=42)
+            df = df.set_index('Unnamed: 0')
+            preloaded[key] = df
 
     return preloaded
