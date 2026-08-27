@@ -868,7 +868,7 @@ def process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename, target_f
             elif "leaching" in norm:
                 exact_flow_code = "FS.FO-HY.SW-Leaching-Nmix"
                 display_name = "Forest Leaching"
-                description = "Found in data supplied by NIVA, produced in the TEOTIL3 model \\\\citep{sample_teotil3_2024}. For the period 1990-2013, we have used TEOTIL data published by Miljødirektoratet for nitrogen from nitrogen flows that reach the coast, where we have found that values for leaching from forest in the period 2013-2023 are a fraction 0.59 of what is reported by Miljødirektoratet as «Bakgrunn», to within a 2% error."
+                description = "Found in data supplied by NIVA, produced in the TEOTIL3 model \\\\citep{sample_teotil3_2024}. For the period 1990-2012, we have used TEOTIL data published by Miljødirektoratet for nitrogen from nitrogen flows that reach the coast, where we have found that values for leaching from forest in the period 2013-2023 are a fraction 0.59 of what is reported by Miljødirektoratet as «Bakgrunn», to within a 2% error."
             elif "roundwood" in norm or "industrial" in norm:
                 exact_flow_code = "FS.FO-MP.OP-Industrial round wood-Nmix"
                 display_name = "Industrial Round Wood"
@@ -887,15 +887,19 @@ def process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename, target_f
                 display_name = "Organised Grazing"
                 description = ("Calculated using data from NIBIO on organised grazing \\\\citep{nibio_beitestatistikk_2025} together with "
                     "estimated fodder intake for different animal groups taken from Table 1.2 in \\citep{hegrenes_verdi_2006}, "
-                    "assuming an average protein content of 150 g pr FEm and the standard Jones factor for the nitrogen content of protein. ")
+                    "assuming an average protein content of 150 g pr FEm and the standard Jones factor for the nitrogen content of protein. "
+                    "Feed units per animal are calibrated once against 1996 national totals and applied to every year's released-animal counts "
+                    "(NIBIO's Organisert beitebruk statistics); lambs are assumed to have the same feed-unit size as adult sheep, since they are "
+                    "released to outfield pasture together and no separate reference value exists. Cattle and goat counts for 1990-1992, which "
+                    "predate the statistics, are extrapolated linearly from the following years.")
             elif "leaching" in norm:
                 exact_flow_code = "FS.OL-HY.SW-Leaching-Nmix"
                 display_name = "Other Land Leaching"
                 description = ("Found in data supplied by NIVA, produced in the TEOTIL3 model \\\\citep{sample_teotil3_2024}, "
-                    "where it is aggregated with the value for WL. For the period 1990-2013, we have used TEOTIL data published by "
+                    "where it is aggregated with the value for WL. For the period 1990-2012, we have used TEOTIL data published by "
                     "Miljødirektoratet for nitrogen from nitrogen flows that reach the coast, where we have found that values for leaching "
-                    "from forest in the period 2013-2023 are a fraction 0.42 of what is reported by Miljødirektoratet as «Bakgrunn», "
-                    "to within a to within a 3 % error. ")
+                    "from other land in the period 2013-2023 are a fraction 0.41 of what is reported by Miljødirektoratet as «Bakgrunn», "
+                    "to within a 3 % error. ")
 
         with open(full_flow_path, 'w', encoding='utf-8') as f:
             f.write(f"---\nlayout: default\ntitle: {display_name}\nparent: {parent_subpool}\n")
