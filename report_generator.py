@@ -1346,10 +1346,11 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                     "**MP.FP-AG.MM-Farm animal feed-Nmix** is feed to farm animals. We have used data on domestic feed supply from Landbruksdirektoratet "
                     "\\\\citep{landbruksdirektoratet_kraftforstatistikk_2025} and used the detailed composition of animal feed given in \\\\citet{eidem_for-_2022} together with protein contents "
                     "from \\\\citet{fao_annex_2021} and specific Jones factors from \\\\citet{fao_chapter_2023} to get nitrogen contents.\n\n"
-                    "Based on the Landbruksdirektoratet data, the N content of the total amount of feed is 0.02 kgN/kg feed. NIBIO Totalkalkylen "
+                    "N content is applied separately by raw-material type, derived from the feed composition, protein content and Jones factor sources above: "
+                    "0.0197 kgN/kg for carbohydrate raw materials and 0.0648 kgN/kg for protein raw materials. NIBIO Totalkalkylen "
                     "gives statistics for total amount of feed to Norwegian farm animals between 1959 and 2026. Table 6.10 in \\\\citet{bruholt_jordbruksstatistikk_1994} "
                     "gives the domestically produced fraction of farm animal feed between 1985 and 1994. We combine these data to find values before 2000, "
-                    "using an average import fraction for 1995-1999.\n\n"
+                    "using an average import fraction for 1995-1999. The 2000-2003 gap between the two source series is bridged with a linear interpolation.\n\n"
                     "\\\\citet{hohmann-marriott_nitrogen_2025} found the domestic supply of animal feed in 2010 to be around 35 ktN, based on FAO statistics of production, "
                     "export and import of seed cake, which is a dominant ingredient in farm animal feed. This is less than we found when combining domestic and imported animal feed. "
                     "*(Note: This estimate might be too low, as it leads to a surplus here and a deficit in the AG.MM pool).*"
@@ -1358,9 +1359,8 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                 exact_flow_code = "MP.FP-AG.SM-Seeds and planting material-Nmix"
                 display_name = "Seeds and Planting Material"
                 description = (
-                    "**MP.FP-AG.SM-Seeds and planting material-Nmix** is taken from Gross nutrient balance in the Eurostat database as advised by \\\\citet{schappi_annexes_2025}. "
-                    "There is data missing from 2017 to 2019; because there is a large reported increase between 2016 and 2020, we assume a constant increase in the "
-                    "missing time period and fill in data from this interpolation."
+                    "**MP.FP-AG.SM-Seeds and planting material-Nmix** is purchased seed and planting material from NIBIO Totalkalkylen (cereal, oilseed, peas, "
+                    "grass seed, and root/vegetable seed), converted to N via protein content and crop-specific protein-to-N factors from \\\\citet{schappi_annexes_2025}."
                 )
             elif "food" in norm and "product" in norm and "export" not in norm:
                 exact_flow_code = "MP.FP-HS.HS-Food products-Nmix"
@@ -1384,8 +1384,9 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                 display_name = "Feed to Coastal Aquaculture"
                 description = (
                     "**MP.FP-HY.AC-Feed to coastal aquaculture-Nmix**: the amount of feed per ton of produced fish is found by assuming an "
-                    "average protein (N) retention of 35.37 % based on values from \\\\citet{aas_utilization_2022}. The amount of produced fish is found by using data "
-                    "from Fiskeridirektoratet \\\\citep{fiskeridirektoratet_06002_2025} on sold farmed fish.\n\n"
+                    "average protein (N) retention of 35.75 % based on values from \\\\citet{aas_utilization_2022}. The amount of produced fish is found by using data "
+                    "from Fiskeridirektoratet \\\\citep{fiskeridirektoratet_06002_2025} on sold farmed fish. This flow represents only the domestically supplied "
+                    "share of feed (an assumed 8 %); the remaining 92 %, assumed imported, is accounted for elsewhere as an import flow.\n\n"
                     "\\\\citet{hohmann-marriott_nitrogen_2025} found the nitrogen content in aquaculture feed in 2020 to be 124 ktN, which is very similar to our results."
                 )
             elif "untreated" in norm and "fp" in norm:
@@ -1446,7 +1447,7 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                 exact_flow_code = "MP.OP-AT.AT-Emissions-N2O"
                 display_name = "Industrial Emissions (N2O)"
                 description = (
-                    "**MP.OP-AT.AT-Emissions-N2O** are taken from UNFCCC common reporting tables, Table 3 as advised by \\\\citet{schappi_annexes_2025}. "
+                    "**MP.OP-AT.AT-Emissions-N2O** are taken from UNFCCC common reporting tables, Table 2 as advised by \\\\citet{schappi_annexes_2025}. "
                     "Emissions are substantial, at least before 2009, and the main source of emissions is from nitric acid production."
                 )
             elif "nh3" in norm:
@@ -1518,7 +1519,7 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                     "**MP.OP-HY.SW-Untreated wastewater-Nmix** is found using data from Miljødirektoratet (personal communication, 2026) on emissions to water "
                     "from individual industries, where industries are categorized as belonging to OP or FP based on the information given in the statistic, and counting "
                     "those that are not reported to be connected to municipal wastewater treatment. In OP we include industries that process petroleum products that "
-                    "could arguably also have been designated as a separate flow in the EF pool."
+                    "could arguably also have been designated as a separate flow in the EF pool. "
                     "These emissions are also reported by Miljødirektoratet \\\\citep{miljodirektoratet_norske_2025}, but "
                     "as of February 2026 the publicly available data did not include information on connection to municipal wastewater. The database does not distinguish "
                     "between emissions to surface and coastal waters, so even though several large industries discharge their wastewater to the coast, we assign this entire "
@@ -1556,13 +1557,7 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                 display_name = "Other Goods Export"
                 description = (
                     "**MP.OP-RW.RW-Other goods export-Nmix** is taken from SSB trade data (table 08801) on goods that can be characterized as flowers, chemicals, "
-                    "soap, industrial protein, leather, wood and textiles. "
-                )
-            elif "ammonia" in norm and "export" in norm:
-               exact_flow_code = "MP.OP-RW.RW-Ammonia export-NH3"
-               display_name = "Other Goods Export"
-               description = (
-                   "*Taken from SSB trade data (table 08801)."
+                    "soap, industrial protein, leather, wood, textiles, and ammonia. "
                 )
 
         # Skriv ut filen for den gjeldende strømmen
