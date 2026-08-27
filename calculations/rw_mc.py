@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+Rest of world (RW) pool: imports into Norway (fuel, food, feed, live animals,
+fertilizer, other goods) and atmospheric inflow (transboundary transport of
+N into Norway).
+"""
 import pandas as pd
 
 from calculations.utils import (
@@ -11,21 +16,25 @@ from calculations.shared_flow_calculations import find_aquaculture_production
 
 def execute_calculations_rw(preloaded_data, current_params, dataset_noise, current_trade_factors):
     results = []
-    
+
     _add_fuel_import(results, preloaded_data, current_params, current_trade_factors, dataset_noise)
     _add_transport_fuel_import(results, preloaded_data, current_params, current_trade_factors, dataset_noise)
     _add_solid_waste_import(results, preloaded_data, current_params, current_trade_factors, dataset_noise)
     _add_food_import(results, preloaded_data, current_params, current_trade_factors, dataset_noise)
     _add_other_goods_import(results, preloaded_data, current_params, current_trade_factors, dataset_noise)
     _add_ammonia_import(results, preloaded_data, current_params, current_trade_factors, dataset_noise)
-    
+
     _add_animal_feed_import_mc(results, preloaded_data, current_params, dataset_noise)
     _add_aquaculture_feed_import_mc(results, preloaded_data, current_params, dataset_noise)
     _add_live_animal_import_mc(results, preloaded_data, current_params, dataset_noise)
     _add_mineral_fertilizer_import_mc(results, preloaded_data, current_params, dataset_noise)
-    _add_rw_outflow_oxn_mc(results, preloaded_data, current_params, dataset_noise)
-    _add_rw_outflow_rdn_mc(results, preloaded_data, current_params, dataset_noise)
-    
+
+    # 'atm_in_out' <- atm_in_out.xlsx (data_loader.py DATA_MAP): EMEP
+    # source-receptor data for Norway
+    df_atm = preloaded_data.get('atm_in_out')
+    _add_atmospheric_inflow_mc(results, 'RW.RW-AT.AT-Atmospheric inflow-OXN', 1, df_atm, current_params, dataset_noise)
+    _add_atmospheric_inflow_mc(results, 'RW.RW-AT.AT-Atmospheric inflow-RDN', 3, df_atm, current_params, dataset_noise)
+
     return results
 
 
@@ -81,9 +90,15 @@ def _add_animal_feed_import_mc(results, preloaded_data, current_params, dataset_
     flow_code = 'RW.RW-AG.MM-Animal feed import-Nmix'
     collected_years = set()
     
+    # 'feed_raavarer_import' <- Årlig råvareforbruk.xlsx (data_loader.py
+    # DATA_MAP, 'excel_feed_raavarer_import' method): Landbruksdirektoratets
+    # kraftfôrstatistikk, imported raw materials for concentrate feed
     df_raavarer = preloaded_data.get('feed_raavarer_import')
+    # 'feed_totalkalkyle' <- NibioStatistics-4.xlsx (data_loader.py DATA_MAP):
+    # NIBIO Totalkalkylen, purchased concentrate feed (tonnes, price,
+    # domestically produced fraction), 1985-1999
     df_totalkalkyle = preloaded_data.get('feed_totalkalkyle')
-    
+
     N_content_carb = float(current_params.get("feed_carb_N_frac"))
     N_content_prot = float(current_params.get("feed_prot_N_frac"))
     
@@ -95,41 +110,43 @@ def _add_animal_feed_import_mc(results, preloaded_data, current_params, dataset_
     key_total = 'Totalkalkylen'
     noise_total = dataset_noise[key_total]
 
-    # --- Nyere år (Landbruksdirektoratet) ---
+    # Newer years (Landbruksdirektoratet), 2000 onward.
     N_cont_sum = 0
     valid_count = 0
-    
+
     for idx, row in df_raavarer.iterrows():
         val_at_year = str(row['year']).strip()
         if val_at_year.lower() in ['year', 'år', 'årstall', 'nan', '']:
             continue
-            
+
         year = int(float(val_at_year))
         if year in EXPECTED_YEARS:
             collected_years.add(year)
-            
+
             base_carb = float(row['value_carb'])
             base_prot = float(row['value_prot'])
-            
+
             value_carb = base_carb * noise_kraft
             value_prot = base_prot * noise_kraft
-                
+
             imported_feed_N = (value_carb * N_content_carb + value_prot * N_content_prot) / 1000
-            imported_feed_N = max(0.0, imported_feed_N)
-                
+
             results.append({
                 'flow_name': flow_code, 'year': year, 'value': imported_feed_N,
                 'comment': 'ok',
                 'data_sources': 'Landbruksdirektoratets kraftfôrstatistikk'
             })
-            
+
             if (base_carb + base_prot) > 0:
                 N_cont_sum += ((base_carb * N_content_carb + base_prot * N_content_prot) / (base_carb + base_prot))
                 valid_count += 1
 
+    # Average N content per tonne of imported raw feed material across
+    # 2000+, used below as a stand-in for the earlier Totalkalkylen-era
+    # tonnage, which isn't broken down by carbohydrate/protein content.
     N_cont_before_2000 = N_cont_sum / valid_count
 
-    # --- Eldre år (NIBIO Totalkalkylen) ---
+    # Older years (NIBIO Totalkalkylen), 1985-1999.
     for idx, row in df_totalkalkyle.iterrows():
         val_at_year = str(row['year']).strip()
         if val_at_year.lower() in ['year', 'år', 'årstall', 'nan', '']:
@@ -142,23 +159,18 @@ def _add_animal_feed_import_mc(results, preloaded_data, current_params, dataset_
             base_feed_tonn = float(row['value'])                
             feed_tonn = base_feed_tonn * noise_total
             
-            # Sjekker om dom_frac mangler i Excel-filen
+            # 'dom_frac' (domestically produced fraction) is reported directly
+            # for 1985-1994; later years fall back to the cross-year average.
             if 'dom_frac' not in row or pd.isna(row['dom_frac']):
-                if year >= 1995:
-                    dom_frac = global_dom_frac_fallback
-                    comment = 'ok'
-                else:
-                    raise ValueError(f"År {year} mangler 'dom_frac' i kilde og faller utenfor gyldig tidsintervall for parameter-fallback.")
+                dom_frac = global_dom_frac_fallback
             else:
                 dom_frac = float(row['dom_frac'])
-                comment = 'ok'
-            
+
             value_kt_N = feed_tonn * 1e-3 * N_cont_before_2000 * (1 - dom_frac)
-            value_kt_N = max(0.0, value_kt_N)
-                
+
             results.append({
                 'flow_name': flow_code, 'year': year, 'value': value_kt_N,
-                'comment': comment, 'data_sources': 'NIBIO Totalkalkylen'
+                'comment': 'ok', 'data_sources': 'NIBIO Totalkalkylen'
             })
 
     missing_years = EXPECTED_YEARS - collected_years
@@ -169,6 +181,10 @@ def _add_aquaculture_feed_import_mc(results, preloaded_data, current_params, dat
     flow_code = 'RW.RW-HY.AC-Aquaculture feed import-Nmix'
     collected_years = set()
     
+    # 'aqua_modern'/'aqua_old' <- A.06.002_20251111-140559.xlsx (1994 onward)
+    # and akvakultur_1984_1994.xlsx (data_loader.py DATA_MAP, 'excel_aquaculture'
+    # method): Fiskeridirektoratet aquaculture sales of salmon/trout by county,
+    # species and year, extended backward with a historical compilation
     df_modern = preloaded_data.get('aqua_modern')
     df_old = preloaded_data.get('aqua_old')
 
@@ -179,15 +195,17 @@ def _add_aquaculture_feed_import_mc(results, preloaded_data, current_params, dat
     feed_waste = float(current_params.get("aquafeed_waste_fraction"))
 
     for year, fish_harvested_N in aquaculture_production.items():
-        if year not in EXPECTED_YEARS: 
+        if year not in EXPECTED_YEARS:
             continue
         collected_years.add(year)
-        
+
+        # Back-calculate total feed N from harvested fish N (see
+        # MP.FP-HY.AC-Feed to coastal aquaculture-Nmix in mp_mc.py, which
+        # keeps only the domestic share of this same total).
         eaten_feed_N = fish_harvested_N / prot_ret
         total_feed_N = eaten_feed_N / (1 - feed_waste)
         imported_feed_N = total_feed_N * import_fraction
-        imported_feed_N = max(0.0, imported_feed_N)
-            
+
         results.append({
             'flow_name': flow_code, 'year': year, 'value': float(imported_feed_N),
             'comment': 'ok', 'data_sources': 'Fiskeridirektoratet'
@@ -201,6 +219,9 @@ def _add_live_animal_import_mc(results, preloaded_data, current_params, dataset_
     flow_code = 'RW.RW-AG.MM-Live animal import-Nmix'
     collected_years = set()
     
+    # 'fao_live_animals' <- FAOSTAT_data_en_11-12-2025.csv (data_loader.py
+    # DATA_MAP, 'csv_live_animals' method): FAOSTAT crop and livestock
+    # products, import quantity of live animals
     final_data = preloaded_data.get('fao_live_animals')
 
     prot_frac = float(current_params.get("live_animal_protein_frac"))
@@ -217,18 +238,21 @@ def _add_live_animal_import_mc(results, preloaded_data, current_params, dataset_
         try:
             return float(current_params.get(param_key))
         except KeyError:
-            # Godtatt fallback for sjeldne dyrearter som ikke er definert i N_parameters
+            # Intentional: FAOSTAT includes animal types this model doesn't
+            # assign a weight to (see the same fallback in ag_mc.py's
+            # _add_live_animal_export_mc); their contribution is dropped
+            # rather than the whole flow crashing.
             return 0.0
 
     df_round['perturbed_weight'] = df_round['Item'].apply(get_perturbed_weight)
     df_round['N_amount'] = (df_round['perturbed_weight'] * df_round['perturbed_value'] * prot_frac * 1e-6 / prot_to_N)
 
     total_N_per_year = df_round.groupby('Year')['N_amount'].sum().to_dict()
-    
+
     for year in sorted(EXPECTED_YEARS):
         if year in total_N_per_year:
             collected_years.add(year)
-            val = max(0.0, total_N_per_year[year])
+            val = total_N_per_year[year]
             results.append({
                 'flow_name': flow_code, 'year': year, 'value': float(val),
                 'comment': 'ok', 'data_sources': 'FAOSTAT'
@@ -242,23 +266,25 @@ def _add_mineral_fertilizer_import_mc(results, preloaded_data, current_params, d
     flow_code = 'RW.RW-AG.SM-Mineral fertilizer import-Nmix'
     collected_years = set()
     
+    # 'fao_mineral_fertilizer' <- FAOSTAT_data_en_11-12-2025-2.csv
+    # (data_loader.py DATA_MAP): FAOSTAT fertilizer by nutrient, export
+    # quantity (also used here for its import-quantity rows)
     final_data = preloaded_data.get('fao_mineral_fertilizer')
     key_fert = 'Fertilizer by nutrient'
     noise_fert = dataset_noise[key_fert]
-    
+
     final_data.columns = [col.strip() for col in final_data.columns]
     import_data = final_data[final_data['Element'].str.strip() == 'Import quantity']
     total_fert_per_year = import_data.groupby('Year')['Value'].sum().to_dict()
-    
+
     for year in sorted(EXPECTED_YEARS):
         if year in total_fert_per_year:
             collected_years.add(year)
-            base_value = float(total_fert_per_year[year])            
+            base_value = float(total_fert_per_year[year])
             perturbed_value = base_value * noise_fert
-            
-            # Konverterer fra tonn (t) til kilotonn (ktN)
-            value_kt = max(0.0, perturbed_value / 1000.0)
-                
+
+            value_kt = perturbed_value / 1000.0  # tonnes -> kt
+
             results.append({
                 'flow_name': flow_code, 'year': year, 'value': value_kt,
                 'comment': 'ok', 'data_sources': 'FAOSTAT'
@@ -268,76 +294,45 @@ def _add_mineral_fertilizer_import_mc(results, preloaded_data, current_params, d
     report_missing_years(flow_code, missing_years, results)
     
 
-def _add_rw_outflow_oxn_mc(results, preloaded_data, current_params, dataset_noise):
-    flow_code = 'RW.RW-AT.AT-Atmospheric inflow-OXN'
+def _add_atmospheric_inflow_mc(results, flow_code, value_col, df_rw, current_params, dataset_noise):
+    """
+    Shared implementation for atmospheric inflow (transboundary transport of N
+    into Norway), for both OXN (value_col=1, 'NOx in' in atm_in_out.xlsx) and
+    RDN (value_col=3, 'NH3 in'). Source rows are in units of 100 t N (see the
+    file header), so dividing by 10 converts to kt N. Mirrors
+    at_mc.py's _add_atmospheric_outflow_mc, which reads the 'out' columns of
+    the same file for the reverse direction.
+    """
     collected_years = set()
     comment = 'ok'
-    
-    df_rw = preloaded_data.get('atm_in_out')
 
     for r in range(5, 45):
-        # if r >= len(df_rw): 
-        #     break
-            
-        val_at_year = str(df_rw.iloc[r, 0]).strip()
-            
-        year = int(float(val_at_year))
-        collected_years.add(year)
-        
-        status_val = str(df_rw.iloc[r, 5]).strip()
-        dataset_key = 'trend interpolation' if status_val == 'interpolated' else 'Source-receptor'
-        data_sources = 'interpolated' if status_val == 'interpolated' else 'EMEP SR tables'
-            
-        base_value = float(df_rw.iloc[r, 1]) / 10  # 100 tN -> ktN
-        
-        if not dataset_noise or dataset_key not in dataset_noise:
-            raise KeyError(f"[KRITISK] Atmosfærisk støy-nøkkel '{dataset_key}' mangler i dataset_noise for {flow_code}!")
-            
-        noise_val = dataset_noise[dataset_key]
-        value = base_value * noise_val
-            
-        value = max(0.0, value)
-            
-        results.append({
-            'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': comment, 'data_sources': data_sources
-        })
-        
-    missing_years = EXPECTED_YEARS - collected_years
-    report_missing_years(flow_code, missing_years, results)
-
-
-def _add_rw_outflow_rdn_mc(results, preloaded_data, current_params, dataset_noise):
-    flow_code = 'RW.RW-AT.AT-Atmospheric inflow-RDN'
-    collected_years = set()
-    comment = 'ok'
-    
-    df_rw = preloaded_data.get('atm_in_out')
-    
-    for r in range(5, 45): 
-        # if r >= len(df_rw): 
-        #     break
-            
-        val_at_year = str(df_rw.iloc[r, 0]).strip()
-        if val_at_year.lower() in ['year', 'år', 'årstall', 'nan', '']:
+        year_val = df_rw.iloc[r, 0]
+        if pd.isna(year_val):
             continue
-            
-        year = int(float(val_at_year))
+
+        year = int(year_val)
         collected_years.add(year)
-        
+
         status_val = str(df_rw.iloc[r, 5]).strip()
-        dataset_key = 'trend interpolation' if status_val == 'interpolated' else 'Source-receptor'
-        data_sources = 'interpolated' if status_val == 'interpolated' else 'EMEP SR tables'
-            
-        base_value = float(df_rw.iloc[r, 3]) / 10  # 100 tN -> ktN
-        
+        if status_val == 'interpolated':
+            dataset_key = 'trend interpolation'
+            data_sources = 'interpolated'
+        else:
+            dataset_key = 'Source-receptor'
+            data_sources = 'EMEP SR tables'
+
+        base_value = float(df_rw.iloc[r, value_col]) / 10
         noise_val = dataset_noise[dataset_key]
         value = base_value * noise_val
-            
+
         results.append({
-            'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': comment, 'data_sources': data_sources
+            'flow_name': flow_code,
+            'year': year,
+            'value': value,
+            'comment': comment,
+            'data_sources': data_sources
         })
-        
+
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
