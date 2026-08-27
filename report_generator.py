@@ -479,14 +479,10 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename, targe
                 f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_TEXT + "\n\n")
             elif exact_flow_code in ["AT.AT-HY.SW-Deposition-OXN","AT.AT-HY.SW-Deposition-RDN"]:
                 f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_TEXT + "For comparison, the data used in the TEOTIL model gives 3.5 ktN in 2013 and "
-                        "3.0 ktN in 2023. These comparable but slightly lower values are the results of different datasets used and different data "
-                        "treatment. ")
+                        "3.0 ktN in 2023 - a similar declining trend to our combined OXN+RDN values (about 9.4 and 8.1 ktN for the same years), "
+                        "but substantially lower in magnitude, likely reflecting different datasets and different data treatment. ")
             elif exact_flow_code in ["AT.AT-AG.SM-Deposition-OXN", "AT.AT-AG.SM-Deposition-RDN"]:
-                f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_TEXT + "\n\nAs noted, our value for agricultural soils is much larger than given by ""FAOSTAT. "
-                        "\\\\citet{hohmann-marriott_nitrogen_2025} used values from \\\\citet{blake_deposition_2023} to arrive at an average "
-                        "N deposition rate of 80.85 ktN for the period 2017-2021. \\\\citet{hohmann-marriott_nitrogen_2025} "
-                        "also reported values of 74.7 and 33.5 ktN per year using two different methods "
-                        "for estimating biome-dependent N deposition rates.")
+                f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_TEXT + "\n\n")
             elif exact_flow_code == "AT.AT-FS.FO-N2 fixation-N2":
                 f.write("Following the Swedish NBB \\citet{moldan_where_2025}, we use an N-fixation "
                         "rate of 1.5 kg/ha/year and a forested area of 12.0 mill ha as given by SSB for 2019-2023 (table 14368); we assume this value is "
@@ -503,13 +499,20 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename, targe
                         "eutrophic and we use a median value of 0.1 tN/km2, with highest and lowest values of 0 and 2 tN/km2.")
             elif exact_flow_code == "AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2":
                 f.write(f"**{exact_flow_code}**\n\n" + "is found through mass balance where we use data from FAOSTAT Fertilizer by nutrient, domestic "
-                        "fertilizer production, and subtracted the amount of ammonia imported from SSB trade data (table 08801). The result is a very "
+                        "fertilizer production, and adjusted for trade in ammonia using SSB trade data (table 08801): imported ammonia is subtracted "
+                        "(not domestically fixed) and exported ammonia is added back (domestically fixed before leaving the country). The result is a very "
                         "variable curve which probably does not reflect year to year production well and could be a result of how trade statistics are "
                         "reported.")
             elif exact_flow_code == "AT.AT-RW.RW-Atmospheric outflow-OXN":
-                f.write(f"**{exact_flow_code}**\n\n" + "is found using source-receptor data from \\citep{emep_sr_2024}, as advised by \\citep{schappi_annexes_2025}.")
+                f.write(f"**{exact_flow_code}**\n\n" + "is found using source-receptor data from \\citep{emep_sr_2024}, as advised by \\citep{schappi_annexes_2025}. "
+                        "The EMEP source-receptor tables are not published for every year: 1984-1996 use the average of 1997-2001 (the earliest "
+                        "available years); the single missing years 2011, 2015 and 2022 use the average of the surrounding years; and 2019-2020 "
+                        "are linearly interpolated between 2018 and 2021.")
             elif exact_flow_code == "AT.AT-RW.RW-Atmospheric outflow-RDN":
-                f.write(f"**{exact_flow_code}**\n\n" + "is found using source-receptor data from \\citep{emep_sr_2024}, as advised by \\citep{schappi_annexes_2025}.")
+                f.write(f"**{exact_flow_code}**\n\n" + "is found using source-receptor data from \\citep{emep_sr_2024}, as advised by \\citep{schappi_annexes_2025}. "
+                        "The EMEP source-receptor tables are not published for every year: 1984-1996 use the average of 1997-2001 (the earliest "
+                        "available years); the single missing years 2011, 2015 and 2022 use the average of the surrounding years; and 2019-2020 "
+                        "are linearly interpolated between 2018 and 2021.")
             else:
                 f.write(f"*Flow details for {exact_flow_code}*\n\n")
 
@@ -579,14 +582,18 @@ def process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename
             display_name = "Atmospheric Inflow (Oxidized N)"
             description = (
                 "Is found from source-receptor data from EMEP, as advised by \\citep{schappi_annexes_2025}. There is a change "
-                "in methodology in the EMEP reporting between 2002 and 2003 data."
+                "in methodology in the EMEP reporting between 2002 and 2003 data. The EMEP source-receptor tables are not published "
+                "for every year: 1984-1996 use the average of 1997-2001 (the earliest available years); the single missing years "
+                "2011, 2015 and 2022 use the average of the surrounding years; and 2019-2020 are linearly interpolated between 2018 and 2021."
             )
         elif "inflow" in norm and "rdn" in norm:
             exact_flow_code = "RW.RW-AT.AT-Atmospheric inflow-RDN"
             display_name = "Atmospheric Inflow (Reduced N)"
             description = (
                 "Is found from source-receptor data from EMEP, as advised by \\citep{schappi_annexes_2025}. There is a change "
-                "in methodology in the EMEP reporting between 2002 and 2003 data."
+                "in methodology in the EMEP reporting between 2002 and 2003 data. The EMEP source-receptor tables are not published "
+                "for every year: 1984-1996 use the average of 1997-2001 (the earliest available years); the single missing years "
+                "2011, 2015 and 2022 use the average of the surrounding years; and 2019-2020 are linearly interpolated between 2018 and 2021."
             )
         elif "fuel" in norm and "import" in norm and "transport" not in norm:
             exact_flow_code = "RW.RW-EF.EC-Fuel import-Nmix"
