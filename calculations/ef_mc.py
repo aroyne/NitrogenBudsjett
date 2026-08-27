@@ -22,10 +22,10 @@ from calculations.shared_flow_calculations import find_feedstock_fuel
 # CRLTAP category codes per EF subsector, used to select which rows of the
 # CRLTAP inventory (webdabData1863365.txt, loaded as 'ag_crltap_raw_lines') to
 # sum for each subsector's NH3/NOx emissions.
-CRLTAP_EC_SECTORS = ['1A1a', '1A1b', '1A1c', '1B1a', '1B1b', '1B1c', '1B2ai', '1B2aiv', '1B2av', '1B2b', '1B2', '1B2d']
+CRLTAP_EC_SECTORS = ['1A1a', '1A1b', '1A1c', '1B1a', '1B1b', '1B1c', '1B2ai', '1B2aiv', '1B2av', '1B2b', '1B2c', '1B2d']
 CRLTAP_IC_SECTORS = ['1A2a', '1A2b', '1A2c', '1A2d', '1A2e', '1A2f', '1A2gvii', '1A2gviii']
-CRLTAP_TR_SECTORS = ['1A3a(i)', '1A3aii(i)', '1A3bi', '1A3bii', '1A3biii', '1A3biv', '1A3bv', '1A3bvi', '1A3bvii', '1A3c', '1A3di(ii)', '1A3dii', '1A3ei', '1A3eii']
-CRLTAP_OE_SECTORS = ['1A4a1', '1A4aii', '1A4bi', '1A4bii', '1A4ci', '1A4cii', '1A4ciii', '1A5a', '1A5b']
+CRLTAP_TR_SECTORS = ['1A3ai(i)', '1A3aii(i)', '1A3bi', '1A3bii', '1A3biii', '1A3biv', '1A3bv', '1A3bvi', '1A3bvii', '1A3c', '1A3di(ii)', '1A3dii', '1A3ei', '1A3eii']
+CRLTAP_OE_SECTORS = ['1A4ai', '1A4aii', '1A4bi', '1A4bii', '1A4ci', '1A4cii', '1A4ciii', '1A5a', '1A5b']
 
 
 def execute_calculations_ef(preloaded_data, current_params, dataset_noise, current_trade_factors):
@@ -71,7 +71,9 @@ def _add_fuel_for_ec_subsector_mc(results, preloaded_data, dataset_noise, flow_c
     'fuel_for_industry' <- data_files/N_fuel_for_industry.csv
     'fuel_for_transport' <- data_files/N_fuel_for_transport.csv
     'fuel_for_heating' <- data_files/N_fuel_for_heating.csv
-    All three are CRLTAP-derived compilations (see DATA_SOURCES.txt), reported as UNFCCC CRT.
+    All three are compiled from UNFCCC CRT (Common Reporting Tables) fuel
+    consumption in TJ, converted to N via IPCC (2006) NCVs and Schäppi (2025)
+    Annexes Table 15 N contents (see DATA_SOURCES.txt).
     """
     collected_years = set()
     dataset_key = 'UNFCCC_fuel'

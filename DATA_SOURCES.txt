@@ -176,17 +176,17 @@ data taken from CRT (common reporting tables) for Norway under UNFCCC, https://u
 
 N_fuel_for_heating.csv
 Compilation of N flows from fuel used for heating
-data derived from CLRTAP inventory submissions (webdabData1863365.txt)
+data derived from UNFCCC CRT (common reporting tables) for Norway, sheet Table1.A(a)s2, fuel consumption in TJ, converted to N using NCVs from IPCC (2006) Table 1.2 and N contents from Table 15 in Schäppi (2025) Annexes
 data compilation done with script N_fuel_for_heating.ipynb
 
 N_fuel_for_industry.csv
 Compilation of N flows from fuel used in industry
-data derived from CLRTAP inventory submissions (webdabData1863365.txt)
+data derived from UNFCCC CRT (common reporting tables) for Norway, sheet Table1.A(a)s2, fuel consumption in TJ, converted to N using NCVs from IPCC (2006) Table 1.2 and N contents from Table 15 in Schäppi (2025) Annexes
 data compilation done with script N_fuel_for_industry.ipynb
 
 N_fuel_for_transport.csv
 Compilation of N flows from fuel used for transport
-data derived from CLRTAP inventory submissions (webdabData1863365.txt)
+data derived from UNFCCC CRT (common reporting tables) for Norway, sheet Table1.A(a)s2, fuel consumption in TJ, converted to N using NCVs from IPCC (2006) Table 1.2 and N contents from Table 15 in Schäppi (2025) Annexes
 data compilation done with script N_fuel_for_transport.ipynb
 
 N_parameters.xlsx

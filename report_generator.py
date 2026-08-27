@@ -1228,7 +1228,11 @@ def process_energy_and_fuels_pool(ef_folder, plot_files, plot_dir, bib_filename,
             elif "feedstock" in norm:
                 exact_flow_code = "EF.EC-MP.OP-Fuel used as feedstock-Nmix"
                 display_name = "Fuel used as feedstock"
-                description = f"**{exact_flow_code}**: " + description_fuels + " Other minor feedstock categories listed in the guidelines are neglected as advised by \\citet{schappi_annexes_2025}."
+                description = (f"**{exact_flow_code}** covers coal and oil products consumed as chemical feedstock rather than combusted for "
+                    "energy. We use SSB table 11561 \"Energibalansen\"'s \"Netto innenlands forbruk som råstoff\" (net domestic consumption as "
+                    "feedstock) section for consumption volumes by energy product, net caloric values from IPCC (2006), and nitrogen contents "
+                    "for coal and oil feedstock from \\\\citet{schappi_annexes_2025}. Other minor feedstock categories listed in the guidelines "
+                    "are neglected as advised by \\\\citet{schappi_annexes_2025}.")
             elif "export" in norm and "transport" not in norm:
                 exact_flow_code = "EF.EC-RW.RW-Fuel export-Nmix"
                 display_name = "Fuel export"
