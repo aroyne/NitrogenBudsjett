@@ -1,4 +1,12 @@
-# krav: pip install openpyxl
+"""
+One-off utility for splicing a new flow row into an already-exported
+Report.xlsx copy, between two existing marker rows in a sheet, without
+disturbing merged cells or cell styling. Used when a flow gets added to the
+model after a report has already been generated, so it doesn't have to be
+regenerated from scratch just to include one new row.
+
+requires: pip install openpyxl
+"""
 from openpyxl import load_workbook
 from openpyxl.utils import (
     column_index_from_string, get_column_letter, range_boundaries
@@ -43,7 +51,7 @@ def exists_between(ws, col_idx, start_row, end_row, target):
 
 def save_merged_info(ws):
     """
-    Returnerer liste av dict med informasjon om merges:
+    Returns a list of dicts describing each merged range:
     {'coord': 'A1:A3', 'min_col':.., 'min_row':.., 'max_col':.., 'max_row':..,
      'top_left_val': ..., 'top_left_style': {...}}
     """
@@ -52,7 +60,7 @@ def save_merged_info(ws):
         coord = m.coord
         min_col, min_row, max_col, max_row = range_boundaries(coord)
         top_cell = ws.cell(row=min_row, column=min_col)
-        # lagre verdi og stilkopi av toppcelle
+        # Save the top-left cell's value and a copy of its style.
         style = {}
         if top_cell.has_style:
             style['font'] = copy(top_cell.font)
@@ -74,10 +82,11 @@ def save_merged_info(ws):
 
 def restore_merged_info(ws, merged_info):
     """
-    Gjenoppretter merges basert på en liste som fra save_merged_info (med oppdaterte rader/kolonner).
-    Setter også top-left celle verdi og stil.
+    Restores merged ranges from a list produced by save_merged_info (with
+    already-updated row/column coordinates). Also sets the top-left cell's
+    value and style.
     """
-    # Fjern eventuelle merges først for å unngå overlapp
+    # Remove any existing merges first, to avoid overlap.
     for m in list(ws.merged_cells.ranges):
         try:
             ws.unmerge_cells(str(m))
@@ -103,23 +112,24 @@ def restore_merged_info(ws, merged_info):
 
 def adjust_and_insert_row(ws, insert_at, amount=1):
     """
-    Sikker insert med håndtering av merges:
-    - Lagrer merges, fjerner dem,
-    - oppdaterer merged_info koordinater i forhold til insert_at,
-    - setter inn rader,
-    - gjenoppretter merges med oppdaterte koordinater og top-left innhold/stil.
-    Returnerer nothing; ws modifiseres in-place.
+    Inserts rows without breaking merged cells:
+    - saves the current merges and removes them,
+    - shifts each merge's coordinates relative to insert_at,
+    - inserts the new rows,
+    - restores the merges at their shifted coordinates, with the top-left
+      cell's content/style intact.
+    Modifies ws in place; returns nothing.
     """
     merged_info = save_merged_info(ws)
 
-    # Fjern merges
+    # Remove existing merges.
     for m in list(ws.merged_cells.ranges):
         try:
             ws.unmerge_cells(str(m))
         except Exception:
             pass
 
-    # Oppdater merged_info i henhold til reglene:
+    # Shift merge coordinates to account for the rows about to be inserted.
     new_infos = []
     for info in merged_info:
         min_col = info['min_col']
@@ -131,18 +141,18 @@ def adjust_and_insert_row(ws, insert_at, amount=1):
             min_row += amount
             max_row += amount
         elif min_row < insert_at <= max_row:
-            # utvid nedover for de som spenner over insert_at
+            # Ranges spanning insert_at grow downward to keep covering it.
             max_row += amount
-        # ellers før insert_at: ingen endring
+        # Ranges entirely before insert_at are unaffected.
 
         ni = info.copy()
         ni.update({'min_row': min_row, 'max_row': max_row})
         new_infos.append(ni)
 
-    # Sett inn rader
+    # Insert the rows.
     ws.insert_rows(insert_at, amount=amount)
 
-    # Gjenopprett merges med nye koordinater og top-left innhold/stil
+    # Restore the merges at their shifted coordinates.
     restore_merged_info(ws, new_infos)
 
 def copy_style_from_row_above(ws, target_row, max_col):
@@ -186,7 +196,7 @@ def set_year_from_above(ws, new_row, col_idx=16):
 
 def fill_row_after_insert(ws, new_row, values_by_col_idx):
     max_col = max(values_by_col_idx.keys()) if values_by_col_idx else ws.max_column
-    # Kopier stil fra raden over for visuell konsistens
+    # Copy the row above's style for visual consistency.
     copy_style_from_row_above(ws, new_row, max_col)
 
     for col_idx, template in values_by_col_idx.items():
@@ -220,6 +230,13 @@ def ensure_target_between_markers(
     values_to_set=None,
     out_filename=None
 ):
+    """
+    For every (start_marker, end_marker) range found in col_letter, inserts a
+    row containing values_to_set immediately after start_marker (or before
+    end_marker), unless target already appears somewhere in that range.
+    Saves the result to out_filename (or filename with a '_modified' suffix)
+    and returns that path.
+    """
     col_idx = col_to_idx(col_letter)
     wb = load_workbook(filename)
     ws = wb[sheetname]
@@ -245,13 +262,13 @@ def ensure_target_between_markers(
 
             ops.append((insert_at, values_by_col_idx))
 
-    # sorter synkende
+    # Sort descending so earlier insertions don't shift later rows' target positions.
     ops.sort(key=lambda t: t[0], reverse=True)
 
     for insert_at, values_by_col_idx in ops:
-        # sikker insert som bevarer merges
+        # Insert while preserving merged cells.
         adjust_and_insert_row(ws, insert_at, amount=1)
-        # fyll den øverste av de nye radene
+        # Fill the topmost of the newly-inserted rows.
         new_row = insert_at
         fill_row_after_insert(ws, new_row, values_by_col_idx)
 
