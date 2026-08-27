@@ -18,9 +18,17 @@ downloaded 11.02.2026
 SSB table 05307: Dagligrøykere og av-og-til-røykere (daily and occasional smokers, age 16-79), by gender, age, year and statistical variable
 downloaded 19.11.2025
 
+05543_20251217-111610.xlsx
+SSB table 05543: Gjødsling av skog (forest fertilization), by region, year and statistical variable
+downloaded 17.12.2025
+
 05772_20251210-142618.xlsx
 SSB table 05772: Avling i jordbruket (agricultural yield, 1000 tonnes), by statistical variable and year
 data for 2000-2020
+
+06376_20260129-155937.xlsx
+SSB table 06376: food/drink amounts consumed per person per year, by item group, statistical variable and multi-year interval
+downloaded 29.01.2026
 
 06913_20251113-124117.xlsx
 SSB table 06913: Befolkning og endringer (population and changes), by year and statistical variable
@@ -30,9 +38,17 @@ downloaded 13.11.2025
 SSB table 07459: Befolkning (population), by gender, age, year and statistical variable
 downloaded 19.11.2025
 
+08205_20251104-141305.xlsx
+SSB table 08205: energy use, energy costs and energy prices in industry, by statistical variable, energy product, industry (SN2007) and year
+downloaded 04.11.2025
+
 09702_20251120-133716.xlsx
 SSB table 09702: Energibalansen (energy balance), firewood consumption in residences and holiday homes, by year and statistical variable
 downloaded 20.11.2025
+
+10249_20260129-155747.xlsx
+SSB table 10249: food/drink amounts consumed per person per year (kg/liter), by item group, year and statistical variable (1999-2012, with 2010-2011 missing from the source)
+downloaded 29.01.2026
 
 10514_20260211-094101.xlsx
 SSB table 10514: Avfallsregnskap for Norge (waste accounts for Norway, 1000 tonnes), by source, material type, statistical variable and year; includes all categories
@@ -49,6 +65,10 @@ downloaded 26.05.2026
 13648_20251117-154625.xlsx
 SSB table 13648: Avling i jordbruket (agricultural yield, 1000 tonnes, and yield per decare), by crop, statistical variable and year
 downloaded 17.11.2025
+
+13695_20260129-155515.xlsx
+SSB table 13695: food/drink amounts sold per person per day, by nutrient content and statistical variable (2018 onward)
+downloaded 29.01.2026
 
 A.06.002_20251111-140559.xlsx
 Fiskeridirektoratet table A.06.002 Akvakultur (aquaculture). Matfisk (food fish): sales of salmon, rainbow trout and trout, by county, species, year and statistical variable
@@ -79,9 +99,19 @@ FAOSTAT_data_en_11-12-2025.csv
 Crop and livestock products - import and export of live animals
 downloaded 12.11.2025
 
+FAOSTAT_data_en_11-12-2025-2.csv
+Fertilizer by nutrient, export quantity
+https://www.fao.org/faostat/en/#data/RFN
+downloaded 12.11.2025
+
 FAOSTAT_data_en_11-18-2025.csv
 Crop and livestock products: production quantity, animal products
 https://www.fao.org/faostat/en/#data/QCL
+
+FAOSTAT_data_en_11-21-2025.csv
+Fertilizer by nutrient, agricultural use
+https://www.fao.org/faostat/en/#data/RFN
+downloaded 21.11.2025
 
 FAOSTAT_data_en_11-25-2025.csv
 Fertiliser by nutrient, domestic production
@@ -99,6 +129,10 @@ grovfor_før_2000.xlsx
 Historical hay and silage crop yield, pre-2000
 data from Jordbruksstatistikk 2000 (SSB), Table 2.1
 
+industry_categories.xlsx
+Industribedrifter (industrial plants) from norskeutslipp.no, manually categorized by pool and by connection to a municipal sewage network
+manually categorized 28.11.2025
+
 kommunalt_avfall_1985_1995.xlsx
 Historical municipal and industry waste compilation, 1985-1995 (quantities, incineration/recycling shares, material-specific recycling)
 source: Figur 4.3, Naturressurser og miljø 1997, SSB
@@ -115,6 +149,10 @@ data taken from CRT (common reporting tables) for Norway under UNFCCC, https://u
 N2O_NOx_HS_FS.xlsx
 Compilation of N2O and NOx emissions from HS and FS land-use change (LUC)
 data taken from CRT (common reporting tables) for Norway under UNFCCC, https://unfccc.int/documents/644485, Table 4
+
+N2O_NOx_OP.csv
+Compilation of N2O and NOx from other producing industry (OP)
+data taken from CRT (common reporting tables) for Norway under UNFCCC, https://unfccc.int/documents/644485, Table 2
 
 N_fuel_for_heating.csv
 Compilation of N flows from fuel used for heating
@@ -139,6 +177,10 @@ manually maintained, updated on an ongoing basis
 NibioStatistics-4.xlsx
 NIBIO Totalkalkylen: purchased concentrate feed (tonnes, price, domestically produced fraction)
 domestically produced fraction from SSB Jordbruksstatistikk 1994, Table 6.10
+
+NibioStatistics-5.xlsx
+NIBIO Totalkalkylen: purchased seed and planting material (cereal, oilseed, peas, grass seed, root/vegetable seed)
+downloaded 06.02.2026
 
 nitrogenrensing_avløp.xlsx
 Nitrogen removal efficiency at named major Norwegian wastewater treatment plants (VEAS, Bekkelaget, NRVA, etc.)
