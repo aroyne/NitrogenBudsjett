@@ -1679,7 +1679,7 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
             elif "atat" in norm and "n2o" in norm:
                 exact_flow_code = "PR.SO-AT.AT-Emissions-N2O"
                 display_name = "N2O Emissions (Solid Waste)"
-                flow_description = (f"**{exact_flow_code}** is taken from UNFCCC Common reporting tables, where we have included emissions from "
+                flow_description = (f"**{exact_flow_code}** is taken from UNFCCC Common reporting tables, Table 4, where we have included emissions from "
                         "landfills, waste incineration and biofuel production. ")
             elif "atat" in norm and "nh3" in norm:
                 exact_flow_code = "PR.SO-AT.AT-Emissions-NH3"
@@ -1713,9 +1713,9 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
                 flow_description = (
                     f"**{exact_flow_code}** is taken from \\citet{{miljodirektoratet_norske_2026}}, emissions to water from landfills, where we "
                     "have categorized landfills as being connected to municipal wastewater or not based on publicly available data. Where the categorization "
-                    "was not possible, the resulting emissions have been split evenly between the leaching and wastewater flows from landfills. As no data are "
-                    "available before 2009 we have extrapolated using the average value. This probably underestimates the real value because landfilling was "
-                    "more prevalent in previous years. "
+                    "was not possible, the resulting emissions have been split evenly between the leaching and wastewater flows from landfills. Reported data "
+                    "only cover a single landfill in 2009-2010 and are not representative, so for years before 2011 we have extrapolated using the average "
+                    "value from 2011 onward. This probably underestimates the real value because landfilling was more prevalent in previous years. "
                 )
             elif "prww" in norm and "landfills" in norm:
                 exact_flow_code = "PR.SO-PR.WW-Wastewater from landfills-Nmix"
@@ -1723,8 +1723,9 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
                 flow_description = (
                     f"**{exact_flow_code}** is taken from \\citet{{miljodirektoratet_norske_2026}}, emissions to water from landfills, where we have categorized "
                     "landfills as being connected to municipal wastewater or not based on publicly available data. Where the categorization was not possible, "
-                    "the resulting emissions have been split evenly between the leaching and wastewater flows from landfills. As no data are available before 2009 "
-                    "we have extrapolated using the average value. This probably underestimates the real value because landfilling was more prevalent in previous years."
+                    "the resulting emissions have been split evenly between the leaching and wastewater flows from landfills. Reported data only cover a "
+                    "single landfill in 2009-2010 and are not representative, so for years before 2011 we have extrapolated using the average value from "
+                    "2011 onward. This probably underestimates the real value because landfilling was more prevalent in previous years."
                 )
             # elif "prww" in norm and "biofuels" in norm:
             #     exact_flow_code = "PR.SO-PR.WW-Biofuels production wastewater-Nmix"
@@ -1773,7 +1774,7 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
                 exact_flow_code = "PR.WW-AT.AT-Emissions-N2"
                 display_name = "N2 Emissions (Wastewater)"
                 flow_description = ("Found by using data on N emissions and removal rates from the six wastewater treatment "
-                    "plants that were equipped with nitrogen removal up to 2025. Where specific data on nitrogen removal fraction were missing we assumed "
+                    "plants that were equipped with nitrogen removal through 2024, joined by a seventh (Hokksund) from 2025. Where specific data on nitrogen removal fraction were missing we assumed "
                     "a default 70 %, and we extrapolated or interpolated between existing data where reported emission data were missing. The amount of "
                     "N released as N2 was calculated as N_released*removal_rate/(1-removal_rate). ")
             elif "atat" in norm and "n2o" in norm:
