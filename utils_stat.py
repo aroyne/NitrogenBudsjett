@@ -8,6 +8,7 @@ import os
 import shutil
 import numpy as np
 import pandas as pd
+import openpyxl
 import matplotlib.pyplot as plt
 from datetime import datetime
 import plotly.graph_objects as go
@@ -313,218 +314,556 @@ def plot_pool_balance(df_flows, pool_code, output_dir="output_files/plots"):
     print(f"[INFO] Balanseplott generert for {pool_code} -> {filepath}")
     return plot_filename
 
+SANKEY_SPECIES_COLORS = {
+    'N2O': "rgba(156, 39, 176, 0.55)",
+    'N2 (excl. NOx)': "rgba(140, 140, 140, 0.55)",
+    'NH3 / RDN': "rgba(255, 152, 0, 0.55)",
+    'NOx / OXN': "rgba(244, 67, 54, 0.55)",
+    'Nmix': "rgba(76, 175, 80, 0.55)",
+    'Other': "rgba(33, 150, 243, 0.55)",
+}
+
+SANKEY_CATEGORY_COLORS = {
+    'useful output': "rgba(76, 175, 80, 0.55)",
+    'N wasted': "rgba(244, 67, 54, 0.55)",
+    'import': "rgba(33, 150, 243, 0.55)",
+    'recycling': "rgba(255, 152, 0, 0.55)",
+    'other/unclassified': "rgba(160, 160, 160, 0.55)",
+}
+
+SANKEY_NODE_COLORS = {
+    "AT": "rgba(26, 54, 93, 0.85)",
+    "HY": "rgba(43, 108, 176, 0.85)",
+    "RW": "rgba(74, 85, 104, 0.85)",
+    "AG": "#2f855a", "EF": "#c53030", "FS": "#2c7a7b", "HS": "#744210", "PR": "#97266d", "MP": "#d69e2e",
+}
+SANKEY_NODE_X = {
+    "AT": 0.02, "AG": 0.40, "FS": 0.40, "EF": 0.65, "PR": 0.65, "MP": 0.65, "HS": 0.65, "HY": 0.98, "RW": 0.98,
+}
+
+
+def _get_species_color(flow_name):
+    """Colors a link by which N species it carries."""
+    fn = flow_name.upper()
+    if "N2O" in fn:
+        return SANKEY_SPECIES_COLORS['N2O']
+    elif "N2" in fn and "NOX" not in fn:
+        return SANKEY_SPECIES_COLORS['N2 (excl. NOx)']
+    elif "NH3" in fn or "AMMONIA" in fn or "RDN" in fn:
+        return SANKEY_SPECIES_COLORS['NH3 / RDN']
+    elif "NOX" in fn or "OXN" in fn or "NITRITE" in fn or "NITRATE" in fn:
+        return SANKEY_SPECIES_COLORS['NOx / OXN']
+    elif "NMIX" in fn:
+        return SANKEY_SPECIES_COLORS['Nmix']
+    else:
+        return SANKEY_SPECIES_COLORS['Other']
+
+
+def _load_flow_categories(report_path='Report.xlsx', sheet_name='2a. Database N flows'):
+    """
+    Loads the manually-maintained flow -> overview-category mapping from the
+    official Report.xlsx template ('2a. Database N flows', column C = flow
+    code, column U = overViewType: useful output / N wasted / import /
+    recycling / -), keyed by flow code. The two spellings of 'N wasted' found
+    in the template ('N wasted' and 'N wastedd') are merged into one category.
+    """
+    category_map = {}
+    if not os.path.exists(report_path):
+        return category_map
+    wb_report = openpyxl.load_workbook(report_path, data_only=True)
+    if sheet_name not in wb_report.sheetnames:
+        return category_map
+    sheet = wb_report[sheet_name]
+    for row in range(3, sheet.max_row + 1):
+        code = sheet.cell(row=row, column=3).value
+        raw_cat = sheet.cell(row=row, column=21).value
+        if code is None or raw_cat is None:
+            continue
+        cat = str(raw_cat).strip()
+        if cat.lower() in ('n wasted', 'n wastedd'):
+            cat = 'N wasted'
+        elif cat == '-':
+            cat = 'other/unclassified'
+        category_map[str(code).strip()] = cat
+    return category_map
+
+
+def _get_category_color(flow_name, category_map):
+    cat = category_map.get(flow_name, 'other/unclassified')
+    return SANKEY_CATEGORY_COLORS.get(cat, SANKEY_CATEGORY_COLORS['other/unclassified'])
+
+
 def plot_global_sankey_interactive(df_flows, output_dir="output_files/plots"):
     """
-    Genererer to interaktive Sankey-diagrammer på HOVED-POOL-nivå begrenset til 1990-2023:
-    Låser den globale flytskalaen fullstendig ved bruk av en isolert skaleringsnode.
+    Generates two interactive Sankey diagrams at the main-pool level (AT, EF,
+    AG, ...), limited to 1990-2023: one with every flow, one with fertilizer
+    trade flows hidden. Both let the viewer scrub through years via a slider
+    and switch link coloring between N species and Report.xlsx's
+    useful-output/waste/import/recycling categorization.
+
+    Locking the scale across years: Plotly's Sankey layout scales each
+    column (the nodes sharing an x-position) to fit the plot height based on
+    that column's total throughput, recomputed independently for every
+    frame. A single global buffer link therefore isn't enough to keep the
+    scale constant if different columns dominate in different years, which
+    is the case here (e.g. the AT column's total throughput varies more than
+    2x across 1990-2023). Instead, each column gets one dedicated,
+    disconnected filler link (own source and sink node, invisible, touching
+    no real node) padded up to that column's fixed historical peak
+    footprint every year, so every column's total - and thus its
+    value-to-pixel scale - never changes. The filler is deliberately kept
+    off the real nodes themselves (rather than attached to their own
+    inflow/outflow) so a real node's displayed size is always its true value
+    for that year, not inflated toward its own historical peak.
     """
     os.makedirs(output_dir, exist_ok=True)
-    
-    # Kloner og klargjør kilde/mål-kolonner
+
     df_base = df_flows.copy()
-    
-    # --- 1. BEGRENS TIL ÅRENE 1990 - 2023 ---
     df_base = df_base[(df_base['year'] >= 1990) & (df_base['year'] <= 2023)]
-    
     if df_base.empty:
         print("[WARN] Ingen data funnet for tidsperioden 1990-2023.")
         return None
-        
+
     res = df_base['flow_name'].apply(extract_source_target)
-    
-    # Trunkerer subpools til hoved-pools (f.eks. EF.TR -> EF)
     df_base['source_pool'] = [r[0].split('.')[0] for r in res]
     df_base['target_pool'] = [r[1].split('.')[0] for r in res]
-    
-    # Filtrer bort ukjente eller interne feilstrømmer
+
     df_base = df_base[(df_base['source_pool'] != "Unknown") & (df_base['target_pool'] != "Unknown")]
-    
-    # Fjerner interne looper som oppstår ved sammenslåing (f.eks. EF -> EF)
     df_base = df_base[df_base['source_pool'] != df_base['target_pool']]
-    
     if df_base.empty:
         print("[WARN] Ingen gyldige strømmer funnet til å generere Sankey-diagram.")
         return None
 
-    # Aggregerer verdiene på nytt etter sammenslåingen til hoved-pools
     df_base = df_base.groupby(['year', 'source_pool', 'target_pool', 'flow_name'], as_index=False).agg({
         'value': 'sum',
         'uncertainty': lambda x: np.sqrt((x**2).sum())
     })
 
-    # --- 2. FARGE-MAPPING FOR NITROGENTYPER ---
-    def get_flow_color(flow_name):
-        fn = flow_name.upper()
-        if "N2O" in fn: 
-            return "rgba(156, 39, 176, 0.4)"       # Lilla
-        elif "N2" in fn and "NOX" not in fn: 
-            return "rgba(180, 180, 180, 0.4)"       # Grå
-        elif "NH3" in fn or "AMMONIA" in fn or "RDN" in fn: 
-            return "rgba(255, 152, 0, 0.4)"         # Oransje
-        elif "NOX" in fn or "OXN" in fn or "NITRITE" in fn or "NITRATE" in fn: 
-            return "rgba(244, 67, 54, 0.4)"         # Rød
-        elif "NMIX" in fn: 
-            return "rgba(76, 175, 80, 0.4)"          # Grønn
-        else: 
-            return "rgba(33, 150, 243, 0.4)"         # Blå (Fallback)
+    category_map = _load_flow_categories()
+    df_base['color_species'] = df_base['flow_name'].apply(_get_species_color)
+    df_base['color_category'] = df_base['flow_name'].apply(lambda fn: _get_category_color(fn, category_map))
+    # Hover label: the descriptive part of the flow code only (e.g. "Emissions-N2O"),
+    # since the pool codes are already identified by which nodes the link connects.
+    df_base['hover_label'] = df_base['flow_name'].str.split('-').str[2:].str.join('-')
 
-    df_base['color'] = df_base['flow_name'].apply(get_flow_color)
-
-    # 3. Map unike hoved-nodes + NYE USYNLIGE SKALERINGSNODER
-    base_nodes = sorted(list(set(df_base['source_pool'].unique()) | set(df_base['target_pool'].unique())))
-    
-    # Vi legger til to kunstige noder dedikert KUN til å holde på skalaen
-    all_nodes = base_nodes + ["SCALE_SRC", "SCALE_TRG"]
-    node_indices = {node: i for i, node in enumerate(all_nodes)}
-    
-    # Fargemapping for reelle noder, de to skaleringsnodene gjøres 100% gjennomsiktige
-    node_color_map = {
-        "AT": "rgba(26, 54, 93, 0.4)",
-        "HY": "rgba(43, 108, 176, 0.4)",
-        "RW": "rgba(74, 85, 104, 0.4)",
-        "AG": "#2f855a", "EF": "#c53030", "FS": "#2c7a7b", "HS": "#744210", "PR": "#97266d", "MP": "#d69e2e",
-        "SCALE_SRC": "rgba(0,0,0,0)", # Usynlig
-        "SCALE_TRG": "rgba(0,0,0,0)"  # Usynlig
-    }
-    node_colors = [node_color_map.get(node, "#bdc3c7") for node in all_nodes]
-    
-    # Plassering av noder (X-koordinater). Skaleringsnodene gjemmes helt øverst i venstre/høyre hjørne
-    node_x_map = {
-        "AT": 0.02, "AG": 0.40, "FS": 0.40, "EF": 0.65, "PR": 0.65, "MP": 0.65, "HS": 0.65, "HY": 0.98, "RW": 0.98,
-        "SCALE_SRC": 0.01,
-        "SCALE_TRG": 0.99
-    }
-    node_x = [node_x_map.get(node, 0.5) for node in all_nodes]
-    
-    # For å hindre at de usynlige nodene dytter ned de ekte nodene, tvinger vi dem til y=0 (helt øverst)
-    node_y_map = {
-        "SCALE_SRC": 0.001,
-        "SCALE_TRG": 0.001
-    }
-    node_y = [node_y_map.get(node, None) for node in all_nodes] # None lar Plotly bestemme resten dynamisk
-
-    static_node_config = dict(
-        pad=20, 
-        thickness=25, 
-        line=dict(color="black", width=0.5),
-        label=[n if "SCALE" not in n else "" for n in all_nodes], # Skjul merkelappen på skaleringsnodene
-        color=node_colors,
-        x=node_x,
-        y=node_y
-    )
-    
-    # Definer strømmene som skal skjules i versjon nr. 2
     hidden_keywords = ["AMMONIA IMPORT", "AMMONIA EXPORT", "AMMONIA SYNTHESIS", "FERTILIZER EXPORT"]
     filter_regex = "|".join(hidden_keywords)
     df_filtered = df_base[~df_base['flow_name'].str.upper().str.contains(filter_regex, na=False)].copy()
 
-    # --- MAKSIMAL SYSTEMKAPASITET FOR STATISK SKALERING ---
-    max_total_base = df_base.groupby('year')['value'].sum().max() * 1.05 # 5% ekstra margin
-    max_total_filtered = df_filtered.groupby('year')['value'].sum().max() * 1.05
+    def build_sankey_figure(df_data, title_suffix, filename):
+        base_nodes = sorted(list(set(df_data['source_pool'].unique()) | set(df_data['target_pool'].unique())))
 
-    # --- 4. INDRE FUNKSJON FOR Å BYGGE EN ENCELT HTML-FIGUR ---
-    def build_sankey_figure(df_data, title_suffix, max_scale_value):
+        # Padding used to be attached directly to each real node's own
+        # inflow/outflow, which does lock the scale, but it also means a
+        # real node's displayed box height is its *padded* total (its own
+        # historical peak) rather than that year's true value - a small pool
+        # in a light year would show as tall as its heaviest year ever. A
+        # node's box height is simply the sum of its own connected link
+        # values, so there is no way to pad a real node without inflating
+        # it. A later per-column redesign (one disconnected filler link per
+        # x-position) turned out not to match Plotly's actual behavior
+        # either: measuring real nodes' rendered pixel height against their
+        # true kt value confirmed empirically (via a headless-browser probe
+        # reading Plotly's own trace/link data back out of the page) that
+        # the value-to-pixel scale is ONE ratio for the *entire* figure, not
+        # set independently per column, and that scale is driven by the sum
+        # of every node's own max(inflow, outflow) - counting each filler
+        # node separately, since a disconnected filler is still two distinct
+        # node boxes (source and sink) that each contribute their own value
+        # to that sum. So a single global filler pair - not one per column -
+        # sized to keep that whole-figure sum constant is what actually
+        # locks the scale, and it can sit anywhere since the scale isn't
+        # column-local.
+        fill_src, fill_sink = "__FILL_SRC", "__FILL_SINK"
+        all_nodes = base_nodes + [fill_src, fill_sink]
+        node_indices = {node: i for i, node in enumerate(all_nodes)}
+        n_fill = 2
+
+        node_colors = [SANKEY_NODE_COLORS.get(n, "#bdc3c7") for n in base_nodes] + ["rgba(0,0,0,0)"] * n_fill
+        node_x = [SANKEY_NODE_X.get(n, 0.5) for n in base_nodes] + [0.5, 0.5]
+        # Filler nodes are pinned near the top so they never push the real
+        # nodes around; None lets Plotly place real nodes freely.
+        node_y = [None] * len(base_nodes) + [0.001] * n_fill
+
+        # No node.hovertemplate: sankey 'hoverinfo' is a single enum for the
+        # whole trace (not arrayable per element), and setting even one
+        # array entry of node.hovertemplate turns out to blank out the
+        # hover text for EVERY node on the trace, including the ones left as
+        # None - the same CDN Plotly.js (3.7.0) bug as the one on link
+        # hovertemplate below. The filler nodes don't need a suppressed
+        # tooltip of their own: pointer-events is set to none on them (see
+        # fixPadElements below), so the mouse can't hover them at all, and
+        # the real nodes are left to Plotly's own default hover (their pool
+        # code plus total value).
+        #
+        # Node/link borders aren't set here via the `line` attribute either:
+        # Plotly's sankey renderer doesn't apply an arrayed node.line/
+        # link.line per element (verified by inspecting the rendered SVG -
+        # every node and link, including the fully transparent filler ones,
+        # came out with the same hardcoded opaque black 1px border
+        # regardless of what was requested here). Borders are instead
+        # corrected after rendering, in the post-script below, by reading
+        # each element's actual paint back out of the DOM.
+        static_node_config = dict(
+            pad=20,
+            thickness=25,
+            label=list(base_nodes) + [""] * n_fill,
+            color=node_colors,
+            x=node_x,
+            y=node_y,
+        )
+
         all_years = sorted(list(df_data['year'].unique()))
-        frames = []
-        slider_steps = []
 
-        def get_sankey_components(df_year_source, total_max):
-            df_yr = df_year_source.copy()
-            current_total = df_yr['value'].sum()
-            remaining_buffer = total_max - current_total
-            
-            # Konverter reelle data til lister
+        def node_max_through(df_yr, node):
+            out_total = df_yr.loc[df_yr['source_pool'] == node, 'value'].sum()
+            in_total = df_yr.loc[df_yr['target_pool'] == node, 'value'].sum()
+            return max(out_total, in_total)
+
+        def real_total(df_yr):
+            return sum(node_max_through(df_yr, n) for n in base_nodes)
+
+        # 5% margin, same as the earlier per-column design.
+        global_ceiling = max(real_total(df_data[df_data['year'] == yr]) for yr in all_years) * 1.05
+
+        def get_sankey_components(df_yr, color_col):
             sources = [node_indices[s] for s in df_yr['source_pool']]
             targets = [node_indices[t] for t in df_yr['target_pool']]
             values = df_yr['value'].tolist()
-            colors = df_yr['color'].tolist()
-            labels = df_yr['flow_name'].tolist()
-            
-            # Kantlinje-konfigurasjon for de ekte strømmene
-            line_colors = ["rgba(50, 50, 50, 0.3)"] * len(values)
-            line_widths = [0.5] * len(values)
-            
-            # Hvis vi trenger å fylle opp skalaen, bruker vi de dedikerte usynlige nodene
-            if remaining_buffer > 0:
-                sources.append(node_indices["SCALE_SRC"])
-                targets.append(node_indices["SCALE_TRG"])
-                values.append(remaining_buffer)
-                colors.append("rgba(0,0,0,0)") # 100% gjennomsiktig flyt
-                labels.append("")               # Ingen tekst ved hover
-                line_colors.append("rgba(0,0,0,0)") # Ingen kantlinjefarge
-                line_widths.append(0.0)             # Ingen kantlinjebredde
-                
+            colors = df_yr[color_col].tolist()
+            # No explicit link.hovertemplate: the CDN-pulled Plotly.js
+            # version (3.7.0) has a bug where any hovertemplate on a sankey
+            # LINK renders a completely empty tooltip (confirmed in
+            # isolation, down to a 3-node/2-link minimal reproduction, with
+            # both token-based and plain-literal templates - the highlight-
+            # on-hover effect still works, only the text is silently
+            # missing). Plotly's own default link hover already reads
+            # link.label - set here from hover_label, the flow's descriptive
+            # name only (e.g. "Emissions-N2O"), not the full
+            # source.target-coded flow_name - alongside the value, so
+            # dropping hovertemplate keeps the wanted name+value on hover
+            # without hitting the bug. The filler link doesn't need a
+            # suppressed tooltip of its own: pointer-events is set to none
+            # on it (see fixPadElements below) so the mouse can't hover it
+            # at all.
+            labels = df_yr['hover_label'].tolist()
+
+            # The filler link is present in every single frame, even when
+            # the padding needed is zero. Sankey's d3 rendering joins
+            # consecutive frames' links by position/identity to animate
+            # between them; letting the link disappear in some frames breaks
+            # that identity match and leaves stray elements on screen with a
+            # stale, pre-transition style (usually an opaque black border)
+            # instead of the requested transparent one.
+            #
+            # Divided by 2, not subtracted directly: the filler source and
+            # sink are two separate node boxes, each independently
+            # contributing its own value to the figure-wide scale sum, so a
+            # single filler link of value v adds 2v to that sum, not v.
+            pad_value = max(0.0, (global_ceiling - real_total(df_yr)) / 2.0)
+            sources.append(node_indices[fill_src])
+            targets.append(node_indices[fill_sink])
+            values.append(pad_value); colors.append("rgba(0,0,0,0)"); labels.append("")
+
             return dict(
                 source=sources, target=targets, value=values, color=colors, label=labels,
-                line=dict(color=line_colors, width=line_widths)
             )
 
+        color_modes = {'species': 'color_species', 'category': 'color_category'}
+        frames = []
+        for yr in all_years:
+            df_yr = df_data[df_data['year'] == yr]
+            for mode_name, color_col in color_modes.items():
+                frames.append(go.Frame(
+                    data=[go.Sankey(node=static_node_config, link=get_sankey_components(df_yr, color_col), arrangement='fixed')],
+                    name=f"{yr}|{mode_name}",
+                ))
+
         first_year = all_years[0]
-        link_config_first = get_sankey_components(df_data[df_data['year'] == first_year], max_scale_value)
-        
         initial_sankey = go.Sankey(
             node=static_node_config,
-            link=link_config_first
+            link=get_sankey_components(df_data[df_data['year'] == first_year], 'color_species'),
+            arrangement='fixed',
         )
 
-        for yr in all_years:
-            link_config_yr = get_sankey_components(df_data[df_data['year'] == yr], max_scale_value)
-            
-            frames.append(go.Frame(
-                data=[go.Sankey(
-                    node=static_node_config, 
-                    link=link_config_yr
-                )],
-                name=str(yr)
-            ))
-            
-            slider_steps.append(dict(
-                method="animate",
-                args=[[str(yr)], dict(mode="immediate", frame=dict(duration=200, redraw=True), transition=dict(duration=0))],
-                label=str(yr)
-            ))
+        slider_steps = [dict(
+            method="animate",
+            args=[[f"{yr}|species"], dict(mode="immediate", frame=dict(duration=200, redraw=True), transition=dict(duration=0))],
+            label=str(yr),
+        ) for yr in all_years]
+
+        # The legend is built as plain HTML/CSS in the post-script below, not
+        # as Plotly traces: adding go.Scatter "dummy" traces alongside a
+        # go.Sankey trace forces Plotly to create a real cartesian x/y axis
+        # for the Scatter traces (Sankey doesn't use one), which then shows
+        # up as a visible, oddly-scaled axis fighting the Sankey for space.
 
         fig = go.Figure(data=[initial_sankey], frames=frames)
         fig.update_layout(
-            title=dict(
-                text=f"Global Nitrogen Flow Evolution (1990-2023) - {title_suffix}",
-                font=dict(size=18, family="Arial")
-            ),
+            title=dict(text=f"Global Nitrogen Flow Evolution (1990-2023) - {title_suffix}", font=dict(size=18, family="Arial")),
             height=750,
-            margin=dict(l=20, r=20, t=60, b=20),
-            updatemenus=[dict(
-                type="buttons",
-                showactive=False,
-                x=0.05, y=-0.15, xanchor="right", yanchor="top",
-                buttons=[
-                    dict(label="▶ Play", method="animate", args=[None, dict(frame=dict(duration=400, redraw=True), fromcurrent=True)]),
-                    dict(label="⏸ Pause", method="animate", args=[[None], dict(mode="immediate", frame=dict(duration=0, redraw=True))])
-                ]
-            )],
+            margin=dict(l=20, r=180, t=60, b=110),
             sliders=[dict(
-                active=0,
-                steps=slider_steps,
-                x=0.08, y=-0.15,
+                active=0, steps=slider_steps, x=0.08, y=-0.05,
                 currentvalue=dict(font=dict(size=14, color="navy"), prefix="Year: ", visible=True),
-                len=0.9
-            )]
+                len=0.75,
+            )],
         )
-        return fig
 
-    # --- 5. GENERER OG LAGRE BEGGE FILENE ---
-    fig_all = build_sankey_figure(df_base, "All Flows", max_total_base)
-    filename_all = "global_nitrogen_sankey.html"
-    filepath_all = os.path.join(output_dir, filename_all)
-    fig_all.write_html(filepath_all, include_plotlyjs='cdn', default_width='100%')
-    print(f"[SUCCESS] Komplett Sankey med låst global skalering generert -> {filepath_all}")
-    
-    fig_filtered = build_sankey_figure(df_filtered, "Fertilizer Trade Hidden", max_total_filtered)
-    filename_filtered = "global_nitrogen_sankey_no_fertilizer.html"
-    filepath_filtered = os.path.join(output_dir, filename_filtered)
-    fig_filtered.write_html(filepath_filtered, include_plotlyjs='cdn', default_width='100%')
-    print(f"[SUCCESS] Filtrert Sankey med låst global skalering generert -> {filepath_filtered}")
-    
-    return filename_all
+        # Legend swatches: same colors as the link coloring, built as plain
+        # HTML rather than Plotly traces (see note above on why).
+        def _swatch_rows(color_dict):
+            return "".join(
+                f'<div style="margin-bottom:3px;"><span style="display:inline-block;width:12px;height:12px;'
+                f'background:{c.replace("0.55", "1.0")};margin-right:6px;border-radius:2px;"></span>{label}</div>'
+                for label, c in color_dict.items()
+            )
+        species_legend_html = _swatch_rows(SANKEY_SPECIES_COLORS)
+        category_legend_html = _swatch_rows(SANKEY_CATEGORY_COLORS)
+
+        # Custom JS: native `updatemenus` buttons can't read the figure's
+        # current animation state, so a button-driven color-mode toggle can't
+        # combine with "whatever year is currently showing" using the
+        # declarative updatemenus/sliders spec alone. We track the current
+        # year ourselves (from the slider's change event) and drive real HTML
+        # buttons that jump to the frame named "{year}|{mode}", and a
+        # Play/Pause pair that steps through the current mode's frames.
+        #
+        # write_html() itself appends a `Plotly.animate(gd, null)` call right
+        # after the initial Plotly.newPlot() - Plotly.js's built-in shorthand
+        # for "play every frame in sequence" - which is why the diagram used
+        # to auto-play through every year/mode combination on open. The first
+        # line below runs in a later .then() callback and immediately jumps
+        # to a single, fixed frame, which cancels that queued auto-play.
+        all_years_js = "[" + ",".join(f"'{y}'" for y in all_years) + "]"
+        post_script = f"""
+        var gd = document.getElementsByClassName('plotly-graph-div')[0];
+        Plotly.animate(gd, ['{first_year}|species'], {{frame: {{duration: 0, redraw: true}}, transition: {{duration: 0}}, mode: 'immediate'}});
+
+        // Plotly's own sankey hover box splits into two side-by-side boxes -
+        // a colored one (the link/node's own color) holding just the value,
+        // and a white one holding the label/source/target text - which
+        // reads as two disconnected tooltips rather than one. Since
+        // hoverinfo can only be 'all'/'none'/'skip' for sankey (no way to
+        // keep just the label half) and hovertemplate is unusable (see the
+        // note on link.hovertemplate below), Plotly's own hover box is
+        // hidden outright and replaced with one plain custom tooltip built
+        // from the same plotly_hover event data, styled to match the rest
+        // of this page's controls.
+        var style = document.createElement('style');
+        style.textContent = '.hoverlayer {{ display: none !important; }}';
+        document.head.appendChild(style);
+
+        var tooltip = document.createElement('div');
+        tooltip.style.position = 'fixed';
+        tooltip.style.pointerEvents = 'none';
+        tooltip.style.background = 'rgba(255,255,255,0.95)';
+        tooltip.style.border = '1px solid #888';
+        tooltip.style.borderRadius = '4px';
+        tooltip.style.padding = '5px 9px';
+        tooltip.style.fontFamily = 'Arial, sans-serif';
+        tooltip.style.fontSize = '13px';
+        tooltip.style.display = 'none';
+        tooltip.style.zIndex = '10000';
+        document.body.appendChild(tooltip);
+
+        gd.on('plotly_hover', function(evt) {{
+            var pt = evt.points[0];
+            tooltip.textContent = pt.label + ': ' + pt.value.toFixed(2) + ' kt N';
+            tooltip.style.display = 'block';
+        }});
+        gd.on('plotly_unhover', function() {{ tooltip.style.display = 'none'; }});
+        gd.addEventListener('mousemove', function(e) {{
+            tooltip.style.left = (e.clientX + 14) + 'px';
+            tooltip.style.top = (e.clientY + 14) + 'px';
+        }});
+
+        // Plotly's sankey renderer paints every node-rect/sankey-link with a
+        // hardcoded opaque black 1px border, ignoring the node.line/link.line
+        // trace attributes entirely (confirmed by inspecting the rendered
+        // SVG - both real and fully-transparent filler elements came out
+        // with identical black borders no matter what those attributes
+        // said), and it doesn't stop the filler links/node from lighting up
+        // and showing an (empty) tooltip on hover either. Both are corrected
+        // after the fact here: a filler element is identified by its own
+        // fill being fully transparent (fill-opacity 0), since only the
+        // invisible filler link/nodes are ever colored that way.
+        function fixPadElements() {{
+            document.querySelectorAll('rect.node-rect, path.sankey-link').forEach(function(el) {{
+                var isPad = parseFloat(getComputedStyle(el).fillOpacity) === 0;
+                if (isPad) {{
+                    el.style.stroke = 'none';
+                    el.style.pointerEvents = 'none';
+                }} else if (el.tagName.toLowerCase() === 'rect') {{
+                    el.style.stroke = 'rgba(0,0,0,0.6)';
+                    el.style.strokeWidth = '0.5px';
+                }} else {{
+                    el.style.stroke = 'rgba(50,50,50,0.3)';
+                    el.style.strokeWidth = '0.5px';
+                }}
+            }});
+        }}
+
+        // The figure's own vertical extent always includes room for the
+        // filler node near the top (needed to keep the value-to-pixel scale
+        // constant across years - see the note on the filler construction
+        // above), which shows up as blank space above the real diagram
+        // whenever that year doesn't need much filler. Rather than trying
+        // to precompute how much room that takes (it changes every year),
+        // this measures the real, visible content's own bounding box after
+        // each render and crops a wrapper div around exactly that, so the
+        // reserved filler space is clipped away instead of shown as padding.
+        var plotWrapper = document.createElement('div');
+        plotWrapper.style.overflow = 'hidden';
+        gd.parentNode.insertBefore(plotWrapper, gd);
+        plotWrapper.appendChild(gd);
+
+        function cropToContent() {{
+            gd.style.transform = 'none';
+            // Real links can bulge above/below the node boxes they connect
+            // (a loop-back curve dips well past both endpoints), so the
+            // content bounds need every real node AND real link, not just
+            // the nodes.
+            var realEls = Array.from(document.querySelectorAll('rect.node-rect, path.sankey-link')).filter(function(el) {{
+                return parseFloat(getComputedStyle(el).fillOpacity) > 0;
+            }});
+            var titleEl = document.querySelector('.g-gtitle');
+            var sliderEl = document.querySelector('g.slider-container');
+            var minTop = Infinity, maxBottom = -Infinity;
+            if (titleEl) {{
+                var tb = titleEl.getBoundingClientRect();
+                minTop = Math.min(minTop, tb.top); maxBottom = Math.max(maxBottom, tb.bottom);
+            }}
+            if (sliderEl) {{
+                // The slider sits at a fixed position regardless of frame,
+                // but the real content's own bounding box shrinks in low-
+                // value years - without this, a small enough year crops the
+                // wrapper shorter than the (unmoved) slider, clipping its
+                // year tick labels.
+                var sb = sliderEl.getBoundingClientRect();
+                minTop = Math.min(minTop, sb.top); maxBottom = Math.max(maxBottom, sb.bottom);
+            }}
+            realEls.forEach(function(el) {{
+                var b = el.getBoundingClientRect();
+                minTop = Math.min(minTop, b.top); maxBottom = Math.max(maxBottom, b.bottom);
+            }});
+            if (!isFinite(minTop)) return;
+            var margin = 30;
+            var wrapperTop = plotWrapper.getBoundingClientRect().top;
+            var shiftUp = Math.max(0, (minTop - wrapperTop) - margin);
+            plotWrapper.style.height = ((maxBottom - minTop) + 2 * margin) + 'px';
+            gd.style.transform = 'translateY(-' + shiftUp + 'px)';
+        }}
+
+        // A MutationObserver (rather than a fixed setTimeout delay) reacts
+        // to Plotly's own redraw synchronously, in the same tick, so there's
+        // no gap where an unfixed frame - with its default black border or
+        // its untrimmed height - gets painted and briefly flashes on screen
+        // (which happened during Play's rapid automatic frame changes with
+        // the previous, delay-based version of this fix). fixPadElements()
+        // and cropToContent() both write style attributes themselves, which
+        // would otherwise make the observer trigger itself forever; it is
+        // disconnected for the duration of every fix pass to prevent that.
+        var padObserver = new MutationObserver(fixAndCrop);
+        function fixAndCrop() {{
+            padObserver.disconnect();
+            fixPadElements();
+            cropToContent();
+            padObserver.observe(gd, {{
+                attributes: true, subtree: true, attributeFilter: ['style', 'fill', 'd', 'transform'],
+            }});
+        }}
+        fixAndCrop();
+
+        var allYears = {all_years_js};
+        var currentYear = '{first_year}';
+        var currentMode = 'species';
+        var playTimer = null;
+
+        gd.on('plotly_sliderchange', function(e) {{ currentYear = e.step.label; }});
+        gd.on('plotly_animatingframe', function(e) {{
+            if (e.name) {{ currentYear = e.name.split('|')[0]; }}
+        }});
+
+        function showYear(year) {{
+            Plotly.animate(gd, [year + '|' + currentMode], {{
+                frame: {{duration: 0, redraw: true}}, transition: {{duration: 0}}, mode: 'immediate'
+            }});
+        }}
+        function setMode(mode) {{
+            currentMode = mode;
+            showYear(currentYear);
+            document.getElementById('legend-species').style.display = (mode === 'species') ? 'block' : 'none';
+            document.getElementById('legend-category').style.display = (mode === 'category') ? 'block' : 'none';
+            document.getElementById('btn-species').style.fontWeight = (mode === 'species') ? 'bold' : 'normal';
+            document.getElementById('btn-category').style.fontWeight = (mode === 'category') ? 'bold' : 'normal';
+        }}
+        function play() {{
+            if (playTimer) return;
+            playTimer = setInterval(function() {{
+                var idx = (allYears.indexOf(currentYear) + 1) % allYears.length;
+                currentYear = allYears[idx];
+                showYear(currentYear);
+            }}, 500);
+        }}
+        function pause() {{
+            clearInterval(playTimer);
+            playTimer = null;
+        }}
+
+        var ctrlDiv = document.createElement('div');
+        ctrlDiv.style.textAlign = 'center';
+        ctrlDiv.style.marginTop = '10px';
+        ctrlDiv.style.fontFamily = 'Arial, sans-serif';
+        var BTN_STYLE = 'font-family:Arial,sans-serif;font-size:14px;padding:6px 14px;';
+        ctrlDiv.innerHTML =
+            '<button id="btn-play" style="' + BTN_STYLE + '">&#9654; Play</button> ' +
+            '<button id="btn-pause" style="' + BTN_STYLE + '">&#10074;&#10074; Pause</button>' +
+            '<span style="margin:0 10px;font-size:14px;">|</span>' +
+            '<span style="margin-right:8px;font-size:14px;">Color by:</span>' +
+            '<button id="btn-species" style="' + BTN_STYLE + 'font-weight:bold;margin-right:6px;">N species</button>' +
+            '<button id="btn-category" style="' + BTN_STYLE + '">Category (useful output / waste / ...)</button>';
+        // Inserted relative to plotWrapper, not gd: gd now lives inside the
+        // cropping wrapper (see cropToContent above), and that wrapper clips
+        // anything placed inside it via overflow:hidden, so these controls
+        // and the legend have to sit alongside the wrapper instead.
+        plotWrapper.parentNode.insertBefore(ctrlDiv, plotWrapper.nextSibling);
+        document.getElementById('btn-play').onclick = play;
+        document.getElementById('btn-pause').onclick = pause;
+        document.getElementById('btn-species').onclick = function() {{ setMode('species'); }};
+        document.getElementById('btn-category').onclick = function() {{ setMode('category'); }};
+
+        plotWrapper.parentNode.style.position = 'relative';
+        var legendDiv = document.createElement('div');
+        legendDiv.style.position = 'absolute';
+        legendDiv.style.right = '15px';
+        legendDiv.style.top = '70px';
+        legendDiv.style.fontFamily = 'Arial, sans-serif';
+        legendDiv.style.fontSize = '12px';
+        legendDiv.style.background = 'rgba(255,255,255,0.85)';
+        legendDiv.style.padding = '8px 10px';
+        legendDiv.style.border = '1px solid #ccc';
+        legendDiv.style.borderRadius = '4px';
+        legendDiv.innerHTML =
+            '<div id="legend-species" style="display:block;"><b>N species</b>{species_legend_html}</div>' +
+            '<div id="legend-category" style="display:none;"><b>Category</b>{category_legend_html}</div>';
+        plotWrapper.parentNode.insertBefore(legendDiv, plotWrapper.nextSibling);
+        """
+
+        fig.write_html(
+            os.path.join(output_dir, filename),
+            include_plotlyjs='cdn',
+            default_width='100%',
+            post_script=[post_script],
+        )
+
+    build_sankey_figure(df_base, "All Flows", "global_nitrogen_sankey.html")
+    print(f"[SUCCESS] Komplett Sankey med låst skalering per node generert -> {os.path.join(output_dir, 'global_nitrogen_sankey.html')}")
+
+    build_sankey_figure(df_filtered, "Fertilizer Trade Hidden", "global_nitrogen_sankey_no_fertilizer.html")
+    print(f"[SUCCESS] Filtrert Sankey med låst skalering per node generert -> {os.path.join(output_dir, 'global_nitrogen_sankey_no_fertilizer.html')}")
+
+    return "global_nitrogen_sankey.html"
 
 
 def extract_source_target(flow_name):
