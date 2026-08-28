@@ -162,15 +162,10 @@ def process_generic_trade_flow(preloaded_data, current_params, current_trade_fac
     by most of the RW.RW-facing import/export flows across ag_mc.py, ef_mc.py,
     mp_mc.py, pr_mc.py and rw_mc.py.
     """
-    df_vol = preloaded_data.get('compressed_trade_volume')
-    if df_vol is None:
-        # data_loader.py's own load of 'compressed_trade_volume' is wrapped in
-        # a broad try/except that can leave this key unset on failure - see
-        # CLAUDE.md's utils.py notes for the plan to revisit this together
-        # with data_loader.py's own review.
-        if flow_code:
-            print(f"[ADVARSEL] Mangler handelsdata for {flow_code}.")
-        return {}
+    # Always loaded before any of process_generic_trade_flow's callers run:
+    # every pool that calls this (ag/ef/mp/pr/rw/at) is itself a member of
+    # data_loader.py's trade_needing_pools, so the load has already happened.
+    df_vol = preloaded_data['compressed_trade_volume']
 
     dataset_key = '08801'
     noise_val = dataset_noise[dataset_key]
