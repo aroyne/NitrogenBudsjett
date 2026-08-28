@@ -10,7 +10,7 @@ nav_order: 5
 ![RW.RW-AT.AT-Atmospheric inflow-RDN](../output_files/plots/RW_RW_AT_AT_Atmospheric_inflow_RDN.png)
 
 ### Flow Description
-Is found from source-receptor data from EMEP, as advised by (Schäppi et al., 2025). There is a change in methodology in the EMEP reporting between 2002 and 2003 data.
+Is found from source-receptor data from EMEP, as advised by (Schäppi et al., 2025). There is a change in methodology in the EMEP reporting between 2002 and 2003 data. The EMEP source-receptor tables are not published for every year: 1984-1996 use the average of 1997-2001 (the earliest available years); the single missing years 2011, 2015 and 2022 use the average of the surrounding years; and 2019-2020 are linearly interpolated between 2018 and 2021.
 
 ### References
 

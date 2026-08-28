@@ -10,7 +10,7 @@ nav_order: 4
 ![MP.FP-HY.AC-Feed to coastal aquaculture-Nmix](../output_files/plots/MP_FP_HY_AC_Feed_to_coastal_aquaculture_Nmix.png)
 
 ### Flow Description
-**MP.FP-HY.AC-Feed to coastal aquaculture-Nmix**: the amount of feed per ton of produced fish is found by assuming an average protein (N) retention of 35.37 % based on values from Aas et al. (2022). The amount of produced fish is found by using data from Fiskeridirektoratet (Fiskeridirektoratet, 2025) on sold farmed fish.
+**MP.FP-HY.AC-Feed to coastal aquaculture-Nmix**: the amount of feed per ton of produced fish is found by assuming an average protein (N) retention of 35.75 % based on values from Aas et al. (2022). The amount of produced fish is found by using data from Fiskeridirektoratet (Fiskeridirektoratet, 2025) on sold farmed fish. This flow represents only the domestically supplied share of feed (an assumed 8 %); the remaining 92 %, assumed imported, is accounted for elsewhere as an import flow.
 
 Hohmann-Marriott (2025) found the nitrogen content in aquaculture feed in 2020 to be 124 ktN, which is very similar to our results.
 

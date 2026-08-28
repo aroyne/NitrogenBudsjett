@@ -10,5 +10,5 @@ nav_order: 12
 ![RW.RW-PR.SO-Solid waste import-Nmix](../output_files/plots/RW_RW_PR_SO_Solid_waste_import_Nmix.png)
 
 ### Flow Description
-Is taken from trade data, SSB table 08801. We include imports of municipal waste, wastewater sludge, hazardous waste, plastic, paper and textile waste.
+Is taken from trade data, SSB table 08801. We include imports of municipal waste, other waste, wastewater sludge, hazardous waste, plastic, paper and textile waste.
 

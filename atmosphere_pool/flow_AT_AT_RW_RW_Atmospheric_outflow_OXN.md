@@ -12,7 +12,7 @@ nav_order: 16
 ### Flow Description
 **AT.AT-RW.RW-Atmospheric outflow-OXN**
 
-is found using source-receptor data from (EMEP, 2024), as advised by (Schäppi et al., 2025).
+is found using source-receptor data from (EMEP, 2024), as advised by (Schäppi et al., 2025). The EMEP source-receptor tables are not published for every year: 1984-1996 use the average of 1997-2001 (the earliest available years); the single missing years 2011, 2015 and 2022 use the average of the surrounding years; and 2019-2020 are linearly interpolated between 2018 and 2021.
 
 ### References
 
