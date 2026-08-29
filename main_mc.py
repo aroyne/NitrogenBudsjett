@@ -373,7 +373,7 @@ def main():
     preloaded_data = load_all_data(selected_pools)
 
     print("[INFO] Pre-loader N_parameters.xlsx inn i RAM...")
-    base_params = NParameters("data_files/N_parameters.xlsx")
+    base_params = NParameters("parameters/N_parameters.xlsx")
     df_global_static = base_params.get_table('global_parameters')
     original_clean_dict = dict(zip(df_global_static['parameter_id'], df_global_static['value']))
     df_dataset_uncertainties = base_params.get_table('dataset_uncertainties')

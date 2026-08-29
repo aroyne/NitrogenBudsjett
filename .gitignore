@@ -189,6 +189,13 @@ data_files/
 *.xls
 *.csv
 
+# N_parameters.xlsx is tracked (unlike everything else above) so the
+# manually-compiled parameter values and their sources are checkable by
+# others. Note: a file cannot be un-ignored while its parent directory is
+# itself excluded (data_files/ above), which is why this lives in its own
+# untracked-elsewhere folder instead.
+!/parameters/N_parameters.xlsx
+
 # Litteratur (lokal mappe, ikke synces)
 litteratur/
 

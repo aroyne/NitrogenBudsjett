@@ -109,7 +109,7 @@ def load_all_data(selected_pools):
         print("[I/O] Pre-loader komplett varehandelsstatistikk...")
         df_trade_raw = read_trade_data('data_files/Tab_08801_1988_2024.csv')
         from calculations.n_params import NParameters
-        df_mapping = NParameters("data_files/N_parameters.xlsx").get_trade_mapping()
+        df_mapping = NParameters("parameters/N_parameters.xlsx").get_trade_mapping()
         if 'konv' not in df_mapping.columns:
             df_mapping = df_mapping.reset_index()
 
