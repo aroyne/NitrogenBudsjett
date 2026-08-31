@@ -25,7 +25,7 @@ The diagram below illustrates the integrated nitrogen economy of Norway. Use the
 
 > 💡 **Tip:** The national budget is highly dominated by fertilizer production and trade. If you want to study the smaller, internal environmental and agricultural cycles more closely, you can view the **[Sankey Map with Fertilizer Trade Hidden](output_files/plots/global_nitrogen_sankey_no_fertilizer.html)**.
 
-<iframe src="output_files/plots/global_nitrogen_sankey.html" width="100%" height="800px" frameborder="0" scrolling="no"></iframe>
+<iframe src="output_files/plots/global_nitrogen_sankey.html" width="100%" height="900px" frameborder="0" scrolling="no"></iframe>
 
 ---
 

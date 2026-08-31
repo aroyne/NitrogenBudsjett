@@ -326,7 +326,7 @@ def build_landing_page(output_filename, current_date_str, bib_filename, target_f
             
             # Standard visning (Viser alle strømmer)
             f.write('<iframe src="output_files/plots/global_nitrogen_sankey.html" '
-                    'width="100%" height="800px" frameborder="0" scrolling="no"></iframe>\n\n')
+                    'width="100%" height="900px" frameborder="0" scrolling="no"></iframe>\n\n')
             f.write("---\n\n")
         else:
             # Fallback-tekst hvis man bygger en statisk PDF via Pandoc
