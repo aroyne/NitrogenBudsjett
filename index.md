@@ -6,7 +6,7 @@ nav_order: 1
 
 # Nitrogen Budget for Norway
 
-**Last Updated:** August 28, 2026
+**Last Updated:** August 31, 2026
 
 {: .label .label-red }
 Work in Progress
@@ -23,7 +23,7 @@ Use the navigation menu on the left side to explore the individual nitrogen pool
 ### Interactive National Nitrogen Flow Map
 The diagram below illustrates the integrated nitrogen economy of Norway. Use the **slider at the bottom** or press **Play** to explore how the flow magnitudes have evolved over time. Flows are color-coded by chemical/functional type (e.g., gray for inert N₂, red for NOx, orange for NH₃/RDN, green for Nmix).
 
-> 💡 **Tip:** The national budget is highly dominated by fertilizer production and trade. If you want to study the smaller, internal environmental and agricultural cycles more closely, you can view the **[Sankey Map with Fertilizer Trade Hidden](output_files/plots/global_nitrogen_sankey_no_fertilizer.html)**.
+> 💡 **Tip:** The national budget is highly dominated by fertilizer production and trade, and by crude oil export. If you want to study the smaller, internal environmental and agricultural cycles more closely, you can view the **[Sankey Map with Dominant Trade Flows Hidden](output_files/plots/global_nitrogen_sankey_no_fertilizer.html)** (fertilizer/ammonia trade and crude oil export removed).
 
 <iframe src="output_files/plots/global_nitrogen_sankey.html" width="100%" height="900px" frameborder="0" scrolling="no"></iframe>
 

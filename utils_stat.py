@@ -396,8 +396,10 @@ def _get_category_color(flow_name, category_map):
 def plot_global_sankey_interactive(df_flows, output_dir="output_files/plots"):
     """
     Generates two interactive Sankey diagrams at the main-pool level (AT, EF,
-    AG, ...), limited to 1990-2023: one with every flow, one with fertilizer
-    trade flows hidden. Both let the viewer scrub through years via a slider
+    AG, ...), limited to 1990-2023: one with every flow, one with the
+    dominant trade flows (fertilizer/ammonia trade and crude oil export)
+    hidden so the smaller internal flows stay legible. Both let the viewer
+    scrub through years via a slider
     and switch link coloring between N species and Report.xlsx's
     useful-output/waste/import/recycling categorization.
 
@@ -446,7 +448,7 @@ def plot_global_sankey_interactive(df_flows, output_dir="output_files/plots"):
     # since the pool codes are already identified by which nodes the link connects.
     df_base['hover_label'] = df_base['flow_name'].str.split('-').str[2:].str.join('-')
 
-    hidden_keywords = ["AMMONIA IMPORT", "AMMONIA EXPORT", "AMMONIA SYNTHESIS", "FERTILIZER EXPORT"]
+    hidden_keywords = ["AMMONIA IMPORT", "AMMONIA EXPORT", "AMMONIA SYNTHESIS", "FERTILIZER EXPORT", "FUEL EXPORT"]
     filter_regex = "|".join(hidden_keywords)
     df_filtered = df_base[~df_base['flow_name'].str.upper().str.contains(filter_regex, na=False)].copy()
 
@@ -860,7 +862,7 @@ def plot_global_sankey_interactive(df_flows, output_dir="output_files/plots"):
     build_sankey_figure(df_base, "All Flows", "global_nitrogen_sankey.html")
     print(f"[SUCCESS] Komplett Sankey med låst skalering per node generert -> {os.path.join(output_dir, 'global_nitrogen_sankey.html')}")
 
-    build_sankey_figure(df_filtered, "Fertilizer Trade Hidden", "global_nitrogen_sankey_no_fertilizer.html")
+    build_sankey_figure(df_filtered, "Fertilizer & Crude Oil Trade Hidden", "global_nitrogen_sankey_no_fertilizer.html")
     print(f"[SUCCESS] Filtrert Sankey med låst skalering per node generert -> {os.path.join(output_dir, 'global_nitrogen_sankey_no_fertilizer.html')}")
 
     return "global_nitrogen_sankey.html"

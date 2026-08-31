@@ -341,10 +341,12 @@ def build_landing_page(output_filename, current_date_str, bib_filename, target_f
                     "have evolved over time. Flows are color-coded by chemical/functional type "
                     "(e.g., gray for inert N₂, red for NOx, orange for NH₃/RDN, green for Nmix).\n\n")
             
-            # Informasjon og bryter/lenke for å se diagrammet uten kunstgjødsel ---
-            f.write("> 💡 **Tip:** The national budget is highly dominated by fertilizer production and trade. "
-                    "If you want to study the smaller, internal environmental and agricultural cycles more closely, "
-                    "you can view the **[Sankey Map with Fertilizer Trade Hidden](output_files/plots/global_nitrogen_sankey_no_fertilizer.html)**.\n\n")
+            # Informasjon og bryter/lenke for å se diagrammet uten de dominerende strømmene ---
+            f.write("> 💡 **Tip:** The national budget is highly dominated by fertilizer production and trade, and by "
+                    "crude oil export. If you want to study the smaller, internal environmental and agricultural cycles "
+                    "more closely, you can view the "
+                    "**[Sankey Map with Dominant Trade Flows Hidden](output_files/plots/global_nitrogen_sankey_no_fertilizer.html)** "
+                    "(fertilizer/ammonia trade and crude oil export removed).\n\n")
             
             # Standard visning (Viser alle strømmer)
             f.write('<iframe src="output_files/plots/global_nitrogen_sankey.html" '
@@ -564,7 +566,10 @@ def process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename
             exact_flow_code = "RW.RW-EF.EC-Fuel import-Nmix"
             display_name = "Fuel Import"
             description = (
-                "Is taken from trade data, SSB table 08801 for all fuel items except those for transport."
+                "Is taken from trade data, SSB table 08801 for all fuel items except those for transport. Unlike the export side of "
+                "this flow, coal products (coking coal, bituminous coal, anthracite) dominate here rather than crude oil, since Norway "
+                "imports comparatively little crude oil but relies on imported coal for coking and industrial use; the total flow is on "
+                "the order of 12-16 ktN/year (2013-2023)."
             )
         elif "transport" in norm and "fuel" in norm:
             exact_flow_code = "RW.RW-EF.TR-Import of transport fuel-Nmix"
@@ -1205,7 +1210,14 @@ def process_energy_and_fuels_pool(ef_folder, plot_files, plot_dir, bib_filename,
             elif "export" in norm and "transport" not in norm:
                 exact_flow_code = "EF.EC-RW.RW-Fuel export-Nmix"
                 display_name = "Fuel export"
-                description = "EF.EC-RW.RW-Fuel export-Nmix is the nitrogen content in exported fuels. We use trade data in SSB table 08801 to account for all petroleum products excluding those assumed to be used in the transport sector. "
+                description = ("EF.EC-RW.RW-Fuel export-Nmix is the nitrogen content in exported fuels. We use trade data in SSB table 08801 "
+                    "to account for all petroleum products excluding those assumed to be used in the transport sector. Crude oil (HS code "
+                    "2709) dominates this flow, accounting for over 99% of its N content: it is assigned an average N content of 0.25% "
+                    "(range 0.02-1.5%) from \\\\citet{schappi_annexes_2025}, giving a total flow on the order of 150-210 ktN/year "
+                    "(2013-2023) - broadly consistent with the Norway-specific crude oil N content and export estimate of "
+                    "\\\\citet{hohmann-marriott_nitrogen_2025}. Natural gas exports (HS code 2711) are not captured here: they are a "
+                    "comparably large export by mass and energy content, but natural gas itself has negligible nitrogen content and is "
+                    "therefore not expected to materially affect the national N budget.")
 
         elif upper.startswith("EF_IC_"):
             parent_subpool = "Manufacturing industries and construction (EF.IC)"
