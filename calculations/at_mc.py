@@ -117,10 +117,15 @@ def _deposition_flow_mc(results, flow_code, class4, poll, preloaded_data, curren
                 
         elif year < 2022:
             # No new NILU period map exists yet for 2017-2021, so we keep the 2016
-            # per-class distribution and scale it by the ratio of national deposition
-            # totals (tN) between the 2017-2021 and 2012-2016 periods (Blake et al. 2023):
-            # NOx: 61440/68166, Nred: 61175/73494 (68166+73494 = 141660 t ~= the paper's
-            # reported national total of 142 ktN for 2012-2016).
+            # per-class distribution and scale it by the national trend reported for
+            # observed (kriging-method) deposition since 2015 in Blake et al. (2023,
+            # Table 3): NOx -10%, Nred/NHx -17%, giving factors 61440/68166 and
+            # 61175/73494. The kriging method is used here rather than the newer
+            # NILU model-assimilation totals for 2017-2021 because NILU themselves
+            # advise using the kriging method specifically for trend assessment
+            # (personal correspondence, 2026): it is the only method applied
+            # consistently across all periods, whereas the assimilation methodology
+            # for the two most recent periods differs somewhat between them.
             if poll == 'NOx':
                 value = value_2016 * 61440 / 68166
             else:

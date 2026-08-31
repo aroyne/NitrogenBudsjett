@@ -8,14 +8,36 @@ from datetime import datetime
 # ==============================================================================
 
 DEPOSITION_TEXT = (
-    "Atmospheric deposition was calculated using data from NILU (described in \\\\citet{blake_deposition_2023}) which gives gridded "
-    "deposition data for both oxidized and reduced N as averages for periods 1983-1987, "
-    "1988-1992, 1997-2001, 2002-2006, 2007-2011 and 2012-2016. For 2017-2021 we use "
-    "total NILU data for that period and scale with the distribution across land classes "
-    "for the previous period. Values after 2021 are extrapolated. To find deposition on "
-    "different land categories we use the map resource AR5 from NIBIO \\\\citep{nibio_ar5_2016}. "
-    "We find the total value of atmospheric deposition to the Norwegian mainland is, "
-    "as given by NILU, 142 ktN in 2012-2016.\n\n"
+    "Atmospheric deposition to the Norwegian mainland is distributed across five land-cover "
+    "categories - agricultural soils (AG.SM), forest (FS.FO), other land (FS.OL), settlements "
+    "(HS.HS) and surface waters (HY.SW) - each documented as its own flow below.\n\n"
+    "Deposition data comes from NILU (described in \\\\citet{blake_deposition_2023}), which gives "
+    "gridded deposition data for both oxidized and reduced N as averages for the periods "
+    "1983-1987, 1988-1992, 1997-2001, 2002-2006, 2007-2011 and 2012-2016. Deposition is allocated "
+    "to each land class by intersecting this deposition grid with the NIBIO AR5 land-cover map "
+    "\\\\citep{nibio_ar5_2016} (FKB-AR5, downloaded from geonorge.no): each AR5 polygon is assigned "
+    "to one of the five classes above (settlements: AR5 types 11-12; agriculture: 21-23; forest: 30; "
+    "surface water: 81; other: 50/60/70/99), and each grid cell's deposition is distributed across "
+    "classes in proportion to the area of each class within that cell. The resulting land-class areas "
+    "agree well with NIBIO's own Arealbarometer, aside from a modest discrepancy in the 'other' "
+    "category from differences in how unclassified area is handled.\n\n"
+    "Summed across the five land classes, this gives a total of about 68 ktN oxidized N (OXN) and "
+    "73 ktN reduced N (RDN) for the 2012-2016 period. No new NILU period map exists yet for 2017 "
+    "onward, so the 2012-2016 land-class distribution is kept and scaled by the national trend "
+    "reported for that period. NILU's own guidance for trend assessment (personal correspondence, "
+    "2026) is to use their measurement-kriging method specifically, since it is the only method "
+    "applied consistently across all periods - their two most recent periods instead assimilate "
+    "measurements with the EMEP chemical transport model, with the fusion methodology itself "
+    "changing somewhat between periods. Applying the kriging-method trend reported in "
+    "\\\\citet{blake_deposition_2023} (a 10% decrease in oxidized N and 17% in reduced N since 2015) "
+    "gives about 61 ktN OXN and 61 ktN RDN from 2017 onward - a step change rather than a gradual "
+    "trend, extrapolated flat for years after 2021.\n\n"
+)
+
+DEPOSITION_REFERENCE = (
+    "Deposition of N to {land_class} is one of five land-class deposition flows derived from the "
+    "same NILU/AR5 dataset; see the [Atmospheric Nitrogen Deposition Overview](pool_atmosphere.html) "
+    "on the Atmosphere (AT) pool page for the shared methodology, period structure and national totals.\n\n"
 )
 
 def get_balance_image_markdown(pool_code, plot_files, plot_dir, relative_depth="", target_format = 'html'):
@@ -351,6 +373,8 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename, targe
         f.write("---\nlayout: default\ntitle: Atmosphere (AT)\nnav_order: 2\nhas_children: true\n---\n\n")
         f.write("# Pool: Atmosphere (AT)\n\nThis section contains all documented nitrogen flows leaving the Atmosphere pool.\n")
         f.write(get_balance_image_markdown("AT", plot_files, plot_dir, relative_depth="../", target_format=target_format))
+        f.write("\n### Atmospheric Nitrogen Deposition Overview\n\n")
+        f.write(DEPOSITION_TEXT)
         f.write("\n### Flows that are zero or neglected:\n\n")
         f.write("* **AT.AT-EF.EC-Combustion N2 fixation-N2**, **AT.AT-EF.IC-Combustion N2 fixation-N2** and **AT.AT-EF.OE-Combustion N2 fixation-N2** "
                 "are neglected because we have chosen to ignore nitrogen fixation in combustion processes. In fuel combustion, some bound N is "
@@ -411,14 +435,19 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename, targe
                     sown for pasture and fodder production (fulldyrka eng) has remained constant to within about 3 % from 1995 up to today. Our \
                     best estimate for BNF, and for consistency with the previous study, is therefore to assume a constant value of 8 ktN/year. \
                     In Sweden \\citep{moldan_where_2025} the value was found to be 34 kT in 2015, which is more in line with the values found before 2000.""")
-            elif exact_flow_code in ["AT.AT-FS.FO-Deposition-OXN", "AT.AT-FS.FO-Deposition-RDN", "AT.AT-FS.OL-Deposition-OXN", "AT.AT-FS.OL-Deposition-RDN", "AT.AT-HS.HS-Deposition-OXN", "AT.AT-HS.HS-Deposition-RDN"]:
-                f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_TEXT + "\n\n")
+            elif exact_flow_code in ["AT.AT-AG.SM-Deposition-OXN", "AT.AT-AG.SM-Deposition-RDN"]:
+                f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_REFERENCE.format(land_class="agricultural soils"))
+            elif exact_flow_code in ["AT.AT-FS.FO-Deposition-OXN", "AT.AT-FS.FO-Deposition-RDN"]:
+                f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_REFERENCE.format(land_class="forest"))
+            elif exact_flow_code in ["AT.AT-FS.OL-Deposition-OXN", "AT.AT-FS.OL-Deposition-RDN"]:
+                f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_REFERENCE.format(land_class="other land"))
+            elif exact_flow_code in ["AT.AT-HS.HS-Deposition-OXN", "AT.AT-HS.HS-Deposition-RDN"]:
+                f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_REFERENCE.format(land_class="settlements"))
             elif exact_flow_code in ["AT.AT-HY.SW-Deposition-OXN","AT.AT-HY.SW-Deposition-RDN"]:
-                f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_TEXT + "For comparison, the data used in the TEOTIL model gives 3.5 ktN in 2013 and "
+                f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_REFERENCE.format(land_class="surface waters") +
+                        "For comparison, the data used in the TEOTIL model gives 3.5 ktN in 2013 and "
                         "3.0 ktN in 2023 - a similar declining trend to our combined OXN+RDN values (about 9.4 and 8.1 ktN for the same years), "
                         "but substantially lower in magnitude, likely reflecting different datasets and different data treatment. ")
-            elif exact_flow_code in ["AT.AT-AG.SM-Deposition-OXN", "AT.AT-AG.SM-Deposition-RDN"]:
-                f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_TEXT + "\n\n")
             elif exact_flow_code == "AT.AT-FS.FO-N2 fixation-N2":
                 f.write("Following the Swedish NBB \\citet{moldan_where_2025}, we use an N-fixation "
                         "rate of 1.5 kg/ha/year and a forested area of 12.0 mill ha as given by SSB for 2019-2023 (table 14368); we assume this value is "
