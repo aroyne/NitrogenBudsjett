@@ -600,7 +600,11 @@ def process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename
                 "(polyamide/nylon, polyurethane, melamine and urea formaldehyde resins, polyacrylonitrile) use the N contents "
                 "given in \\citet{schappi_annexes_2025}, Table 23, while ordinary commodity plastics and fibres with no "
                 "nitrogen in their polymer backbone (polyethylene, polypropylene, PVC, polystyrene, polyester, viscose/rayon, "
-                "cotton) are assigned ~0."
+                "cotton) are assigned ~0. The same principle applies to clothing, footwear and other finished textile "
+                "articles: items explicitly of wool use the protein-fibre N content from \\citet{schappi_annexes_2025}, "
+                "Table 24 (as for silk), items with a leather component use the same N content as hides and skins, and "
+                "items of cotton or unspecified synthetic/artificial fibre (predominantly polyester, which - like cotton - "
+                "has no nitrogen in its polymer backbone) default to ~0."
             )
         elif "solid" in norm and "waste" in norm:
             exact_flow_code = "RW.RW-PR.SO-Solid waste import-Nmix"
@@ -1609,7 +1613,10 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                     "assigned by base polymer rather than a single blended factor: nitrogen-containing polymers (polyamide/nylon, polyurethane, melamine and "
                     "urea formaldehyde resins, polyacrylonitrile) use the N contents given in \\\\citet{schappi_annexes_2025}, Table 23, while ordinary "
                     "commodity plastics and fibres with no nitrogen in their polymer backbone (polyethylene, polypropylene, PVC, polystyrene, polyester, "
-                    "viscose/rayon, cotton) are assigned ~0. "
+                    "viscose/rayon, cotton) are assigned ~0. The same principle applies to clothing, footwear and other finished textile articles: items "
+                    "explicitly of wool use the protein-fibre N content from \\\\citet{schappi_annexes_2025}, Table 24 (as for silk), items with a leather "
+                    "component use the same N content as hides and skins, and items of cotton or unspecified synthetic/artificial fibre (predominantly "
+                    "polyester, which - like cotton - has no nitrogen in its polymer backbone) default to ~0. "
                 )
 
         # Skriv ut filen for den gjeldende strømmen

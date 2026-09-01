@@ -589,12 +589,12 @@ def _add_live_animal_export_mc(results, preloaded_data, current_params, dataset_
         clean_item = str(item_name).strip()
         param_key = f"weight_{clean_item}"
 
-        defined_weights = getattr(current_params, 'animal_weights', {})
-
-        if clean_item not in defined_weights:
+        try:
+            return float(current_params.get(param_key))
+        except KeyError:
+            # FAOSTAT's live-animal export list includes types the model
+            # deliberately does not track a weight for (see docstring above).
             return 0.0
-
-        return float(current_params.get(param_key))
 
     df_round['perturbed_weight'] = df_round['Item'].apply(get_perturbed_weight)
     df_round['N_amount'] = (df_round['perturbed_weight'] * df_round['perturbed_value'] * prot_frac * 1e-6 / prot_to_N)
