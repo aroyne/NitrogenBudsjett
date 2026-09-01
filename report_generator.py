@@ -595,7 +595,12 @@ def process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename
             display_name = "Other Goods Import"
             description = (
                 "Is taken from trade data, SSB table 08801. Import of N2 is a large contributor but not included here because it "
-                "does not contribute to the reactive nitrogen cycle."
+                "does not contribute to the reactive nitrogen cycle. Within the plastics and synthetic-textile trade categories, "
+                "N content is assigned by base polymer rather than a single blended factor: nitrogen-containing polymers "
+                "(polyamide/nylon, polyurethane, melamine and urea formaldehyde resins, polyacrylonitrile) use the N contents "
+                "given in \\citet{schappi_annexes_2025}, Table 23, while ordinary commodity plastics and fibres with no "
+                "nitrogen in their polymer backbone (polyethylene, polypropylene, PVC, polystyrene, polyester, viscose/rayon, "
+                "cotton) are assigned ~0."
             )
         elif "solid" in norm and "waste" in norm:
             exact_flow_code = "RW.RW-PR.SO-Solid waste import-Nmix"
@@ -1600,7 +1605,11 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                 display_name = "Other Goods Export"
                 description = (
                     "**MP.OP-RW.RW-Other goods export-Nmix** is taken from SSB trade data (table 08801) on goods that can be characterized as flowers, chemicals, "
-                    "soap, industrial protein, leather, wood, textiles, and ammonia. "
+                    "soap, industrial protein, leather, wood, textiles, and ammonia. Within the plastics and synthetic-textile trade categories, N content is "
+                    "assigned by base polymer rather than a single blended factor: nitrogen-containing polymers (polyamide/nylon, polyurethane, melamine and "
+                    "urea formaldehyde resins, polyacrylonitrile) use the N contents given in \\\\citet{schappi_annexes_2025}, Table 23, while ordinary "
+                    "commodity plastics and fibres with no nitrogen in their polymer backbone (polyethylene, polypropylene, PVC, polystyrene, polyester, "
+                    "viscose/rayon, cotton) are assigned ~0. "
                 )
 
         # Skriv ut filen for den gjeldende strømmen
