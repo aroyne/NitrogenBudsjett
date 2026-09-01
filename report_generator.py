@@ -467,9 +467,11 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename, targe
             elif exact_flow_code == "AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2":
                 f.write(f"**{exact_flow_code}**\n\n" + "is found through mass balance where we use data from FAOSTAT Fertilizer by nutrient, domestic "
                         "fertilizer production, and adjusted for trade in ammonia using SSB trade data (table 08801): imported ammonia is subtracted "
-                        "(not domestically fixed) and exported ammonia is added back (domestically fixed before leaving the country). The result is a very "
-                        "variable curve which probably does not reflect year to year production well and could be a result of how trade statistics are "
-                        "reported.")
+                        "(not domestically fixed) and exported ammonia is added back (domestically fixed before leaving the country). This combined value "
+                        "is smoothed with a centered 3-year moving average, since actual ammonia production is a continuous industrial process and "
+                        "presumably much steadier than the underlying trade statistics suggest on their own - annual trade figures are sensitive to "
+                        "shipment timing around year-end and to inventory/stock effects, which can otherwise dominate the apparent year-to-year change. "
+                        "The result is floored at zero, since a negative N2-fixation flow has no physical meaning.")
             elif exact_flow_code == "AT.AT-RW.RW-Atmospheric outflow-OXN":
                 f.write(f"**{exact_flow_code}**\n\n" + "is found using source-receptor data from \\citep{emep_sr_2024}, as advised by \\citep{schappi_annexes_2025}. "
                         "The EMEP source-receptor tables are not published for every year: 1984-1996 use the average of 1997-2001 (the earliest "

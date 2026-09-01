@@ -158,24 +158,24 @@ def _add_OP_N2_fixation_mc(results, preloaded_data, current_params, ammonia_impo
     collected_years = set()
     
     dataset_key = 'Fertilizer by nutrient'
-    data_sources = 'FAOSTAT Fertilizer by nutrient + SSB'
+    data_sources = 'FAOSTAT Fertilizer by nutrient + SSB (3-year moving average)'
 
     # 'faostat_fertilizer_production' <- data_files/FAOSTAT_data_en_11-25-2025.csv:
     # FAOSTAT Fertilizer by nutrient, domestic production (downloaded 25.11.2025)
     df_faostat = preloaded_data['faostat_fertilizer_production']
 
+    raw_values = {}
     for _, row in df_faostat.iterrows():
         year = int(row['Year'])
         if year in ammonia_import_dict:  # Data finnes fra handelsstart (1988)
             if year not in EXPECTED_YEARS:
                 continue
-            collected_years.add(year)
-            
+
             base_faostat = float(row['Value']) / 1000  # tN -> ktN
-            
+
             noise_val = dataset_noise[dataset_key]
             perturbed_faostat = base_faostat * noise_val
-            
+
             # Mass balance proxy for domestic industrial N2 fixation via ammonia
             # synthesis: FAOSTAT-reported domestic fertilizer N production, minus
             # imported ammonia N (not fixed domestically), plus exported ammonia N
@@ -185,17 +185,35 @@ def _add_OP_N2_fixation_mc(results, preloaded_data, current_params, ammonia_impo
             # Export presence is sporadic (SSB tab 08801 has no NH3 export row in 1991,
             # 2003, 2006, 2007 - no shipments that year, not missing data), so a missing
             # year defaults to 0 rather than requiring the key like import does.
-            value = perturbed_faostat - ammonia_import_dict[year] + ammonia_export_dict.get(year, 0.0)
-            
-            comment = 'ok'
+            raw_values[year] = perturbed_faostat - ammonia_import_dict[year] + ammonia_export_dict.get(year, 0.0)
 
-            results.append({
-                'flow_name': flow_code,
-                'year': year,
-                'value': value, 
-                'comment': comment,
-                'data_sources': data_sources
-            })
+    # Smoothed with a centered 3-year moving average (partial window at the
+    # series' edges): the underlying trade statistics are reported per
+    # calendar year and are sensitive to shipment timing around year-end and
+    # to inventory/stock effects, causing large swings that don't reflect
+    # actual ammonia production - which, as a continuous industrial process,
+    # is presumably much steadier year to year than this proxy suggests.
+    # Since the combination above is linear, averaging the combined value is
+    # equivalent to averaging production, import and export individually
+    # first.
+    for year in sorted(raw_values):
+        window_years = [y for y in (year - 1, year, year + 1) if y in raw_values]
+        value = sum(raw_values[y] for y in window_years) / len(window_years)
+        # The averaging above smooths most, but not all, of the underlying
+        # trade data's year-to-year noise - a negative N2-fixation flow has
+        # no physical meaning, so floored at 0.0.
+        value = max(0.0, value)
+
+        collected_years.add(year)
+        comment = 'ok'
+
+        results.append({
+            'flow_name': flow_code,
+            'year': year,
+            'value': value,
+            'comment': comment,
+            'data_sources': data_sources
+        })
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)    
     
