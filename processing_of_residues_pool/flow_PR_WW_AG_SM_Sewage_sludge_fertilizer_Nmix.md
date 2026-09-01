@@ -10,7 +10,7 @@ nav_order: 1
 ![PR.WW-AG.SM-Sewage sludge fertilizer-Nmix](../output_files/plots/PR_WW_AG_SM_Sewage_sludge_fertilizer_Nmix.png)
 
 ### Flow Description
-Taken from SSB table 05279 “Avløpsslam, etter slamdisponering, statistikkvariabel, år og region”. We use a N content of 0.26 %  as given in Table 54 in Schäppi et al. (2025). For years 1993-2001 we use data from the SSB Naturressurser og miljø series. For years 1990-1992 we use the average value of the 1993-1995.
+Taken from SSB table 05279 “Avløpsslam, etter slamdisponering, statistikkvariabel, år og region”. We use a N content of 0.26 % as given in Table 54 in Schäppi et al. (2025). For years 1993-2001 we use data from the SSB Naturressurser og miljø series. For years 1990-1992 we use the average value of the 1993-1995.
 
 ### References
 

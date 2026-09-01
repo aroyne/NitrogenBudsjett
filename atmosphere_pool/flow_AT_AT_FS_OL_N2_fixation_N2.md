@@ -10,7 +10,7 @@ nav_order: 9
 ![AT.AT-FS.OL-N2 fixation-N2](../output_files/plots/AT_AT_FS_OL_N2_fixation_N2.png)
 
 ### Flow Description
-We use N2 fixation rates from Table 62 in Schäppi et al. (2025) together with land type areas calculated from the CORINE land cover  inventory Agency (2019). In the Swedish NNB (Moldan et al., 2025), N2 fixation in the OL compartment was considered negligible.
+We use N2 fixation rates from Table 62 in Schäppi et al. (2025) together with land type areas calculated from the CORINE land cover inventory Agency (2019). In the Swedish NNB (Moldan et al., 2025), N2 fixation in the OL compartment was considered negligible.
 
 ### References
 

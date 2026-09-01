@@ -422,21 +422,22 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename, targe
             f.write(f"# {display_name}\n\n![{exact_flow_code}](../{plot_dir}/{filename})\n\n### Flow Description\n")
 
             if exact_flow_code == "AT.AT-AG.SM-Biological N2 fixation-N2":
-                f.write("\\citet{schappi_annexes_2025} advises using data from the EUROSTAT Gross nutrient balance, but there \
-                    is an error in this dataset for Norway which is currently being corrected (as of February 2026; personal correspondence, \
-                    EUROSTAT). According to the EUROSTAT metadata, the BNF in this statistic is calculated based on the area of leguminous crops and \
-                    fization coefficients. The production of leguminous crops (peas, beans etc) in Norway is very low and we assume that agricultural \
-                    BNF is for the most part determined by leguminous crops such as clover grown on pastures and in fodder production.\n \
-                    \\citet{bleken_nitrogen_1997} based their estimate for BNF from the sale of clover seeds: a sale of about 145 t seeds was \
-                    estimated to be used to plant 95 000 ha of grass/clover mixtures (655 ha/t seeds). Together with a rate of BNF of 80 kgN/ha on \
-                    this area, they found a total of 7.6 ktN per year and summed up to 8 ktN to account for BNF from free-living orghanisms and \
-                    other sources. The rate of 80 kgN/ha agrees relatively well with later studies of agricultural BNF in Norway, where average \
-                    values between 10 and 100 kgN/ha have been found; the highest values in particularly productive areas were up to 260 kgN/ha \
-                    \\citet{hansen_engbelgvekster_2020}. \n Yearly statistics of clover \
-                    seed sales are not available, but according to NIBIO Totalkalkylen (NIBIO, 2025b), the area where grass/clover mixes may be \
-                    sown for pasture and fodder production (fulldyrka eng) has remained constant to within about 3 % from 1995 up to today. Our \
-                    best estimate for BNF, and for consistency with the previous study, is therefore to assume a constant value of 8 ktN/year. \
-                    In Sweden \\citep{moldan_where_2025} the value was found to be 34 kT in 2015, which is more in line with the values found before 2000.""")
+                f.write("\\citet{schappi_annexes_2025} advises using data from the EUROSTAT Gross nutrient balance, but there "
+                    "is an error in this dataset for Norway which is currently being corrected (as of February 2026; personal correspondence, "
+                    "EUROSTAT). According to the EUROSTAT metadata, the BNF in this statistic is calculated based on the area of leguminous crops and "
+                    "fixation coefficients. The production of leguminous crops (peas, beans etc) in Norway is very low and we assume that agricultural "
+                    "BNF is for the most part determined by leguminous crops such as clover grown on pastures and in fodder production.\n\n"
+                    "\\citet{bleken_nitrogen_1997} based their estimate for BNF from the sale of clover seeds: a sale of about 145 t seeds was "
+                    "estimated to be used to plant 95 000 ha of grass/clover mixtures (655 ha/t seeds). Together with a rate of BNF of 80 kgN/ha on "
+                    "this area, they found a total of 7.6 ktN per year and summed up to 8 ktN to account for BNF from free-living organisms and "
+                    "other sources. The rate of 80 kgN/ha agrees relatively well with later studies of agricultural BNF in Norway, where average "
+                    "values between 10 and 100 kgN/ha have been found; the highest values in particularly productive areas were up to 260 kgN/ha "
+                    "\\citet{hansen_engbelgvekster_2020}.\n\n"
+                    "Yearly statistics of clover "
+                    "seed sales are not available, but according to NIBIO Totalkalkylen (NIBIO, 2025b), the area where grass/clover mixes may be "
+                    "sown for pasture and fodder production (fulldyrka eng) has remained constant to within about 3 % from 1995 up to today. Our "
+                    "best estimate for BNF, and for consistency with the previous study, is therefore to assume a constant value of 8 ktN/year. "
+                    "In Sweden \\citep{moldan_where_2025} the value was found to be 34 kT in 2015, which is more in line with the values found before 2000.")
             elif exact_flow_code in ["AT.AT-AG.SM-Deposition-OXN", "AT.AT-AG.SM-Deposition-RDN"]:
                 f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_REFERENCE.format(land_class="agricultural soils"))
             elif exact_flow_code in ["AT.AT-FS.FO-Deposition-OXN", "AT.AT-FS.FO-Deposition-RDN"]:
@@ -457,7 +458,7 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename, targe
                         "in 2015 was found to be 39.5 ktN \\citet{moldan_where_2025}.")
             elif exact_flow_code == "AT.AT-FS.OL-N2 fixation-N2":
                 f.write("We use N2 fixation rates from Table 62 in \\citet{schappi_annexes_2025} together with land type areas calculated from the CORINE land cover "
-                        " inventory \\citet{european_environment_agency_corine_2019}. "
+                        "inventory \\citet{european_environment_agency_corine_2019}. "
                         "In the Swedish NNB \\citep{moldan_where_2025}, N2 fixation in the OL compartment was considered negligible.")
             elif exact_flow_code == "AT.AT-HY.SW-N2 fixation-N2":
                 f.write(f"**{exact_flow_code}**\n\n" + "According to NIBIO \\citep{nibio_arealbarometer_2026}, the surface water area is 20 457 km2 "
@@ -532,7 +533,8 @@ def process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename
                 "N content is applied separately by raw-material type: 0.0197 kgN/kg for carbohydrate raw materials and 0.0648 kgN/kg for "
                 "protein raw materials. NIBIO Totalkalkylen gives statistics for total amount of feed to Norwegian farm animals between 1959 "
                 "and 2026. Table 6.10 in \\citep{bruholt_jordbruksstatistikk_1994} gives the domestically produced fraction of farm animal feed "
-                "between 1985 and 1994. We combine these data to find values before 2000, using an average import fraction for 1995-1999"
+                "between 1985 and 1994. We combine these data to find values before 2000, using an average import fraction for 1995-1999. "
+                "The 2000-2003 gap between the two source series is bridged with a linear interpolation."
             )
         elif "live" in norm and "animal" in norm:
             exact_flow_code = "RW.RW-AG.MM-Live animal import-Nmix"
@@ -712,18 +714,18 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename, targ
             elif "nonedible" in norm or "wool" in norm or ("animal" in norm and "op" in norm):
                 exact_flow_code = "AG.MM-MP.OP-Non-edible animal products-Nmix"
                 display_name = "Non-edible Animal Products"
-                description = "\\\\citet{schappi_annexes_2025} advises using FAOSTAT Commodity Balances (non-food). For Norway this statistic "
+                description = ("\\\\citet{schappi_annexes_2025} advises using FAOSTAT Commodity Balances (non-food). For Norway this statistic "
                 "only contains wool for 4 individual years and we therefore use data for wool from Landbruksdirektoratet "
                 "\\\\citep{landbruksdirektoratet_leveransedata-slakt-2005-2012_2025} for 2005-2024; for earlier years, we use the number of "
                 "sheep (SSB table 03710) and extrapolate from a linear regression found between sheep and wool for 2005-2024. In addition, "
                 "we use numbers for raw hides and skins from FAOSTAT Crops and livestock products. N contents are taken from "
-                "\\\\citet{schappi_annexes_2025}."
+                "\\\\citet{schappi_annexes_2025}.")
             elif "export" in norm or "live" in norm:
                 exact_flow_code = "AG.MM-RW.RW-Live animal export-Nmix"
                 display_name = "Live Animal Export"
-                description = "Taken from FAOSTAT Crop and livestock products, assuming typical weights of animals from various sources, average "
+                description = ("Taken from FAOSTAT Crop and livestock products, assuming typical weights of animals from various sources, average "
                 "16 % protein in whole animal based on typical values in \\\\citet{schappi_annexes_2025} and Jones factor 6.25 for nitrogen to "
-                "protein (standard) "
+                "protein (standard).")
 
         elif filename.upper().startswith("AG_SM_"):
             parent_subpool = "Soil Management (AG.SM)"
@@ -747,7 +749,7 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename, targ
             elif "emissionsn2o" in norm:
                 exact_flow_code = "AG.SM-AT.AT-Emissions-N2O"
                 display_name = "N2O emissions from denitrification"
-                description = "N2O emissions are taken from UNFCCC Common reporting tables, Table 3"
+                description = "N2O emissions are taken from UNFCCC Common reporting tables, Table 3."
             elif "emissionsnox" in norm:
                 exact_flow_code = "AG.SM-AT.AT-Emissions-NOx"
                 display_name = "NOx emissions from soil management"
@@ -761,12 +763,12 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename, targ
             elif "leaching" in norm:
                 exact_flow_code = "AG.SM-HY.SW-Leaching-Nmix"
                 display_name = "Leaching from soil management"
-                description = "Leaching from soil management is taken from UNFCCC Common reporting tables, Table 3. The data agrees within the error "
-                "range with what is reported in the TEOTIL3 \\citet{model sample_kildefordelte_2024}"
+                description = ("Leaching from soil management is taken from UNFCCC Common reporting tables, Table 3. The data agrees within the error "
+                "range with what is reported in the TEOTIL3 \\citet{sample_kildefordelte_2024}.")
             elif "foodcrop" in norm:
                 exact_flow_code = "AG.SM-MP.FP-Food crop products-Nmix"
                 display_name = "Food crop products"
-                description = ("Food crop products are  taken from EUROSTAT Gross nutrient balance as advised by \\\\citet{schappi_annexes_2025}: «Nutrient "
+                description = ("Food crop products are taken from EUROSTAT Gross nutrient balance as advised by \\\\citet{schappi_annexes_2025}: «Nutrient "
                     "removal by harvest of crops» minus «Industrial crops». «Ornamenal crops», which should also be removed, are negligible in Norway. "
                     "For the 2017-2019 gap in the source data, we linearly interpolate between the 2016 and 2020 values. ")
             elif "industrial" in norm:
@@ -1227,7 +1229,7 @@ def process_energy_and_fuels_pool(ef_folder, plot_files, plot_dir, bib_filename,
                 exact_flow_code = "EF.EC-AT.AT-Emissions-NOx"
                 display_name = "Energy conversion emissions (NOx)"
                 description = ("EF.EC-AT.AT-Emissions-NOx: We have used data from CLRTAP Inventory Submissions \\citet{emep_officially_2025} as advised by "
-                    "\\\\citet{schappi_annexes_2025}, using the categories given in Table 11")
+                    "\\\\citet{schappi_annexes_2025}, using the categories given in Table 11.")
             elif "emissions" in norm and "n2o" in norm:
                 exact_flow_code = "EF.EC-AT.AT-Emissions-N2O"
                 display_name = "Energy conversion emissions (N2O)"
@@ -1723,16 +1725,16 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
                 exact_flow_code = "PR.SO-AG.SM-Biologically treated organic waste-Nmix"
                 display_name = "Biologically treated organic waste to Ag"
                 flow_description = (
-                    f"**{exact_flow_code}** includes all forms of organic waste except sewage sludge that is organically treaded and used in "
-                    "agriultural soils. Biological treatment of organic waste includes both composting and biogas production, but in Norway, "
+                    f"**{exact_flow_code}** includes all forms of organic waste except sewage sludge that is organically treated and used in "
+                    "agricultural soils. Biological treatment of organic waste includes both composting and biogas production, but in Norway, "
                     "most of the waste composted in the municipal waste sector is used on the private sector, not in agriculture.\n\n"
                     "SSB statistics on composted organic waste also includes some composted wastewater sludge, but there is no exact statistics "
-                    "on the amount. Reports indicate that this is a minor (less than 15 %) of sludge) and decreasing fraction of sewage sludge, "
+                    "on the amount. Reports indicate that this is a minor (less than 15 % of sludge) and decreasing fraction of sewage sludge, "
                     "which is already included in the flows from PR.WW. There is therefore some double counting which serves to make this flow "
                     "(PR.SO-HS.HS) artificially large. \n"
                     "From 2018, we use data on the disposal of biologically produced waste from SSB table 12818 assuming a typical N content of "
                     "compost, although a smaller fraction is also biogas digestate. \n"
-                    "For 2012-2017, we use data on composted organic waste from SSB table 10513  “Avfallsregnskap for Norge (1 000 tonn) and scale "
+                    "For 2012-2017, we use data on composted organic waste from SSB table 10513 “Avfallsregnskap for Norge (1 000 tonn) and scale "
                     "the nitrogen value in 2018 with that found from table 12818 for consistency. \n"
                     "There are no official data prior to 2012, but we know that there was organic waste composted and used in the private sector. "
                     "In lack of other data we extrapolate the 2012 value back to 1990. \n\n"
@@ -1810,8 +1812,8 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
             elif "rwrw" in norm and "recycling" in norm:
                 exact_flow_code = "PR.SO-RW.RW-Export for recycling-Nmix"
                 display_name = "Export for Recycling"
-                flow_description = f"**{exact_flow_code}** is plastic, paper and textile waste which has been collected for recycling and "
-                "exported to recycling facilities outside of Norway. Data taken from trade data, SSB table 08801."
+                flow_description = (f"**{exact_flow_code}** is plastic, paper and textile waste which has been collected for recycling and "
+                "exported to recycling facilities outside of Norway. Data taken from trade data, SSB table 08801.")
             elif "rwrw" in norm and "reuse" in norm:
                 exact_flow_code = "PR.SO-RW.RW-Export for reuse-Nmix"
                 display_name = "Export for Reuse"
@@ -1831,7 +1833,7 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
                 exact_flow_code = "PR.WW-AG.SM-Sewage sludge fertilizer-Nmix"
                 display_name = "Sewage Sludge Fertilizer to Ag"
                 flow_description = ("Taken from SSB table 05279 “Avløpsslam, etter slamdisponering, statistikkvariabel, år og "
-                    "region”. We use a N content of 0.26 %  as given in Table 54 in \\citet{schappi_annexes_2025}. For years 1993-2001 we use data from the "
+                    "region”. We use a N content of 0.26 % as given in Table 54 in \\citet{schappi_annexes_2025}. For years 1993-2001 we use data from the "
                     "SSB Naturressurser og miljø series. For years 1990-1992 we use the average value of the 1993-1995.")
             elif "atat" in norm and "n2" in norm and not "n2o" in norm:
                 exact_flow_code = "PR.WW-AT.AT-Emissions-N2"
@@ -1849,7 +1851,7 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
                 display_name = "Sewage Sludge Fertilizer to HS"
                 flow_description = ("Taken from SSB table 05279 *Avløpsslam, etter slamdisponering, statistikkvariabel, år og region*, "
                     "including all sludge used for green areas and for soil production \\citet{schappi_annexes_2025}. For years 1993-2001 we use data from the "
-                    "SSB *Naturressurser og miljø series*. For years 1990-1992 we use the average value of the 1993-1995. We use a N content of 0.26 %  as given in "
+                    "SSB *Naturressurser og miljø series*. For years 1990-1992 we use the average value of the 1993-1995. We use a N content of 0.26 % as given in "
                     "Table 54 in \\citet{schappi_annexes_2025}.")
             elif "hycw" in norm:
                 exact_flow_code = "PR.WW-HY.CW-Treated wastewater discharge-Nmix"
