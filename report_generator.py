@@ -1022,7 +1022,9 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename, targ
             if "excretia" in norm:
                 exact_flow_code = "HY.AC-HY.CW-Excretia-Nmix"
                 display_name = "Excretia"
-                description = "Found through mass balance by assuming N that does not become fish or waste feed is excreted."
+                description = ("Found through mass balance by assuming N that does not become fish or waste feed is excreted, "
+                    "using the same time-varying biological retention as the other aquafeed-budget flows (see the "
+                    "[methodological note](subpool_aquaculture.html) on the Aquaculture (HY.AC) subpool page for details and sources).")
             elif "wastefeed" in norm:
                 exact_flow_code = "HY.AC-HY.CW-Waste feed-Nmix"
                 display_name = "Waste feed"
