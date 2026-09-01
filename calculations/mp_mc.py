@@ -1223,6 +1223,45 @@ def _add_other_goods_export_mc(results, preloaded_data, current_params, current_
     )
 
 
+# konv values within the 'kjemikalier' trade type that are specifically
+# fertilizer-production intermediates rather than consumer goods, despite
+# being reported under the same broad chemicals category as genuine
+# consumer-good inputs (pharmaceuticals, polyamide, resin, etc.): nitric
+# acid (ammonium nitrate/calcium ammonium nitrate feedstock) and
+# dicyandiamide (a fertilizer nitrification inhibitor). Consumer goods is
+# meant to capture "other producing industry" broadly - explosives, though
+# also ammonium-nitrate-based, serve mining/civil engineering rather than
+# fertilizer production and are deliberately left in.
+_CONSUMER_GOODS_EXCLUDED_KONV = {'nitric_acid', 'dicyanamid'}
+
+
+def _get_excluded_fertilizer_chemicals_by_year(preloaded_data, current_trade_factors, dataset_noise, is_import):
+    """
+    N in trade of _CONSUMER_GOODS_EXCLUDED_KONV commodities, isolated from
+    the broader 'kjemikalier' trade type that RW.RW-MP.OP-Other goods
+    import-Nmix and MP.OP-RW.RW-Other goods export-Nmix report (konv, not
+    type, distinguishes them - process_generic_trade_flow can't isolate
+    them on its own, since it only filters on type). _add_consumer_goods_mc
+    subtracts this from both the Other goods import inflow and Other goods
+    export outflow it nets against; the two Other goods flows themselves are
+    unaffected and still report the full 'kjemikalier' totals including
+    these commodities.
+    """
+    df_vol = preloaded_data['compressed_trade_volume']
+    noise_val = dataset_noise['08801']
+    impeks_target = ['1', '1.0'] if is_import else ['2', '2.0']
+    mask = (df_vol['konv'].astype(str).str.strip().isin(_CONSUMER_GOODS_EXCLUDED_KONV)) & \
+           (df_vol['impeks'].astype(str).str.strip().isin(impeks_target))
+    df_filtered = df_vol[mask].copy()
+    v_factors = df_filtered['konv'].astype(str).str.strip().map(current_trade_factors).fillna(0.0)
+
+    result = {}
+    for yr_raw, amt, vf in zip(df_filtered['year'].values, df_filtered['amount'].values, v_factors.values):
+        yr = int(float(yr_raw))
+        result[yr] = result.get(yr, 0.0) + amt * noise_val * vf / 1e6
+    return result
+
+
 def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise):
     """
     MP.OP-HS.HS-Consumer goods-Nmix is not measured directly; it's the
@@ -1323,8 +1362,13 @@ def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trad
         ],
         is_import=True, dataset_noise=dataset_noise
     )
+    # Fertilizer-production intermediates within 'kjemikalier' are excluded
+    # here too (see _get_excluded_fertilizer_chemicals_by_year) - RW.RW-MP.OP-
+    # Other goods import -Nmix itself is unaffected and still reports the
+    # full 'kjemikalier' total.
+    excluded_import = _get_excluded_fertilizer_chemicals_by_year(preloaded_data, current_trade_factors, dataset_noise, is_import=True)
     for res in temp_import_results:
-        add_flow(res['year'], res['value'], inflow_totals, inflow_count)
+        add_flow(res['year'], res['value'] - excluded_import.get(res['year'], 0.0), inflow_totals, inflow_count)
 
     # =========================================================================
     # --- OUTFLOWS (strictly from results computed earlier) -------------------
@@ -1344,11 +1388,19 @@ def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trad
         'MP.OP-EF.IC-Industrial waste fuels-Nmix'
     ]
 
+    # Fertilizer-production intermediates within 'kjemikalier' are excluded
+    # from the Other goods export outflow below (see
+    # _get_excluded_fertilizer_chemicals_by_year) before it's netted against
+    # inflows.
+    excluded_export = _get_excluded_fertilizer_chemicals_by_year(preloaded_data, current_trade_factors, dataset_noise, is_import=False)
+
     # Each of these must already be in `results` - i.e. its _add_*_mc function
     # must run before this one in execute_calculations_mp - or the lookup
     # below raises KeyError naturally.
     for out_code in required_outflows:
         for year, val in existing_outflows[out_code].items():
+            if out_code == 'MP.OP-RW.RW-Other goods export-Nmix':
+                val = val - excluded_export.get(year, 0.0)
             add_flow(year, val, outflow_totals, outflow_count)
 
 

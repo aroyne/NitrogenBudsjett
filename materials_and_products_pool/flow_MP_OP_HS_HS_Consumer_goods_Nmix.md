@@ -12,19 +12,21 @@ nav_order: 7
 ### Flow Description
 **MP.OP-HS.HS-Consumer goods-Nmix** is calculated by mass balance, assuming that all incoming flows to OP that are not accounted for in outgoing flows end up in domestic consumer goods. We have excluded N2 fixation for ammonia synthesis, and mineral fertilizer flows. We also exclude emissions to air from the balance because they result mainly from fertilizer production.
 
+The trade-based inflow and outflow below (Other goods import/export) are further adjusted to exclude nitric acid and dicyandiamide specifically: both are fertilizer-production intermediates (ammonium/calcium ammonium nitrate feedstock and a nitrification inhibitor, respectively) reported within the broader 'kjemikalier' (chemicals) trade category alongside genuine consumer-good inputs such as pharmaceuticals, polyamide and resin, which are kept. This distinction is about the fertilizer industry specifically, not industry in general: explosives, though also ammonium-nitrate-based, serve mining and civil engineering rather than fertilizer production and are deliberately left in the balance. A sharp rise in Norwegian nitric acid exports from 2018 onward, most plausibly linked to increased commercial nitric acid trade by domestic fertilizer producers, had been distorting the Consumer goods trend before this adjustment.
+
 **Incoming flows:**
 * AG.SM-MP.OP-Crop products for industrial use-Nmix
 * AG.MM-MP.OP-Non-edible animal products-Nmix
 * PR.SO-MP.OP-Recycling-Nmix
 * EF.EC-MP.OP-Fuel used as feedstock-Nmix
 * FS.FO-MP.OP-Industrial round wood-Nmix
-* RW.RW-MP.OP-Other goods import -Nmix
+* RW.RW-MP.OP-Other goods import -Nmix (excluding nitric acid and dicyandiamide - RW.RW-MP.OP-Other goods import -Nmix itself still reports the full total including them)
 
 **Outgoing flows:**
 * MP.OP-PR.SO-Other industry waste-Nmix
 * MP.OP-PR.WW-Other industry wastewater-Nmix
 * MP.OP-HY.SW-Untreated wastewater-Nmix
-* MP.OP-RW.RW-Other goods export-Nmix
+* MP.OP-RW.RW-Other goods export-Nmix (excluding nitric acid and dicyandiamide, for the same reason as the import flow above - MP.OP-RW.RW-Other goods export-Nmix itself still reports the full total including them)
 * MP.OP-EF.IC-Industrial waste fuels-Nmix
 
 For comparison, Moldan et al. (2025) found flows from MP to HS of 15.9 ktN in the form of wood products (produced – export – waste) and 52.2 ktN in the form of chemical products, also found by mass balance, and identified as “plastics, deicing agents, glue, paint, tensides, etc.”, giving a total of 68.1 ktN which, given that the Swedish population is larger than that of Norway, agrees well with our findings.
