@@ -54,7 +54,7 @@ def find_aquaculture_production(df_aqua_modern, df_aqua_old, current_params, dat
     return aquaculture_production
 
 
-def _get_apparent_aquafeed_retention(year, current_params, dataset_noise):
+def _get_apparent_aquafeed_retention(year, current_params):
     """
     Apparent whole-fish N retention for farmed salmon in a given year:
     harvested N as a fraction of *total* feed N used industry-wide (not just
@@ -70,18 +70,26 @@ def _get_apparent_aquafeed_retention(year, current_params, dataset_noise):
     2010; constant after. Used only via get_aquafeed_budget below, which
     splits this apparent trend into a constant biological retention and a
     time-varying feed-waste fraction.
+
+    No separate interpolation noise is applied here (unlike most other
+    linear interpolations in this codebase): both endpoints
+    (aquafeed_N_retention_1990, aquafeed_N_retention) already carry their
+    own literature-based PERT uncertainty, and this value is used as a
+    divisor downstream (harvested N / retention), so multiplying it by the
+    generic +/-50% 'trend interpolation' noise - sized for interpolated mass
+    quantities, not divisor fractions - would double-count uncertainty and
+    amplify it non-linearly through the division.
     """
     prot_ret_1990 = float(current_params.get("aquafeed_N_retention_1990"))
     prot_ret_2010 = float(current_params.get("aquafeed_N_retention"))
-    noise_interp = dataset_noise['trend interpolation']
 
     if year >= 2010:
         return prot_ret_2010
     elif year <= 1990:
-        return prot_ret_1990 * noise_interp
+        return prot_ret_1990
     else:
         frac = (year - 1990) / (2010 - 1990)
-        return (prot_ret_1990 + frac * (prot_ret_2010 - prot_ret_1990)) * noise_interp
+        return prot_ret_1990 + frac * (prot_ret_2010 - prot_ret_1990)
 
 
 def get_aquafeed_budget(fish_harvested_N, year, current_params, dataset_noise):
@@ -105,7 +113,7 @@ def get_aquafeed_budget(fish_harvested_N, year, current_params, dataset_noise):
     from how far that year's apparent retention falls below R_bio, without
     needing its own separate historical trend data.
     """
-    apparent_retention = _get_apparent_aquafeed_retention(year, current_params, dataset_noise)
+    apparent_retention = _get_apparent_aquafeed_retention(year, current_params)
     prot_ret_2010 = float(current_params.get("aquafeed_N_retention"))
     feed_waste_2010 = float(current_params.get("aquafeed_waste_fraction"))
     r_bio = prot_ret_2010 / (1.0 - feed_waste_2010)
