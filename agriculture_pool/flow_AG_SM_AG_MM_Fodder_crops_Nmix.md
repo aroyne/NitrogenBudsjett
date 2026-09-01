@@ -14,6 +14,9 @@ We have used data for grass and fodder production from SSB table 13648 «Avling 
 
 Hohmann-Marriott (2025) used similar data sources but arrived at a smaller N flow (40-45 ktN) using a protein content of 8 % and N content in protein of 15 % (Table S2).
 
+As seen in Figure 2 in Volden (2025), the protein content of Norwegian fodder has fluctuated around a constant value throughout the entire period.
+
 ### References
 
 * Hohmann-Marriott, M. F. (2025). A Nitrogen budget for Norway analysis of Nitrogen flows from societal and natural sources (1961–2020). *PLOS ONE, 20*(2), e0313598. [https://doi.org/10.1371/journal.pone.0313598](https://doi.org/10.1371/journal.pone.0313598)
+* Volden, H. (2025). *Hvordan utnytte det norske kornet i melkeproduksjonen*. [https://www.landbruksdirektoratet.no/nb/nyhetsrom/rapporter/gjennomgang-av-korn-og-kraftforpolitikken](https://www.landbruksdirektoratet.no/nb/nyhetsrom/rapporter/gjennomgang-av-korn-og-kraftforpolitikken)

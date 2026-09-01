@@ -513,10 +513,13 @@ def process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename
             exact_flow_code = "RW.RW-HY.AC-Aquaculture feed import-Nmix"
             display_name = "Aquaculture Feed Import"
             description = (
-                "We assume a constant import fraction of 0.92 as given by \\citet{aas_utilization_2022} for the year 2020. "
-                "The amount of feed used is based on the amount of fish produced, calculated using data from \\citet{fiskeridirektoratet_06002_2025}"
-                "on sold farmed fish, assuming average protein (N) retention of 35,75 % \\citep{aas_utilization_2022}, 2.8 % nitrogen content "
-                "in fish and shellfish  \\citet{schappi_annexes_2025}, p. 254) and 3% feed waste \citet{wang_chemical_2013}."
+                "The import fraction of aquafeed varies by year, rising from about 11% in the mid-1980s to the 92% reported "
+                "for 2020 \\citep{aas_utilization_2022} (see the [methodological note](../hydrosphere_pool/subpool_aquaculture.html) "
+                "on the Aquaculture (HY.AC) subpool page for how this is derived). "
+                "The amount of feed used is based on the amount of fish produced, calculated using data from \\citet{fiskeridirektoratet_06002_2025} "
+                "on sold farmed fish, using a feed-waste fraction estimated to fall from ~29% in 1990 to the measured 3% "
+                "\\citep{wang_chemical_2013} by 2010 (see the same methodological note for how this is derived from the apparent "
+                "whole-fish retention trend) and 2.8 % nitrogen content in fish and shellfish (\\citet{schappi_annexes_2025}, p. 254)."
             )
         elif "feed" in norm and "animal" in norm:
             exact_flow_code = "RW.RW-AG.MM-Animal feed import-Nmix"
@@ -722,7 +725,9 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename, targ
                     "content of grass and fodder is known to be highly variable. We have assumed a protein content of 15 % based on 2025 analyses of "
                     "13 000 grass samples from all over Norway by Tine/NorFor, and 15 % N in protein (FAO, 2003). \n\n"
                     "\citet{hohmann-marriott_nitrogen_2025} used similar data sources but arrived at a smaller N flow (40-45 ktN) using a protein content "
-                    "of 8 % and N content in protein of 15 % (Table S2).  ")
+                    "of 8 % and N content in protein of 15 % (Table S2).\n\n"
+                    "As seen in Figure 2 in \citet{volden2025korn}, the protein content of Norwegian fodder has fluctuated around a constant value "
+                    "throughout the entire period.")
             elif "emissionsn2" in norm and "n2o" not in norm:
                 exact_flow_code = "AG.SM-AT.AT-Emissions-N2"
                 display_name = "N2 emissions from denitrification"
@@ -915,12 +920,38 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename, targ
         f.write("# Subpool: Aquaculture (HY.AC)\n\n")
         f.write(get_balance_image_markdown("HY.AC", plot_files, plot_dir, relative_depth="../", target_format=target_format))
         f.write("\n**Methodological note:** The conversion from feed N to fish production N (and the resulting waste feed "
-            "and excretion, `HY.AC-HY.SW-Waste feed-Nmix` and `HY.AC-HY.SW-Excretia-Nmix`) uses a single, constant N-retention "
-            "factor applied uniformly across the entire 1990–2023 period, rather than a value that varies by year. This does "
-            "not capture the well-documented improvement in feed conversion efficiency in Norwegian aquaculture over this "
-            "period, and may therefore misrepresent the feed input (and associated waste/excretion) implied by production "
-            "figures in earlier vs. later years. This is a possible methodological weakness that should be followed up, "
-            "e.g. by introducing a time-varying retention factor if suitable historical data can be found.\n")
+            "and excretion, `HY.AC-HY.SW-Waste feed-Nmix` and `HY.AC-HY.SW-Excretia-Nmix`) is based on the apparent, "
+            "whole-industry N retention reported for Norwegian salmon farming: about 26% in 1990 \\citep{ytrestoyl_utilisation_2015}, "
+            "rising linearly (no intermediate data points are available) to the ~35.75% plateau measured from 2010 onward "
+            "\\citep{aas_utilization_2022}, and held constant at each end of that range outside 1990-2010. "
+            "\\citet{aas_utilization_2022} state explicitly that this figure is a mass balance for the whole production "
+            "system, \"including all losses of feed ingredients, feed and fish\", and contrast it with controlled "
+            "nutritional studies that isolate the fish's own metabolic efficiency on feed actually eaten, which is higher. "
+            "We attribute the historical rise in apparent retention entirely to improved feed technology reducing feed "
+            "waste, not to a change in the fish's own metabolic efficiency: the biological retention of feed actually "
+            "eaten is held constant over time, derived from the two 2010-onward parameters where both apparent retention "
+            "and feed waste are independently known (apparent retention = biological retention x (1 - feed waste), so "
+            "biological retention = 35.75% / (1 - 3%) = 36.9%). The feed-waste fraction for any other year then follows "
+            "directly from how far that year's apparent retention falls below this constant biological retention, without "
+            "needing its own separate historical trend data - implying a feed-waste fraction of about 29% in 1990, falling "
+            "to the measured 3% \\citep{wang_chemical_2013} by 2010. The same decomposition is used consistently for "
+            "`MP.FP-HY.AC-Feed to coastal aquaculture-Nmix` and `RW.RW-HY.AC-Aquaculture feed import-Nmix`, which derive the "
+            "same underlying feed budget from the other direction.\n")
+        f.write("\n**Methodological note (feed import share):** `MP.FP-HY.AC-Feed to coastal aquaculture-Nmix` (the domestically "
+            "supplied share of feed) and `RW.RW-HY.AC-Aquaculture feed import-Nmix` (the imported share) split the total feed "
+            "budget above using an import fraction that varies by year rather than the constant 92% reported for 2020 "
+            "\\citep{aas_utilization_2022}. This is composed from two separately-trending components: the marine share of "
+            "feed (fish meal and fish oil), which fell roughly linearly from 89.4% in 1990 to 22.4% in 2020 "
+            "\\citep{aas_utilization_2022}, and the import dependence of that marine share specifically, which rose from "
+            "negligible in the mid-1980s (Norway was a net fishmeal exporter, \\citep{deutsch_feeding_2007}) to about "
+            "two-thirds of consumption by 2000, held flat from there (back-solving from the measured 92% total import "
+            "fraction and 22.4% marine share for 2020 gives an implied ~64% marine import dependence today, close enough to "
+            "the 2000 level to treat as a plateau absent further data points). The remaining, non-marine (plant-based) "
+            "share of feed is assumed 100% imported throughout, since Norway has no domestic capacity for protein-rich feed "
+            "crops - so the overall import fraction keeps rising after 2000 even though the marine-specific import "
+            "dependence has plateaued, simply because the always-imported non-marine share keeps growing. This gives an "
+            "import fraction of about 11% in 1984-1985 (already nonzero purely from the small non-marine share importable "
+            "at the time), rising to 76% by 2000 and 92% by 2020.\n")
         f.write("\n### Flows that are zero or neglected:\n\n* **HY.AC-MP.FP-Freshwater fish and seafood-Nmix**, **HY.AC-HY.SW-Waste feed-Nmix** and **HY.AC-HY.SW-Excretia-Nmix** are set to zero...\n* **HY.AC-AT.AT-Emissions-NH3** is set to zero assuming negligible ammonia emissions from these coastal marine cages.\n")
         append_bibtex_references(f, bib_filename)
         
@@ -995,9 +1026,11 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename, targ
             elif "wastefeed" in norm:
                 exact_flow_code = "HY.AC-HY.CW-Waste feed-Nmix"
                 display_name = "Waste feed"
-                description = ("Calculated using data from \\citet{fiskeridirektoratet_06002_2025} on sold farmed fish, assuming average "
-                    "protein (N) retention of 35,75 % \\citet{aas_utilization_2022}, 2.8 % nitrogen content in fish and shellfish "
-                    "(\\\\citet{schappi_annexes_2025}, p. 254) and 3% feed waste \\citet{wang_chemical_2013}.")
+                description = ("Calculated using data from \\citet{fiskeridirektoratet_06002_2025} on sold farmed fish, using a "
+                    "feed-waste fraction estimated to fall from ~29% in 1990 to the measured 3% \\citep{wang_chemical_2013} by "
+                    "2010 (see the [methodological note](subpool_aquaculture.html) on the Aquaculture (HY.AC) subpool page for "
+                    "how this is derived from the apparent whole-fish retention trend) and 2.8 % nitrogen content in fish and "
+                    "shellfish (\\\\citet{schappi_annexes_2025}, p. 254).")
             elif "coastalfish" in norm:
                 exact_flow_code = "HY.AC-MP.FP-Coastal fish and seafood-Nmix"
                 display_name = "Aquaculture production"
@@ -1378,10 +1411,13 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                 exact_flow_code = "MP.FP-HY.AC-Feed to coastal aquaculture-Nmix"
                 display_name = "Feed to Coastal Aquaculture"
                 description = (
-                    "**MP.FP-HY.AC-Feed to coastal aquaculture-Nmix**: the amount of feed per ton of produced fish is found by assuming an "
-                    "average protein (N) retention of 35.75 % based on values from \\\\citet{aas_utilization_2022}. The amount of produced fish is found by using data "
-                    "from Fiskeridirektoratet \\\\citep{fiskeridirektoratet_06002_2025} on sold farmed fish. This flow represents only the domestically supplied "
-                    "share of feed (an assumed 8 %); the remaining 92 %, assumed imported, is accounted for elsewhere as an import flow.\n\n"
+                    "**MP.FP-HY.AC-Feed to coastal aquaculture-Nmix**: the amount of feed per ton of produced fish is found by assuming a "
+                    "whole-fish protein (N) retention rising from 26% in 1990 to a 35.75% plateau from 2010 onward (see the "
+                    "[methodological note](../hydrosphere_pool/subpool_aquaculture.html) on the Aquaculture (HY.AC) subpool page for details "
+                    "and sources). The amount of produced fish is found by using data "
+                    "from Fiskeridirektoratet \\\\citep{fiskeridirektoratet_06002_2025} on sold farmed fish. This flow represents only the domestically "
+                    "supplied share of feed - about 89% in the mid-1980s, falling to 8% by 2020 as the import fraction rises (see the same "
+                    "methodological note for details); the remaining, imported share is accounted for elsewhere as an import flow.\n\n"
                     "\\\\citet{hohmann-marriott_nitrogen_2025} found the nitrogen content in aquaculture feed in 2020 to be 124 ktN, which is very similar to our results."
                 )
             elif "untreated" in norm and "fp" in norm:

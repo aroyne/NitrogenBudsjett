@@ -14,7 +14,8 @@ from calculations.utils import (
 )
 from calculations.shared_flow_calculations import (
     find_aquaculture_production,
-    find_treated_wastewater_discharge
+    find_treated_wastewater_discharge,
+    get_aquafeed_budget
 )
 
 def execute_calculations_hy(preloaded_data, current_params, dataset_noise):
@@ -37,7 +38,7 @@ def execute_calculations_hy(preloaded_data, current_params, dataset_noise):
     _add_wild_shellfish_and_macroalgae(results, preloaded_data, current_params, dataset_noise)
     _add_surface_water_emissions(results, preloaded_data, current_params, dataset_noise, outflow_tracker)
     _add_wild_fish_catch(results, preloaded_data, current_params, dataset_noise)
-    _add_aquaculture_internal_flows(results, aqua_production_dict, current_params)
+    _add_aquaculture_internal_flows(results, aqua_production_dict, current_params, dataset_noise)
     
     return results
 
@@ -364,15 +365,12 @@ def _add_wild_fish_catch(results, preloaded_data, current_params, dataset_noise)
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
 
-def _add_aquaculture_internal_flows(results, aquaculture_production_dict, current_params):
+def _add_aquaculture_internal_flows(results, aquaculture_production_dict, current_params, dataset_noise):
     flow_harvest = 'HY.AC-MP.FP-Coastal fish and seafood-Nmix'
     flow_waste = 'HY.AC-HY.CW-Waste feed-Nmix'
     flow_excretia = 'HY.AC-HY.CW-Excretia-Nmix'
-    
+
     collected_years = set()
-    
-    prot_ret = float(current_params.get("aquafeed_N_retention"))
-    feed_waste = float(current_params.get("aquafeed_waste_fraction"))
 
     for year, fish_harvested_N in aquaculture_production_dict.items():
         if year in EXPECTED_YEARS:
@@ -384,20 +382,20 @@ def _add_aquaculture_internal_flows(results, aquaculture_production_dict, curren
                 'comment': 'ok', 'data_sources': 'Fiskeridirektoratet'
             })
 
-            # 2. Feed waste and faeces to coastal water: back-calculate total
-            # feed N from the harvested N via the retention fraction, then
-            # split off the fraction lost as uneaten feed.
-            total_feed_N = (fish_harvested_N / prot_ret) if prot_ret > 0 else 0.0
-            waste_val = total_feed_N * feed_waste
+            # 2. Feed waste and faeces to coastal water: get_aquafeed_budget
+            # splits harvested N into the same underlying feed budget used by
+            # MP.FP-HY.AC-Feed to coastal aquaculture-Nmix and RW.RW-HY.AC-
+            # Aquaculture feed import-Nmix (see its docstring), so all three
+            # flows stay mass-balance consistent.
+            _, _, waste_val, excretia_val = get_aquafeed_budget(fish_harvested_N, year, current_params, dataset_noise)
 
             results.append({
                 'flow_name': flow_waste, 'year': year, 'value': waste_val,
                 'comment': 'ok', 'data_sources': 'Mass balance'
             })
 
-            # 3. Metabolic (dissolved) excretion to coastal water: whatever's
-            # left of total feed N once retained and wasted N are removed.
-            excretia_val = total_feed_N * (1.0 - prot_ret - feed_waste)
+            # 3. Metabolic (dissolved) excretion to coastal water: the eaten
+            # feed N that wasn't retained as fish biomass.
             results.append({
                 'flow_name': flow_excretia, 'year': year, 'value': excretia_val,
                 'comment': 'ok', 'data_sources': 'Mass balance'

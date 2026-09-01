@@ -54,6 +54,144 @@ def find_aquaculture_production(df_aqua_modern, df_aqua_old, current_params, dat
     return aquaculture_production
 
 
+def _get_apparent_aquafeed_retention(year, current_params, dataset_noise):
+    """
+    Apparent whole-fish N retention for farmed salmon in a given year:
+    harvested N as a fraction of *total* feed N used industry-wide (not just
+    the fraction actually eaten - Aas et al. 2022 state explicitly that their
+    retention figures are a whole-system mass balance "including all losses
+    of feed ingredients, feed and fish", unlike controlled nutritional
+    studies that isolate the fish's own metabolic efficiency on feed eaten).
+
+    Apparent retention rose from ~26% in 1990 (Ytrestøyl et al. 2015) to the
+    ~35.75% plateau measured from 2010 onward (Aas et al. 2022, Figure 4
+    upper panel). No data point exists before 1990, so it is held flat at
+    the 1990 value back to 1984; linearly interpolated between 1990 and
+    2010; constant after. Used only via get_aquafeed_budget below, which
+    splits this apparent trend into a constant biological retention and a
+    time-varying feed-waste fraction.
+    """
+    prot_ret_1990 = float(current_params.get("aquafeed_N_retention_1990"))
+    prot_ret_2010 = float(current_params.get("aquafeed_N_retention"))
+    noise_interp = dataset_noise['trend interpolation']
+
+    if year >= 2010:
+        return prot_ret_2010
+    elif year <= 1990:
+        return prot_ret_1990 * noise_interp
+    else:
+        frac = (year - 1990) / (2010 - 1990)
+        return (prot_ret_1990 + frac * (prot_ret_2010 - prot_ret_1990)) * noise_interp
+
+
+def get_aquafeed_budget(fish_harvested_N, year, current_params, dataset_noise):
+    """
+    Splits harvested fish N into the underlying aquafeed budget (total feed
+    used, feed actually eaten, feed wasted uneaten, and metabolic
+    excretion), used consistently by every flow built on this feed budget -
+    HY.AC-HY.CW-Waste feed-Nmix/-Excretia-Nmix in hy_mc.py,
+    MP.FP-HY.AC-Feed to coastal aquaculture-Nmix in mp_mc.py, and
+    RW.RW-HY.AC-Aquaculture feed import-Nmix in rw_mc.py.
+
+    The historical rise in apparent retention (see
+    _get_apparent_aquafeed_retention) is attributed entirely to improved
+    feed technology reducing feed waste, not to a change in the fish's own
+    metabolic efficiency: biological retention R_bio (the fraction of *eaten*
+    feed N retained as biomass) is treated as constant over time, derived
+    from the 2010-onward parameters where both apparent retention and feed
+    waste are independently known (apparent = R_bio * (1 - waste), so
+    R_bio = aquafeed_N_retention / (1 - aquafeed_waste_fraction)). The
+    implied feed-waste fraction for any other year then follows directly
+    from how far that year's apparent retention falls below R_bio, without
+    needing its own separate historical trend data.
+    """
+    apparent_retention = _get_apparent_aquafeed_retention(year, current_params, dataset_noise)
+    prot_ret_2010 = float(current_params.get("aquafeed_N_retention"))
+    feed_waste_2010 = float(current_params.get("aquafeed_waste_fraction"))
+    r_bio = prot_ret_2010 / (1.0 - feed_waste_2010)
+
+    total_feed_N = fish_harvested_N / apparent_retention
+    eaten_feed_N = fish_harvested_N / r_bio
+    waste_val = total_feed_N - eaten_feed_N
+    excretia_val = eaten_feed_N - fish_harvested_N
+    return total_feed_N, eaten_feed_N, waste_val, excretia_val
+
+
+def _get_marine_feed_share(year, current_params, dataset_noise):
+    """
+    Fraction of aquaculture feed (by mass) that is of marine origin (fish
+    meal + fish oil) in a given year, used by get_aquafeed_import_fraction
+    below to weight the feed budget between marine ingredients (partly
+    imported) and non-marine, plant-based ingredients (100% imported).
+
+    Declined roughly linearly from 89.4% in 1990 to 22.4% in 2020 (Aas et
+    al. 2022, Figure 1: marine protein + marine oil shares), held flat
+    outside that range.
+    """
+    share_1990 = float(current_params.get("marine_feed_share_1990"))
+    share_2020 = float(current_params.get("marine_feed_share_2020"))
+    noise_interp = dataset_noise['trend interpolation']
+
+    if year >= 2020:
+        return share_2020
+    elif year <= 1990:
+        return share_1990 * noise_interp
+    else:
+        frac = (year - 1990) / (2020 - 1990)
+        return (share_1990 + frac * (share_2020 - share_1990)) * noise_interp
+
+
+def _get_marine_import_fraction(year, current_params, dataset_noise):
+    """
+    Fraction of the marine-ingredient portion of aquafeed that is imported
+    (as opposed to domestically produced from Norwegian fisheries
+    byproducts/forage fish), used by get_aquafeed_import_fraction below.
+
+    Norway was a net fishmeal exporter through the mid-1980s (negligible
+    import before 1985, Deutsch et al. 2007); import dependence then rose to
+    about two-thirds of consumption by 2000. Held flat from 2000 onward:
+    back-solving from aquafeed_import_fraction (the measured 2020-onward
+    total import fraction) and marine_feed_share_2020 gives an implied ~64%
+    marine-ingredient import dependence today, close enough to the 2000
+    level to treat as a plateau rather than continued growth, absent further
+    data points between 2000 and today.
+    """
+    total_import_2020 = float(current_params.get("aquafeed_import_fraction"))
+    marine_share_2020 = float(current_params.get("marine_feed_share_2020"))
+    plateau = (total_import_2020 - (1.0 - marine_share_2020)) / marine_share_2020
+    noise_interp = dataset_noise['trend interpolation']
+
+    if year >= 2000:
+        return plateau
+    elif year <= 1985:
+        return 0.0
+    else:
+        frac = (year - 1985) / (2000 - 1985)
+        return plateau * frac * noise_interp
+
+
+def get_aquafeed_import_fraction(year, current_params, dataset_noise):
+    """
+    Overall fraction of total aquafeed N that is imported, used by
+    MP.FP-HY.AC-Feed to coastal aquaculture-Nmix in mp_mc.py and
+    RW.RW-HY.AC-Aquaculture feed import-Nmix in rw_mc.py.
+
+    Composed from two separately-trending components rather than a single
+    flat import fraction: marine ingredients (fish meal/oil), whose import
+    dependence rose from near-zero in the mid-1980s to today's level over
+    the 1985-2000 window (see _get_marine_import_fraction), and non-marine,
+    plant-based ingredients, assumed 100% imported throughout (Norway has no
+    domestic capacity for protein-rich feed crops). Because the marine share
+    of feed itself declines over time (see _get_marine_feed_share), the
+    overall import fraction keeps rising even after the marine-specific
+    import dependence plateaus, since a growing share of the total is the
+    always-imported non-marine portion.
+    """
+    marine_share = _get_marine_feed_share(year, current_params, dataset_noise)
+    marine_import_frac = _get_marine_import_fraction(year, current_params, dataset_noise)
+    return marine_share * marine_import_frac + (1.0 - marine_share) * 1.0
+
+
 def find_export_for_recycling(results, preloaded_data, current_params, current_trade_factors, dataset_noise):
     year_values = process_generic_trade_flow(
         preloaded_data=preloaded_data, 

@@ -10,7 +10,7 @@ nav_order: 8
 ![RW.RW-HY.AC-Aquaculture feed import-Nmix](../output_files/plots/RW_RW_HY_AC_Aquaculture_feed_import_Nmix.png)
 
 ### Flow Description
-We assume a constant import fraction of 0.92 as given by Aas et al. (2022) for the year 2020. The amount of feed used is based on the amount of fish produced, calculated using data from Fiskeridirektoratet (2025)on sold farmed fish, assuming average protein (N) retention of 35,75 % (Aas et al., 2022), 2.8 % nitrogen content in fish and shellfish  Schäppi et al. (2025), p. 254) and 3% feed waste Wang et al. (2013).
+The import fraction of aquafeed varies by year, rising from about 11% in the mid-1980s to the 92% reported for 2020 (Aas et al., 2022) (see the [methodological note](../hydrosphere_pool/subpool_aquaculture.html) on the Aquaculture (HY.AC) subpool page for how this is derived). The amount of feed used is based on the amount of fish produced, calculated using data from Fiskeridirektoratet (2025) on sold farmed fish, using a feed-waste fraction estimated to fall from ~29% in 1990 to the measured 3% (Wang et al., 2013) by 2010 (see the same methodological note for how this is derived from the apparent whole-fish retention trend) and 2.8 % nitrogen content in fish and shellfish (Schäppi et al. (2025), p. 254).
 
 ### References
 

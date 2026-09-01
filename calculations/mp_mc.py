@@ -17,6 +17,8 @@ from calculations.utils import (
 )
 from calculations.shared_flow_calculations import (
     find_aquaculture_production,
+    get_aquafeed_budget,
+    get_aquafeed_import_fraction,
     find_feedstock_fuel,
     find_food_industry_waste,
     find_industrial_round_wood,
@@ -643,27 +645,27 @@ def _add_aquaculture_feed_mc(results, preloaded_data, current_params, dataset_no
     df_old = preloaded_data.get('aqua_old')
     aquaculture_production = find_aquaculture_production(df_modern, df_old, current_params, dataset_noise)
 
-    import_fraction = float(current_params.get("aquafeed_import_fraction"))
-    prot_ret = float(current_params.get("aquafeed_N_retention"))
-    feed_waste = float(current_params.get("aquafeed_waste_fraction"))
-
     for year, fish_harvested_N in aquaculture_production.items():
-        if year not in EXPECTED_YEARS: 
+        if year not in EXPECTED_YEARS:
             continue
         collected_years.add(year)
 
-        # Back-calculate total feed N from harvested fish N: divide by the
-        # retention fraction to get feed actually eaten, then by (1 - waste
-        # fraction) to add back the feed lost uneaten (see HY.AC-HY.CW-Waste
-        # feed-Nmix/-Excretia-Nmix in hy_mc.py, which use the same feed budget
-        # from the other direction).
-        eaten_feed_N = fish_harvested_N / prot_ret
-        total_feed_N = eaten_feed_N / (1 - feed_waste)
+        # get_aquafeed_budget splits harvested fish N into the same
+        # underlying feed budget used by HY.AC-HY.CW-Waste feed-Nmix/
+        # -Excretia-Nmix in hy_mc.py (see its docstring), so both stay
+        # mass-balance consistent.
+        total_feed_N, _, _, _ = get_aquafeed_budget(fish_harvested_N, year, current_params, dataset_noise)
 
+        # get_aquafeed_import_fraction (see its docstring) replaces a flat
+        # import share with one that varies by year, matching
+        # RW.RW-HY.AC-Aquaculture feed import-Nmix in rw_mc.py.
+        import_fraction = get_aquafeed_import_fraction(year, current_params, dataset_noise)
         domestic_feed_N = total_feed_N * (1.0 - import_fraction)
         # aquafeed_import_fraction's PERT uncertainty range extends above 1.0
-        # (base 0.92 +/- 20% -> up to 1.104), so (1 - import_fraction) can go
-        # negative for some MC draws even though it represents a fraction.
+        # (base 0.92 +/- 20% -> up to 1.104), which propagates through the
+        # marine-import plateau in get_aquafeed_import_fraction, so
+        # (1 - import_fraction) can still go negative for some MC draws even
+        # though it represents a fraction.
         domestic_feed_N = max(0.0, domestic_feed_N)
             
         results.append({

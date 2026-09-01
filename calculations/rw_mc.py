@@ -12,7 +12,7 @@ from calculations.utils import (
     report_missing_years,
     process_generic_trade_flow
 )
-from calculations.shared_flow_calculations import find_aquaculture_production
+from calculations.shared_flow_calculations import find_aquaculture_production, get_aquafeed_budget, get_aquafeed_import_fraction
 
 def execute_calculations_rw(preloaded_data, current_params, dataset_noise, current_trade_factors):
     results = []
@@ -190,20 +190,19 @@ def _add_aquaculture_feed_import_mc(results, preloaded_data, current_params, dat
 
     aquaculture_production = find_aquaculture_production(df_modern, df_old, current_params, dataset_noise)
 
-    import_fraction = float(current_params.get("aquafeed_import_fraction"))
-    prot_ret = float(current_params.get("aquafeed_N_retention"))
-    feed_waste = float(current_params.get("aquafeed_waste_fraction"))
-
     for year, fish_harvested_N in aquaculture_production.items():
         if year not in EXPECTED_YEARS:
             continue
         collected_years.add(year)
 
-        # Back-calculate total feed N from harvested fish N (see
-        # MP.FP-HY.AC-Feed to coastal aquaculture-Nmix in mp_mc.py, which
-        # keeps only the domestic share of this same total).
-        eaten_feed_N = fish_harvested_N / prot_ret
-        total_feed_N = eaten_feed_N / (1 - feed_waste)
+        # get_aquafeed_budget splits harvested fish N into the same
+        # underlying feed budget used by MP.FP-HY.AC-Feed to coastal
+        # aquaculture-Nmix in mp_mc.py, which keeps only the domestic share
+        # of this same total.
+        total_feed_N, _, _, _ = get_aquafeed_budget(fish_harvested_N, year, current_params, dataset_noise)
+        # get_aquafeed_import_fraction (see its docstring) replaces a flat
+        # import share with one that varies by year.
+        import_fraction = get_aquafeed_import_fraction(year, current_params, dataset_noise)
         imported_feed_N = total_feed_N * import_fraction
 
         results.append({
