@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Energy conversion (EF.EC)
-parent: Energy and fuels (EF)
+parent: 1. Energy and fuels (EF)
 nav_order: 1
 has_children: true
 ---

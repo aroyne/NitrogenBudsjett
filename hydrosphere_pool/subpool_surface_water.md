@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Surface Water (HY.SW)
-parent: Hydrosphere (HY)
+parent: 8. Hydrosphere (HY)
 nav_order: 1
 has_children: true
 ---

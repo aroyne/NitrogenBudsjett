@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Aquaculture (HY.AC)
-parent: Hydrosphere (HY)
+parent: 8. Hydrosphere (HY)
 nav_order: 3
 has_children: true
 ---

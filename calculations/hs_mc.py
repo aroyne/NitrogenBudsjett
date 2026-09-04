@@ -149,7 +149,7 @@ def _add_nh3_human_emissions_mc(results, preloaded_data, current_params, dataset
 def _add_luc_N2O_emissions_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'HS.HS-AT.AT-LUC emissions-N2O'
     collected_years = set()
-    dataset_key = 'UNFCCC_emissions'
+    dataset_key = 'UNFCCC_N2O_lulucf'
     noise_val = dataset_noise[dataset_key]
     conv = float(current_params.get("N2O_to_N_factor"))
     # 'hs_unfccc_n2o_raw' <- N2O_NOx_HS_FS.xlsx (data_loader.py DATA_MAP): N2O

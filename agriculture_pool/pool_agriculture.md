@@ -1,11 +1,11 @@
 ---
 layout: default
-title: Agriculture (AG)
+title: 3. Agriculture (AG)
 nav_order: 4
 has_children: true
 ---
 
-# Pool: Agriculture (AG)
+# Pool: 3. Agriculture (AG)
 
 Because biofuel production in Norway is typically done as part of the waste management sector, flows of agricultural wastes to biofuel production are directed to PR.SO and we do not include the subpool AG.BC.
 

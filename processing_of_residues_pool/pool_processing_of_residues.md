@@ -1,11 +1,11 @@
 ---
 layout: default
-title: Processing of residues (PR)
-nav_order: 9
+title: 5. Processing of residues (PR)
+nav_order: 6
 has_children: true
 ---
 
-# Pool: Processing of residues (PR)
+# Pool: 5. Processing of residues (PR)
 
 This pool accounts for the treatment and processing of waste and wastewater residues in Norway.
 

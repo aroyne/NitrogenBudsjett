@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Wastewater (PR.WW)
-parent: Processing of residues (PR)
+parent: 5. Processing of residues (PR)
 nav_order: 2
 has_children: true
 ---

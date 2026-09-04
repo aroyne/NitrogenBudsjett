@@ -1,11 +1,11 @@
 ---
 layout: default
-title: Hydrosphere (HY)
-nav_order: 6
+title: 8. Hydrosphere (HY)
+nav_order: 9
 has_children: true
 ---
 
-# Pool: Hydrosphere (HY)
+# Pool: 8. Hydrosphere (HY)
 
 We have chosen to not include the pool groundwater (GW) because N concentrations and dynamics in Norway are largely unknown (kvaerno_2024).
 

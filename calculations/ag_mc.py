@@ -45,7 +45,7 @@ def execute_calculations_ag(preloaded_data, current_params, dataset_noise, curre
     _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_noise)
     _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.SM-AT.AT-Emissions-NH3', AG_SM_CRLTAP_SECTORS, 'NH3')
     _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.SM-AT.AT-Emissions-NOx', AG_SM_CRLTAP_SECTORS, 'NOx')
-    _add_ag_n2o_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.SM-AT.AT-Emissions-N2O', 2)
+    _add_ag_n2o_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.SM-AT.AT-Emissions-N2O', 2, 'UNFCCC_N2O_agri_soils')
     _add_ag_leaching_mc(results, preloaded_data, dataset_noise, 'AG.SM-HY.SW-Leaching-Nmix', 'Nr_SM')
     _add_ag_leaching_mc(results, preloaded_data, dataset_noise, 'AG.MM-HY.SW-Leaching-Nmix', 'Nr_MM')
     _add_animal_products_flow_mc(results, preloaded_data, current_params, dataset_noise)
@@ -53,7 +53,7 @@ def execute_calculations_ag(preloaded_data, current_params, dataset_noise, curre
     _add_manure_application_flow_mc(results, preloaded_data, current_params, dataset_noise)
     _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.MM-AT.AT-Emissions-NH3', AG_MM_CRLTAP_SECTORS, 'NH3')
     _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.MM-AT.AT-Emissions-NOx', AG_MM_CRLTAP_SECTORS, 'NOx')
-    _add_ag_n2o_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.MM-AT.AT-Emissions-N2O', 1)
+    _add_ag_n2o_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.MM-AT.AT-Emissions-N2O', 1, 'UNFCCC_N2O_agri_manure')
     _add_live_animal_export_mc(results, preloaded_data, current_params, dataset_noise)
     _add_N2_emissions_soil_management_mc(results, preloaded_data, current_params, dataset_noise)
 
@@ -305,21 +305,23 @@ def _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset
     report_missing_years(flow_code, missing_years, results)
 
 
-def _add_ag_n2o_emissions_mc(results, preloaded_data, current_params, dataset_noise, flow_code, value_col):
+def _add_ag_n2o_emissions_mc(results, preloaded_data, current_params, dataset_noise, flow_code, value_col, dataset_key):
     """
     Shared implementation for AG subsector N2O emissions. Both subsectors are
     columns of the same compilation: preloaded_data['unfccc_ark1_raw'] <-
     data_files/N2O_NOx_AG.xlsx (N2O and NOx emissions from agriculture, UNFCCC
     CRT Table 3), loaded without headers - column 1 = 'N2O, MM', column 2 =
-    'N2O, SM'. Rows 4-37 = years 2023 down to 1990.
+    'N2O, SM'. Rows 4-37 = years 2023 down to 1990. dataset_key differs by caller
+    since Norway NID Annexes 2025, Annex 2 gives manure management (IPCC 3B,
+    'UNFCCC_N2O_agri_manure') and soil emissions (IPCC 3D, 'UNFCCC_N2O_agri_soils')
+    different N2O uncertainty ("Fac2" vs "Fac3").
     """
     collected_years = set()
     comment = 'ok'
     data_sources = 'UNFCCC CRT'
 
     conv_N2O = float(current_params.get("N2O_to_N_factor"))
-    key_n2o = 'UNFCCC_emissions'
-    noise_val = dataset_noise[key_n2o]
+    noise_val = dataset_noise[dataset_key]
     df_unfccc = preloaded_data.get('unfccc_ark1_raw')
 
     for r_idx in range(4, 38):
@@ -358,7 +360,7 @@ def _add_ag_leaching_mc(results, preloaded_data, dataset_noise, flow_code, value
     data_sources = 'UNFCCC CRT'
     comment = 'ok'
 
-    key_leach = 'UNFCCC_emissions'
+    key_leach = 'UNFCCC_N_leaching'
     noise_val = dataset_noise[key_leach]
 
     df_leaching = preloaded_data.get('ag_leaching_csv')

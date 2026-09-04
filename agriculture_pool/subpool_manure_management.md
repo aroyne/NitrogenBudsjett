@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Manure Management (AG.MM)
-parent: Agriculture (AG)
+parent: 3. Agriculture (AG)
 nav_order: 1
 has_children: true
 ---

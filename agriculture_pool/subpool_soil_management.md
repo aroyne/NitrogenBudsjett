@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Soil Management (AG.SM)
-parent: Agriculture (AG)
+parent: 3. Agriculture (AG)
 nav_order: 2
 has_children: true
 ---

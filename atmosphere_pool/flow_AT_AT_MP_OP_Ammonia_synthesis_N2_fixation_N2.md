@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Ammonia Synthesis N2 Fixation
-parent: Atmosphere (AT)
+parent: 7. Atmosphere (AT)
 nav_order: 15
 ---
 

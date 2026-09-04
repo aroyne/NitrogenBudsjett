@@ -1,11 +1,11 @@
 ---
 layout: default
-title: Materials and products (MP)
-nav_order: 6
+title: 2. Materials and products (MP)
+nav_order: 3
 has_children: true
 ---
 
-# Pool: Materials and products in industry (MP)
+# Pool: 2. Materials and products in industry (MP)
 
 This pool covers chemical, processing, food, and manufacturing industries in Norway, split into two primary segments:
 

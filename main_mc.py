@@ -301,7 +301,7 @@ def write_mc_flows_to_international_report(summary_df):
         flow_name = str(row_data["flow_name"]).strip()
         year = int(row_data["year"]) 
         value = row_data["median"]
-        cv_percent = row_data["cv_percent"]
+        uncertainty_percent = row_data["uncertainty_percent"]
         comment = row_data.get("comment", "")
         data_sources = row_data.get("data_sources", "")
 
@@ -330,8 +330,8 @@ def write_mc_flows_to_international_report(summary_df):
                     # Write the values into their exact columns.
                     sheet.cell(row=row, column=VALUE_COL, value=value)
 
-                    # CV% is stored as a real fraction in Excel (e.g. 0.20 for 20%).
-                    sheet.cell(row=row, column=UNCERTAINTY_COL, value=cv_percent / 100.0)
+                    # Uncertainty is stored as a real fraction in Excel (e.g. 0.20 for 20%).
+                    sheet.cell(row=row, column=UNCERTAINTY_COL, value=uncertainty_percent / 100.0)
                     
                     if data_sources:
                         sheet.cell(row=row, column=DATASOURCE_COL, value=data_sources)

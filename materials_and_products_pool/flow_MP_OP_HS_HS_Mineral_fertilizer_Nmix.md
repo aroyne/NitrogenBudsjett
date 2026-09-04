@@ -1,11 +1,11 @@
 ---
 layout: default
-title: Non-Agricultural Mineral Fertilizer
+title: Mineral Fertilizer for HS
 parent: Other Producing Industry (MP.OP)
 nav_order: 8
 ---
 
-# Non-Agricultural Mineral Fertilizer
+# Mineral Fertilizer for HS
 
 ![MP.OP-HS.HS-Mineral fertilizer-Nmix](../output_files/plots/MP_OP_HS_HS_Mineral_fertilizer_Nmix.png)
 

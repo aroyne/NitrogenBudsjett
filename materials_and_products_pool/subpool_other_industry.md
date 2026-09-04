@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Other Producing Industry (MP.OP)
-parent: Materials and products (MP)
+parent: 2. Materials and products (MP)
 nav_order: 2
 has_children: true
 ---

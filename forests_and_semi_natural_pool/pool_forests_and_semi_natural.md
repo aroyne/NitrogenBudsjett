@@ -1,11 +1,11 @@
 ---
 layout: default
-title: Forests and semi-natural vegetation (FS)
+title: 4. Forests and semi-natural vegetation (FS)
 nav_order: 5
 has_children: true
 ---
 
-# Pool: Forests and semi-natural vegetation (FS)
+# Pool: 4. Forests and semi-natural vegetation (FS)
 
 Because of limited data on OL and because data on leaching are combined for WL and OL, we have chosen to combine WL and OL into the OL subpool in this study.
 

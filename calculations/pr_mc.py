@@ -780,7 +780,7 @@ def _add_so_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
     data_sources = 'UNFCCC CRT'
 
     conv_N2O = float(current_params.get("N2O_to_N_factor"))
-    key_n2o = 'UNFCCC_emissions'
+    key_n2o = 'UNFCCC_N2O_solid_waste'
     noise_val = dataset_noise[key_n2o]
 
     # 'n2o_so_raw' <- N2O_SO.csv (data_loader.py DATA_MAP): N2O emissions from
@@ -1058,7 +1058,7 @@ def _add_ww_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
     data_sources = 'UNFCCC CRT'
 
     conv_N2O = float(current_params.get("N2O_to_N_factor"))
-    key_n2o = 'UNFCCC_emissions'
+    key_n2o = 'UNFCCC_N2O_wastewater'
     noise_val = dataset_noise[key_n2o]
 
     # 'n2o_ww_raw' <- N2O_WW.csv (data_loader.py DATA_MAP): N2O emissions from

@@ -37,7 +37,7 @@ DEPOSITION_TEXT = (
 DEPOSITION_REFERENCE = (
     "Deposition of N to {land_class} is one of five land-class deposition flows derived from the "
     "same NILU/AR5 dataset; see the [Atmospheric Nitrogen Deposition Overview](pool_atmosphere.html) "
-    "on the Atmosphere (AT) pool page for the shared methodology, period structure and national totals.\n\n"
+    "on the 7. Atmosphere (AT) pool page for the shared methodology, period structure and national totals.\n\n"
 )
 
 def get_balance_image_markdown(pool_code, plot_files, plot_dir, relative_depth="", target_format = 'html'):
@@ -372,8 +372,8 @@ def build_landing_page(output_filename, current_date_str, bib_filename, target_f
 def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename, target_format):
     """Genererer alle sider knyttet til Atmosphere (AT) poolen med ren LaTeX-siteringssyntaks."""
     with open(os.path.join(at_folder, "pool_atmosphere.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Atmosphere (AT)\nnav_order: 2\nhas_children: true\n---\n\n")
-        f.write("# Pool: Atmosphere (AT)\n\nThis section contains all documented nitrogen flows leaving the Atmosphere pool.\n")
+        f.write("---\nlayout: default\ntitle: 7. Atmosphere (AT)\nnav_order: 8\nhas_children: true\n---\n\n")
+        f.write("# Pool: 7. Atmosphere (AT)\n\nThis section contains all documented nitrogen flows leaving the Atmosphere pool.\n")
         f.write(get_balance_image_markdown("AT", plot_files, plot_dir, relative_depth="../", target_format=target_format))
         f.write("\n### Atmospheric Nitrogen Deposition Overview\n\n")
         f.write(DEPOSITION_TEXT)
@@ -417,7 +417,7 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename, targe
         elif "rwrw" in norm and "outflow" in norm and "rdn" in norm: exact_flow_code, display_name = "AT.AT-RW.RW-Atmospheric outflow-RDN", "Atmospheric Outflow (Reduced N)"
 
         with open(full_flow_path, 'w', encoding='utf-8') as f:
-            f.write(f"---\nlayout: default\ntitle: {display_name}\nparent: Atmosphere (AT)\nnav_order: {menu_counter}\n---\n\n")
+            f.write(f"---\nlayout: default\ntitle: {display_name}\nparent: 7. Atmosphere (AT)\nnav_order: {menu_counter}\n---\n\n")
             menu_counter += 1
             f.write(f"# {display_name}\n\n![{exact_flow_code}](../{plot_dir}/{filename})\n\n### Flow Description\n")
 
@@ -491,7 +491,7 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename, targe
 def process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename, target_format):
     """Genererer alle sider knyttet til Rest of the World (RW) poolen med oppdaterte LaTeX-sitat-referanser."""
     with open(os.path.join(rw_folder, "pool_rest_of_the_world.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Rest of the world (RW)\nnav_order: 3\nhas_children: true\n---\n\n")
+        f.write("---\nlayout: default\ntitle: Rest of the world (RW)\nnav_order: 10\nhas_children: true\n---\n\n")
         f.write("# Pool: Rest of the world (RW)\n\nThis section contains all documented nitrogen inflows and transfers originating from the Rest of the world (RW) pool. ")
         f.write("Click on the individual sub-flows in the left-hand menu to view graphs and methodological explanations.\n\n")
         f.write(get_balance_image_markdown("RW", plot_files, plot_dir, relative_depth="../", target_format=target_format))
@@ -633,8 +633,8 @@ def process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename
 def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename, target_format):
     """Genererer hovedsiden, subpools og alle strømmer for Agriculture (AG) med oppdatert LaTeX-syntaks."""
     with open(os.path.join(ag_folder, "pool_agriculture.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Agriculture (AG)\nnav_order: 4\nhas_children: true\n---\n\n")
-        f.write("# Pool: Agriculture (AG)\n\nBecause biofuel production in Norway is typically done as part of the waste management sector, ")
+        f.write("---\nlayout: default\ntitle: 3. Agriculture (AG)\nnav_order: 4\nhas_children: true\n---\n\n")
+        f.write("# Pool: 3. Agriculture (AG)\n\nBecause biofuel production in Norway is typically done as part of the waste management sector, ")
         f.write("flows of agricultural wastes to biofuel production are directed to PR.SO and we do not include the subpool AG.BC.\n\n")
         f.write("This pool is divided into two operational sub-pools. Explore them using the side menu or links below:\n\n")
         f.write("* [Manure Management (AG.MM)](subpool_manure_management.html)\n")
@@ -642,7 +642,7 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename, targ
         f.write(get_balance_image_markdown("AG", plot_files, plot_dir, relative_depth="../", target_format=target_format))
 
     with open(os.path.join(ag_folder, "subpool_manure_management.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Manure Management (AG.MM)\nparent: Agriculture (AG)\nnav_order: 1\nhas_children: true\n---\n\n")
+        f.write("---\nlayout: default\ntitle: Manure Management (AG.MM)\nparent: 3. Agriculture (AG)\nnav_order: 1\nhas_children: true\n---\n\n")
         f.write("# Subpool: Manure management, storage and animal husbandry (AG.MM)\n\n")
         f.write(get_balance_image_markdown("AG.MM", plot_files, plot_dir, relative_depth="../", target_format=target_format))
         f.write("\n### Flows that are zero or neglected:\n\n* **AG.MM-RW.RW-Manure export-Nmix** is assumed small and neglected.\\\\citep{schulte-uebbing_planetary_2022}\n")
@@ -654,7 +654,7 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename, targ
                 "application. We therefore do not introduce a correction for the amount of nitrogen lost through biogas processing.  ")
 
     with open(os.path.join(ag_folder, "subpool_soil_management.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Soil Management (AG.SM)\nparent: Agriculture (AG)\nnav_order: 2\nhas_children: true\n---\n\n")
+        f.write("---\nlayout: default\ntitle: Soil Management (AG.SM)\nparent: 3. Agriculture (AG)\nnav_order: 2\nhas_children: true\n---\n\n")
         f.write("# Subpool: Soil management (AG.SM)\n\n")
         f.write(get_balance_image_markdown("AG.SM", plot_files, plot_dir, relative_depth="../", target_format=target_format))
         f.write("\n### Flows that are zero or neglected:\n\n* **AG.SM-HY.SW-Overland flow-Nmix**, **AG.SM-FS.OL-Overland flow-Nmix** "
@@ -793,8 +793,8 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename, targ
 def process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename, target_format):
     """Genererer hovedsiden, subpools og alle strømmer for Forests and semi-natural vegetation (FS) med oppdatert LaTeX-syntaks."""
     with open(os.path.join(fs_folder, "pool_forests_and_semi_natural.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Forests and semi-natural vegetation (FS)\nnav_order: 5\nhas_children: true\n---\n\n")
-        f.write("# Pool: Forests and semi-natural vegetation (FS)\n\nBecause of limited data on OL and because data on leaching are combined for WL and OL, ")
+        f.write("---\nlayout: default\ntitle: 4. Forests and semi-natural vegetation (FS)\nnav_order: 5\nhas_children: true\n---\n\n")
+        f.write("# Pool: 4. Forests and semi-natural vegetation (FS)\n\nBecause of limited data on OL and because data on leaching are combined for WL and OL, ")
         f.write("we have chosen to combine WL and OL into the OL subpool in this study.\n\n")
         f.write("We have considered including meat from hunting of wild animals in flows from this subpool, but chosen not to. ")
         f.write("According to \\\\citet{steinset_verdi_2021}, the amount of wild game caught in 2019 was around 6000 tonnes, ")
@@ -804,7 +804,7 @@ def process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename, target_f
         f.write(get_balance_image_markdown("FS", plot_files, plot_dir, relative_depth="../", target_format=target_format))
 
     with open(os.path.join(fs_folder, "subpool_forests.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Forests (FS.FO)\nparent: Forests and semi-natural vegetation (FS)\nnav_order: 1\nhas_children: true\n---\n\n")
+        f.write("---\nlayout: default\ntitle: Forests (FS.FO)\nparent: 4. Forests and semi-natural vegetation (FS)\nnav_order: 1\nhas_children: true\n---\n\n")
         f.write("# Subpool: Forests (FS.FO)\n\n")
         f.write(get_balance_image_markdown("FS.FO", plot_files, plot_dir, relative_depth="../", target_format=target_format))
         f.write("\n### Flows that are zero or neglected:\n\n")
@@ -814,7 +814,7 @@ def process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename, target_f
         f.write("* Because the N-flow in forest fertilization is not large, we have chosen to ignore the associated N2O emissions that were included in the Swedish NBB \\\\citep{moldan_where_2025}.\n")
 
     with open(os.path.join(fs_folder, "subpool_other_land.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Other Land (FS.OL)\nparent: Forests and semi-natural vegetation (FS)\nnav_order: 2\nhas_children: true\n---\n\n")
+        f.write("---\nlayout: default\ntitle: Other Land (FS.OL)\nparent: 4. Forests and semi-natural vegetation (FS)\nnav_order: 2\nhas_children: true\n---\n\n")
         f.write("# Subpool: Other land (FS.OL)\n\n")
         f.write(get_balance_image_markdown("FS.OL", plot_files, plot_dir, relative_depth="../", target_format=target_format))
         f.write("\n### Flows that are zero or neglected:\n\n* **FS.OL-AT.AT-Emissions-NOx** is neglected because no values are reported in the CRLTAP/WebDab categories 4F1 and 4F2 (wetlands / other land NOx).\n")
@@ -906,8 +906,8 @@ def process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename, target_f
 def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename, target_format):
     """Genererer hovedsiden og alle under-hovedsider for Hydrosphere (HY) poolen med oppdatert LaTeX-syntaks."""
     with open(os.path.join(hy_folder, "pool_hydrosphere.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Hydrosphere (HY)\nnav_order: 6\nhas_children: true\n---\n\n")
-        f.write("# Pool: Hydrosphere (HY)\n\nWe have chosen to not include the pool groundwater (GW) because N concentrations and dynamics ")
+        f.write("---\nlayout: default\ntitle: 8. Hydrosphere (HY)\nnav_order: 9\nhas_children: true\n---\n\n")
+        f.write("# Pool: 8. Hydrosphere (HY)\n\nWe have chosen to not include the pool groundwater (GW) because N concentrations and dynamics ")
         f.write("in Norway are largely unknown \\\\citep{kvaerno_2024}.\n\n")
         f.write("The hydrosphere ecosystem is split into three operational modules. Explore them below:\n\n")
         f.write("* [Surface Water (HY.SW)](subpool_surface_water.html)\n* [Coastal Water (HY.CW)](subpool_coastal_water.html)\n* [Aquaculture (HY.AC)](subpool_aquaculture.html)\n")
@@ -915,21 +915,21 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename, targ
         append_bibtex_references(f, bib_filename)
 
     with open(os.path.join(hy_folder, "subpool_surface_water.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Surface Water (HY.SW)\nparent: Hydrosphere (HY)\nnav_order: 1\nhas_children: true\n---\n\n")
+        f.write("---\nlayout: default\ntitle: Surface Water (HY.SW)\nparent: 8. Hydrosphere (HY)\nnav_order: 1\nhas_children: true\n---\n\n")
         f.write("# Subpool: Surface water (HY.SW)\n\n")
         f.write(get_balance_image_markdown("HY.SW", plot_files, plot_dir, relative_depth="../", target_format=target_format))
         f.write("\n### Flows that are zero or neglected:\n\n* **HY.SW-AT.AT-Emissions-NOx** is assumed negligible.\n* **HY.SW-RW.RW-Export of surface water-Nmix** is assumed negligible due to Norwegian topography.\n")
         append_bibtex_references(f, bib_filename)
 
     with open(os.path.join(hy_folder, "subpool_coastal_water.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Coastal Water (HY.CW)\nparent: Hydrosphere (HY)\nnav_order: 2\nhas_children: true\n---\n\n")
+        f.write("---\nlayout: default\ntitle: Coastal Water (HY.CW)\nparent: 8. Hydrosphere (HY)\nnav_order: 2\nhas_children: true\n---\n\n")
         f.write("# Subpool: Coastal water (HY.CW)\n\n")
         f.write(get_balance_image_markdown("HY.CW", plot_files, plot_dir, relative_depth="../", target_format=target_format))
         f.write("\n### Flows that are zero or neglected:\n\n* **HY.CW-AT.AT-Emissions-N2** is neglected as we do not use mass balance on this subpool.\n* **HY.CW-AT.AT-Emissions-N2O** and **HY.CW-AT.AT-Emissions-NOx** are neglected as we lack a clearly defined area for coastal waters.\n* **HY.CW-PR.SO-Biomass for energy production-Nmix** is neglected because organic material from the processing of caught or farmed fish is assigned to the MP.FS subpool...\n* **Recreational fishing** is not included in the official guidelines, and we have also chosen to neglect it here...\n")
         append_bibtex_references(f, bib_filename)
 
     with open(os.path.join(hy_folder, "subpool_aquaculture.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Aquaculture (HY.AC)\nparent: Hydrosphere (HY)\nnav_order: 3\nhas_children: true\n---\n\n")
+        f.write("---\nlayout: default\ntitle: Aquaculture (HY.AC)\nparent: 8. Hydrosphere (HY)\nnav_order: 3\nhas_children: true\n---\n\n")
         f.write("# Subpool: Aquaculture (HY.AC)\n\n")
         f.write(get_balance_image_markdown("HY.AC", plot_files, plot_dir, relative_depth="../", target_format=target_format))
         f.write("\n**Methodological note:** The conversion from feed N to fish production N (and the resulting waste feed "
@@ -1075,8 +1075,8 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename, targ
 def process_humans_and_settlements_pool(hs_folder, plot_files, plot_dir, bib_filename, target_format):
     """Genererer hovedsiden og alle understrømmer for Humans and settlements (HS) poolen med oppdatert LaTeX-syntaks."""
     with open(os.path.join(hs_folder, "pool_humans_and_settlements.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Humans and settlements (HS)\nnav_order: 7\nhas_children: true\n---\n\n")
-        f.write("# Pool: Humans and settlements (HS)\n\n")
+        f.write("---\nlayout: default\ntitle: 6. Humans and settlements (HS)\nnav_order: 7\nhas_children: true\n---\n\n")
+        f.write("# Pool: 6. Humans and settlements (HS)\n\n")
         f.write(get_balance_image_markdown("HS", plot_files, plot_dir, relative_depth="../", target_format=target_format))
         f.write("\n### Flows that are zero or neglected:\n\n")
         f.write("* **HS.HS-AT.AT-LUC emissions-NH3** is assumed negligible as no NH3 emissions are given in the CLRTAP inventory submissions.\n")
@@ -1153,7 +1153,7 @@ def process_humans_and_settlements_pool(hs_folder, plot_files, plot_dir, bib_fil
             )
 
         with open(full_flow_path, 'w', encoding='utf-8') as f:
-            f.write(f"---\nlayout: default\ntitle: {display_name}\nparent: Humans and settlements (HS)\nnav_order: {hs_menu_counter}\n---\n\n")
+            f.write(f"---\nlayout: default\ntitle: {display_name}\nparent: 6. Humans and settlements (HS)\nnav_order: {hs_menu_counter}\n---\n\n")
             hs_menu_counter += 1
             f.write(f"# {display_name}\n\n![{exact_flow_code}](../{plot_dir}/{filename})\n\n### Flow Description\n")
             if description:
@@ -1166,8 +1166,8 @@ def process_humans_and_settlements_pool(hs_folder, plot_files, plot_dir, bib_fil
 def process_energy_and_fuels_pool(ef_folder, plot_files, plot_dir, bib_filename, target_format):
     """Genererer hovedsiden, subpools og alle strømmer for Energy and Fuels (EF) med oppdatert LaTeX-syntaks."""
     with open(os.path.join(ef_folder, "pool_energy_and_fuels.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Energy and fuels (EF)\nnav_order: 7\nhas_children: true\n---\n\n")
-        f.write("# Pool: Energy and fuels (EF)\n\nIn the guidelines, there are N2 flows assigned to and from EF sectors associated with nitrogen "
+        f.write("---\nlayout: default\ntitle: 1. Energy and fuels (EF)\nnav_order: 2\nhas_children: true\n---\n\n")
+        f.write("# Pool: 1. Energy and fuels (EF)\n\nIn the guidelines, there are N2 flows assigned to and from EF sectors associated with nitrogen "
                 "conversions in the combustion process. We have chosen to ignore these here because they can only be found by mass balance but by "
                 "doing so, they may hide other imbalances that could be significant. They also do not make any significant contributions to the flows "
                 "of reactive N. Note on subpools: it is not always clear where flows end up. For example, industrial waste fuels from MP.OP is assigned "
@@ -1179,7 +1179,7 @@ def process_energy_and_fuels_pool(ef_folder, plot_files, plot_dir, bib_filename,
 
     # Opprett subpools
     with open(os.path.join(ef_folder, "subpool_energy_conversion.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Energy conversion (EF.EC)\nparent: Energy and fuels (EF)\nnav_order: 1\nhas_children: true\n---\n\n# Subpool: Energy conversion (EF.EC)\n\n")
+        f.write("---\nlayout: default\ntitle: Energy conversion (EF.EC)\nparent: 1. Energy and fuels (EF)\nnav_order: 1\nhas_children: true\n---\n\n# Subpool: Energy conversion (EF.EC)\n\n")
         f.write(get_balance_image_markdown("EF.EC", plot_files, plot_dir, relative_depth="../", target_format=target_format))
         f.write("This subpool includes extraction of fossil fuels from geological sources, which is a large sector in Norway. Because of this there is no mass balance "
                 "for EF.EC; nitrogen bound to extracted fuels arise in the sector, and outflows are therefore significantly larger than inflows. \n\n")
@@ -1188,17 +1188,17 @@ def process_energy_and_fuels_pool(ef_folder, plot_files, plot_dir, bib_filename,
         append_bibtex_references(f, bib_filename)
 
     with open(os.path.join(ef_folder, "subpool_industry.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Manufacturing industries and construction (EF.IC)\nparent: Energy and fuels (EF)\nnav_order: 2\nhas_children: true\n---\n\n# Subpool: Manufacturing industries and construction (EF.IC)\n\n")
+        f.write("---\nlayout: default\ntitle: Manufacturing industries and construction (EF.IC)\nparent: 1. Energy and fuels (EF)\nnav_order: 2\nhas_children: true\n---\n\n# Subpool: Manufacturing industries and construction (EF.IC)\n\n")
         f.write(get_balance_image_markdown("EF.IC", plot_files, plot_dir, relative_depth="../", target_format=target_format))
         append_bibtex_references(f, bib_filename)
 
     with open(os.path.join(ef_folder, "subpool_transport.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Transportation (EF.TR)\nparent: Energy and fuels (EF)\nnav_order: 3\nhas_children: true\n---\n\n# Subpool: Transportation (EF.TR)\n\n")
+        f.write("---\nlayout: default\ntitle: Transportation (EF.TR)\nparent: 1. Energy and fuels (EF)\nnav_order: 3\nhas_children: true\n---\n\n# Subpool: Transportation (EF.TR)\n\n")
         f.write(get_balance_image_markdown("EF.TR", plot_files, plot_dir, relative_depth="../", target_format=target_format))
         append_bibtex_references(f, bib_filename)
 
     with open(os.path.join(ef_folder, "subpool_other_energy.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Other energy and fuels (EF.OE)\nparent: Energy and fuels (EF)\nnav_order: 4\nhas_children: true\n---\n\n# Subpool: Other energy and fuels (EF.OE)\n\n")
+        f.write("---\nlayout: default\ntitle: Other energy and fuels (EF.OE)\nparent: 1. Energy and fuels (EF)\nnav_order: 4\nhas_children: true\n---\n\n# Subpool: Other energy and fuels (EF.OE)\n\n")
         f.write(get_balance_image_markdown("EF.OE", plot_files, plot_dir, relative_depth="../", target_format=target_format))
         append_bibtex_references(f, bib_filename)
 
@@ -1334,8 +1334,8 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
     
     # 1. GENERER HOVEDSIDE FOR POOLEN (pool_materials_and_products.md)
     with open(os.path.join(mp_folder, "pool_materials_and_products.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Materials and products (MP)\nnav_order: 6\nhas_children: true\n---\n\n")
-        f.write("# Pool: Materials and products in industry (MP)\n\n")
+        f.write("---\nlayout: default\ntitle: 2. Materials and products (MP)\nnav_order: 3\nhas_children: true\n---\n\n")
+        f.write("# Pool: 2. Materials and products in industry (MP)\n\n")
         f.write("This pool covers chemical, processing, food, and manufacturing industries in Norway, split into two primary segments:\n\n")
         f.write("* [Food and Feed Processing (MP.FP)](subpool_food_and_feed.html)\n")
         f.write("* [Other Producing Industry (MP.OP)](subpool_other_industry.html)\n")
@@ -1344,7 +1344,7 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
 
     # 2. SUBPOOL: FOOD AND FEED PROCESSING (MP.FP)
     with open(os.path.join(mp_folder, "subpool_food_and_feed.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Food and Feed Processing (MP.FP)\nparent: Materials and products (MP)\nnav_order: 1\nhas_children: true\n---\n\n")
+        f.write("---\nlayout: default\ntitle: Food and Feed Processing (MP.FP)\nparent: 2. Materials and products (MP)\nnav_order: 1\nhas_children: true\n---\n\n")
         f.write("# Subpool: Food and feed processing (MP.FP)\n\n")
         f.write(get_balance_image_markdown("MP.FP", plot_files, plot_dir, relative_depth="../", target_format=target_format))
         f.write("\n### Flows that are zero or neglected:\n\n")
@@ -1354,7 +1354,7 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
 
     # 3. SUBPOOL: OTHER PRODUCING INDUSTRY (MP.OP)
     with open(os.path.join(mp_folder, "subpool_other_industry.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Other Producing Industry (MP.OP)\nparent: Materials and products (MP)\nnav_order: 2\nhas_children: true\n---\n\n")
+        f.write("---\nlayout: default\ntitle: Other Producing Industry (MP.OP)\nparent: 2. Materials and products (MP)\nnav_order: 2\nhas_children: true\n---\n\n")
         f.write("# Subpool: Other producing industry (MP.OP)\n\n")
         f.write(get_balance_image_markdown("MP.OP", plot_files, plot_dir, relative_depth="../", target_format=target_format))
         f.write("\n### Flows that are zero or neglected:\n\n")
@@ -1420,7 +1420,16 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                     "and we have used the Jones factor of 6.25 for nitrogen content in protein.\n\n"
                     "For pet food, we have assumed (based on available statistics) that cats and dogs consume > 90 % of pet food. Horses are accounted for under the agriculture pool. "
                     "The nitrogen intake per animal per year is taken from Table 19 in \\\\citet{schappi_annexes_2025} and the number of cats and dogs between 1985 and 2025 is assumed using "
-                    "a trendline based on available statistics from a variety of sources."
+                    "a trendline based on available statistics from a variety of sources.\n\n"
+                    "The values above reflect food actually eaten, so food that physically left MP.FP but is later discarded at wholesale, retail, food service, catering/institutions or "
+                    "in the household is not included, even though it did leave FP. That same food waste is counted as N entering the household waste flow "
+                    "(see \"Household Waste\", HS.HS-PR.SO), sourced independently from SSB's waste-by-material statistics - so without a correction, that waste N would have no traceable "
+                    "inflow to HS.HS at all. We therefore add a downstream food waste term using per-sector 2021 tonnage and the 2015-to-2021 change per capita for wholesale, retail, food "
+                    "service, catering and education/care institutions reported by \\\\citet{stensgard_kartleggingsrapport_2023} (Norway's food waste reduction agreement, \"Bransjeavtalen\", "
+                    "uses 2015 as its baseline year), linearly interpolated between the two years and held constant outside that range. This is converted to N using the mean N content of "
+                    "Norway's total food supply basket across 2010-2023 (FAOSTAT Food Balance Sheets \"Food\" quantity by item, weighted by N content per Table 21 in "
+                    "\\\\citet{schappi_annexes_2025}). Food waste occurring upstream of MP.FP (agriculture, seafood landing) or internally within the food industry is excluded, since both "
+                    "are already covered by other flows."
                 )
             elif "coastal" in norm or ("feed" in norm and "aquaculture" in norm):
                 exact_flow_code = "MP.FP-HY.AC-Feed to coastal aquaculture-Nmix"
@@ -1482,9 +1491,9 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
         elif filename.upper().startswith("MP_OP_"):
             parent_subpool = "Other Producing Industry (MP.OP)"
             
-            if "mineral" in norm and "fertilizer" in norm and "export" not in norm and "hs" not in norm:
+            if "mineral" in norm and "fertilizer" in norm and "export" not in norm and "hs" not in norm and "fsfo" not in norm:
                 exact_flow_code = "MP.OP-AG.SM-Mineral fertilizer-Nmix"
-                display_name = "Produced Mineral Fertilizer"
+                display_name = "Mineral Fertilizer for Agriculture"
                 description = (
                     "**MP.OP-AG.SM-Mineral fertilizer-Nmix** is domestically produced mineral fertilizer used in agriculture, found as "
                     "(total domestic use) – (import), where both use and import are given in FAOSTAT Fertilizer by nutrient \\\\citep{fao_fertilizer_2025}."
@@ -1518,9 +1527,9 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                     "SSB has not reported data on this energy category before 1998, but the size of these industries was relatively constant through the period 1991-2001 "
                     "\\\\citep{spilde_energibruk_2004}. For years 1990-1997 we have therefore used the average for the next 10 years (1998-2007)."
                 )
-            elif "forest" in norm :
+            elif "fsfo" in norm:
                 exact_flow_code = "MP.OP-FS.FO-Mineral fertilizer-Nmix"
-                display_name = "Forest Fertilization Nitrogen"
+                display_name = "Mineral Fertilizer for Forestry"
                 description = (
                     "**MP.OP-FS.FO-Mineral fertilizer-Nmix** is nitrogen for forest fertilization. This flow is not part of the guidelines but has been "
                     "added because it is a significant flow in Norway, as was also done in the Swedish NNB \\\\citep{moldan_where_2025}. We have used data from SSB on "
@@ -1563,7 +1572,7 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                 )
             elif "mineral" in norm and "fertilizer" in norm and "hs" in norm:
                 exact_flow_code = "MP.OP-HS.HS-Mineral fertilizer-Nmix"
-                display_name = "Non-Agricultural Mineral Fertilizer"
+                display_name = "Mineral Fertilizer for HS"
                 description = (
                     "**MP.OP-HS.HS-Mineral fertilizer-Nmix**: as advised by \\\\citet{schappi_annexes_2025}, we assume a default value of 2% of total mineral "
                     "fertilizer for non-agricultural use. Data for fertilizer use in agriculture are taken from FAOSTAT Fertilizer by nutrient \\\\citep{fao_fertilizer_2025}."
@@ -1641,8 +1650,8 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
     """Genererer hovedsiden, subpools og alle strømmer for Processing of residues (PR) med oppdatert LaTeX-syntaks."""
     # 1. Generer hovedsiden for poolen
     with open(os.path.join(pr_folder, "pool_processing_of_residues.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Processing of residues (PR)\nnav_order: 9\nhas_children: true\n---\n\n")
-        f.write("# Pool: Processing of residues (PR)\n\n")
+        f.write("---\nlayout: default\ntitle: 5. Processing of residues (PR)\nnav_order: 6\nhas_children: true\n---\n\n")
+        f.write("# Pool: 5. Processing of residues (PR)\n\n")
         f.write("This pool accounts for the treatment and processing of waste and wastewater residues in Norway.\n\n")
         f.write("This pool is divided into two operational sub-pools. Explore them using the side menu or links below:\n\n")
         f.write("* [Solid Waste (PR.SO)](subpool_solid_waste.html)\n* [Wastewater (PR.WW)](subpool_wastewater.html)\n\n")
@@ -1651,7 +1660,7 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
 
     # 2. Generer subpool-side for Solid Waste (PR.SO)
     with open(os.path.join(pr_folder, "subpool_solid_waste.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Solid Waste (PR.SO)\nparent: Processing of residues (PR)\nnav_order: 1\nhas_children: true\n---\n\n")
+        f.write("---\nlayout: default\ntitle: Solid Waste (PR.SO)\nparent: 5. Processing of residues (PR)\nnav_order: 1\nhas_children: true\n---\n\n")
         f.write("# Subpool: Solid Waste (PR.SO)\n\n")
         f.write(get_balance_image_markdown("PR.SO", plot_files, plot_dir, relative_depth="../", target_format=target_format))
         f.write("We have added the flow *PR.SO-EF.EC-Waste to energy-Nmix* to better account for the Norwegian waste management system and statistics. "
@@ -1671,7 +1680,7 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
 
     # 3. Generer subpool-side for Wastewater (PR.WW)
     with open(os.path.join(pr_folder, "subpool_wastewater.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: Wastewater (PR.WW)\nparent: Processing of residues (PR)\nnav_order: 2\nhas_children: true\n---\n\n")
+        f.write("---\nlayout: default\ntitle: Wastewater (PR.WW)\nparent: 5. Processing of residues (PR)\nnav_order: 2\nhas_children: true\n---\n\n")
         f.write("# Subpool: Wastewater (PR.WW)\n\n")
         f.write(get_balance_image_markdown("PR.WW", plot_files, plot_dir, relative_depth="../", target_format=target_format))
         f.write("We considered added a flow *PR.WW-PR.SO-Sewage sludge to biogas-Nmix* to account for sewage sludge used in biogas production. "

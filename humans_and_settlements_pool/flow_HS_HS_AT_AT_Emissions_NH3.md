@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Ammonia Body Emissions
-parent: Humans and settlements (HS)
+parent: 6. Humans and settlements (HS)
 nav_order: 1
 ---
 

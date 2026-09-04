@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Solid Waste (PR.SO)
-parent: Processing of residues (PR)
+parent: 5. Processing of residues (PR)
 nav_order: 1
 has_children: true
 ---

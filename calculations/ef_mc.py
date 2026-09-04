@@ -54,7 +54,7 @@ def execute_calculations_ef(preloaded_data, current_params, dataset_noise, curre
 
     _add_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'EF.TR-AT.AT-Emissions-NH3', CRLTAP_TR_SECTORS, 'NH3')
     _add_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'EF.TR-AT.AT-Emissions-NOx', CRLTAP_TR_SECTORS, 'NOx')
-    _add_n2o_emissions_mc(results, preloaded_data, dataset_noise, 'EF.TR-AT.AT-Emissions-N2O', 'value_TR')
+    _add_n2o_emissions_mc(results, preloaded_data, dataset_noise, 'EF.TR-AT.AT-Emissions-N2O', 'value_TR', dataset_key='UNFCCC_N2O_transport')
     _add_export_of_transport_fuels_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise)
 
     _add_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'EF.OE-AT.AT-Emissions-NH3', CRLTAP_OE_SECTORS, 'NH3')
@@ -143,16 +143,18 @@ def _add_crltap_emissions_mc(results, preloaded_data, current_params, dataset_no
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
 
 
-def _add_n2o_emissions_mc(results, preloaded_data, dataset_noise, flow_code, value_col):
+def _add_n2o_emissions_mc(results, preloaded_data, dataset_noise, flow_code, value_col, dataset_key='UNFCCC_N2O_energy'):
     """
     Shared implementation for combustion N2O emissions of an EF subsector. All four
     subsectors are split columns of the same compilation:
     preloaded_data['n2o_ec_data'] <- data_files/N2O_EC.csv (N2O emissions from
     combustion, split by EC/IC/TR/OE, UNFCCC CRT). value_col is 'value_EC',
-    'value_IC', 'value_TR' or 'value_OE'.
+    'value_IC', 'value_TR' or 'value_OE'. dataset_key defaults to the stationary-
+    combustion uncertainty (Norway NID Annexes 2025, Annex 2: N2O EF for 1A1/1A2/1A4/1A5
+    and 1B2C = "Fac3"); the EF.TR caller overrides this with 'UNFCCC_N2O_transport'
+    since Annex 2 gives transport its own, much smaller uncertainty (25-65%, not Fac3).
     """
     collected_years = set()
-    dataset_key = 'UNFCCC_emissions'
 
     df = preloaded_data.get('n2o_ec_data')
     noise_val = dataset_noise[dataset_key]

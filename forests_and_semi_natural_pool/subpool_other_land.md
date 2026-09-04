@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Other Land (FS.OL)
-parent: Forests and semi-natural vegetation (FS)
+parent: 4. Forests and semi-natural vegetation (FS)
 nav_order: 2
 has_children: true
 ---

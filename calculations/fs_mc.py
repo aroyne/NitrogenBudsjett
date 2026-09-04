@@ -44,7 +44,7 @@ def _add_fo_denitrification_emissions_mc(results, preloaded_data, current_params
     per Schäppi et al. 2025); pass n2_n2o_ratio_key=None for the N2O flow itself.
     """
     collected_years = set()
-    dataset_key = 'UNFCCC_emissions'
+    dataset_key = 'UNFCCC_N2O_lulucf'
 
     df_unfccc = preloaded_data.get('fs_unfccc_emissions_raw')
     N2O_to_N = float(current_params.get("N2O_to_N_factor"))

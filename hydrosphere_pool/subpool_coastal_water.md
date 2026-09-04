@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Coastal Water (HY.CW)
-parent: Hydrosphere (HY)
+parent: 8. Hydrosphere (HY)
 nav_order: 2
 has_children: true
 ---

@@ -960,10 +960,13 @@ def process_and_export_mc_results(all_records):
         0.0
     )
     summary_df['cv_percent'] = np.where(
-        summary_df['mean'] > 0, 
-        (summary_df['std'] / summary_df['mean']) * 100, 
+        summary_df['mean'] > 0,
+        (summary_df['std'] / summary_df['mean']) * 100,
         0.0
     )
+    # Half-width of the 95% CI, expressed as a percentage of the median - this is the
+    # 'relative uncertainty' figure the reporting guidelines define, not the CV above.
+    summary_df['uncertainty_percent'] = (summary_df['unc_down_percent'] + summary_df['unc_up_percent']) / 2
 
     # 4. Export to Excel
     output_dir = 'output_files'
@@ -972,7 +975,7 @@ def process_and_export_mc_results(all_records):
     
     summary_df_rounded = summary_df.round({
         'median': 4, 'mean': 4, 'p2_5': 4, 'p97_5': 4, 'std': 4,
-        'unc_down_percent': 2, 'unc_up_percent': 2, 'cv_percent': 2
+        'unc_down_percent': 2, 'unc_up_percent': 2, 'cv_percent': 2, 'uncertainty_percent': 2
     })
     summary_df_rounded.to_excel(excel_path, index=False)
     print(f"[SUCCESS] Statistical report saved to: {excel_path}")

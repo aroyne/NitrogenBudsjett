@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Forests (FS.FO)
-parent: Forests and semi-natural vegetation (FS)
+parent: 4. Forests and semi-natural vegetation (FS)
 nav_order: 1
 has_children: true
 ---

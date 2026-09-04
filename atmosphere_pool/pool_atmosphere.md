@@ -1,11 +1,11 @@
 ---
 layout: default
-title: Atmosphere (AT)
-nav_order: 2
+title: 7. Atmosphere (AT)
+nav_order: 8
 has_children: true
 ---
 
-# Pool: Atmosphere (AT)
+# Pool: 7. Atmosphere (AT)
 
 This section contains all documented nitrogen flows leaving the Atmosphere pool.
 

@@ -1,11 +1,11 @@
 ---
 layout: default
-title: Produced Mineral Fertilizer
+title: Mineral Fertilizer for Agriculture
 parent: Other Producing Industry (MP.OP)
 nav_order: 1
 ---
 
-# Produced Mineral Fertilizer
+# Mineral Fertilizer for Agriculture
 
 ![MP.OP-AG.SM-Mineral fertilizer-Nmix](../output_files/plots/MP_OP_AG_SM_Mineral_fertilizer_Nmix.png)
 

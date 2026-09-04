@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Atmospheric Outflow (Reduced N)
-parent: Atmosphere (AT)
+parent: 7. Atmosphere (AT)
 nav_order: 17
 ---
 

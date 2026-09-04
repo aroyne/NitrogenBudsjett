@@ -1,11 +1,11 @@
 ---
 layout: default
-title: Humans and settlements (HS)
+title: 6. Humans and settlements (HS)
 nav_order: 7
 has_children: true
 ---
 
-# Pool: Humans and settlements (HS)
+# Pool: 6. Humans and settlements (HS)
 
 
 ---

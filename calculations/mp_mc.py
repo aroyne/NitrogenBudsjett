@@ -550,6 +550,51 @@ def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise
             'data_sources': 'interpolated'
         }
 
+    # Downstream-of-industry food waste (Stensgård & Berntsen / NORSUS
+    # matsvinn mapping report). "Food products" above is calibrated from
+    # dietary intake surveys - i.e. only food actually eaten - so food that
+    # physically left MP.FP but is later discarded at wholesale, retail,
+    # food service, catering/institutions or in the household never enters
+    # this flow, even though it did leave FP's boundary. That same food
+    # waste is counted as N entering HS.HS-PR.SO-Household waste-Nmix,
+    # sourced independently from SSB's waste-by-material statistics - so
+    # without this addition, that waste N would have no traceable MP.FP
+    # inflow at all. Excludes upstream agriculture/seafood losses and
+    # food-industry-internal waste, both already covered by other flows.
+    #
+    # The report gives 2021 tonnage and the 2015-to-2021 change in
+    # kg/capita for each downstream sector (Norway's food waste reduction
+    # agreement, "Bransjeavtalen", uses 2015 as its baseline year). The
+    # 2015 per-capita rate is backed out from the 2021 rate and the
+    # reported change, then linearly interpolated between the two; outside
+    # 2015-2021 the nearest endpoint's per-capita rate is held constant, as
+    # no data exists beyond that range.
+    downstream_matsvinn_sectors = {
+        # sector: (tonnage 2021, fractional change in kg/capita 2015->2021)
+        'wholesale': (5_800, -0.32),
+        'retail': (62_400, -0.19),
+        'food_service': (15_500, -0.17),
+        'catering': (5_200, -0.24),
+        'education_care': (5_000, -0.12),
+        'household': (216_100, -0.06),
+    }
+    # Mean N content of Norway's total food supply basket, 2010-2023
+    # (FAOSTAT Food Balance Sheets 'Food' quantity by item, weighted by N
+    # content per Schäppi2025Ann Table 21).
+    downstream_matsvinn_avg_N_frac = 0.0128
+    pop_2021 = float(df_pop.loc[2021, 'Befolkning 1. januar'])
+    percap_2021 = {k: t / pop_2021 for k, (t, _chg) in downstream_matsvinn_sectors.items()}
+    percap_2015 = {k: percap_2021[k] / (1 + chg) for k, (_t, chg) in downstream_matsvinn_sectors.items()}
+
+    for year in year_values:
+        pop = float(df_pop.loc[year, 'Befolkning 1. januar']) * noise_pop
+        frac = min(1.0, max(0.0, (year - 2015) / (2021 - 2015)))
+        matsvinn_t_per_capita = sum(
+            percap_2015[k] + frac * (percap_2021[k] - percap_2015[k])
+            for k in downstream_matsvinn_sectors
+        )
+        year_values[year]['value'] += matsvinn_t_per_capita * pop * downstream_matsvinn_avg_N_frac / 1000.0 * noise_trend
+
     for year in sorted(year_values.keys()):
         if year in EXPECTED_YEARS:
             collected_years.add(year)
@@ -1086,7 +1131,7 @@ def _add_op_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
     data_sources = 'UNFCCC CRT'
 
     conv_N2O = float(current_params.get("N2O_to_N_factor"))
-    key_n2o = 'UNFCCC_emissions'
+    key_n2o = 'UNFCCC_N2O_industry'
     noise_val = dataset_noise[key_n2o]
 
     # 'n2o_nox_op_raw' <- N2O_NOx_OP.csv (data_loader.py DATA_MAP): N2O and
