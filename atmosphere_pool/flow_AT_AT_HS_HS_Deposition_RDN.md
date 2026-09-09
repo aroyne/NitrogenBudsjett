@@ -7,7 +7,7 @@ nav_order: 11
 
 # Reduced N Deposition (Settlements)
 
-![AT.AT-HS.HS-Deposition-RDN](../output_files/plots/AT_AT_HS_HS_Deposition_RDN.png)
+<iframe src="../output_files/plots/AT_AT_HS_HS_Deposition_RDN.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 **AT.AT-HS.HS-Deposition-RDN**

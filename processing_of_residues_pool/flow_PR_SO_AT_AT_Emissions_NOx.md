@@ -7,7 +7,7 @@ nav_order: 4
 
 # NOx Emissions (Solid Waste)
 
-![PR.SO-AT.AT-Emissions-NOx](../output_files/plots/PR_SO_AT_AT_Emissions_NOx.png)
+<iframe src="../output_files/plots/PR_SO_AT_AT_Emissions_NOx.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 **PR.SO-AT.AT-Emissions-NOx**: We have used data from CLRTAP Inventory Submissions, using the categories given in Table 48 and 31 (emissions from category 1A1 Energy industries are all assigned to the EF pool). 

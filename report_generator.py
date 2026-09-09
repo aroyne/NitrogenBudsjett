@@ -65,6 +65,23 @@ def get_balance_image_markdown(pool_code, plot_files, plot_dir, relative_depth="
     return ""
 
 
+def get_flow_image_markdown(exact_flow_code, filename, plot_dir, target_format, relative_depth="../"):
+    """
+    Returns the markdown/HTML snippet embedding a single flow's plot: a static
+    image for PDF, or an iframe to the interactive Plotly version (generated
+    alongside the PNG in utils_stat.py's process_and_export_mc_results, same
+    filename with a .html extension) for the website. Falls back to the
+    static image if the interactive file isn't present.
+    """
+    if target_format != "pdf":
+        html_filename = filename.rsplit('.', 1)[0] + '.html'
+        return (
+            f'<iframe src="{relative_depth}{plot_dir}/{html_filename}" '
+            f'width="100%" height="400px" frameborder="0" scrolling="no"></iframe>'
+        )
+    return f"![{exact_flow_code}]({relative_depth}{plot_dir}/{filename})"
+
+
 def append_bibtex_references(file_handle, bib_filename=None):
     """
     Writes a placeholder References section. The real, APA7-formatted
@@ -389,6 +406,8 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename, targe
 
     menu_counter = 1
     for filename in plot_files:
+        if not filename.endswith('.png'):
+            continue
         if not filename.startswith("AT_AT_"):
             continue
 
@@ -419,7 +438,7 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename, targe
         with open(full_flow_path, 'w', encoding='utf-8') as f:
             f.write(f"---\nlayout: default\ntitle: {display_name}\nparent: 7. Atmosphere (AT)\nnav_order: {menu_counter}\n---\n\n")
             menu_counter += 1
-            f.write(f"# {display_name}\n\n![{exact_flow_code}](../{plot_dir}/{filename})\n\n### Flow Description\n")
+            f.write(f"# {display_name}\n\n{get_flow_image_markdown(exact_flow_code, filename, plot_dir, target_format)}\n\n### Flow Description\n")
 
             if exact_flow_code == "AT.AT-AG.SM-Biological N2 fixation-N2":
                 f.write("\\citet{schappi_annexes_2025} advises using data from the EUROSTAT Gross nutrient balance, but there "
@@ -459,7 +478,11 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename, targe
             elif exact_flow_code == "AT.AT-FS.OL-N2 fixation-N2":
                 f.write("We use N2 fixation rates from Table 62 in \\citet{schappi_annexes_2025} together with land type areas calculated from the CORINE land cover "
                         "inventory \\citet{european_environment_agency_corine_2019}. "
-                        "In the Swedish NNB \\citep{moldan_where_2025}, N2 fixation in the OL compartment was considered negligible.")
+                        "In the Swedish NNB \\citep{moldan_where_2025}, N2 fixation in the OL compartment was considered negligible. "
+                        "Note that in our model, OL includes what \\citet{moldan_where_2025} treat as a separate wetland (WL) compartment. Broken down by land type, "
+                        "our OL fixation is dominated by peat bogs (84%, based on a CORINE-derived area of 2.1 million ha), with a smaller contribution from coastal "
+                        "wetlands; freshwater marshes contribute negligibly. This total (27 ktN) is therefore not directly comparable to \\citet{moldan_where_2025}'s "
+                        "\"negligible\" OL estimate, but instead corresponds closely to their separate WL estimate of about 30 ktN \\citep{jutterstrom_swedish_2020}.")
             elif exact_flow_code == "AT.AT-HY.SW-N2 fixation-N2":
                 f.write(f"**{exact_flow_code}**\n\n" + "According to NIBIO \\citep{nibio_arealbarometer_2026}, the surface water area is 20 457 km2 "
                         "https://arealbarometer.nibio.no/nb/norge/. According to \\citep{schappi_annexes_2025}, the biological fixation rate can vary "
@@ -502,6 +525,8 @@ def process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename
 
     rw_menu_counter = 1
     for filename in plot_files:
+        if not filename.endswith('.png'):
+            continue
         if not filename.startswith("RW_RW_"):
             continue
 
@@ -621,7 +646,7 @@ def process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename
         with open(full_flow_path, 'w', encoding='utf-8') as f:
             f.write(f"---\nlayout: default\ntitle: {display_name}\nparent: Rest of the world (RW)\nnav_order: {rw_menu_counter}\n---\n\n")
             rw_menu_counter += 1
-            f.write(f"# {display_name}\n\n![{exact_flow_code}](../{plot_dir}/{filename})\n\n### Flow Description\n")
+            f.write(f"# {display_name}\n\n{get_flow_image_markdown(exact_flow_code, filename, plot_dir, target_format)}\n\n### Flow Description\n")
             if description:
                 f.write(f"{description}\n\n")
             else:
@@ -672,6 +697,8 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename, targ
     ag_mm_counter, ag_sm_counter = 1, 1
 
     for filename in plot_files:
+        if not filename.endswith('.png'):
+            continue
         if not (filename.upper().startswith("AG_MM_") or filename.upper().startswith("AG_SM_")):
             continue
 
@@ -690,7 +717,17 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename, targ
             if "application" in norm:
                 exact_flow_code = "AG.MM-AG.SM-Manure application-Nmix"
                 display_name = "Manure Application"
-                description = "Taken from EUROSTAT Gross nutrient balance as advised by \\\\citet{schappi_annexes_2025}. We interpolate the missing values between 2016 and 2020."
+                description = (
+                    "Taken from EUROSTAT Gross nutrient balance as advised by \\\\citet{schappi_annexes_2025}. Norway's submission has no data for "
+                    "2017-2019 (the same gap also appears in EUROSTAT's crop-harvest N removal figures for Norway, so it reflects a general reporting "
+                    "gap rather than something specific to manure), and we linearly interpolate across it. "
+                    "The reported value jumps by 23 % between 2016 and 2020, once reporting resumes, considerably more than the roughly 5 % change seen "
+                    "over the same gap in the crop-harvest series. Norway's own UNFCCC National Inventory Document (NID 2025) reports manure "
+                    "management emissions essentially flat over 1990-2023 (+3 % overall, -2 % for 2022-2023 alone) and dairy cow numbers falling "
+                    "about 12 % from 2015 to 2020 - neither is consistent with a genuine 23 % increase in manure output over four years. We interpret "
+                    "the jump as most likely a reporting or methodological artifact in EUROSTAT's data around the gap, rather than a real change in "
+                    "Norwegian manure application."
+                )
             elif "n2o" in norm:
                 exact_flow_code = "AG.MM-AT.AT-Emissions-N2O"
                 display_name = "Manure Emissions (N2O)"
@@ -734,7 +771,8 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename, targ
                 display_name = "Fodder Crops Production"
                 description = ("We have used data for grass and fodder production from SSB table 13648 «Avling i jordbruket (1000 tonn) og avling "
                     "per dekar (kg), etter ymse jordbruksvekstar (F) 2021 – 2024» and 05772 «Avling i jordbruket, etter ymse jordbruksvekstar (1 000 tonn) "
-                    "(F) (avslutta serie) 2000 – 2020». Values prior to 2000 are found in the SSB Jordbruksstatistikk (Table 2.1/Table 20). The protein "
+                    "(F) (avslutta serie) 2000 – 2020». Values prior to 2000 are found in the SSB Jordbruksstatistikk (Table 2.1/Table 20). Data prior to 2000 are read from yearly SSB publications (Jordbruksstatistikk). The jump in data between "
+                    "1996 and 1997 may be due to methodological differences, but we have not been able to confirm this. The protein "
                     "content of grass and fodder is known to be highly variable. We have assumed a protein content of 15 % based on 2025 analyses of "
                     "13 000 grass samples from all over Norway by Tine/NorFor, and 15 % N in protein (FAO, 2003). \n\n"
                     "\citet{hohmann-marriott_nitrogen_2025} used similar data sources but arrived at a smaller N flow (40-45 ktN) using a protein content "
@@ -785,7 +823,7 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename, targ
                 f.write(f"nav_order: {ag_sm_counter}\n---\n\n")
                 ag_sm_counter += 1
 
-            f.write(f"# {display_name}\n\n![{exact_flow_code}](../{plot_dir}/{filename})\n\n### Flow Description\n{description}\n\n")
+            f.write(f"# {display_name}\n\n{get_flow_image_markdown(exact_flow_code, filename, plot_dir, target_format)}\n\n### Flow Description\n{description}\n\n")
             
             # Legger til bibliografitaggen {% bibliography --cited %}
             append_bibtex_references(f, bib_filename)
@@ -823,6 +861,8 @@ def process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename, target_f
     fs_fo_counter, fs_ol_counter = 1, 1
 
     for filename in plot_files:
+        if not filename.endswith('.png'):
+            continue
         if not (filename.upper().startswith("FS_FO_") or filename.upper().startswith("FS_OL_")):
             continue
 
@@ -898,7 +938,7 @@ def process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename, target_f
                 f.write(f"nav_order: {fs_ol_counter}\n---\n\n")
                 fs_ol_counter += 1
 
-            f.write(f"# {display_name}\n\n![{exact_flow_code}](../{plot_dir}/{filename})\n\n### Flow Description\n{description}\n\n")
+            f.write(f"# {display_name}\n\n{get_flow_image_markdown(exact_flow_code, filename, plot_dir, target_format)}\n\n### Flow Description\n{description}\n\n")
             
             append_bibtex_references(f, bib_filename)
             
@@ -971,6 +1011,8 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename, targ
     hy_sw_counter, hy_cw_counter, hy_ac_counter = 1, 1, 1
 
     for filename in plot_files:
+        if not filename.endswith('.png'):
+            continue
         if not (filename.upper().startswith("HY_SW_") or filename.upper().startswith("HY_CW_") or filename.upper().startswith("HY_AC_")):
             continue
 
@@ -1065,7 +1107,7 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename, targ
                 f.write(f"nav_order: {hy_ac_counter}\n---\n\n")
                 hy_ac_counter += 1
     
-            f.write(f"# {display_name}\n\n![{exact_flow_code}](../{plot_dir}/{filename})\n\n### Flow Description\n{description}\n\n")
+            f.write(f"# {display_name}\n\n{get_flow_image_markdown(exact_flow_code, filename, plot_dir, target_format)}\n\n### Flow Description\n{description}\n\n")
             
             append_bibtex_references(f, bib_filename)
 
@@ -1088,6 +1130,8 @@ def process_humans_and_settlements_pool(hs_folder, plot_files, plot_dir, bib_fil
 
     hs_menu_counter = 1
     for filename in plot_files:
+        if not filename.endswith('.png'):
+            continue
         if not filename.upper().startswith("HS_HS_"):
             continue
 
@@ -1141,7 +1185,16 @@ def process_humans_and_settlements_pool(hs_folder, plot_files, plot_dir, bib_fil
                 "and extrapolate from 1995 values back to 1990. Power/water supply and water/sewage/waste-management sources are "
                 "only included from 2012 onward, and table 10514 introduces a new, large \"mixed waste\" (blandet avfall) reporting "
                 "category from 2012 with no equivalent in the earlier table - both mean 1995-2011 values likely understate total "
-                "household waste N relative to 2012 onward by a substantial margin."
+                "household waste N relative to 2012 onward by a substantial margin.\n\n"
+                "Despite its name, this flow's strong growth over the full period (roughly 3.5-fold, 1990-2023) is not primarily a "
+                "household phenomenon: broken down by the underlying source sectors, construction waste grew fastest, both in "
+                "absolute terms (roughly 5-fold) and as a share of the total (from about 9% in 1995 to 17-21% from the late 2010s "
+                "onward), consistent with SSB reporting construction and demolition as one of the fastest-growing waste streams "
+                "nationally. Private households' own share of the total actually fell over the same period (from about 52% to "
+                "roughly 39%), even though its absolute value still grew. This also explains why this flow has grown so much "
+                "faster than Other Industry Waste (MP.OP-PR.SO): that flow covers mining and manufacturing specifically, a "
+                "sector that has stagnated or declined in Norway, whereas this flow bundles in construction and services, both "
+                "sectors that have grown substantially over the same period."
             )
         elif "wastewater" in norm or "municipal" in norm:
             exact_flow_code = "HS.HS-PR.WW-Municipal wastewater-Nmix"
@@ -1155,7 +1208,7 @@ def process_humans_and_settlements_pool(hs_folder, plot_files, plot_dir, bib_fil
         with open(full_flow_path, 'w', encoding='utf-8') as f:
             f.write(f"---\nlayout: default\ntitle: {display_name}\nparent: 6. Humans and settlements (HS)\nnav_order: {hs_menu_counter}\n---\n\n")
             hs_menu_counter += 1
-            f.write(f"# {display_name}\n\n![{exact_flow_code}](../{plot_dir}/{filename})\n\n### Flow Description\n")
+            f.write(f"# {display_name}\n\n{get_flow_image_markdown(exact_flow_code, filename, plot_dir, target_format)}\n\n### Flow Description\n")
             if description:
                 f.write(f"{description}\n\n")
             else:
@@ -1205,6 +1258,8 @@ def process_energy_and_fuels_pool(ef_folder, plot_files, plot_dir, bib_filename,
     ef_ec_counter = ef_ic_counter = ef_tr_counter = ef_oe_counter = 1
 
     for filename in plot_files:
+        if not filename.endswith('.png'):
+            continue
         upper = filename.upper()
         if not (upper.startswith("EF_EC_") or upper.startswith("EF_IC_") or upper.startswith("EF_TR_") or upper.startswith("EF_OE_")):
             continue
@@ -1324,7 +1379,7 @@ def process_energy_and_fuels_pool(ef_folder, plot_files, plot_dir, bib_filename,
             elif "EF.OE" in exact_flow_code: f.write(f"nav_order: {ef_oe_counter}\n---\n\n"); ef_oe_counter += 1
             else: f.write("nav_order: 99\n---\n\n")
 
-            f.write(f"# {display_name}\n\n![{exact_flow_code}](../{plot_dir}/{filename})\n\n### Flow Description\n")
+            f.write(f"# {display_name}\n\n{get_flow_image_markdown(exact_flow_code, filename, plot_dir, target_format)}\n\n### Flow Description\n")
             f.write(f"{description}\n\n" if description else f"*Flow details detected for file: `{filename}` (code: {exact_flow_code}).*\n\n")
             append_bibtex_references(f, bib_filename)
             
@@ -1365,6 +1420,8 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
 
     # 4. ITERER OVER ALLE FILER FOR Å IDENTIFISERE STRØMMER TILHØRENDE MP
     for filename in plot_files:
+        if not filename.endswith('.png'):
+            continue
         if not (filename.upper().startswith("MP_FP_") or filename.upper().startswith("MP_OP_")):
             continue
 
@@ -1642,7 +1699,7 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                 f.write(f"nav_order: {mp_op_counter}\n---\n\n")
                 mp_op_counter += 1
 
-            f.write(f"# {display_name}\n\n![{exact_flow_code}](../{plot_dir}/{filename})\n\n### Flow Description\n{description}\n\n")
+            f.write(f"# {display_name}\n\n{get_flow_image_markdown(exact_flow_code, filename, plot_dir, target_format)}\n\n### Flow Description\n{description}\n\n")
             append_bibtex_references(f, bib_filename)
             
             
@@ -1701,6 +1758,8 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
 
     # 4. Gå igjennom og generer individuelle strømmer fordelt på subpools
     for filename in plot_files:
+        if not filename.endswith('.png'):
+            continue
         if not (filename.startswith("PR_SO_") or filename.startswith("PR_WW_")):
             continue
 
@@ -1886,7 +1945,7 @@ def process_processing_of_residues_pool(pr_folder, plot_files, plot_dir, bib_fil
                 f.write(f"nav_order: {pr_ww_counter}\n---\n\n")
                 pr_ww_counter += 1
 
-            f.write(f"# {display_name}\n\n![{exact_flow_code}](../{plot_dir}/{filename})\n\n### Flow Description\n")
+            f.write(f"# {display_name}\n\n{get_flow_image_markdown(exact_flow_code, filename, plot_dir, target_format)}\n\n### Flow Description\n")
             f.write(f"{flow_description}\n\n")
             append_bibtex_references(f, bib_filename)      
             

@@ -7,7 +7,7 @@ nav_order: 1
 
 # Transport emissions (N2O)
 
-![EF.TR-AT.AT-Emissions-N2O](../output_files/plots/EF_TR_AT_AT_Emissions_N2O.png)
+<iframe src="../output_files/plots/EF_TR_AT_AT_Emissions_N2O.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 EF.TR-AT.AT-Emissions-N2O is taken from UNFCCC Common Reporting Tables, Table 1 using the categories give in Table 13 by Schäppi et al. (2025).

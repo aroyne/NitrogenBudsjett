@@ -7,7 +7,7 @@ nav_order: 10
 
 # Oxidized N Deposition (Settlements)
 
-![AT.AT-HS.HS-Deposition-OXN](../output_files/plots/AT_AT_HS_HS_Deposition_OXN.png)
+<iframe src="../output_files/plots/AT_AT_HS_HS_Deposition_OXN.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 **AT.AT-HS.HS-Deposition-OXN**

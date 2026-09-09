@@ -7,7 +7,7 @@ nav_order: 7
 
 # Food crop products
 
-![AG.SM-MP.FP-Food crop products-Nmix](../output_files/plots/AG_SM_MP_FP_Food_crop_products_Nmix.png)
+<iframe src="../output_files/plots/AG_SM_MP_FP_Food_crop_products_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 Food crop products are taken from EUROSTAT Gross nutrient balance as advised by Schäppi et al. (2025): «Nutrient removal by harvest of crops» minus «Industrial crops». «Ornamenal crops», which should also be removed, are negligible in Norway. For the 2017-2019 gap in the source data, we linearly interpolate between the 2016 and 2020 values.

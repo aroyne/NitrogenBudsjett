@@ -7,7 +7,7 @@ nav_order: 9
 
 # Food Import
 
-![RW.RW-MP.FP-Food import-Nmix](../output_files/plots/RW_RW_MP_FP_Food_import_Nmix.png)
+<iframe src="../output_files/plots/RW_RW_MP_FP_Food_import_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 Is taken from trade data, SSB table 08801.

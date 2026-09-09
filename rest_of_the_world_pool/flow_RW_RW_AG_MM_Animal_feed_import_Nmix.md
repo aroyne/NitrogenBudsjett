@@ -7,7 +7,7 @@ nav_order: 1
 
 # Animal Feed Import
 
-![RW.RW-AG.MM-Animal feed import-Nmix](../output_files/plots/RW_RW_AG_MM_Animal_feed_import_Nmix.png)
+<iframe src="../output_files/plots/RW_RW_AG_MM_Animal_feed_import_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 Data on imported animal feed is taken from Landbruksdirektoratet and we have used the detailed composition of animal feed together with protein contents from FAO and specific Jones factors to get nitrogen contents.

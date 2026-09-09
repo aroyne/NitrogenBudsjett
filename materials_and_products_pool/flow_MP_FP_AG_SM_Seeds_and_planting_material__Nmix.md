@@ -7,7 +7,7 @@ nav_order: 2
 
 # Seeds and Planting Material
 
-![MP.FP-AG.SM-Seeds and planting material-Nmix](../output_files/plots/MP_FP_AG_SM_Seeds_and_planting_material__Nmix.png)
+<iframe src="../output_files/plots/MP_FP_AG_SM_Seeds_and_planting_material__Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 **MP.FP-AG.SM-Seeds and planting material-Nmix** is purchased seed and planting material from NIBIO Totalkalkylen (cereal, oilseed, peas, grass seed, and root/vegetable seed), converted to N via protein content and crop-specific protein-to-N factors from Schäppi et al. (2025).

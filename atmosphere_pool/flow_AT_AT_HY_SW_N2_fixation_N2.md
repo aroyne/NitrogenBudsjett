@@ -7,7 +7,7 @@ nav_order: 14
 
 # Biological N2 Fixation (Surface Water)
 
-![AT.AT-HY.SW-N2 fixation-N2](../output_files/plots/AT_AT_HY_SW_N2_fixation_N2.png)
+<iframe src="../output_files/plots/AT_AT_HY_SW_N2_fixation_N2.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 **AT.AT-HY.SW-N2 fixation-N2**

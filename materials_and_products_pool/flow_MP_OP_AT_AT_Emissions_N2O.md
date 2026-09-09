@@ -7,7 +7,7 @@ nav_order: 2
 
 # Industrial Emissions (N2O)
 
-![MP.OP-AT.AT-Emissions-N2O](../output_files/plots/MP_OP_AT_AT_Emissions_N2O.png)
+<iframe src="../output_files/plots/MP_OP_AT_AT_Emissions_N2O.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 **MP.OP-AT.AT-Emissions-N2O** are taken from UNFCCC common reporting tables, Table 2 as advised by Schäppi et al. (2025). Emissions are substantial, at least before 2009, and the main source of emissions is from nitric acid production.

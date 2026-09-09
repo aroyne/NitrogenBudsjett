@@ -7,7 +7,7 @@ nav_order: 2
 
 # Oxidized N Deposition (Agricultural Soils)
 
-![AT.AT-AG.SM-Deposition-OXN](../output_files/plots/AT_AT_AG_SM_Deposition_OXN.png)
+<iframe src="../output_files/plots/AT_AT_AG_SM_Deposition_OXN.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 **AT.AT-AG.SM-Deposition-OXN**

@@ -7,7 +7,7 @@ nav_order: 12
 
 # Oxidized N Deposition (Surface Water)
 
-![AT.AT-HY.SW-Deposition-OXN](../output_files/plots/AT_AT_HY_SW_Deposition_OXN.png)
+<iframe src="../output_files/plots/AT_AT_HY_SW_Deposition_OXN.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 **AT.AT-HY.SW-Deposition-OXN**

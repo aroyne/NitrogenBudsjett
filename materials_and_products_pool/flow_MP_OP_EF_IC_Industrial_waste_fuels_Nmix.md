@@ -7,7 +7,7 @@ nav_order: 5
 
 # Industrial Waste Fuels
 
-![MP.OP-EF.IC-Industrial waste fuels-Nmix](../output_files/plots/MP_OP_EF_IC_Industrial_waste_fuels_Nmix.png)
+<iframe src="../output_files/plots/MP_OP_EF_IC_Industrial_waste_fuels_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 **MP.OP-EF.IC-Industrial waste fuels-Nmix** is wood waste used as biofuel in the industries where the waste originates, reported as "egentilvirket bioenergi" in the SSB statistic (table 08205). Producers of wood and paper products obtain a significant fraction of their energy through this source. “Egentilvirket bioenergi” encompasses “black liquor” as well as wood waste. For lack of better compositional details we have assumed values for the entire flow corresponding to wood, although this brings significant uncertainty.

@@ -7,7 +7,7 @@ nav_order: 2
 
 # Forest Emissions (N2O)
 
-![FS.FO-AT.AT-Emissions-N2O](../output_files/plots/FS_FO_AT_AT_Emissions_N2O.png)
+<iframe src="../output_files/plots/FS_FO_AT_AT_Emissions_N2O.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 Taken from UNFCCC Common reporting tables, Table 4.

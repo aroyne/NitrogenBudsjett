@@ -7,7 +7,7 @@ nav_order: 3
 
 # Other energy emissions (NOx)
 
-![EF.OE-AT.AT-Emissions-NOx](../output_files/plots/EF_OE_AT_AT_Emissions_NOx.png)
+<iframe src="../output_files/plots/EF_OE_AT_AT_Emissions_NOx.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 EF.OE-AT.AT-Emissions-NOx is NOx emissions from fuel combustion in residential, commercial and other sectors that are not already covered. We have used data from CLRTAP Inventory Submissions EMEP (2025) as advised by Schäppi et al. (2025), using the categories given in Table 14.

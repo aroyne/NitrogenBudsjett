@@ -7,7 +7,7 @@ nav_order: 3
 
 # Aquaculture production
 
-![HY.AC-MP.FP-Coastal fish and seafood-Nmix](../output_files/plots/HY_AC_MP_FP_Coastal_fish_and_seafood_Nmix.png)
+<iframe src="../output_files/plots/HY_AC_MP_FP_Coastal_fish_and_seafood_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 Calculated using data from Fiskeridirektoratet (2025) on sold farmed fish (extended back to 1984 using a historical compilation), assuming 2.8 % nitrogen content in fish and shellfish (Schäppi et al. (2025), p. 254).

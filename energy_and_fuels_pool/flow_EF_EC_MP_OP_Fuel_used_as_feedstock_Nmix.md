@@ -7,7 +7,7 @@ nav_order: 6
 
 # Fuel used as feedstock
 
-![EF.EC-MP.OP-Fuel used as feedstock-Nmix](../output_files/plots/EF_EC_MP_OP_Fuel_used_as_feedstock_Nmix.png)
+<iframe src="../output_files/plots/EF_EC_MP_OP_Fuel_used_as_feedstock_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 **EF.EC-MP.OP-Fuel used as feedstock-Nmix** covers coal and oil products consumed as chemical feedstock rather than combusted for energy. We use SSB table 11561 "Energibalansen"'s "Netto innenlands forbruk som råstoff" (net domestic consumption as feedstock) section for consumption volumes by energy product, net caloric values from IPCC (2006), and nitrogen contents for coal and oil feedstock from Schäppi et al. (2025). Other minor feedstock categories listed in the guidelines are neglected as advised by Schäppi et al. (2025).

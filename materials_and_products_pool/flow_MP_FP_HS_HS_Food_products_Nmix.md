@@ -7,7 +7,7 @@ nav_order: 3
 
 # Food Products to Consumers
 
-![MP.FP-HS.HS-Food products-Nmix](../output_files/plots/MP_FP_HS_HS_Food_products_Nmix.png)
+<iframe src="../output_files/plots/MP_FP_HS_HS_Food_products_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 **MP.FP-HS.HS-Food products-Nmix** is food products consumed by private households including restaurants and pets. Schäppi et al. (2025) advises using FAO statistics on food availability for human food consumption, but this only gives data back to 2009. The values in this statistic gives a bit more than 40 ktN per year. We have chosen to use data on food sales to consumers from SSB (table 13695: Næringsinnhald per dag frå selde mat- og drikkevarer 2018 – 2023, table 10249: Forbrukte mengder av mat- og drikkevarer per person per år, etter varegruppe (kg/liter) (avslutta serie) 1999 – 2012 and table 06376: Forbrukte mengder av mat- og drikkevarer per person per år, etter varegruppe (kg/liter) (avslutta serie) 1958-1959 - 1996-1998). The latter series gives values for 3 year averages, and we have assigned the averages to each individual year.

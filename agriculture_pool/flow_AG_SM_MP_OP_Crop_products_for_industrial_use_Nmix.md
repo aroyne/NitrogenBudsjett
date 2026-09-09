@@ -7,7 +7,7 @@ nav_order: 8
 
 # Crop products for industrial use
 
-![AG.SM-MP.OP-Crop products for industrial use-Nmix](../output_files/plots/AG_SM_MP_OP_Crop_products_for_industrial_use_Nmix.png)
+<iframe src="../output_files/plots/AG_SM_MP_OP_Crop_products_for_industrial_use_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 Crop products for industrial use is taken from EUROSTAT Gross nutrient balance as advised by Schäppi et al. (2025). For years with missing data, we have filled in the average of all other years.

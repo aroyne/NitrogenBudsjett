@@ -7,7 +7,7 @@ nav_order: 12
 
 # Solid Waste Export
 
-![PR.SO-RW.RW-Solid waste export-Nmix](../output_files/plots/PR_SO_RW_RW_Solid_waste_export_Nmix.png)
+<iframe src="../output_files/plots/PR_SO_RW_RW_Solid_waste_export_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 Taken from trade data, SSB table 08801 with N contents taken from Table 50 in Schäppi et al. (2025) for municipal waste, sewage sludge, hazardous and other waste. No export in these categories is reported before 2002, so we set all previous years to zero. The increase seen from 2022 to 2023 is in the category municipal waste.

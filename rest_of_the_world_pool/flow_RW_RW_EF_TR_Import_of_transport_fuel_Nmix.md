@@ -7,7 +7,7 @@ nav_order: 7
 
 # Transport Fuel Import
 
-![RW.RW-EF.TR-Import of transport fuel-Nmix](../output_files/plots/RW_RW_EF_TR_Import_of_transport_fuel_Nmix.png)
+<iframe src="../output_files/plots/RW_RW_EF_TR_Import_of_transport_fuel_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 Is taken from trade data, SSB table 08801 for all fuel items for transport.

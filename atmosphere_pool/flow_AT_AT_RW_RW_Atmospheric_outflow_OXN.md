@@ -7,7 +7,7 @@ nav_order: 16
 
 # Atmospheric Outflow (Oxidized N)
 
-![AT.AT-RW.RW-Atmospheric outflow-OXN](../output_files/plots/AT_AT_RW_RW_Atmospheric_outflow_OXN.png)
+<iframe src="../output_files/plots/AT_AT_RW_RW_Atmospheric_outflow_OXN.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 **AT.AT-RW.RW-Atmospheric outflow-OXN**

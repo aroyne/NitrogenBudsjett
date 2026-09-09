@@ -7,7 +7,7 @@ nav_order: 6
 
 # Food Industry Waste
 
-![MP.FP-PR.SO-Food industry waste-Nmix](../output_files/plots/MP_FP_PR_SO_Food_industry_waste_Nmix.png)
+<iframe src="../output_files/plots/MP_FP_PR_SO_Food_industry_waste_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 **MP.FP-PR.SO-Food industry waste-Nmix** is food waste from the food industry, including the primary sector (fisheries and slaughter houses). We use data from SSB table 05282 “Avfallsregnskap for Norge (1 000 tonn), etter materialtype, statistikkvariabel, år og kilde” (1995-2011) and 10514 «Avfallsregnskap for Norge, etter kilde og materialtype (1 000 tonn) 2012 – 2023» and the category “wet organic waste” with N content from Schäppi et al. (2025). The statistic does not separate between food and other industry waste. According to Chaudhary & Skjerpen (2025) everything in the industry category “wet organic waste” is from the food industry.

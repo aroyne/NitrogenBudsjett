@@ -7,7 +7,7 @@ nav_order: 4
 
 # Oxidized N Deposition (Forest)
 
-![AT.AT-FS.FO-Deposition-OXN](../output_files/plots/AT_AT_FS_FO_Deposition_OXN.png)
+<iframe src="../output_files/plots/AT_AT_FS_FO_Deposition_OXN.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 **AT.AT-FS.FO-Deposition-OXN**

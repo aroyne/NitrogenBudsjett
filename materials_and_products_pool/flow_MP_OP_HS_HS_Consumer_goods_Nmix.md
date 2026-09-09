@@ -7,7 +7,7 @@ nav_order: 7
 
 # Consumer Goods (Mass Balance)
 
-![MP.OP-HS.HS-Consumer goods-Nmix](../output_files/plots/MP_OP_HS_HS_Consumer_goods_Nmix.png)
+<iframe src="../output_files/plots/MP_OP_HS_HS_Consumer_goods_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 **MP.OP-HS.HS-Consumer goods-Nmix** is calculated by mass balance, assuming that all incoming flows to OP that are not accounted for in outgoing flows end up in domestic consumer goods. We have excluded N2 fixation for ammonia synthesis, and mineral fertilizer flows. We also exclude emissions to air from the balance because they result mainly from fertilizer production.

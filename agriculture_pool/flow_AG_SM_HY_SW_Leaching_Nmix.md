@@ -7,7 +7,7 @@ nav_order: 6
 
 # Leaching from soil management
 
-![AG.SM-HY.SW-Leaching-Nmix](../output_files/plots/AG_SM_HY_SW_Leaching_Nmix.png)
+<iframe src="../output_files/plots/AG_SM_HY_SW_Leaching_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 Leaching from soil management is taken from UNFCCC Common reporting tables, Table 3. The data agrees within the error range with what is reported in the TEOTIL3 Sample (2024).

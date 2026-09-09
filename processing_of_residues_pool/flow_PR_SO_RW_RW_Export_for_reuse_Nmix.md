@@ -7,7 +7,7 @@ nav_order: 11
 
 # Export for Reuse
 
-![PR.SO-RW.RW-Export for reuse-Nmix](../output_files/plots/PR_SO_RW_RW_Export_for_reuse_Nmix.png)
+<iframe src="../output_files/plots/PR_SO_RW_RW_Export_for_reuse_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 **PR.SO-RW.RW-Export for reuse-Nmix** is exported used textiles. Data taken from trade data, SSB table 08801.

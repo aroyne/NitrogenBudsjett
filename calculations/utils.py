@@ -150,6 +150,17 @@ def read_trade_data(trade_file):
     trade_data = pd.read_csv(trade_file, sep=';', header=None)
     trade_columns = ['year', 'impeks', 'HS_code', 'country', 'value_code', 'amount', 'value_2', 'value_3']
     trade_data.columns = trade_columns
+
+    # Country code '97' never appears anywhere in the file before 2023, then
+    # carries an implausible ~500-600 million kg/year for a single commodity
+    # (HS 38251000, "Kommunalt avfall") in both trade directions in 2023 and
+    # 2024 alone - around 30% of Norway's entire annual household waste
+    # generation attributed to one previously-unused code. No matching real-
+    # world event (regulatory change, new export contract) explains this;
+    # treated as an SSB/Tolletaten reporting artifact in the newest data
+    # vintages and excluded.
+    trade_data = trade_data[trade_data['country'].astype(str).str.strip() != '97']
+
     return trade_data
 
 def process_generic_trade_flow(preloaded_data, current_params, current_trade_factors,

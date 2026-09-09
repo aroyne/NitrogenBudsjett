@@ -7,7 +7,7 @@ nav_order: 5
 
 # Waste to energy (Incineration)
 
-![PR.SO-EF.EC-Waste to energy-Nmix](../output_files/plots/PR_SO_EF_EC_Waste_to_energy_Nmix.png)
+<iframe src="../output_files/plots/PR_SO_EF_EC_Waste_to_energy_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 **PR.SO-EF.EC-Waste to energy-Nmix** is found from SSB tables 05281 “Avfallsregnskap for Norge (1 000 tonn), etter statistikkvariabel, behandlingsmåte, materialtype og år “ (1995-2011) and 10513 “Avfallsregnskap for Norge (1 000 tonn), etter materialtype, statistikkvariabel, år og behandlingsmåte” (2012-2023), using N content values from Schäppi et al. (2025).

@@ -7,7 +7,7 @@ nav_order: 13
 
 # Reduced N Deposition (Surface Water)
 
-![AT.AT-HY.SW-Deposition-RDN](../output_files/plots/AT_AT_HY_SW_Deposition_RDN.png)
+<iframe src="../output_files/plots/AT_AT_HY_SW_Deposition_RDN.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 **AT.AT-HY.SW-Deposition-RDN**

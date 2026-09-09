@@ -7,7 +7,7 @@ nav_order: 5
 
 # Municipal Wastewater
 
-![HS.HS-PR.WW-Municipal wastewater-Nmix](../output_files/plots/HS_HS_PR_WW_Municipal_wastewater_Nmix.png)
+<iframe src="../output_files/plots/HS_HS_PR_WW_Municipal_wastewater_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 **HS.HS-PR.WW-Municipal wastewater-Nmix** are based on population data from SSB table 06913 and assuming an average value of 4.56 kg N / person / year for municipal wastewater as advised by Schäppi et al. (2025). This corresponds to 12.5 g N / person / day.

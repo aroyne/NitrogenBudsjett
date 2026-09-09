@@ -7,7 +7,7 @@ nav_order: 8
 
 # Live Animal Export
 
-![AG.MM-RW.RW-Live animal export-Nmix](../output_files/plots/AG_MM_RW_RW_Live_animal_export_Nmix.png)
+<iframe src="../output_files/plots/AG_MM_RW_RW_Live_animal_export_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 Taken from FAOSTAT Crop and livestock products, assuming typical weights of animals from various sources, average 16 % protein in whole animal based on typical values in Schäppi et al. (2025) and Jones factor 6.25 for nitrogen to protein (standard).

@@ -7,7 +7,7 @@ nav_order: 7
 
 # Oxidized N Deposition (Other Land)
 
-![AT.AT-FS.OL-Deposition-OXN](../output_files/plots/AT_AT_FS_OL_Deposition_OXN.png)
+<iframe src="../output_files/plots/AT_AT_FS_OL_Deposition_OXN.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 **AT.AT-FS.OL-Deposition-OXN**

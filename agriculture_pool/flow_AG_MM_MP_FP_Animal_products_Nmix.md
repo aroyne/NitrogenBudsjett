@@ -7,7 +7,7 @@ nav_order: 6
 
 # Animal Products
 
-![AG.MM-MP.FP-Animal products-Nmix](../output_files/plots/AG_MM_MP_FP_Animal_products_Nmix.png)
+<iframe src="../output_files/plots/AG_MM_MP_FP_Animal_products_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 Taken from FAOSTAT Crops and livestock products, with N contents taken from Schäppi et al. (2025).

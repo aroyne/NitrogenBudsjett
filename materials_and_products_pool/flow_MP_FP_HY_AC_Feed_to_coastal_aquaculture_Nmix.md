@@ -7,7 +7,7 @@ nav_order: 4
 
 # Feed to Coastal Aquaculture
 
-![MP.FP-HY.AC-Feed to coastal aquaculture-Nmix](../output_files/plots/MP_FP_HY_AC_Feed_to_coastal_aquaculture_Nmix.png)
+<iframe src="../output_files/plots/MP_FP_HY_AC_Feed_to_coastal_aquaculture_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 **MP.FP-HY.AC-Feed to coastal aquaculture-Nmix**: the amount of feed per ton of produced fish is found by assuming a whole-fish protein (N) retention rising from 26% in 1990 to a 35.75% plateau from 2010 onward (see the [methodological note](../hydrosphere_pool/subpool_aquaculture.html) on the Aquaculture (HY.AC) subpool page for details and sources). The amount of produced fish is found by using data from Fiskeridirektoratet (Fiskeridirektoratet, 2025) on sold farmed fish. This flow represents only the domestically supplied share of feed - about 89% in the mid-1980s, falling to 8% by 2020 as the import fraction rises (see the same methodological note for details); the remaining, imported share is accounted for elsewhere as an import flow.

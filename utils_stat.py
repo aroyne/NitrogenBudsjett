@@ -174,6 +174,69 @@ def plot_pool_balance_interactive(df_flows, pool_code, output_dir="output_files/
     return plot_filename
 
 
+def plot_flow_timeseries_interactive(df_flow, flow_name, output_dir="output_files/plots"):
+    """
+    Genererer et interaktivt Plotly-tidsserieplott (HTML) for én enkelt N-strøm:
+    median-linje (most likely value) pluss et skyggelagt 95%-usikkerhetsbånd
+    (2.5-97.5 persentil). Hover viser begge deler for det aktuelle året.
+    """
+    os.makedirs(output_dir, exist_ok=True)
+
+    df_flow = df_flow.sort_values('year')
+    years = df_flow['year']
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(
+        x=years, y=df_flow['p97_5'],
+        mode='lines', line=dict(width=0), showlegend=False, hoverinfo='skip'
+    ))
+    fig.add_trace(go.Scatter(
+        x=years, y=df_flow['p2_5'],
+        mode='lines', line=dict(width=0), fill='tonexty',
+        fillcolor='rgba(70, 130, 180, 0.3)',
+        name='95% Confidence Interval (MC)',
+        hoverinfo='skip'
+    ))
+    fig.add_trace(go.Scatter(
+        x=years, y=df_flow['median'],
+        mode='lines', line=dict(color='navy', width=2.5),
+        name='Median (most likely value)',
+        customdata=np.stack([df_flow['p2_5'], df_flow['p97_5']], axis=-1),
+        hovertemplate=(
+            "<b>Year: %{x}</b><br>" +
+            "Most likely value: %{y:.3f} kt N/year<br>" +
+            "95% interval: %{customdata[0]:.3f} – %{customdata[1]:.3f} kt N/year" +
+            "<extra></extra>"
+        )
+    ))
+
+    fig.update_layout(
+        title=dict(text=flow_name, font=dict(size=13, family="Arial, sans-serif", color="black")),
+        xaxis=dict(
+            title="Year", range=[1984, 2025],
+            gridcolor='rgba(200, 200, 200, 0.4)',
+            showspikes=True, spikethickness=1, spikedash="dot", spikemode="across"
+        ),
+        yaxis=dict(
+            title="Nitrogen Flow (kt N / year)",
+            gridcolor='rgba(200, 200, 200, 0.4)',
+            rangemode='tozero'
+        ),
+        hovermode="closest",
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        legend=dict(x=0.01, y=0.99, xanchor='left', yanchor='top', font=dict(size=10)),
+        margin=dict(l=60, r=20, t=45, b=45),
+        height=380
+    )
+
+    safe_filename = flow_name.replace('.', '_').replace('-', '_').replace(' ', '_') + '.html'
+    filepath = os.path.join(output_dir, safe_filename)
+    fig.write_html(filepath, include_plotlyjs='cdn', default_width='100%')
+    return safe_filename
+
+
 def plot_pool_balance(df_flows, pool_code, output_dir="output_files/plots"):
     """
     Genererer et balansediagram for en spesifikk pool eller subpool.
@@ -1038,9 +1101,11 @@ def process_and_export_mc_results(all_records):
         plt.grid(True, linestyle='--', alpha=0.4)
         plt.legend(loc='upper left')
         
-        safe_filename = flow.replace('.', '_').replace('-', '_').replace(' ', '_') + '.png'        
-        plt.savefig(os.path.join(plot_dir, safe_filename), dpi=150, bbox_inches='tight')        
+        safe_filename = flow.replace('.', '_').replace('-', '_').replace(' ', '_') + '.png'
+        plt.savefig(os.path.join(plot_dir, safe_filename), dpi=150, bbox_inches='tight')
         plt.close()
+
+        plot_flow_timeseries_interactive(df_flow, flow, output_dir=plot_dir)
 
     # ========================================================
     # INTEGRASJON: GENERERING AV BALANSEPLOTT FOR POOLER

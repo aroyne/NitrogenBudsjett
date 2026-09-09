@@ -7,7 +7,7 @@ nav_order: 1
 
 # Biological N2 Fixation (Agricultural Soils)
 
-![AT.AT-AG.SM-Biological N2 fixation-N2](../output_files/plots/AT_AT_AG_SM_Biological_N2_fixation_N2.png)
+<iframe src="../output_files/plots/AT_AT_AG_SM_Biological_N2_fixation_N2.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 Schäppi et al. (2025) advises using data from the EUROSTAT Gross nutrient balance, but there is an error in this dataset for Norway which is currently being corrected (as of February 2026; personal correspondence, EUROSTAT). According to the EUROSTAT metadata, the BNF in this statistic is calculated based on the area of leguminous crops and fixation coefficients. The production of leguminous crops (peas, beans etc) in Norway is very low and we assume that agricultural BNF is for the most part determined by leguminous crops such as clover grown on pastures and in fodder production.

@@ -7,7 +7,7 @@ nav_order: 10
 
 # Ammonia Import
 
-![RW.RW-MP.OP-Ammonia import-Nmix](../output_files/plots/RW_RW_MP_OP_Ammonia_import__Nmix.png)
+<iframe src="../output_files/plots/RW_RW_MP_OP_Ammonia_import__Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 Is taken from trade data, SSB table 08801.

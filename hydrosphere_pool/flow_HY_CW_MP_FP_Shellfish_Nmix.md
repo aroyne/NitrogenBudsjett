@@ -7,7 +7,7 @@ nav_order: 2
 
 # Shellfish
 
-![HY.CW-MP.FP-Shellfish-Nmix](../output_files/plots/HY_CW_MP_FP_Shellfish_Nmix.png)
+<iframe src="../output_files/plots/HY_CW_MP_FP_Shellfish_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 This flow combines shellfish/crustacean catch (2.8% N content, according to Schäppi et al. (2025), p254, UNECE Guidance Annex 6 Table 12) and wild-harvested macroalgae/seaweed (4% N content, Schäppi et al. (2025), table 21), both from Fiskeridirektoratet (2025). For 1990-2000, both components are taken from a historical compilation; from 2001 onward we switch to the modern source for shellfish. The modern source has no macroalgae figures before 2011, so for 2001-2010 the seaweed component is linearly interpolated between the last historical figure (2000) and the first modern one (2011).

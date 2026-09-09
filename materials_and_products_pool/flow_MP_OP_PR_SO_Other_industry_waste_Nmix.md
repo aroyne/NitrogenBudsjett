@@ -7,7 +7,7 @@ nav_order: 10
 
 # Other Industry Waste
 
-![MP.OP-PR.SO-Other industry waste-Nmix](../output_files/plots/MP_OP_PR_SO_Other_industry_waste_Nmix.png)
+<iframe src="../output_files/plots/MP_OP_PR_SO_Other_industry_waste_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
 **MP.OP-PR.SO-Other industry waste-Nmix**: we use data from SSB table 05282 “Avfallsregnskap for Norge (1 000 tonn), etter materialtype, statistikkvariabel, år og kilde” (1995-2011) and 10514 «Avfallsregnskap for Norge, etter kilde og materialtype (1 000 tonn) 2012 – 2023» with N contents taken from Schäppi et al. (2025) and typical, assumed values are chosen if none are given. The statistic does not separate between food and other industry waste. We make the assumption that everything in the category “wet organic waste” is from the food industry, and all other waste is assigned to other producing industry. Here we also include all waste from “other industries” (annen eller uspesifisert næring). The category “contaminated waste” is very irregularly reported (placed in different sectors in different years) and has therefore been excluded.
