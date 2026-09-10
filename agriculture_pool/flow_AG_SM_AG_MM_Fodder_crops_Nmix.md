@@ -16,7 +16,11 @@ Hohmann-Marriott (2025) used similar data sources but arrived at a smaller N flo
 
 As seen in Figure 2 in Volden (2025), the protein content of Norwegian fodder has fluctuated around a constant value throughout the entire period.
 
+In addition to harvested (slått) forage above, this flow includes grazing on agricultural land (innmark), which the harvest statistics do not cover. This is taken from Budsjettnemnda for jordbruket's Totalkalkylen "Eng, beite" series (Budsjettnemnda for jordbruket (2025)), 1000 FEm/year, calculated by BFJ as 200 FEm/daa on innmarksbeite plus 18 FEm/daa aftermath grazing on eng til slått, both scaled by the actual-vs-normal-year harvest ratio (Landbruksdirektoratet (2021)). Converted to N using the same 150 g protein/FEm assumption as the corresponding utmark-grazing flow (FS.OL-AG.MM-Grazing-Nmix).
+
 ### References
 
+* Budsjettnemnda for jordbruket (2025). *Totalkalkylen for jordbruket - statistikk*. [https://www.nibio.no/tjenester/totalkalkylen-statistikk](https://www.nibio.no/tjenester/totalkalkylen-statistikk)
 * Hohmann-Marriott, M. F. (2025). A Nitrogen budget for Norway analysis of Nitrogen flows from societal and natural sources (1961–2020). *PLOS ONE, 20*(2), e0313598. [https://doi.org/10.1371/journal.pone.0313598](https://doi.org/10.1371/journal.pone.0313598)
+* Landbruksdirektoratet (2021). *Bruk av norske fôrressurser. Utredning av forbedring av virkemidler med sikte på økt produksjon og bruk av norsk fôr*. [https://www.landbruksdirektoratet.no/nb/filarkiv/rapporter/Utredning%20av%20forbedring%20av%20virkemidler%20med%20sikte%20på%20økt%20produksjon%20og%20bruk%20av%20norsk%20fôr.pdf](https://www.landbruksdirektoratet.no/nb/filarkiv/rapporter/Utredning%20av%20forbedring%20av%20virkemidler%20med%20sikte%20på%20økt%20produksjon%20og%20bruk%20av%20norsk%20fôr.pdf)
 * Volden, H. (2025). *Hvordan utnytte det norske kornet i melkeproduksjonen*. [https://www.landbruksdirektoratet.no/nb/nyhetsrom/rapporter/gjennomgang-av-korn-og-kraftforpolitikken](https://www.landbruksdirektoratet.no/nb/nyhetsrom/rapporter/gjennomgang-av-korn-og-kraftforpolitikken)

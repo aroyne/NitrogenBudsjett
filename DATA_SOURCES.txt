@@ -202,6 +202,11 @@ NibioStatistics-5.xlsx
 NIBIO Totalkalkylen: purchased seed and planting material (cereal, oilseed, peas, grass seed, root/vegetable seed)
 downloaded 06.02.2026
 
+NibioStatisticsNewTK.xlsx
+Budsjettnemnda for jordbruket (BFJ), Totalkalkylen for jordbruket - "Areal, avling, anvendelser" statistics, sheet "Eng, beite": total feed quantity (1000 FEm/year, 1959-2024) taken up by grazing on agricultural land (innmark). Per BFJ's own methodology (cited in Landbruksdirektoratet's "Utredning av forbedring av virkemidler med sikte på økt produksjon og bruk av norsk fôr"), calculated as 200 FEm/daa on innmarksbeite plus 18 FEm/daa aftermath grazing on eng til slått, both scaled by the actual-vs-normal-year harvest ratio for eng til slått
+distinct from harvested ("slått") fodder, which is a separate BFJ series
+downloaded 2026-09-10
+
 nitrogenrensing_avløp.xlsx
 Nitrogen removal efficiency at named major Norwegian wastewater treatment plants (VEAS, Bekkelaget, NRVA, etc.)
 downloaded from norskeutslipp.no 11.05.2026

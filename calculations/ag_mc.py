@@ -174,6 +174,25 @@ def _add_industrial_crop_products_flow_mc(results, preloaded_data, current_param
     
     
 def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    Harvested (slått) forage from SSB yield statistics, plus grazing directly
+    on agricultural land (innmark), which the harvest statistics do not
+    cover. Innmark grazing is taken from Budsjettnemnda for jordbruket's
+    Totalkalkylen "Eng, beite" series (\\citet{bfj_totalkalkylen_2025}),
+    1000 FEm/year, calculated by BFJ as 200 FEm/daa on innmarksbeite plus
+    18 FEm/daa aftermath grazing on eng til slått, both scaled by the
+    actual-vs-normal-year harvest ratio (\\citet{landbruksdirektoratet_forressurser_2021}).
+    Converted to N using the same 150 g protein/FEm assumption as the
+    corresponding utmark-grazing flow (FS.OL-AG.MM-Grazing-Nmix in fs_mc.py),
+    since both represent grazed grass rather than harvested crop mass and
+    are not on the same physical basis as fodder_protein_frac below (which
+    is calibrated per kg of harvested dry matter, not per feed unit).
+
+    Harvested-forage and grazing values are summed into a single value per
+    year before being reported, since two rows for the same (flow_name,
+    year) would each be treated as a separate observation when results are
+    aggregated across simulations, biasing that year's median/CI.
+    """
     flow_code = 'AG.SM-AG.MM-Fodder crops-Nmix'
     collected_years = set()
     comment = 'ok'
@@ -197,73 +216,79 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
     df_05772 = preloaded_data.get('ssb_05772_raw')
     df_old = preloaded_data.get('grovfor_old_raw')
 
-    data_sources_A = 'SSB table 13648'
+    year_entries = {}
+
     for col_idx in range(1, 5):
         year_val = df_13648.iloc[3, col_idx]
         val5 = df_13648.iloc[4, col_idx]  # Eng til slått
         val6 = df_13648.iloc[5, col_idx]  # Grøntfôr- og silovekstar
-        
+
         if pd.notna(year_val) and pd.notna(val5) and pd.notna(val6):
             year = int(year_val)
             if year not in EXPECTED_YEARS:
                 continue
-            collected_years.add(year)
-            
             base_value = (float(val5) + float(val6)) * N_content
-            
-            value = base_value * noise_13648_val
-            
-            results.append({
-                'flow_name': flow_code, 'year': year, 'value': float(value),
-                'comment': comment, 'data_sources': data_sources_A
-            })
+            year_entries[year] = {'value': base_value * noise_13648_val, 'data_sources': 'SSB table 13648'}
 
-    data_sources_B = 'SSB table 05772'
     for col_idx in range(1, 22):
         year_val = df_05772.iloc[2, col_idx]
         val4 = df_05772.iloc[3, col_idx]  # Grøntfôr- og silovekstar
         val5 = df_05772.iloc[4, col_idx]  # Høy
-        
+
         if pd.notna(year_val) and pd.notna(val4) and pd.notna(val5):
             year = int(year_val)
             if year not in EXPECTED_YEARS:
                 continue
-            collected_years.add(year)
-            
             base_value = (float(val4) + float(val5)) * N_content
-            
             value = base_value * noise_05772_val
-            
-            if value < 0: value = 0.0
-            
-            results.append({
-                'flow_name': flow_code, 'year': year, 'value': float(value),
-                'comment': comment, 'data_sources': data_sources_B
-            })
+            if value < 0:
+                value = 0.0
+            year_entries[year] = {'value': value, 'data_sources': 'SSB table 05772'}
 
     # Pre-2000 (SSB Jordbruksstatistikk)
-    data_sources_C = 'SSB Jordbruksstatistikk'
     for r_idx in range(2, 18):
         year_val = df_old.iloc[r_idx, 0]
         val2 = df_old.iloc[r_idx, 1]  # Grøntfôr- og silovekstar
         val3 = df_old.iloc[r_idx, 2]  # Høy
-        
+
         if pd.notna(year_val) and pd.notna(val2) and pd.notna(val3):
             year = int(year_val)
             if year not in EXPECTED_YEARS:
                 continue
-            collected_years.add(year)
-            
             base_value = (float(val2) + float(val3)) * N_content
             value = base_value * noise_05772_val
-            
-            results.append({
-                'flow_name': flow_code, 'year': year, 'value': float(value),
-                'comment': comment, 'data_sources': data_sources_C
-            })
+            year_entries[year] = {'value': value, 'data_sources': 'SSB Jordbruksstatistikk'}
+
+    # Innmark grazing (Budsjettnemnda for jordbruket Totalkalkylen), added on
+    # top of the harvested-forage value for each year rather than as its own
+    # row - see this function's docstring for why.
+    df_innmark = preloaded_data.get('ag_innmark_grazing_raw')
+    noise_bfj_val = dataset_noise['BFJ_totalkalkylen_grazing']
+    n_content_grazing = float(current_params.get("protein_cont_grazing")) / Jones / 1.0e9  # g protein/FEm -> kt N/FEm
+
+    for row_idx in range(1, df_innmark.shape[0]):
+        year_val = df_innmark.iloc[row_idx, 0]
+        fem_1000 = df_innmark.iloc[row_idx, 3]
+
+        if pd.isna(year_val) or pd.isna(fem_1000):
+            continue
+        year = int(year_val)
+        if year not in EXPECTED_YEARS or year not in year_entries:
+            continue
+
+        grazing_value = float(fem_1000) * 1000 * n_content_grazing * noise_bfj_val  # 1000 FEm -> FEm -> kt N
+        year_entries[year]['value'] += grazing_value
+        year_entries[year]['data_sources'] += ' + BFJ Totalkalkylen, Eng-beite'
+
+    for year, entry in year_entries.items():
+        collected_years.add(year)
+        results.append({
+            'flow_name': flow_code, 'year': year, 'value': float(entry['value']),
+            'comment': comment, 'data_sources': entry['data_sources']
+        })
 
     missing_years = EXPECTED_YEARS - collected_years
-    report_missing_years(flow_code, missing_years, results)    
+    report_missing_years(flow_code, missing_years, results)
 
 def _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, flow_code, sectors, pollutant):
     """
@@ -476,92 +501,67 @@ def _add_non_edible_animal_products_flow_mc(results, preloaded_data, current_par
     report_missing_years(flow_code, missing_years, results)    
     
 def _add_manure_application_flow_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    N in managed manure applied to agricultural soil: the IPCC 2006 FAM term
+    (Eq. 11.4, Volume 4 Chapter 11) - managed manure N net of losses during
+    animal housing and manure storage (tracked separately as AG.MM's own
+    emissions flows) - plus the share of manure deposited directly by
+    grazing animals (PRP) that lands on agricultural grazing land (innmark)
+    rather than unmanaged land (utmark, not included here - see the FS.OL
+    subpool page for that portion and why it is excluded).
+
+    EUROSTAT's Gross Nutrient Balance reports a substantially larger figure
+    for this same quantity (roughly 40-65% higher across the time series):
+    its own documentation states manure excretion coefficients are gross,
+    with "no reductions... made for volatilisation from the moment of
+    excretion till the application to the soil" (\\citet{eurostat_gnb_glossary_2025})
+    - i.e. it measures total excretion rather than what actually reaches
+    the field. EUROSTAT's Norwegian series also has a reporting-methodology
+    discontinuity around 2017-2020 (Norway supplied EUROSTAT with
+    pre-calculated results up to 2017; EUROSTAT has calculated results
+    itself from raw activity data since 2020, per personal correspondence
+    with EUROSTAT), producing an artificial ~23% step between 2016 and 2020
+    that does not appear in the CRT-based series used here.
+
+    'ag_manure_applied_crt'/'ag_manure_prp_crt' <- UNFCCC CRT submission,
+    Table3.D, "Animal manure applied to soils" / "Urine and dung deposited
+    by grazing animals" (data_loader.py DATA_MAP)
+    """
     flow_code = 'AG.MM-AG.SM-Manure application-Nmix'
     collected_years = set()
     comment = 'ok'
-    
-    # 'gnb_sheet12_raw' <- data_files/aei_pr_gnb__custom_18744910_spreadsheet.xlsx,
-    # Sheet 12 (Eurostat Gross nutrient balance, manure N input)
-    df_sheet12 = preloaded_data.get('gnb_sheet12_raw')
-    key_gnb = 'Gross nutrient balance'
-    noise_gnb_val = dataset_noise[key_gnb]
-    key_interp = 'trend interpolation'
-    noise_interp_val = dataset_noise[key_interp]
+    data_sources = 'UNFCCC CRT Table3.D'
 
-    year_row_idx = 8
-    value_row_idx = 10
-    first_col_idx = 1
-    unit_factor = 1.0e-3
+    fam_values = preloaded_data.get('ag_manure_applied_crt')
+    prp_values = preloaded_data.get('ag_manure_prp_crt')
+    noise_val = dataset_noise['UNFCCC_manure_applied']
 
-    years_row = df_sheet12.iloc[year_row_idx].values
-    values_row = df_sheet12.iloc[value_row_idx].values
+    # Share of manure deposited during grazing (PRP) that lands on
+    # agricultural grazing land (innmark) rather than unmanaged land
+    # (utmark). Not reported directly in any source found; estimated by
+    # apportioning national PRP by animal category (Miljødirektoratet 2020,
+    # Tables 2-3) using typical Norwegian grazing practice per species - see
+    # innmark_prp_fraction's own source note in N_parameters.xlsx.
+    innmark_prp_frac = float(current_params.get("innmark_prp_fraction"))
 
-    year_values = {}
-    for col_idx in range(first_col_idx, len(years_row)):
-        yr = years_row[col_idx]
-        val = values_row[col_idx]
-
-        # Eurostat's GNB sheet alternates each value column with an empty flag
-        # column (year cell is None there), and marks missing years with ':'
-        # instead of a number - both cases are expected and skipped, not errors.
-        try:
-            yr = int(float(yr))
-            if pd.notna(val) and val != '':
-                year_values[yr] = float(val) * unit_factor
-        except (ValueError, TypeError):
-            continue
-
-    value_2016 = None
-    value_2020 = None
-    reported_entries = []
-
-    for year, base_value in year_values.items():
+    for year in sorted(set(fam_values) & set(prp_values)):
         if year not in EXPECTED_YEARS:
             continue
-            
         collected_years.add(year)
-        
-        # Store the un-noised base values as anchors for interpolation
-        if year == 2016:
-            value_2016 = base_value
-        elif year == 2020:
-            value_2020 = base_value
 
-        value = base_value * noise_gnb_val
+        base_value_t = fam_values[year] + prp_values[year] * innmark_prp_frac
+        value = (base_value_t * 1.0e-3) * noise_val  # t N -> kt N
 
-        if value < 0: 
-            value = 0.0
-
-        reported_entries.append({
+        results.append({
             'flow_name': flow_code,
             'year': year,
             'value': float(value),
             'comment': comment,
-            'data_sources': 'Eurostat Gross nutrient balance, Manure input'
+            'data_sources': data_sources
         })
 
-    results.extend(reported_entries)
-
-    # Interpolation for the 2017-2019 data gap
-    for year in range(2017, 2020):
-        if year in EXPECTED_YEARS:
-            collected_years.add(year)
-
-            # Linear interpolation on the base values
-            base_interp_val = value_2016 + (value_2020 - value_2016) / 4.0 * (year - 2016)
-            val_with_gnb = base_interp_val * noise_gnb_val
-            value = val_with_gnb * noise_interp_val
-
-            results.append({
-                'flow_name': flow_code,
-                'year': year,
-                'value': float(value),
-                'comment': 'ok',
-                'data_sources': 'interpolated'
-            })
-
     missing_years = EXPECTED_YEARS - collected_years
-    report_missing_years(flow_code, missing_years, results)    
+    report_missing_years(flow_code, missing_years, results)
     
 def _add_live_animal_export_mc(results, preloaded_data, current_params, dataset_noise):
     """

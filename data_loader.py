@@ -7,10 +7,12 @@ generic per-method loading loop below and end up under their own dict key,
 but a handful of methods load one workbook and split it into several output
 keys instead - for those, the DATA_MAP key itself (e.g. 'ag_gnb', 'ag_grovfor',
 'aqua_data', 'avlop_sewage', 'hy_teotil3', 'fs_obb_grazing',
-'fao_live_animals_all', 'ag_faostat_production_all') exists only to gate
+'fao_live_animals_all', 'ag_faostat_production_all', 'ag_manure_crt') exists only to gate
 loading by pool membership and is never read back; the actual data lives
 under the differently-named keys set inside that method's branch.
 """
+import os
+import re
 import pandas as pd
 import openpyxl
 import warnings
@@ -43,6 +45,8 @@ def load_all_data(selected_pools):
         'hy_fiske_old_raw': ({'hy'}, 'data_files/fiske_1990_2000.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Ark1'}),
         'avlop_sewage': ({'hy', 'pr'}, 'data_files/05280_20251113-113329.xlsx', 'openpyxl_sewage', {}),
         'ag_gnb': ({'ag','mp'}, 'data_files/aei_pr_gnb__custom_18744910_spreadsheet.xlsx', 'openpyxl_gnb', {}),
+        'ag_manure_crt': ({'ag'}, 'data_files/NOR-CRT-2025-V1.0-20250314-104902_awaiting_submission', 'crt_manure_applied', {}),
+        'ag_innmark_grazing_raw': ({'ag'}, 'data_files/NibioStatisticsNewTK.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Eng, beite'}),
         'ag_grovfor': ({'ag'}, 'grovfor_filer_samling', 'excel_grovfor', {}),  # filepath unused - method loads 3 fixed files directly
         'ag_crltap_raw_lines': ({'ag','ef','mp','pr'}, 'data_files/webdabData1863365.txt', 'text_lines', {}),
         'unfccc_ark1_raw': ({'ag'}, 'data_files/N2O_NOx_AG.xlsx', 'openpyxl_single_sheet_df', {'sheet_name': 'Ark1'}),        
@@ -148,6 +152,33 @@ def load_all_data(selected_pools):
             with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                 preloaded[key] = f.readlines()
 
+        elif method == 'crt_manure_applied':
+            # UNFCCC CRT (Common Reporting Table) submission, one workbook per
+            # inventory year. Table3.D gives two relevant rows (both t N/year):
+            # "Animal manure applied to soils" (FAM, IPCC 2006 Eq. 11.4 -
+            # managed manure N net of storage/housing losses) and "Urine and
+            # dung deposited by grazing animals" (PRP - manure deposited
+            # directly on pasture, never routed through storage or spreading).
+            fam_values = {}
+            prp_values = {}
+            for fname in os.listdir(filepath):
+                if not fname.endswith('.xlsx'):
+                    continue
+                match = re.search(r'-(\d{4})-\d{8}', fname)
+                if not match:
+                    continue
+                year = int(match.group(1))
+                wb_crt = openpyxl.load_workbook(os.path.join(filepath, fname), data_only=True, read_only=True)
+                ws_crt = wb_crt['Table3.D']
+                for row in ws_crt.iter_rows(min_row=10, max_row=17, values_only=True):
+                    if row[1] and 'Animal manure applied' in str(row[1]):
+                        fam_values[year] = row[3]
+                    if row[1] and 'Urine and dung deposited' in str(row[1]):
+                        prp_values[year] = row[3]
+                wb_crt.close()
+            preloaded['ag_manure_applied_crt'] = fam_values
+            preloaded['ag_manure_prp_crt'] = prp_values
+
         elif method == 'openpyxl_single_sheet':
             wb = openpyxl.load_workbook(filepath, data_only=True)
             preloaded[key] = pd.DataFrame(list(wb[kwargs['sheet_name']].values))
@@ -218,8 +249,6 @@ def load_all_data(selected_pools):
             wb_gnb = openpyxl.load_workbook(filepath, data_only=True)
             preloaded['ag_gnb_workbook'] = wb_gnb
             preloaded['gnb_sheet30_raw'] = pd.DataFrame(list(wb_gnb['Sheet 30'].values))
-            if 'Sheet 12' in wb_gnb.sheetnames:
-                preloaded['gnb_sheet12_raw'] = pd.DataFrame(list(wb_gnb['Sheet 12'].values))
 
         elif method == 'excel_grovfor':
             wb_13648 = openpyxl.load_workbook('data_files/13648_20251117-154625.xlsx', data_only=True)

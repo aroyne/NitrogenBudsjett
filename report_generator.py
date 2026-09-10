@@ -162,8 +162,11 @@ def get_short_author(raw_author_str):
             # Hvis 'Etternavn, Fornavn', hent det som står før komma
             last_names.append(auth.split(",")[0].strip())
         else:
-            # Fallback hvis formatet er 'Fornavn Etternavn' eller org-navn
-            last_names.append(auth.split()[-1].strip())
+            # Every personal author in library.bib uses "Etternavn, Fornavn"
+            # with a comma; an author string with no comma is therefore an
+            # institutional name (e.g. "Norwegian Environment Agency") and
+            # must be kept whole rather than reduced to its last word.
+            last_names.append(auth.strip())
             
     # Formater i henhold til antall forfattere (APA7 i tekst)
     if len(last_names) == 1:
@@ -718,15 +721,27 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename, targ
                 exact_flow_code = "AG.MM-AG.SM-Manure application-Nmix"
                 display_name = "Manure Application"
                 description = (
-                    "Taken from EUROSTAT Gross nutrient balance as advised by \\\\citet{schappi_annexes_2025}. Norway's submission has no data for "
-                    "2017-2019 (the same gap also appears in EUROSTAT's crop-harvest N removal figures for Norway, so it reflects a general reporting "
-                    "gap rather than something specific to manure), and we linearly interpolate across it. "
-                    "The reported value jumps by 23 % between 2016 and 2020, once reporting resumes, considerably more than the roughly 5 % change seen "
-                    "over the same gap in the crop-harvest series. Norway's own UNFCCC National Inventory Document (NID 2025) reports manure "
-                    "management emissions essentially flat over 1990-2023 (+3 % overall, -2 % for 2022-2023 alone) and dairy cow numbers falling "
-                    "about 12 % from 2015 to 2020 - neither is consistent with a genuine 23 % increase in manure output over four years. We interpret "
-                    "the jump as most likely a reporting or methodological artifact in EUROSTAT's data around the gap, rather than a real change in "
-                    "Norwegian manure application."
+                    "Taken from the UNFCCC Common Reporting Table (CRT), Table 3.D. The main component is row "
+                    "\"Animal manure applied to soils\" - the IPCC 2006 Guidelines' FAM term (Volume 4, Chapter 11, "
+                    "Equation 11.4; \\\\citet{deklein_chapter11_2006}), i.e. managed manure N net of losses during "
+                    "animal housing and manure storage (tracked separately as AG.MM's own NH3/N2O/NOx emissions "
+                    "flows). We add to this the share of manure deposited directly by grazing animals (row \"Urine "
+                    "and dung deposited by grazing animals\", PRP) that we estimate lands on agricultural grazing "
+                    "land (innmark) rather than unmanaged land (utmark) - approximately 44-62 % of the national PRP "
+                    "total, apportioned by animal category using typical Norwegian grazing practice (e.g. dairy "
+                    "cattle graze almost exclusively on innmark, while sheep spend a large share of the season on "
+                    "utmark). The utmark share is not included in any flow in this study; see the Other Land "
+                    "(FS.OL) subpool page for that portion and why it is excluded. Norway's calculation "
+                    "methodology for both terms is documented in \\\\citet{miljodirektoratet_manure_2020}. \n\n"
+                    "EUROSTAT's Gross Nutrient Balance reports a substantially larger figure for manure N (roughly "
+                    "40-65 % higher across the time series): its documentation states manure excretion "
+                    "coefficients are gross, with \"no reductions... made for volatilisation from the moment of "
+                    "excretion till the application to the soil\" (\\\\citet{eurostat_gnb_glossary_2025}) - i.e. it "
+                    "measures total excretion rather than what actually reaches the field. EUROSTAT's Norwegian "
+                    "series also has a reporting-methodology discontinuity around 2017-2020 (Norway supplied "
+                    "EUROSTAT with pre-calculated results up to 2017; EUROSTAT has calculated results itself from "
+                    "raw activity data since 2020, per personal correspondence with EUROSTAT), producing an "
+                    "artificial ~23 % step between 2016 and 2020 that does not appear in the CRT-based series used here."
                 )
             elif "n2o" in norm:
                 exact_flow_code = "AG.MM-AT.AT-Emissions-N2O"
@@ -778,7 +793,13 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename, targ
                     "\citet{hohmann-marriott_nitrogen_2025} used similar data sources but arrived at a smaller N flow (40-45 ktN) using a protein content "
                     "of 8 % and N content in protein of 15 % (Table S2).\n\n"
                     "As seen in Figure 2 in \citet{volden2025korn}, the protein content of Norwegian fodder has fluctuated around a constant value "
-                    "throughout the entire period.")
+                    "throughout the entire period.\n\n"
+                    "In addition to harvested (slått) forage above, this flow includes grazing on agricultural land (innmark), which the harvest "
+                    "statistics do not cover. This is taken from Budsjettnemnda for jordbruket's Totalkalkylen \"Eng, beite\" series "
+                    "(\\citet{bfj_totalkalkylen_2025}), 1000 FEm/year, calculated by BFJ as 200 FEm/daa on innmarksbeite plus 18 FEm/daa aftermath "
+                    "grazing on eng til slått, both scaled by the actual-vs-normal-year harvest ratio "
+                    "(\\citet{landbruksdirektoratet_forressurser_2021}). Converted to N using the same 150 g protein/FEm assumption as the "
+                    "corresponding utmark-grazing flow (FS.OL-AG.MM-Grazing-Nmix).")
             elif "emissionsn2" in norm and "n2o" not in norm:
                 exact_flow_code = "AG.SM-AT.AT-Emissions-N2"
                 display_name = "N2 emissions from denitrification"
@@ -856,7 +877,23 @@ def process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename, target_f
         f.write("# Subpool: Other land (FS.OL)\n\n")
         f.write(get_balance_image_markdown("FS.OL", plot_files, plot_dir, relative_depth="../", target_format=target_format))
         f.write("\n### Flows that are zero or neglected:\n\n* **FS.OL-AT.AT-Emissions-NOx** is neglected because no values are reported in the CRLTAP/WebDab categories 4F1 and 4F2 (wetlands / other land NOx).\n")
-        f.write("* Following Swedish NBB \\citep{jutterstrom_swedish_2020}, we also consider denitrification in the OL pool to be negligible and therefore neglect **FS.OL-AT.AT-Emissions-N2** and **FS.OL-AT.AT-Emissions-N2O**.")
+        f.write("* Following Swedish NBB \\citep{jutterstrom_swedish_2020}, we also consider denitrification in the OL pool to be negligible and therefore neglect **FS.OL-AT.AT-Emissions-N2** and **FS.OL-AT.AT-Emissions-N2O**.\n")
+        f.write(
+            "* **Manure deposited directly by grazing animals on unmanaged land (utmark)** is not "
+            "included as a flow into FS.OL. Norway's national inventory (UNFCCC CRT, Table 3.D, \"Urine "
+            "and dung deposited by grazing animals\") reports total manure-N deposited during grazing "
+            "(all land types combined) at approximately 25 ktN/year, calculated from livestock population, "
+            "animal-specific excretion factors, and animal-specific fractions of time spent grazing "
+            "\\citep{miljodirektoratet_manure_2020}. This total is not split between managed agricultural "
+            "grazing land (innmark, which belongs to AG.SM's manure input, see AG.MM-AG.SM-Manure "
+            "application-Nmix) and unmanaged land (utmark, which would belong here) in any source we have "
+            "found. Apportioning it by species using typical Norwegian grazing practice (e.g. dairy cattle "
+            "graze almost exclusively on innmark for milking logistics, while sheep spend a large share of "
+            "the grazing season on utmark) gives a rough estimate of 9.5-13.8 ktN/year on utmark "
+            "specifically - a similar order of magnitude to several flows this study does track explicitly. "
+            "We have not included it because that species-level apportionment is our own estimate rather "
+            "than a reported figure, and we are not aware of a data source that reports it directly."
+        )
 
     fs_fo_counter, fs_ol_counter = 1, 1
 
