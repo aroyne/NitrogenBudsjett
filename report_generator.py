@@ -664,6 +664,11 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename, targ
         f.write("---\nlayout: default\ntitle: 3. Agriculture (AG)\nnav_order: 4\nhas_children: true\n---\n\n")
         f.write("# Pool: 3. Agriculture (AG)\n\nBecause biofuel production in Norway is typically done as part of the waste management sector, ")
         f.write("flows of agricultural wastes to biofuel production are directed to PR.SO and we do not include the subpool AG.BC.\n\n")
+        f.write("Bleken and Bakken (1997) included the use of NH3 for straw treatment (\"halmluting\") as a separate "
+                "flow of around 3 kt N/year. This flow has no natural placement in the NNB framework of "
+                "\\citet{winiwarter_inms_2025}, and it is unclear whether it would belong to AG.MM or AG.SM in our "
+                "framework. Since the use of treated straw has decreased significantly since the late 1990s "
+                "\\citep{ahlstrom_halmluting_2024}, we have chosen not to include this flow in our NNB.\n\n")
         f.write("This pool is divided into two operational sub-pools. Explore them using the side menu or links below:\n\n")
         f.write("* [Manure Management (AG.MM)](subpool_manure_management.html)\n")
         f.write("* [Soil Management (AG.SM)](subpool_soil_management.html)\n")
