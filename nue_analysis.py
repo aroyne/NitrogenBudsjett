@@ -149,6 +149,40 @@ ANIMAL_PRODUCTS = ['AG.MM-MP.FP-Animal products-Nmix']
 NON_EDIBLE_ANIMAL_PRODUCTS = ['AG.MM-MP.OP-Non-edible animal products-Nmix']
 
 FOOD_PRODUCTS_CONSUMED = ['MP.FP-HS.HS-Food products-Nmix']  # national consumption, SSB-based
+FOOD_EXPORT_TOTAL = ['MP.FP-RW.RW-Food export-Nmix']  # includes fish - see food_export_excluding_fish()
+
+# 'kjøtt/fisk/meieri/egg' bundles fish together with meat/dairy/eggs at the
+# trade_mapping type level, so excluding fish from Food export requires going
+# one level deeper to the konv codes (MC_Reporting_Statistics.xlsx only has
+# the already-summed flow, not this breakdown).
+FOOD_EXPORT_TYPES = {'korn/planter', 'kjøtt/fisk/meieri/egg', 'mat'}
+FISH_EXPORT_KONV = 'fish_fresh_frozen'
+
+
+def food_export_excluding_fish(years=ANALYSIS_YEARS):
+    """MP.FP-RW.RW-Food export-Nmix, with the fish_fresh_frozen konv category
+    removed. Norway's fish exports (the vast majority of Food export by mass)
+    are not matched by any fertilizer/manure/BNF/deposition input in Q3's
+    denominator, since they come from the sea rather than AG.SM - including
+    them in N_food would inflate food-system NUE without a matching
+    input-side cost. Uses the trade_parameters median value (not
+    MC-perturbed) for a single, reproducible point estimate, since this
+    breakdown isn't carried in MC_Reporting_Statistics.xlsx."""
+    from data_loader import load_all_data
+    preloaded = load_all_data({'mp'})
+    df_vol = preloaded['compressed_trade_volume']
+    trade_params = pd.read_excel('parameters/N_parameters.xlsx', sheet_name='trade_parameters')
+    factors = dict(zip(trade_params['param_id'], trade_params['value']))
+
+    is_export = df_vol['impeks'].astype(str).str.strip().isin(['2', '2.0'])
+    is_food = df_vol['type'].astype(str).str.lower().str.strip().isin(FOOD_EXPORT_TYPES)
+    is_not_fish = df_vol['konv'] != FISH_EXPORT_KONV
+    sub = df_vol[is_export & is_food & is_not_fish].copy()
+    sub['N_amount'] = sub['amount'] * sub['konv'].map(factors).fillna(0.0) / 1e6
+
+    yearly = sub.groupby('year')['N_amount'].sum()
+    yearly.index = yearly.index.astype(int)
+    return yearly.reindex(years, fill_value=0.0)
 
 # Full mass-balance flow sets (all inflows/outflows, not just the
 # efficiency-scoped subset above) - used for the AG.MM/AG.SM balance
@@ -231,8 +265,11 @@ def q2_corrected_ag_whole_nue(df, years=ANALYSIS_YEARS):
 # =============================================================================
 
 def q3_food_system_nue(df, years=ANALYSIS_YEARS):
+    """N_food = domestic consumption + non-fish food export, i.e. all food
+    the system produced whether it was eaten domestically or exported (fish
+    export excluded - see food_export_excluding_fish())."""
     denom = sum_flows(df, FERTILIZER_SM + MANURE_APPLICATION + BNF_SM + DEPOSITION_SM + FEED_IMPORT, years)
-    n_food = flow_series(df, FOOD_PRODUCTS_CONSUMED[0], years)
+    n_food = flow_series(df, FOOD_PRODUCTS_CONSUMED[0], years) + food_export_excluding_fish(years)
     return 100 * n_food / denom
 
 
