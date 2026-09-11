@@ -151,6 +151,20 @@ NON_EDIBLE_ANIMAL_PRODUCTS = ['AG.MM-MP.OP-Non-edible animal products-Nmix']
 FOOD_PRODUCTS_CONSUMED = ['MP.FP-HS.HS-Food products-Nmix']  # national consumption, SSB-based
 FOOD_EXPORT_TOTAL = ['MP.FP-RW.RW-Food export-Nmix']  # includes fish - see food_export_excluding_fish()
 
+# Wild catch and aquaculture feed, used only by the fish/aquaculture-included
+# variant of Q3 below - treated the same way BNF is treated elsewhere: a
+# 'free' natural N source (wild catch) or an external feed cost (aquafeed)
+# that must be counted as an input if the corresponding output (fish landed
+# or farmed) is counted as food.
+WILD_CATCH = [
+    'HY.CW-MP.FP-Fish (wild catch)-Nmix',
+    'HY.CW-MP.FP-Shellfish-Nmix',
+]
+AQUACULTURE_FEED = [
+    'MP.FP-HY.AC-Feed to coastal aquaculture-Nmix',  # domestic
+    'RW.RW-HY.AC-Aquaculture feed import-Nmix',       # imported
+]
+
 # 'kjøtt/fisk/meieri/egg' bundles fish together with meat/dairy/eggs at the
 # trade_mapping type level, so excluding fish from Food export requires going
 # one level deeper to the konv codes (MC_Reporting_Statistics.xlsx only has
@@ -273,6 +287,24 @@ def q3_food_system_nue(df, years=ANALYSIS_YEARS):
     return 100 * n_food / denom
 
 
+def q3_food_system_nue_incl_fish(df, years=ANALYSIS_YEARS):
+    """Same formula as q3_food_system_nue(), but with wild catch and
+    aquaculture brought into the system boundary instead of excluded, for
+    comparison: wild catch (no feed of its own) is added to the denominator
+    alongside BNF/deposition as another 'free' natural N input, aquaculture
+    feed (domestic + imported) is added as its N cost, and the numerator uses
+    the full, un-filtered Food export (fish included) instead of
+    food_export_excluding_fish()."""
+    denom = sum_flows(
+        df,
+        FERTILIZER_SM + MANURE_APPLICATION + BNF_SM + DEPOSITION_SM + FEED_IMPORT
+        + WILD_CATCH + AQUACULTURE_FEED,
+        years,
+    )
+    n_food = flow_series(df, FOOD_PRODUCTS_CONSUMED[0], years) + flow_series(df, FOOD_EXPORT_TOTAL[0], years)
+    return 100 * n_food / denom
+
+
 # =============================================================================
 # AG.MM / AG.SM full mass balance (all inflows minus all outflows, not just
 # the efficiency-scoped subset above) - the basis for the 2026-09 asymmetry
@@ -330,6 +362,7 @@ def main():
     _print_series_summary("Q2: corrected AG-whole NUE (%) (imported feed at domestic-equivalent N-cost)", corrected_nue)
 
     _print_series_summary("Q3: food-system NUE (%), land-based, excl. aquaculture", q3_food_system_nue(df))
+    _print_series_summary("Q3 (comparison): food-system NUE (%), incl. wild catch and aquaculture", q3_food_system_nue_incl_fish(df))
 
     _print_series_summary("AG.MM full mass balance (kt N/yr, in - out)", ag_mm_balance(df))
     _print_series_summary("AG.SM full mass balance (kt N/yr, in - out)", ag_sm_balance(df))
