@@ -270,6 +270,46 @@ def q2_corrected_ag_whole_nue(df, years=ANALYSIS_YEARS):
     return naive_nue, corrected_nue
 
 
+# Monogastric meat categories (chicken/duck/goose/turkey/pig): unlike
+# ruminants, these species eat almost no home-grown roughage, so their share
+# of animal-product N is a proxy for how much of AG.MM's output depends on
+# concentrate feed (increasingly imported) rather than domestic grazing/
+# fodder - directly relevant context for Q2's imported-feed correction.
+POULTRY_TURKEY_PORK_ITEMS = [
+    'Meat of chickens, fresh or chilled',
+    'Meat of ducks, fresh or chilled',
+    'Meat of geese, fresh or chilled',
+    'Meat of turkeys, fresh or chilled',
+    'Meat of pig with the bone, fresh or chilled',
+]
+
+
+def poultry_pork_share_of_animal_products(years=ANALYSIS_YEARS):
+    """Poultry+turkey+pork's share (%) of AG.MM-MP.FP-Animal products-Nmix,
+    recomputed from the same FAOSTAT item-level data and animal_products
+    N-content table the flow itself is built from (item-level detail isn't
+    kept in the aggregated MC_Reporting_Statistics.xlsx flow), using the
+    table's median N_content_percent (not MC-perturbed) for a single,
+    reproducible point estimate."""
+    from data_loader import load_all_data
+    preloaded = load_all_data({'ag'})
+    df_fao = preloaded['fao_animal_production_clean']
+
+    n_content = pd.read_excel('parameters/N_parameters.xlsx', sheet_name='animal_products')
+    factors = dict(zip(n_content['item'], n_content['N_content_percent']))
+
+    working = df_fao.copy()
+    working['N_amount_kt'] = working['Value'] * working['Item'].map(factors) / 1.0e5
+    working['is_poultry_pork'] = working['Item'].isin(POULTRY_TURKEY_PORK_ITEMS)
+
+    total_by_year = working.groupby('Year')['N_amount_kt'].sum()
+    subset_by_year = working[working['is_poultry_pork']].groupby('Year')['N_amount_kt'].sum()
+
+    share = 100 * subset_by_year.reindex(total_by_year.index, fill_value=0.0) / total_by_year
+    share.index = share.index.astype(int)
+    return share.reindex(years)
+
+
 # =============================================================================
 # Question 3: food-system NUE (Hayashi/Erisman-style), land-based, aquaculture
 # excluded. See claude_tekst/2026-09-10_NUE_metodikk_og_beregninger.md for the
@@ -360,6 +400,7 @@ def main():
     naive_nue, corrected_nue = q2_corrected_ag_whole_nue(df)
     _print_series_summary("Q2: naive AG-whole NUE (%) (= Q1a, repeated for comparison)", naive_nue)
     _print_series_summary("Q2: corrected AG-whole NUE (%) (imported feed at domestic-equivalent N-cost)", corrected_nue)
+    _print_series_summary("Q2 (context): poultry+turkey+pork share of Animal products N (%)", poultry_pork_share_of_animal_products())
 
     _print_series_summary("Q3: food-system NUE (%), land-based, excl. aquaculture", q3_food_system_nue(df))
     _print_series_summary("Q3 (comparison): food-system NUE (%), incl. wild catch and aquaculture", q3_food_system_nue_incl_fish(df))
