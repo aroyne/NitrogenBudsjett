@@ -368,6 +368,60 @@ def ag_total_balance(df, years=ANALYSIS_YEARS):
 
 
 # =============================================================================
+# Per-hectare and per-capita normalisations
+# =============================================================================
+
+# NIBIO's agricultural area figure, the same one used to derive
+# denitrification_AG_N2 in N_parameters.xlsx (14 kg N/ha German default x
+# this area). A single recent-vintage value, not a historical time series -
+# this project does not currently load a yearly agricultural-area dataset, so
+# it is treated as constant across all years. Revisit if a proper time series
+# becomes available, since Norway's agricultural area has drifted over 1990-2023.
+AGRICULTURAL_AREA_HA = 1_132_693
+
+AG_LEACHING = ['AG.SM-HY.SW-Leaching-Nmix', 'AG.MM-HY.SW-Leaching-Nmix']
+AG_ATMOSPHERIC_LOSSES = [
+    'AG.SM-AT.AT-Emissions-N2', 'AG.SM-AT.AT-Emissions-N2O', 'AG.SM-AT.AT-Emissions-NH3', 'AG.SM-AT.AT-Emissions-NOx',
+    'AG.MM-AT.AT-Emissions-N2O', 'AG.MM-AT.AT-Emissions-NH3', 'AG.MM-AT.AT-Emissions-NOx',
+]
+
+
+def ag_per_hectare(df, years=ANALYSIS_YEARS):
+    """Leaching, atmospheric losses (NH3+N2O+NOx+N2) and total input reaching
+    agricultural soil (fertiliser + manure + BNF + deposition + seeds +
+    organic waste/sludge - i.e. SM_IN_FULL), all in kg N/ha/year."""
+    kt_to_kg_per_ha = 1.0e6 / AGRICULTURAL_AREA_HA
+    return pd.DataFrame({
+        'leaching_kgN_ha': sum_flows(df, AG_LEACHING, years) * kt_to_kg_per_ha,
+        'atmospheric_kgN_ha': sum_flows(df, AG_ATMOSPHERIC_LOSSES, years) * kt_to_kg_per_ha,
+        'input_kgN_ha': sum_flows(df, SM_IN_FULL, years) * kt_to_kg_per_ha,
+    })
+
+
+NOX_FLOWS_ALL_POOLS = [
+    'AG.MM-AT.AT-Emissions-NOx', 'AG.SM-AT.AT-Emissions-NOx',
+    'EF.EC-AT.AT-Emissions-NOx', 'EF.IC-AT.AT-Emissions-NOx', 'EF.OE-AT.AT-Emissions-NOx', 'EF.TR-AT.AT-Emissions-NOx',
+    'MP.OP-AT.AT-Emissions-NOx', 'PR.SO-AT.AT-Emissions-NOx',
+]
+
+
+def nox_emissions_per_capita(years=ANALYSIS_YEARS):
+    """Total national NOx emissions (summed across every pool that reports an
+    '-AT.AT-Emissions-NOx' flow), in grams of N per person per year. This is
+    the nitrogen-equivalent mass tracked throughout the model, not the
+    conventional kg-NOx (or NO2-equivalent) per capita figure used in
+    emissions-reporting contexts - divide by NOx_to_N_factor to convert to a
+    NOx-mass basis if a directly comparable figure is needed."""
+    from data_loader import load_all_data
+    preloaded = load_all_data({'mp'})
+    pop = preloaded['ssb_06913']['Befolkning 1. januar']
+
+    df = load_stats()
+    total_nox_kt = sum_flows(df, NOX_FLOWS_ALL_POOLS, years)
+    return total_nox_kt * 1.0e9 / pop.reindex(years)  # kt N -> g N, / population
+
+
+# =============================================================================
 # Report
 # =============================================================================
 
@@ -408,6 +462,13 @@ def main():
     _print_series_summary("AG.MM full mass balance (kt N/yr, in - out)", ag_mm_balance(df))
     _print_series_summary("AG.SM full mass balance (kt N/yr, in - out)", ag_sm_balance(df))
     _print_series_summary("AG total mass balance (kt N/yr, MM + SM)", ag_total_balance(df))
+
+    per_ha = ag_per_hectare(df)
+    _print_series_summary(f"AG leaching per hectare (kg N/ha/yr, area={AGRICULTURAL_AREA_HA:,} ha)", per_ha['leaching_kgN_ha'])
+    _print_series_summary(f"AG atmospheric losses per hectare (kg N/ha/yr, area={AGRICULTURAL_AREA_HA:,} ha)", per_ha['atmospheric_kgN_ha'])
+    _print_series_summary(f"AG soil N input per hectare (kg N/ha/yr, area={AGRICULTURAL_AREA_HA:,} ha)", per_ha['input_kgN_ha'])
+
+    _print_series_summary("National NOx emissions per capita (g N/person/yr)", nox_emissions_per_capita())
 
     print("\n" + "=" * 78)
 
