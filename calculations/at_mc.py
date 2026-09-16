@@ -8,7 +8,8 @@ import pandas as pd
 from calculations.utils import (
     EXPECTED_YEARS,
     report_missing_years,
-    process_generic_trade_flow
+    process_generic_trade_flow,
+    add_flat_carryforward_year
 )
 
 def execute_calculations_at(preloaded_data, current_params, dataset_noise, current_trade_factors):
@@ -214,9 +215,18 @@ def _add_OP_N2_fixation_mc(results, preloaded_data, current_params, ammonia_impo
             'comment': comment,
             'data_sources': data_sources
         })
+
+    # FAOSTAT "Fertilizers by Nutrient" has not published 2024 yet; carry the
+    # already-smoothed 2023 value forward with extra uncertainty rather than
+    # leave the flow silent for a year FAOSTAT will eventually cover.
+    add_flat_carryforward_year(
+        results, flow_code, collected_years, 2023, 2024, dataset_noise,
+        data_sources='flat carry-forward from 2023 (FAOSTAT fertilizer data not yet released for 2024)'
+    )
+
     missing_years = EXPECTED_YEARS - collected_years
-    report_missing_years(flow_code, missing_years, results)    
-    
+    report_missing_years(flow_code, missing_years, results)
+
 
 def _add_AG_N2_fixation_mc(results, current_params):
     flow_code = 'AT.AT-AG.SM-Biological N2 fixation-N2'

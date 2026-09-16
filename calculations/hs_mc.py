@@ -152,16 +152,12 @@ def _add_luc_N2O_emissions_mc(results, preloaded_data, current_params, dataset_n
     dataset_key = 'UNFCCC_N2O_lulucf'
     noise_val = dataset_noise[dataset_key]
     conv = float(current_params.get("N2O_to_N_factor"))
-    # 'hs_unfccc_n2o_raw' <- N2O_NOx_HS_FS.xlsx (data_loader.py DATA_MAP): N2O
-    # and NOx emissions from HS and FS land-use change, compiled from the
-    # UNFCCC CRT (common reporting tables) for Norway, Table 4
+    # 'hs_unfccc_n2o_raw' <- UNFCCC CRT Table4 (data_loader.py's
+    # crt_n2o_hs_fs method, reading directly from the NOR-CRT-2026-...
+    # folder): N2O emissions from HS land-use change ("4.E. Settlements")
     df_n2o = preloaded_data.get('hs_unfccc_n2o_raw')
 
-    # Rows 5-38 hold years 2023 down to 1990 (one row per year, descending);
-    # row 38 (1990) is the earliest year in the sheet and must be included.
-    for row_idx in range(5, 39):
-        if row_idx >= len(df_n2o):
-            break
+    for row_idx in range(len(df_n2o)):
         row_data = df_n2o.iloc[row_idx]
         
         year = int(row_data.iloc[0])

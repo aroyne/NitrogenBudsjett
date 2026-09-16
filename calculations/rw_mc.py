@@ -10,7 +10,8 @@ import pandas as pd
 from calculations.utils import (
     EXPECTED_YEARS,
     report_missing_years,
-    process_generic_trade_flow
+    process_generic_trade_flow,
+    add_flat_carryforward_year
 )
 from calculations.shared_flow_calculations import find_aquaculture_production, get_aquafeed_budget, get_aquafeed_import_fraction
 
@@ -256,10 +257,19 @@ def _add_live_animal_import_mc(results, preloaded_data, current_params, dataset_
                 'flow_name': flow_code, 'year': year, 'value': float(val),
                 'comment': 'ok', 'data_sources': 'FAOSTAT'
             })
-            
+
+    # FAOSTAT "Crops and livestock products" has not published 2024 yet; this
+    # flow is tiny and noisy (~0.02 ktN, no discernible trend), so a flat
+    # carry-forward is a more honest reflection of "we don't know" than
+    # fitting a trend to noise.
+    add_flat_carryforward_year(
+        results, flow_code, collected_years, 2023, 2024, dataset_noise,
+        data_sources='flat carry-forward from 2023 (FAOSTAT Crops and livestock products not yet released for 2024)'
+    )
+
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
-    
+
 
 def _add_mineral_fertilizer_import_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'RW.RW-AG.SM-Mineral fertilizer import-Nmix'
@@ -288,10 +298,18 @@ def _add_mineral_fertilizer_import_mc(results, preloaded_data, current_params, d
                 'flow_name': flow_code, 'year': year, 'value': value_kt,
                 'comment': 'ok', 'data_sources': 'FAOSTAT'
             })
-            
+
+    # FAOSTAT "Fertilizers by Nutrient" has not published 2024 yet; carry the
+    # 2023 value forward with extra uncertainty rather than leave the flow
+    # silent for a year FAOSTAT will eventually cover.
+    add_flat_carryforward_year(
+        results, flow_code, collected_years, 2023, 2024, dataset_noise,
+        data_sources='flat carry-forward from 2023 (FAOSTAT fertilizer data not yet released for 2024)'
+    )
+
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
-    
+
 
 def _add_atmospheric_inflow_mc(results, flow_code, value_col, df_rw, current_params, dataset_noise):
     """

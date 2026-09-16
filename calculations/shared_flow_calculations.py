@@ -304,8 +304,8 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
 
     value_2012_base = 0.0
 
-    # --- PART 1: years 2012-2023 (table 10514) ---
-    for col in range(2, 115, 10):
+    # --- PART 1: years 2012-2024 (table 10514) ---
+    for col in range(2, 125, 10):
         p_col = col - 1  # convert to pandas' 0-based column index
         year_val = df_10514.iloc[3, p_col]
         if pd.isna(year_val):
@@ -468,17 +468,17 @@ def find_household_waste(preloaded_data, current_params, dataset_noise):
             value_1995 = household_waste[year]
 
     # =========================================================================
-    # TABLE 10513 / 10514 (2012-2023)
+    # TABLE 10513 / 10514 (2012-2024)
     # =========================================================================
     df_10514 = preloaded_data['ssb_10514']
     width_10514 = df_10514.shape[1]
-    
+
     col_to_year_10514 = {}
     for col_idx in range(1, width_10514):
         val = str(df_10514.iloc[3, col_idx]).strip()
         if val.replace('.0', '').isdigit():
             y = int(float(val))
-            if 2012 <= y <= 2023:
+            if 2012 <= y <= 2024:
                 col_to_year_10514[col_idx] = y
 
     for col_idx, year in col_to_year_10514.items():
@@ -532,7 +532,7 @@ def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params,
     """
     Computes N in other industry waste (used by mp_mc.py for
     MP.OP-PR.SO-Other industry waste-Nmix), combining SSB tables 05282
-    (1995-2011) and 10514 (2012-2023) for the mining, manufacturing and
+    (1995-2011) and 10514 (2012-2024) for the mining, manufacturing and
     other/unspecified-industry sectors, plus a pre-1995 linear extrapolation
     calibrated against df_hist_waste's 1992/1995 totals.
 
@@ -540,7 +540,7 @@ def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params,
     equivalent in 05282 (the same table-transition issue documented in
     find_household_waste above), but here the deliberately lower N-content
     parameter for 'other_materials' relative to 'mixed_waste' keeps the
-    1995-2011-to-2012-2023 transition continuous for these sectors - unlike
+    1995-2011-to-2012-2024 transition continuous for these sectors - unlike
     household waste, where the same transition is not compensated.
     """
     industry_waste = {}
@@ -590,10 +590,10 @@ def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params,
 
         industry_waste[year] = value_base * noise_05282
 
-    # --- PART 2: YEARS 2012-2023 (table 10514) ---
+    # --- PART 2: YEARS 2012-2024 (table 10514) ---
     # Same c offsets 2, 3, 8 select the same three sectors in this table, even
     # though it splits power/water supply into two extra columns not used here.
-    for col in range(1, 114, 10):
+    for col in range(1, 124, 10):
         year = int(arr_10514[3, col])
 
         value_base = 0.0
@@ -847,7 +847,7 @@ def find_non_edible_animal_products(df_hides_clean, df_wool, df_sheep, current_p
     
 def find_recycling(preloaded_data, current_params, current_trade_factors, dataset_noise, 
                     prepared_trade_recycling, prepared_trade_reuse, trade_params):
-    year_values = {y: 0.0 for y in range(1990, 2024)}
+    year_values = {y: 0.0 for y in range(1990, 2025)}
     
     noise_05281 = float(dataset_noise['05281'])
     noise_10513 = float(dataset_noise['10513'])

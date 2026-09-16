@@ -13,7 +13,8 @@ from calculations.utils import (
     EXPECTED_YEARS,
     report_missing_years,
     process_generic_trade_flow,
-    load_crltap_emissions_to_N
+    load_crltap_emissions_to_N,
+    add_flat_carryforward_year
 )
 from calculations.shared_flow_calculations import (
     find_aquaculture_production,
@@ -308,8 +309,8 @@ def _add_food_industry_waste_mc(results, preloaded_data, current_params, dataset
 
     # 'ssb_05282' <- 05282_20260211-091021.xlsx (data_loader.py DATA_MAP): SSB
     # table 05282, waste accounts by material type, source and year (1995-2011)
-    # 'ssb_10514' <- 10514_20260211-094101.xlsx (data_loader.py DATA_MAP): SSB
-    # table 10514, waste accounts by source and material type (2012-2023)
+    # 'ssb_10514' <- 10514_20260916-101643.xlsx (data_loader.py DATA_MAP): SSB
+    # table 10514, waste accounts by source and material type (2012-2024)
     df_05282 = preloaded_data.get('ssb_05282')
     df_10514 = preloaded_data.get('ssb_10514')
     
@@ -375,7 +376,10 @@ def _add_food_industry_wastewater_mc(results, preloaded_data, current_params, da
                 'data_sources': data_sources
             })
 
-    missing_years = target_years - collected_years
+    # Reported against the full EXPECTED_YEARS range (not target_years) so
+    # years past this flow's source-data cutoff still get the usual 'not
+    # done' placeholder row, instead of having no row at all for that year.
+    missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
 
 
@@ -398,9 +402,11 @@ def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise
     noise_pop = float(dataset_noise['06913'])
     noise_trend = float(dataset_noise['trend interpolation'])
 
-    # 'ssb_13695' <- 13695_20260129-155515.xlsx (data_loader.py DATA_MAP): SSB
+    # 'ssb_13695' <- 13695_20260916-120402.xlsx (data_loader.py DATA_MAP): SSB
     # table 13695, food/drink intake per person per day by nutrient content
-    # (2018 onward)
+    # (2018 onward). SSB republished 2018-2023 alongside adding 2024-2025 in
+    # this export (store-sample weighting adjustment, ~7-8% lower across the
+    # board) - not a data error, see the file's own footnote.
     # 'ssb_06913' <- 06913_20251113-124117.xlsx (data_loader.py DATA_MAP,
     # 'excel_population' method): SSB table 06913, population by year
     # 'ssb_10249' <- 10249_20260129-155747.xlsx (data_loader.py DATA_MAP): SSB
@@ -674,7 +680,10 @@ def _add_fp_untreated_wastewater_mc(results, preloaded_data, current_params, dat
             'data_sources': src
         })
 
-    missing_years = target_years - collected_years
+    # Reported against the full EXPECTED_YEARS range (not target_years) so
+    # years past this flow's source-data cutoff still get the usual 'not
+    # done' placeholder row, instead of having no row at all for that year.
+    missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)    
 
     
@@ -800,11 +809,19 @@ def _add_ag_mineral_fertilizer_mc(results, preloaded_data, current_params, datas
              'comment': comment,
              'data_sources': data_sources
          })
-         
+
+    # FAOSTAT "Fertilizers by Nutrient" has not published 2024 yet; carry the
+    # 2023 value forward with extra uncertainty rather than leave the flow
+    # silent for a year FAOSTAT will eventually cover.
+    add_flat_carryforward_year(
+        results, flow_code, collected_years, 2023, 2024, dataset_noise,
+        data_sources='flat carry-forward from 2023 (FAOSTAT fertilizer data not yet released for 2024)'
+    )
+
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
-        
-        
+
+
 def _add_industrial_waste_fuels_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'MP.OP-EF.IC-Industrial waste fuels-Nmix'
     collected_years = set()
@@ -911,7 +928,10 @@ def _add_other_industry_wastewater_mc(results, preloaded_data, current_params, d
                 'data_sources': data_sources
             })
 
-    missing_years = target_years - collected_years
+    # Reported against the full EXPECTED_YEARS range (not target_years) so
+    # years past this flow's source-data cutoff still get the usual 'not
+    # done' placeholder row, instead of having no row at all for that year.
+    missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
 
 def _add_hs_mineral_fertilizer_mc(results, preloaded_data, current_params, dataset_noise):
@@ -949,10 +969,18 @@ def _add_hs_mineral_fertilizer_mc(results, preloaded_data, current_params, datas
             'data_sources': data_sources
         })
 
+    # FAOSTAT "Fertilizers by Nutrient" has not published 2024 yet; carry the
+    # 2023 value forward with extra uncertainty rather than leave the flow
+    # silent for a year FAOSTAT will eventually cover.
+    add_flat_carryforward_year(
+        results, flow_code, collected_years, 2023, 2024, dataset_noise,
+        data_sources='flat carry-forward from 2023 (FAOSTAT fertilizer data not yet released for 2024)'
+    )
+
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
-    
-    
+
+
 def _add_fo_mineral_fertilizer_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'MP.OP-FS.FO-Mineral fertilizer-Nmix'
     collected_years = set()
@@ -1063,7 +1091,7 @@ def _add_op_NH3_emissions_mc(results, preloaded_data, current_params, dataset_no
     data_sources = 'CRLTAP Inventory Submissions'
 
     conv = float(current_params.get("NH3_to_N_factor"))
-    # 'ag_crltap_raw_lines' <- webdabData1863365.txt (data_loader.py DATA_MAP):
+    # 'ag_crltap_raw_lines' <- webdabData1868031.txt (data_loader.py DATA_MAP):
     # CLRTAP Inventory Submissions for Norway, raw semicolon-separated lines
     raw_lines = preloaded_data.get('ag_crltap_raw_lines')
     sums = load_crltap_emissions_to_N(
@@ -1134,9 +1162,10 @@ def _add_op_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
     key_n2o = 'UNFCCC_N2O_industry'
     noise_val = dataset_noise[key_n2o]
 
-    # 'n2o_nox_op_raw' <- N2O_NOx_OP.csv (data_loader.py DATA_MAP): N2O and
-    # NOx emissions from other producing industry, compiled from the UNFCCC
-    # CRT (common reporting tables) for Norway, Table 2
+    # 'n2o_nox_op_raw' <- UNFCCC CRT Table2(I) (data_loader.py's crt_n2o_op
+    # method, reading directly from the NOR-CRT-2026-... folder): N2O
+    # emissions from other producing industry. The NOx side of this table is
+    # not read here - MP.OP's NOx comes from the CRLTAP webdab file instead.
     df_op_emissions = preloaded_data.get('n2o_nox_op_raw')
     for index, row in df_op_emissions.iterrows():
         year_val = row['year']
@@ -1205,7 +1234,10 @@ def _add_op_untreated_wastewater_mc(results, preloaded_data, current_params, dat
                 'data_sources': data_sources
             })
 
-    missing_years = target_years - collected_years
+    # Reported against the full EXPECTED_YEARS range (not target_years) so
+    # years past this flow's source-data cutoff still get the usual 'not
+    # done' placeholder row, instead of having no row at all for that year.
+    missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
     
     
@@ -1246,10 +1278,18 @@ def _add_mineral_fertilizer_export_mc(results, preloaded_data, current_params, d
                 'data_sources': data_sources
             })
 
+    # FAOSTAT "Fertilizers by Nutrient" has not published 2024 yet; carry the
+    # 2023 value forward with extra uncertainty rather than leave the flow
+    # silent for a year FAOSTAT will eventually cover.
+    add_flat_carryforward_year(
+        results, flow_code, collected_years, 2023, 2024, dataset_noise,
+        data_sources='flat carry-forward from 2023 (FAOSTAT fertilizer data not yet released for 2024)'
+    )
+
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
-    
-    
+
+
 def _add_other_goods_export_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise):
     process_generic_trade_flow(
         results=results, 
@@ -1484,5 +1524,8 @@ def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trad
             'data_sources': data_sources
         })
 
-    missing_years = target_years - collected_years
+    # Reported against the full EXPECTED_YEARS range (not target_years) so
+    # years past this flow's source-data cutoff still get the usual 'not
+    # done' placeholder row, instead of having no row at all for that year.
+    missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)

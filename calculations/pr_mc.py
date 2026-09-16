@@ -121,16 +121,16 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
         })
 
     # =========================================================================
-    # 2. PERIOD 2012-2023: SSB table 10513
+    # 2. PERIOD 2012-2024: SSB table 10513
     # =========================================================================
     dataset_key_10513 = '10513'
-    # 'ssb_waste_10513' <- 10513_20260212-104227.xlsx (data_loader.py
+    # 'ssb_waste_10513' <- 10513_20260916-120243.xlsx (data_loader.py
     # DATA_MAP): SSB table 10513, waste accounts by material type,
-    # statistical variable, year and treatment method (2012-2023)
+    # statistical variable, year and treatment method (2012-2024)
     df_10513 = preloaded_data.get('ssb_waste_10513')
     noise_10513 = dataset_noise[dataset_key_10513]
 
-    for col in range(1, 101, 9):  
+    for col in range(1, 110, 9):
         year = int(float(df_10513.iloc[3, col]))
         collected_years.add(year)
         
@@ -269,32 +269,32 @@ def _add_ag_biologically_treated_organic_waste_mc(results, preloaded_data, curre
         )
         frac_N_10513[year] = total_N/total
 
-    # 2) find the amount of disposed waste allocated to agriculture from SSB 12818 (2018-2023)
+    # 2) find the amount of disposed waste allocated to agriculture from SSB 12818 (2018-2024)
     # removing sewage sludge fraction from previous step
     # 'ssb_waste_12818' <- 12818_20260526-110921.xlsx (data_loader.py
     # DATA_MAP): SSB table 12818, biological waste by disposal method and
     # year (given in kt)
     df_12818 = preloaded_data.get('ssb_waste_12818')
     waste_ag = {}
-    for col_idx in range(1, 7):
+    for col_idx in range(1, 8):
         year = int(float(str(df_12818.iloc[3, col_idx]).strip()))
         kt_ag = float(df_12818.iloc[5, col_idx])
         waste_ag[year] = kt_ag*(1-frac_sludge_10513[year])
-    
+
     # 3) find the N content of that waste by using fraction N from 1)
     N_ag = {}
-    for year in range(2018,2024):
+    for year in range(2018,2025):
         N_ag[year] = waste_ag[year]*frac_N_10513[year]
 
     # 3b) for 2012-2017, scale 2018 input amount and ag fraction using totals from 10513
     for year in range(2012,2018):
         N_ag[year] = N_ag[2018]/total_10513[2018]*total_10513[year]
-        
+
     # 4) extrapolate constant 2012 value back to 1990
     for year in range(1990,2012):
         N_ag[year] = N_ag[2012]
-                      
-    for year in range(1990,2024):
+
+    for year in range(1990,2025):
         collected_years.add(year)
         val = N_ag[year]*noise_10513*noise_12818
         
@@ -357,32 +357,32 @@ def _add_hs_biologically_treated_organic_waste_mc(results, preloaded_data, curre
         )
         frac_N_10513[year] = total_N/total
 
-    # 2) find the amount of disposed waste allocated to HS ("grøntareal" + "levert jordprodusent") from SSB 12818 (2018-2023)
+    # 2) find the amount of disposed waste allocated to HS ("grøntareal" + "levert jordprodusent") from SSB 12818 (2018-2024)
     # removing sewage sludge fraction from previous step
     # 'ssb_waste_12818' <- 12818_20260526-110921.xlsx (data_loader.py
     # DATA_MAP): SSB table 12818, biological waste by disposal method and
     # year (given in kt)
     df_12818 = preloaded_data.get('ssb_waste_12818')
     waste_hs = {}
-    for col_idx in range(1, 7):
+    for col_idx in range(1, 8):
         year = int(float(str(df_12818.iloc[3, col_idx]).strip()))
         kt_hs = float(df_12818.iloc[6, col_idx]) + float(df_12818.iloc[7, col_idx])
         waste_hs[year] = kt_hs*(1-frac_sludge_10513[year])
-    
+
     # 3) find the N content of that waste by using fraction N from 1)
     N_hs = {}
-    for year in range(2018,2024):
+    for year in range(2018,2025):
         N_hs[year] = waste_hs[year]*frac_N_10513[year]
 
     # 3b) for 2012-2017, scale 2018 input amount and ag fraction using totals from 10513
     for year in range(2012,2018):
         N_hs[year] = N_hs[2018]/total_10513[2018]*total_10513[year]
-        
+
     # 4) extrapolate constant 2012 value back to 1990
     for year in range(1990,2012):
         N_hs[year] = N_hs[2012]
-                      
-    for year in range(1990,2024):
+
+    for year in range(1990,2025):
         collected_years.add(year)
         val = N_hs[year]*noise_10513*noise_12818
         
@@ -783,9 +783,9 @@ def _add_so_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
     key_n2o = 'UNFCCC_N2O_solid_waste'
     noise_val = dataset_noise[key_n2o]
 
-    # 'n2o_so_raw' <- N2O_SO.csv (data_loader.py DATA_MAP): N2O emissions from
-    # solid waste, compiled from the UNFCCC CRT (common reporting tables) for
-    # Norway, Table 4
+    # 'n2o_so_raw' <- UNFCCC CRT Table5 (data_loader.py's crt_n2o_so method,
+    # reading directly from the NOR-CRT-2026-... folder): N2O emissions from
+    # incineration and open burning of waste
     df_so_emissions = preloaded_data.get('n2o_so_raw')
     for index, row in df_so_emissions.iterrows():
         year_val = row['year']
@@ -1061,9 +1061,9 @@ def _add_ww_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
     key_n2o = 'UNFCCC_N2O_wastewater'
     noise_val = dataset_noise[key_n2o]
 
-    # 'n2o_ww_raw' <- N2O_WW.csv (data_loader.py DATA_MAP): N2O emissions from
-    # wastewater treatment, compiled from the UNFCCC CRT (common reporting
-    # tables) for Norway, Table 5
+    # 'n2o_ww_raw' <- UNFCCC CRT Table5 (data_loader.py's crt_n2o_ww method,
+    # reading directly from the NOR-CRT-2026-... folder): N2O emissions from
+    # wastewater treatment and discharge
     df_ww_emissions = preloaded_data.get('n2o_ww_raw')
     for index, row in df_ww_emissions.iterrows():
         year_val = row['year']

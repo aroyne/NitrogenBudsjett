@@ -20,7 +20,7 @@ from calculations.utils import (
 from calculations.shared_flow_calculations import find_feedstock_fuel
 
 # CRLTAP category codes per EF subsector, used to select which rows of the
-# CRLTAP inventory (webdabData1863365.txt, loaded as 'ag_crltap_raw_lines') to
+# CRLTAP inventory (webdabData1868031.txt, loaded as 'ag_crltap_raw_lines') to
 # sum for each subsector's NH3/NOx emissions.
 CRLTAP_EC_SECTORS = ['1A1a', '1A1b', '1A1c', '1B1a', '1B1b', '1B1c', '1B2ai', '1B2aiv', '1B2av', '1B2b', '1B2c', '1B2d']
 CRLTAP_IC_SECTORS = ['1A2a', '1A2b', '1A2c', '1A2d', '1A2e', '1A2f', '1A2gvii', '1A2gviii']
@@ -67,13 +67,14 @@ def execute_calculations_ef(preloaded_data, current_params, dataset_noise, curre
 def _add_fuel_for_ec_subsector_mc(results, preloaded_data, dataset_noise, flow_code, preload_key):
     """
     Shared implementation for N in fuel combusted by an EF.EC subsector (industry,
-    transport, heating). preload_key selects the source compilation:
-    'fuel_for_industry' <- data_files/N_fuel_for_industry.csv
-    'fuel_for_transport' <- data_files/N_fuel_for_transport.csv
-    'fuel_for_heating' <- data_files/N_fuel_for_heating.csv
-    All three are compiled from UNFCCC CRT (Common Reporting Tables) fuel
-    consumption in TJ, converted to N via IPCC (2006) NCVs and Schäppi (2025)
-    Annexes Table 15 N contents (see DATA_SOURCES.txt).
+    transport, heating). preload_key selects the source series - 'fuel_for_industry',
+    'fuel_for_transport', 'fuel_for_heating' - each read directly from the UNFCCC
+    CRT submission folder by data_loader.py's crt_fuel_industry/crt_fuel_heating/
+    crt_fuel_transport methods (Table1.A(a)s2/s4/s3 respectively, "Consumption, TJ"
+    column), converted to N via IPCC (2006) NCVs and Schäppi (2025) Annexes Table 15
+    N contents (see DATA_SOURCES.txt). Row positions are resolved by column-B label
+    text (data_loader.py's _find_crt_row) rather than hardcoded row numbers, since
+    UNFCCC has moved rows between CRT submission years.
     """
     collected_years = set()
     dataset_key = 'UNFCCC_fuel'
@@ -118,7 +119,7 @@ def _add_crltap_emissions_mc(results, preloaded_data, current_params, dataset_no
     Shared implementation for CRLTAP-derived NH3/NOx combustion emissions of an EF
     subsector. `sectors` is one of the CRLTAP_{EC,IC,TR,OE}_SECTORS lists above;
     `pollutant` is 'NH3' or 'NOx'. Reads preloaded_data['ag_crltap_raw_lines'] <-
-    data_files/webdabData1863365.txt (CRLTAP Inventory Submissions).
+    data_files/webdabData1868031.txt (CRLTAP Inventory Submissions).
     """
     collected_years = set()
 
@@ -147,8 +148,9 @@ def _add_n2o_emissions_mc(results, preloaded_data, dataset_noise, flow_code, val
     """
     Shared implementation for combustion N2O emissions of an EF subsector. All four
     subsectors are split columns of the same compilation:
-    preloaded_data['n2o_ec_data'] <- data_files/N2O_EC.csv (N2O emissions from
-    combustion, split by EC/IC/TR/OE, UNFCCC CRT). value_col is 'value_EC',
+    preloaded_data['n2o_ec_data'] <- UNFCCC CRT Table1 (data_loader.py's
+    crt_n2o_ec method, reading directly from the NOR-CRT-2026-... folder),
+    combustion N2O split by EC/IC/TR/OE. value_col is 'value_EC',
     'value_IC', 'value_TR' or 'value_OE'. dataset_key defaults to the stationary-
     combustion uncertainty (Norway NID Annexes 2025, Annex 2: N2O EF for 1A1/1A2/1A4/1A5
     and 1B2C = "Fac3"); the EF.TR caller overrides this with 'UNFCCC_N2O_transport'

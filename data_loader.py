@@ -21,6 +21,97 @@ from calculations.utils import read_trade_data
 # Suppresses openpyxl's specific header/footer warning.
 warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl.worksheet.header_footer")
 
+
+def _find_crt_row(sheet, path, header_window=200, item_window=12):
+    """
+    Locates a data row in a UNFCCC CRT Table1.A(a) sheet by following a
+    sequence of column-B label substrings (e.g. ['1.A.3.c.  Railways',
+    'Liquid fuels']), rather than a hardcoded row number - CRT row numbers
+    shift between submission years as UNFCCC adds/removes sub-rows (verified:
+    several rows moved by 2-3 positions between the 2024 and 2026 Norwegian
+    submissions). The first label is searched from the top of the sheet
+    (a section header can be anywhere); each subsequent label is searched
+    only in the few rows right after the previous match, since CRT sheets
+    always list a category's Liquid/Solid/Gaseous/Other fossil/Biomass
+    fuel-type breakdown immediately below that category's header.
+    """
+    anchor = 1
+    found = None
+    for i, label in enumerate(path):
+        window = header_window if i == 0 else item_window
+        found = None
+        for r in range(anchor, anchor + window):
+            cell_val = sheet.cell(row=r, column=2).value
+            if cell_val is not None and label in str(cell_val):
+                found = r
+                break
+        if found is None:
+            raise ValueError(f"CRT row label path {path!r} failed at {label!r} (searched rows {anchor}-{anchor + window - 1})")
+        anchor = found + 1
+    return found
+
+
+def _crt_iter_workbooks(crt_folder):
+    """Yields (year, workbook) for every per-year xlsx in a UNFCCC CRT
+    submission folder, read-only. Caller is responsible for closing each
+    workbook (and for opening the specific sheet(s) it needs)."""
+    for fname in os.listdir(crt_folder):
+        if not fname.endswith('.xlsx'):
+            continue
+        match = re.search(r'-(\d{4})-\d{8}', fname)
+        if not match:
+            continue
+        year = int(match.group(1))
+        wb = openpyxl.load_workbook(os.path.join(crt_folder, fname), data_only=True, read_only=True)
+        yield year, wb
+
+
+def _crt_cell(sheet, label_path, column):
+    """Resolves label_path to a row via _find_crt_row and returns that row's
+    value in `column` as a float, or None for CRT's non-numeric flags
+    (IE/NA/NE/NO) and other non-numeric cells."""
+    row = _find_crt_row(sheet, label_path)
+    try:
+        return float(sheet.cell(row=row, column=column).value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _read_crt_fuel_series(crt_folder, sheet_name, row_specs):
+    """
+    Reads TJ fuel consumption (column C, "Consumption, TJ") from a UNFCCC CRT
+    submission folder (one workbook per inventory year) and converts to N.
+    row_specs is a list of (label_path, ncv_divisor, n_content_frac) tuples;
+    each label_path is resolved to a row via _find_crt_row for every year's
+    workbook independently, so a row shift in one year's template can't
+    silently misalign a different year's reading.
+    """
+    values = {}
+    for fname in os.listdir(crt_folder):
+        if not fname.endswith('.xlsx'):
+            continue
+        match = re.search(r'-(\d{4})-\d{8}', fname)
+        if not match:
+            continue
+        year = int(match.group(1))
+        wb = openpyxl.load_workbook(os.path.join(crt_folder, fname), data_only=True, read_only=True)
+        sheet = wb[sheet_name]
+        value = 0.0
+        for label_path, ncv, n_frac in row_specs:
+            row = _find_crt_row(sheet, label_path)
+            cell_value = sheet.cell(row=row, column=3).value
+            try:
+                value += float(cell_value) / ncv * n_frac
+            except (TypeError, ValueError):
+                # CRT reports non-numeric flags (IE/NA/NE/NO) for combinations
+                # with no estimate; treated as zero, matching the original
+                # compilation notebooks' handling of the same flags.
+                pass
+        values[year] = value
+        wb.close()
+    return values
+
+
 def load_all_data(selected_pools):
     preloaded = {}
     print(f"\n[DATA_LOADER] Kalles med selected_pools: {selected_pools}")
@@ -45,33 +136,33 @@ def load_all_data(selected_pools):
         'hy_fiske_old_raw': ({'hy'}, 'data_files/fiske_1990_2000.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Ark1'}),
         'avlop_sewage': ({'hy', 'pr'}, 'data_files/05280_20251113-113329.xlsx', 'openpyxl_sewage', {}),
         'ag_gnb': ({'ag','mp'}, 'data_files/aei_pr_gnb__custom_18744910_spreadsheet.xlsx', 'openpyxl_gnb', {}),
-        'ag_manure_crt': ({'ag'}, 'data_files/NOR-CRT-2025-V1.0-20250314-104902_awaiting_submission', 'crt_manure_applied', {}),
+        'ag_manure_crt': ({'ag'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_manure_applied', {}),
         'ag_innmark_grazing_raw': ({'ag'}, 'data_files/NibioStatisticsNewTK.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Eng, beite'}),
         'ag_grovfor': ({'ag'}, 'grovfor_filer_samling', 'excel_grovfor', {}),  # filepath unused - method loads 3 fixed files directly
-        'ag_crltap_raw_lines': ({'ag','ef','mp','pr'}, 'data_files/webdabData1863365.txt', 'text_lines', {}),
-        'unfccc_ark1_raw': ({'ag'}, 'data_files/N2O_NOx_AG.xlsx', 'openpyxl_single_sheet_df', {'sheet_name': 'Ark1'}),        
-        'ag_leaching_csv': ({'ag'}, 'data_files/Nr_AG--HY.csv', 'csv', {}),
+        'ag_crltap_raw_lines': ({'ag','ef','mp','pr'}, 'data_files/webdabData1868031.txt', 'text_lines', {}),
+        'unfccc_ark1_raw': ({'ag'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_n2o_ag', {}),
+        'ag_leaching_csv': ({'ag'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_nr_ag', {}),
         'ag_faostat_production_all': ({'ag','mp'}, 'data_files/FAOSTAT_data_en_11-18-2025.csv', 'csv_faostat_production', {}),
         'wool_production': ({'ag','mp'}, 'data_files/ull.xlsx', 'excel', {'skiprows': 3}),
         'ssb_sheep_numbers': ({'ag','mp'}, 'data_files/03710_20260128-152225.xlsx', 'excel', {'skiprows': 2}),
-        'fs_unfccc_emissions_raw': ({'fs'}, 'data_files/N2O_NOx_HS_FS.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Ark1'}),
+        'fs_unfccc_emissions_raw': ({'fs'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_n2o_hs_fs', {}),
         'fs_firewood_raw': ({'fs'}, 'data_files/09702_20251120-133716.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'VedTonn'}),
         'fs_obb_grazing': ({'fs'}, 'data_files/OBB_Fylke_1970-2025.xlsx', 'openpyxl_obb_grazing', {}),
         'faostat_forestry': ({'fs'}, 'data_files/FAOSTAT_data_en_2-20-2026.csv', 'csv_forestry', {}),
-        'fuel_for_industry': ({'ef'}, 'data_files/N_fuel_for_industry.csv', 'csv_ef_fuel', {}),
-        'fuel_for_transport': ({'ef'}, 'data_files/N_fuel_for_transport.csv', 'csv_ef_fuel', {}),
-        'fuel_for_heating': ({'ef'}, 'data_files/N_fuel_for_heating.csv', 'csv_ef_fuel', {}),
-        'n2o_ec_data': ({'ef'}, 'data_files/N2O_EC.csv', 'csv', {}),
-        'n2o_so_raw': ({'pr'}, 'data_files/N2O_SO.csv', 'csv', {}),
-        'n2o_ww_raw': ({'pr'}, 'data_files/N2O_WW.csv', 'csv', {}),
-        'n2o_nox_op_raw': ({'mp'}, 'data_files/N2O_NOx_OP.csv', 'csv', {}),
+        'fuel_for_industry': ({'ef'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_fuel_industry', {}),
+        'fuel_for_transport': ({'ef'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_fuel_transport', {}),
+        'fuel_for_heating': ({'ef'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_fuel_heating', {}),
+        'n2o_ec_data': ({'ef'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_n2o_ec', {}),
+        'n2o_so_raw': ({'pr'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_n2o_so', {}),
+        'n2o_ww_raw': ({'pr'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_n2o_ww', {}),
+        'n2o_nox_op_raw': ({'mp'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_n2o_op', {}),
         'trade_fuels_n_content': ({'ef'}, 'data_files/N_content_fuels.xlsx', 'excel', {}),
         'ssb_energy_balance_11561': ({'ef','mp'}, 'data_files/11561_20251113-154607.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'EnergibalansenGWh'}),
         'hs_pop_size_06913': ({'hs'}, 'data_files/06913_20251113-124117.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Folkemengde'}),
         'hs_pop_age_groups_07459': ({'hs'}, 'data_files/07459_20251119-151434.xlsx', 'excel', {'sheet_name': 'Personer1', 'skiprows': 3, 'header': None}),
         'hs_smoking_stats_05307': ({'hs'}, 'data_files/05307_20251119-152214.xlsx', 'excel', {'sheet_name': 'Dagroyk', 'skiprows': 3, 'header': None}),
-        'hs_unfccc_n2o_raw': ({'hs'}, 'data_files/N2O_NOx_HS_FS.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Ark1'}),
-        'hs_luc_crltap_raw_lines': ({'hs'}, 'data_files/webdabData1863365.txt', 'text_lines', {}),
+        'hs_unfccc_n2o_raw': ({'hs'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_n2o_hs_fs', {}),
+        'hs_luc_crltap_raw_lines': ({'hs'}, 'data_files/webdabData1868031.txt', 'text_lines', {}),
         'mp_sau_saakorn_raw': ({'mp'}, 'data_files/NibioStatistics-5.xlsx', 'excel', {'sheet_name': 'Sum innkjøpt såkorn', 'header': None}),
         'mp_oljefroe_raw': ({'mp'}, 'data_files/NibioStatistics-5.xlsx', 'excel', {'sheet_name': 'Oljefrø til modning', 'header': None}),
         'mp_erter_raw': ({'mp'}, 'data_files/NibioStatistics-5.xlsx', 'excel', {'sheet_name': 'Erter', 'header': None}),
@@ -85,10 +176,10 @@ def load_all_data(selected_pools):
         'ssb_06913': ({'mp'}, 'data_files/06913_20251113-124117.xlsx', 'excel_population', {}),
         'ssb_06376': ({'mp'}, 'data_files/06376_20260129-155937.xlsx', 'excel_ssb_generic', {'sheet': '06376'}),
         'ssb_10249': ({'mp'}, 'data_files/10249_20260129-155747.xlsx', 'excel_ssb_generic', {'sheet': '10249'}),
-        'ssb_waste_10513': ({'pr', 'mp'}, 'data_files/10513_20260212-104227.xlsx', 'openpyxl_single_sheet', {'sheet_name': '10513'}),
-        'ssb_10514': ({'hs','mp','pr'}, 'data_files/10514_20260211-094101.xlsx', 'openpyxl_single_sheet', {'sheet_name': '10514'}),
+        'ssb_waste_10513': ({'pr', 'mp'}, 'data_files/10513_20260916-120243.xlsx', 'openpyxl_single_sheet', {'sheet_name': '10513'}),
+        'ssb_10514': ({'hs','mp','pr'}, 'data_files/10514_20260916-101643.xlsx', 'openpyxl_single_sheet', {'sheet_name': '10514'}),
         'ssb_waste_12359': ({'pr'}, 'data_files/12359_20251211-153434.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Mengde'}),
-        'ssb_13695': ({'mp'}, 'data_files/13695_20260129-155515.xlsx', 'excel_ssb_generic', {'sheet': '13695'}),
+        'ssb_13695': ({'mp'}, 'data_files/13695_20260916-120402.xlsx', 'excel_ssb_generic', {'sheet': '13695'}),
         'ssb_bio_08205': ({'mp'}, 'data_files/08205_20251104-141305.xlsx', 'excel_ssb_generic', {'sheet': 'Energibruk'}),
         'ssb_bio_hist': ({'mp'}, 'data_files/egentilvirket_bioenergi_industri.xlsx', 'excel_ssb_generic', {'sheet': 'Ark1'}),
         'ssb_hist_industry_waste': ({'mp','pr'}, 'data_files/kommunalt_avfall_1985_1995.xlsx', 'excel_ssb_generic', {'sheet': 'avfallsmengder'}),
@@ -179,6 +270,171 @@ def load_all_data(selected_pools):
             preloaded['ag_manure_applied_crt'] = fam_values
             preloaded['ag_manure_prp_crt'] = prp_values
 
+        elif method == 'crt_fuel_industry':
+            # UNFCCC CRT Table1.A(a)s2, "1.A.2 Manufacturing industries and
+            # construction" top-level aggregate (already the sum of all its
+            # sub-sectors, so no need to read further down the sheet).
+            # NCVs from IPCC (2006) Table 1.2, N contents from Table 15 in
+            # Schäppi (2025) Annexes.
+            row_specs = [
+                (['1.A.2 Manufacturing industries and construction', 'Liquid fuels'], 44, 0.0015),
+                (['1.A.2 Manufacturing industries and construction', 'Solid fuels'], 25, 0.014),
+                (['1.A.2 Manufacturing industries and construction', 'Other fossil fuels'], 30, 0.005),
+                (['1.A.2 Manufacturing industries and construction', 'Biomass'], 30, 0.005),
+            ]
+            values = _read_crt_fuel_series(filepath, 'Table1.A(a)s2', row_specs)
+            preloaded[key] = pd.DataFrame(sorted(values.items()), columns=['year', 'value'])
+
+        elif method == 'crt_fuel_heating':
+            # UNFCCC CRT Table1.A(a)s4, "1.A.4 Other sectors" top-level
+            # aggregate (commercial/institutional + residential +
+            # agriculture/forestry/fishing combined, stationary and mobile).
+            row_specs = [
+                (['1.A.4  Other sectors', 'Liquid fuels'], 44, 0.0015),
+                (['1.A.4  Other sectors', 'Solid fuels'], 25, 0.014),
+                (['1.A.4  Other sectors', 'Other fossil fuels'], 30, 0.005),
+                (['1.A.4  Other sectors', 'Biomass'], 30, 0.005),
+            ]
+            values = _read_crt_fuel_series(filepath, 'Table1.A(a)s4', row_specs)
+            preloaded[key] = pd.DataFrame(sorted(values.items()), columns=['year', 'value'])
+
+        elif method == 'crt_fuel_transport':
+            # UNFCCC CRT Table1.A(a)s3. Domestic aviation's value sits
+            # directly on its own header row (already a pre-aggregated
+            # total), so that entry's label path is a single element.
+            row_specs = [
+                (['1.A.3.a.  Domestic aviation'], 44.1, 0.001),
+                (['1.A.3.b.  Road transportation', 'Diesel oil'], 43, 0.000133),
+                (['1.A.3.b.  Road transportation', 'Biomass'], 27, 0.01),
+                (['1.A.3.c.  Railways', 'Liquid fuels'], 44, 0.0015),
+                (['1.A.3.c.  Railways', 'Solid fuels'], 25, 0.014),
+                (['1.A.3.d.  Domestic Navigation', 'Residual fuel oil'], 40.4, 0.0045),
+                (['1.A.3.d.  Domestic Navigation', 'Gas/diesel oil'], 43, 0.000133),
+            ]
+            values = _read_crt_fuel_series(filepath, 'Table1.A(a)s3', row_specs)
+            preloaded[key] = pd.DataFrame(sorted(values.items()), columns=['year', 'value'])
+
+        elif method == 'crt_n2o_ec':
+            # UNFCCC CRT Table1, column E (N2O, kt), converted to N via the
+            # N2/N2O molar-mass ratio (28/44 = 0.6364). Four IPCC top-level
+            # categories map to the model's EC/IC/TR/OE subsectors.
+            rows = []
+            for year, wb in _crt_iter_workbooks(filepath):
+                sheet = wb['Table1']
+                ec = sum(v for v in (
+                    _crt_cell(sheet, ['1.A.1. Energy industries'], 5),
+                    _crt_cell(sheet, ['1.B.1. Solid fuels'], 5),
+                    _crt_cell(sheet, ['1.B.2.a. Oil'], 5),
+                    _crt_cell(sheet, ['1.B.2.b. Natural gas'], 5),
+                    _crt_cell(sheet, ['1.B.2.d. Other'], 5),
+                ) if v is not None) * 0.6364
+                ic = (_crt_cell(sheet, ['1.A.2. Manufacturing industries and construction'], 5) or 0.0) * 0.6364
+                tr = (_crt_cell(sheet, ['1.A.3. Transport'], 5) or 0.0) * 0.6364
+                oe = sum(v for v in (
+                    _crt_cell(sheet, ['1.A.4. Other sectors'], 5),
+                    _crt_cell(sheet, ['1.A.5. Other'], 5),
+                ) if v is not None) * 0.6364
+                rows.append({'year': year, 'value_EC': ec, 'value_IC': ic, 'value_TR': tr, 'value_OE': oe})
+                wb.close()
+            preloaded[key] = pd.DataFrame(rows).sort_values('year').reset_index(drop=True)
+
+        elif method == 'crt_n2o_so':
+            # UNFCCC CRT Table5, "5.C. Incineration and open burning of
+            # waste", column E (N2O, kt) - converted to N further downstream
+            # (pr_mc.py applies N2O_to_N_factor from N_parameters.xlsx).
+            rows = []
+            for year, wb in _crt_iter_workbooks(filepath):
+                v = _crt_cell(wb['Table5'], ['5.C. Incineration and open burning of waste'], 5)
+                rows.append({'year': year, 'value': v})
+                wb.close()
+            preloaded[key] = pd.DataFrame(rows).sort_values('year').reset_index(drop=True)
+
+        elif method == 'crt_n2o_ww':
+            # UNFCCC CRT Table5, "5.D. Wastewater treatment and discharge",
+            # column E (N2O, kt) - converted to N downstream in pr_mc.py.
+            rows = []
+            for year, wb in _crt_iter_workbooks(filepath):
+                v = _crt_cell(wb['Table5'], ['5.D. Wastewater treatment and discharge'], 5)
+                rows.append({'year': year, 'value': v})
+                wb.close()
+            preloaded[key] = pd.DataFrame(rows).sort_values('year').reset_index(drop=True)
+
+        elif method == 'crt_n2o_op':
+            # UNFCCC CRT Table2(I), column E (N2O, kt), summed over the
+            # IPCC subcategories that report a nonzero N2O figure for other
+            # producing industry (2A Mineral industry and 2D Non-energy
+            # products always report zero N2O in this compilation, so are
+            # skipped). Only mp_mc.py's N2O use of this table is live - the
+            # matching NOx column (2A/2B/2C/2G/2H, column K) was computed by
+            # the original N2O_NOx_OP.ipynb but never read by any
+            # calculations/*.py file (MP.OP's NOx comes from the CRLTAP
+            # webdab file instead), so it is not reproduced here.
+            rows = []
+            for year, wb in _crt_iter_workbooks(filepath):
+                sheet = wb['Table2(I)']
+                n2o = sum(v for v in (
+                    _crt_cell(sheet, ['2.B.  Chemical industry'], 5),
+                    _crt_cell(sheet, ['2.C.  Metal industry'], 5),
+                    _crt_cell(sheet, ['2.G.  Other product manufacture and use'], 5),
+                    _crt_cell(sheet, ['2.H.  Other'], 5),
+                ) if v is not None)
+                rows.append({'year': year, 'N2O': n2o})
+                wb.close()
+            preloaded[key] = pd.DataFrame(rows).sort_values('year').reset_index(drop=True)
+
+        elif method == 'crt_n2o_ag':
+            # UNFCCC CRT Table3 (agriculture summary), column E (N2O, kt).
+            # "3.B. Manure management" -> MM, "3.D. Agricultural soils" -> SM.
+            # Originally compiled by hand into N2O_NOx_AG.xlsx (no notebook
+            # found for it); the NOx column that file also had is dropped -
+            # AG's NOx comes from the CRLTAP webdab file instead and this
+            # column was never read by any calculations/*.py file.
+            rows = []
+            for year, wb in _crt_iter_workbooks(filepath):
+                sheet = wb['Table3']
+                mm = _crt_cell(sheet, ['3.B. Manure management'], 5)
+                sm = _crt_cell(sheet, ['3.D. Agricultural soils'], 5)
+                rows.append({'year': year, 1: mm, 2: sm})
+                wb.close()
+            df = pd.DataFrame(rows).sort_values('year').reset_index(drop=True)
+            preloaded[key] = df[['year', 1, 2]]
+
+        elif method == 'crt_n2o_hs_fs':
+            # UNFCCC CRT Table4 (LULUCF summary), column E (N2O, kt).
+            # "4.E. Settlements" -> HS, "4.A. Forest land" -> FS.FO. Kept in
+            # the original file's 9-column layout (year, HS N2O/NOx, FS.FO
+            # N2O/NOx, FS.OL N2O/NOx, FS.WL N2O/NOx) so hs_mc.py/fs_mc.py's
+            # existing column-index reads (column 1 / column 3) still work
+            # unchanged; FS.OL and FS.WL are left blank - fs_mc.py already
+            # omits their N2O/N2 emissions deliberately (see fs_mc.py), and
+            # the NOx columns were never read by any calculations/*.py file
+            # (same CRLTAP-webdab reasoning as elsewhere).
+            rows = []
+            for year, wb in _crt_iter_workbooks(filepath):
+                sheet = wb['Table4']
+                hs_n2o = _crt_cell(sheet, ['4.E. Settlements'], 5)
+                fo_n2o = _crt_cell(sheet, ['4.A. Forest land'], 5)
+                rows.append({0: year, 1: hs_n2o, 2: None, 3: fo_n2o, 4: None,
+                             5: None, 6: None, 7: None, 8: None})
+                wb.close()
+            df = pd.DataFrame(rows).sort_values(0).reset_index(drop=True)
+            preloaded[key] = df
+
+        elif method == 'crt_nr_ag':
+            # UNFCCC CRT Table3.D ("3.D.2.b. Nitrogen leaching and run-off",
+            # column D, t N -> kt N) and Table3.B(b) ("3.B.5. Indirect N2O
+            # emissions", column T, kg N -> kt N) - soil-management (SM) and
+            # manure-management (MM) leaching/runoff respectively.
+            rows = []
+            for year, wb in _crt_iter_workbooks(filepath):
+                sm = _crt_cell(wb['Table3.D'], ['3.D.2.b.   Nitrogen leaching and run-off'], 4)
+                sm = sm / 1000 if sm is not None else None
+                mm = _crt_cell(wb['Table3.B(b)'], ['3.B.5. Indirect N2O emissions'], 20)
+                mm = mm * 1e-6 if mm is not None else None
+                rows.append({'year': year, 'Nr_SM': sm, 'Nr_MM': mm})
+                wb.close()
+            preloaded[key] = pd.DataFrame(rows).sort_values('year').reset_index(drop=True)
+
         elif method == 'openpyxl_single_sheet':
             wb = openpyxl.load_workbook(filepath, data_only=True)
             preloaded[key] = pd.DataFrame(list(wb[kwargs['sheet_name']].values))
@@ -251,13 +507,13 @@ def load_all_data(selected_pools):
             preloaded['gnb_sheet30_raw'] = pd.DataFrame(list(wb_gnb['Sheet 30'].values))
 
         elif method == 'excel_grovfor':
-            wb_13648 = openpyxl.load_workbook('data_files/13648_20251117-154625.xlsx', data_only=True)
+            wb_13648 = openpyxl.load_workbook('data_files/13648_20260916-101847.xlsx', data_only=True)
             wb_05772 = openpyxl.load_workbook('data_files/05772_20251210-142618.xlsx', data_only=True)
             wb_old = openpyxl.load_workbook('data_files/grovfor_før_2000.xlsx', data_only=True)
             preloaded['ag_ssb_13648'] = wb_13648
             preloaded['ag_ssb_05772'] = wb_05772
             preloaded['ag_grovfor_old'] = wb_old
-            preloaded['ssb_13648_raw'] = pd.DataFrame(list(wb_13648['Avling'].values))
+            preloaded['ssb_13648_raw'] = pd.DataFrame(list(wb_13648['13648'].values))
             preloaded['ssb_05772_raw'] = pd.DataFrame(list(wb_05772['Gronfor'].values))
             preloaded['grovfor_old_raw'] = pd.DataFrame(list(wb_old['Ark1'].values))
 

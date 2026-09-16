@@ -58,13 +58,13 @@ downloaded 20.11.2025
 SSB table 10249: food/drink amounts consumed per person per year (kg/liter), by item group, year and statistical variable (1999-2012, with 2010-2011 missing from the source)
 downloaded 29.01.2026
 
-10513_20260212-104227.xlsx
-SSB table 10513: waste accounts for Norway (1000 tonnes), by material type, statistical variable, year and treatment method (2012-2023)
-downloaded 12.02.2026
+10513_20260916-120243.xlsx
+SSB table 10513: waste accounts for Norway (1000 tonnes), by material type, year and treatment method (2012-2024)
+downloaded 16.09.2026
 
-10514_20260211-094101.xlsx
+10514_20260916-101643.xlsx
 SSB table 10514: Avfallsregnskap for Norge (waste accounts for Norway, 1000 tonnes), by source, material type, statistical variable and year; includes all categories
-downloaded 11.02.2026
+downloaded 16.09.2026
 
 11561_20251113-154607.xlsx
 SSB table 11561: Energibalansen (energy balance). Supply and consumption by energy balance item, energy product, year and statistical variable
@@ -74,13 +74,13 @@ downloaded 13.11.2025
 SSB table 12818: Biologisk avfall (1 000 tonn), etter avfallsdisponering og år
 downloaded 26.05.2026
 
-13648_20251117-154625.xlsx
-SSB table 13648: Avling i jordbruket (agricultural yield, 1000 tonnes, and yield per decare), by crop, statistical variable and year
-downloaded 17.11.2025
+13648_20260916-101847.xlsx
+SSB table 13648: Avling i jordbruket (agricultural yield, 1000 tonnes, and yield per decare), by year, region and crop
+downloaded 16.09.2026
 
-13695_20260129-155515.xlsx
-SSB table 13695: food/drink amounts sold per person per day, by nutrient content and statistical variable (2018 onward)
-downloaded 29.01.2026
+13695_20260916-120402.xlsx
+SSB table 13695: food/drink amounts sold per person per day, by nutrient content (2018-2025). 2018-2023 republished alongside this export (store-sample weighting adjustment, SSB's own footnote), not comparable to the earlier 29.01.2026 download of this table
+downloaded 16.09.2026
 
 A.06.002_20251111-140559.xlsx
 Fiskeridirektoratet table A.06.002 Akvakultur (aquaculture). Matfisk (food fish): sales of salmon, rainbow trout and trout, by county, species, year and statistical variable
@@ -149,50 +149,63 @@ kommunalt_avfall_1985_1995.xlsx
 Historical municipal and industry waste compilation, 1985-1995 (quantities, incineration/recycling shares, material-specific recycling)
 source: Figur 4.3, Naturressurser og miljø 1997, SSB
 
-N2O_EC.csv
+N2O_EC.csv (superseded 16.09.2026)
 Compilation of N2O emissions from combustion, split by EC/IC/TR/OE
-data taken from CRT (common reporting tables) for Norway under UNFCCC, https://unfccc.int/documents/644485
+data taken from CRT (common reporting tables) for Norway under UNFCCC, https://unfccc.int/documents/644485, Table 1
 data compilation done with script N2O_EC.ipynb
+no longer read by the model - data_loader.py now reads Table1 directly from the NOR-CRT-2026-... folder (method 'crt_n2o_ec')
 
-N2O_NOx_AG.xlsx
+N2O_NOx_AG.xlsx (superseded 16.09.2026)
 Compilation of N2O and NOx emissions from agriculture (soil and manure management)
 data taken from CRT (common reporting tables) for Norway under UNFCCC, https://unfccc.int/documents/644485, Table 3
+no compilation script/notebook was ever found for this file (unlike the N2O_*.csv files, likely entered by hand from the CRT source); no longer read by the model - data_loader.py now reads Table3 directly from the NOR-CRT-2026-... folder (method 'crt_n2o_ag'), rows "3.B. Manure management" and "3.D. Agricultural soils", N2O column only (the NOx column was never read by any calculations/*.py file - AG's NOx comes from the CRLTAP webdab file instead)
 
-N2O_NOx_HS_FS.xlsx
+N2O_NOx_HS_FS.xlsx (superseded 16.09.2026)
 Compilation of N2O and NOx emissions from HS and FS land-use change (LUC)
 data taken from CRT (common reporting tables) for Norway under UNFCCC, https://unfccc.int/documents/644485, Table 4
+no compilation script/notebook was ever found for this file (likely entered by hand from the CRT source); no longer read by the model - data_loader.py now reads Table4 directly from the NOR-CRT-2026-... folder (method 'crt_n2o_hs_fs'), rows "4.E. Settlements" (HS) and "4.A. Forest land" (FS.FO), N2O column only. FS.OL and FS.WL columns are not reproduced (FS.OL's N2O/N2 emissions are deliberately omitted from the model, see fs_mc.py; FS.WL's column was never read by any calculations/*.py file), nor is the NOx column (same CRLTAP-webdab reasoning as N2O_NOx_AG.xlsx)
 
-N2O_NOx_OP.csv
+N2O_NOx_OP.csv (superseded 16.09.2026)
 Compilation of N2O and NOx from other producing industry (OP)
-data taken from CRT (common reporting tables) for Norway under UNFCCC, https://unfccc.int/documents/644485, Table 2
+data taken from CRT (common reporting tables) for Norway under UNFCCC, https://unfccc.int/documents/644485, Table 2(I)
+no longer read by the model - data_loader.py now reads Table2(I) directly from the NOR-CRT-2026-... folder (method 'crt_n2o_op'), N2O column only; the NOx column this CSV also had was never actually read by any calculations/*.py file (MP.OP's NOx comes from the CRLTAP webdab file instead) and was dropped rather than reproduced
 
-N2O_SO.csv
+N2O_SO.csv (superseded 16.09.2026)
 Compilation of N2O emissions from solid waste (SO)
-data taken from CRT (common reporting tables) for Norway under UNFCCC, https://unfccc.int/documents/644485, Table 4
+data taken from CRT (common reporting tables) for Norway under UNFCCC, https://unfccc.int/documents/644485, Table 5
+no longer read by the model - data_loader.py now reads Table5 directly from the NOR-CRT-2026-... folder (method 'crt_n2o_so'); this CSV had also gone stale, up to ~87% off a fresh re-run of its own notebook against its own documented source file
 
-N2O_WW.csv
+N2O_WW.csv (superseded 16.09.2026)
 Compilation of N2O emissions from wastewater treatment (WW)
 data taken from CRT (common reporting tables) for Norway under UNFCCC, https://unfccc.int/documents/644485, Table 5
+no longer read by the model - data_loader.py now reads Table5 directly from the NOR-CRT-2026-... folder (method 'crt_n2o_ww'); this CSV had also gone stale, up to ~57% off a fresh re-run of its own notebook against its own documented source file
 
-N_fuel_for_heating.csv
+N_fuel_for_heating.csv (superseded 16.09.2026)
 Compilation of N flows from fuel used for heating
-data derived from UNFCCC CRT (common reporting tables) for Norway, sheet Table1.A(a)s2, fuel consumption in TJ, converted to N using NCVs from IPCC (2006) Table 1.2 and N contents from Table 15 in Schäppi (2025) Annexes
+data derived from UNFCCC CRT (common reporting tables) for Norway, sheet Table1.A(a)s4, fuel consumption in TJ, converted to N using NCVs from IPCC (2006) Table 1.2 and N contents from Table 15 in Schäppi (2025) Annexes
 data compilation done with script N_fuel_for_heating.ipynb
+no longer read by the model - data_loader.py now reads Table1.A(a)s4 directly from the NOR-CRT-2026-... folder (method 'crt_fuel_heating'); this also fixed a bug where the notebook's "Biomass" line read the wrong row (an unrelated "Gaseous fuels" figure under a different subsection), underestimating the flow by roughly 2.5-3.5x for every year
 
-N_fuel_for_industry.csv
+N_fuel_for_industry.csv (superseded 16.09.2026)
 Compilation of N flows from fuel used in industry
 data derived from UNFCCC CRT (common reporting tables) for Norway, sheet Table1.A(a)s2, fuel consumption in TJ, converted to N using NCVs from IPCC (2006) Table 1.2 and N contents from Table 15 in Schäppi (2025) Annexes
 data compilation done with script N_fuel_for_industry.ipynb
+no longer read by the model - data_loader.py now reads Table1.A(a)s2 directly from the NOR-CRT-2026-... folder (method 'crt_fuel_industry')
 
-N_fuel_for_transport.csv
+N_fuel_for_transport.csv (superseded 16.09.2026)
 Compilation of N flows from fuel used for transport
-data derived from UNFCCC CRT (common reporting tables) for Norway, sheet Table1.A(a)s2, fuel consumption in TJ, converted to N using NCVs from IPCC (2006) Table 1.2 and N contents from Table 15 in Schäppi (2025) Annexes
+data derived from UNFCCC CRT (common reporting tables) for Norway, sheet Table1.A(a)s3, fuel consumption in TJ, converted to N using NCVs from IPCC (2006) Table 1.2 and N contents from Table 15 in Schäppi (2025) Annexes
 data compilation done with script N_fuel_for_transport.ipynb
+no longer read by the model - data_loader.py now reads Table1.A(a)s3 directly from the NOR-CRT-2026-... folder (method 'crt_fuel_transport'); this CSV had also gone stale (didn't match even a fresh re-run of its own notebook against its documented source file) by up to ~60% in some years
 
 N_parameters.xlsx
 Central model parameter file: global N-content and density factors, trade N-content factors, HS-code trade mapping (from SSB table 08801's classification), and food/protein-content coding
 most values sourced from Schäppi et al. (2025), UNECE/EPNB Annex to the Guidance Document on National Nitrogen Budgets
 manually maintained, updated on an ongoing basis
+
+NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission/
+Norway's 2026 UNFCCC Common Reporting Table submission (one workbook per inventory year, 1990-2024). Read directly by data_loader.py for: sheet Table3.D "Animal manure applied to soils" (FAM) and "Urine and dung deposited by grazing animals" (PRP) rows (method 'crt_manure_applied'); sheet Table1.A(a)s2 "1.A.2 Manufacturing industries and construction" fuel consumption (method 'crt_fuel_industry'); sheet Table1.A(a)s3 transport fuel consumption, several subsectors (method 'crt_fuel_transport'); sheet Table1.A(a)s4 "1.A.4 Other sectors" fuel consumption (method 'crt_fuel_heating'); sheet Table1 combustion N2O by EC/IC/TR/OE (method 'crt_n2o_ec'); sheet Table5 N2O from waste incineration/open burning (method 'crt_n2o_so') and from wastewater treatment/discharge (method 'crt_n2o_ww'); sheet Table2(I) N2O from other producing industry (method 'crt_n2o_op'); sheets Table3.D/Table3.B(b) N leaching/runoff from soil and manure management (method 'crt_nr_ag'); sheet Table3 (agriculture summary) N2O from manure management and agricultural soils (method 'crt_n2o_ag'); sheet Table4 (LULUCF summary) N2O from HS and FS.FO land-use change (method 'crt_n2o_hs_fs'). Row positions within each sheet are resolved by column-B label text (data_loader.py's _find_crt_row), not hardcoded row numbers, since UNFCCC has moved rows between submission years for some sheets (verified for Table1.A(a)s3/s4)
+downloaded 16.09.2026 from https://unfccc.int/ghg-inventories-annex-i-parties/2026
 
 NibioStatistics-4.xlsx
 NIBIO Totalkalkylen: purchased concentrate feed (tonnes, price, domestically produced fraction)
@@ -214,9 +227,10 @@ VEAS: reported removal-rate figures used where available (2002-2015), assumed 70
 Bekkelaget: https://vannforeningen.no/wp-content/uploads/2016/05/04-Eliassen.pdf, supplemented with figures from egenkontrollrapporter (self-monitoring reports) to Statsforvalteren
 NRVA: removal rate assumed 70% where figures are missing
 
-Nr_AG--HY.csv
+Nr_AG--HY.csv (superseded 16.09.2026)
 Compilation of Nr runoff and leaching from soil management (SM) and manure management (MM)
-data taken from CRT (common reporting tables) for Norway under UNFCCC, https://unfccc.int/documents/644485, Table 3
+data taken from CRT (common reporting tables) for Norway under UNFCCC, https://unfccc.int/documents/644485, Tables 3.D and 3.B(b)
+no longer read by the model - data_loader.py now reads Tables 3.D/3.B(b) directly from the NOR-CRT-2026-... folder (method 'crt_nr_ag')
 downloaded 13.11.2025
 
 OBB_Fylke_1970-2025.xlsx
@@ -256,10 +270,11 @@ utslipp_avløp.xlsx
 Historical wastewater treatment plant emissions time series
 data from Naturressurser og miljø, SSB
 
-webdabData1863365.txt
-Downloaded from https://webdab01.umweltbundesamt.at/cgi-bin/wedb2_scaled_choose_sector.pl
+webdabData1868031.txt
+Downloaded 16.09.2026 from https://webdab01.umweltbundesamt.at/cgi-bin/wedb2_scaled_choose_sector.pl
 directed from https://www.ceip.at/webdab-emission-database/emissions-as-used-in-emep-models
 as suggested by Schäppi2025Ann: CLRTAP Inventory Submissions for emission data on NOx
+and NH3, per-sector (NFR14/NFR19) breakdown, now covering data through 2024
 
 Årlig råvareforbruk.xlsx
 Landbruksdirektoratets kraftfôrstatistikk: domestic and imported consumption of carbohydrate, protein, fat and mineral/vitamin raw materials in concentrate feed

@@ -498,7 +498,9 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename, targe
                         "is smoothed with a centered 3-year moving average, since actual ammonia production is a continuous industrial process and "
                         "presumably much steadier than the underlying trade statistics suggest on their own - annual trade figures are sensitive to "
                         "shipment timing around year-end and to inventory/stock effects, which can otherwise dominate the apparent year-to-year change. "
-                        "The result is floored at zero, since a negative N2-fixation flow has no physical meaning.")
+                        "The result is floored at zero, since a negative N2-fixation flow has no physical meaning. FAOSTAT Fertilizer by nutrient has "
+                        "not yet published a 2024 figure at the time of writing; the 2024 value is a flat carry-forward of 2023, with additional "
+                        "uncertainty (±50%) applied to reflect that it is not a real, independently observed value.")
             elif exact_flow_code == "AT.AT-RW.RW-Atmospheric outflow-OXN":
                 f.write(f"**{exact_flow_code}**\n\n" + "is found using source-receptor data from \\citep{emep_sr_2024}, as advised by \\citep{schappi_annexes_2025}. "
                         "The EMEP source-receptor tables are not published for every year: 1984-1996 use the average of 1997-2001 (the earliest "
@@ -569,7 +571,10 @@ def process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename
             display_name = "Live Animal Import"
             description = (
                 "Is taken from FAOSTAT Crops and livestock products, assuming typical weights of animals from various sources, "
-                "average 16% protein in whole animal and Jones factor 6.25 for nitrogen to protein (standard)."
+                "average 16% protein in whole animal and Jones factor 6.25 for nitrogen to protein (standard). FAOSTAT Crops and "
+                "livestock products has not yet published a 2024 figure at the time of writing; the 2024 value is a flat carry-forward "
+                "of 2023 (this flow is small and does not show a discernible trend), with additional uncertainty (±50%) applied "
+                "to reflect that it is not a real, independently observed value."
             )
         elif "mineral" in norm and "fertilizer" in norm:
             exact_flow_code = "RW.RW-AG.SM-Mineral fertilizer import-Nmix"
@@ -577,7 +582,9 @@ def process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename
             description = (
                 "Is taken from FAOSTAT Fertilizer by nutrient \\citet{fao_fertilizer_2025}. Because anhydrous "
                 "ammonia is not used directly as fertilizer in Norway, it is not counted as a fertilizer in this particular FAO statistic. "
-                "We therefore account for NH3 import in the flow **RW.RW-MP.OP-Ammonia import-Nmix**."
+                "We therefore account for NH3 import in the flow **RW.RW-MP.OP-Ammonia import-Nmix**. FAOSTAT Fertilizer by nutrient has "
+                "not yet published a 2024 figure at the time of writing; the 2024 value is a flat carry-forward of 2023, with additional "
+                "uncertainty (±50%) applied to reflect that it is not a real, independently observed value."
             )
         elif "inflow" in norm and "oxn" in norm:
             exact_flow_code = "RW.RW-AT.AT-Atmospheric inflow-OXN"
@@ -767,7 +774,10 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename, targ
             elif "product" in norm and "nonedible" not in norm and "op" not in norm:
                 exact_flow_code = "AG.MM-MP.FP-Animal products-Nmix"
                 display_name = "Animal Products"
-                description = "Taken from FAOSTAT Crops and livestock products, with N contents taken from \\\\citet{schappi_annexes_2025}."
+                description = ("Taken from FAOSTAT Crops and livestock products, with N contents taken from \\\\citet{schappi_annexes_2025}. "
+                "FAOSTAT Crops and livestock products has not yet published a 2024 figure at the time of writing; the 2024 value is a "
+                "flat carry-forward of 2023 (this flow is stable year to year, varying less than 5% over 2018-2023), with additional "
+                "uncertainty (±50%) applied to reflect that it is not a real, independently observed value.")
             elif "nonedible" in norm or "wool" in norm or ("animal" in norm and "op" in norm):
                 exact_flow_code = "AG.MM-MP.OP-Non-edible animal products-Nmix"
                 display_name = "Non-edible Animal Products"
@@ -776,13 +786,18 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename, targ
                 "\\\\citep{landbruksdirektoratet_leveransedata-slakt-2005-2012_2025} for 2005-2024; for earlier years, we use the number of "
                 "sheep (SSB table 03710) and extrapolate from a linear regression found between sheep and wool for 2005-2024. In addition, "
                 "we use numbers for raw hides and skins from FAOSTAT Crops and livestock products. N contents are taken from "
-                "\\\\citet{schappi_annexes_2025}.")
+                "\\\\citet{schappi_annexes_2025}. FAOSTAT Crops and livestock products has not yet published a 2024 figure at the time of "
+                "writing; since this flow shows a clear declining trend over 2018-2023, the 2024 value is extrapolated from a linear fit "
+                "to 2019-2023 rather than a flat carry-forward, with additional uncertainty (±50%) applied to reflect that it is not "
+                "a real, independently observed value.")
             elif "export" in norm or "live" in norm:
                 exact_flow_code = "AG.MM-RW.RW-Live animal export-Nmix"
                 display_name = "Live Animal Export"
                 description = ("Taken from FAOSTAT Crop and livestock products, assuming typical weights of animals from various sources, average "
                 "16 % protein in whole animal based on typical values in \\\\citet{schappi_annexes_2025} and Jones factor 6.25 for nitrogen to "
-                "protein (standard).")
+                "protein (standard). FAOSTAT Crops and livestock products has not yet published a 2024 figure at the time of writing; the "
+                "2024 value is a flat carry-forward of 2023 (this flow is small and does not show a discernible trend), with additional "
+                "uncertainty (±50%) applied to reflect that it is not a real, independently observed value.")
 
         elif filename.upper().startswith("AG_SM_"):
             parent_subpool = "Soil Management (AG.SM)"
@@ -796,9 +811,9 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename, targ
                     "content of grass and fodder is known to be highly variable. We have assumed a protein content of 15 % based on 2025 analyses of "
                     "13 000 grass samples from all over Norway by Tine/NorFor, and 15 % N in protein (FAO, 2003). \n\n"
                     "\citet{hohmann-marriott_nitrogen_2025} used similar data sources but arrived at a smaller N flow (40-45 ktN) using a protein content "
-                    "of 8 % and N content in protein of 15 % (Table S2).\n\n"
-                    "As seen in Figure 2 in \citet{volden2025korn}, the protein content of Norwegian fodder has fluctuated around a constant value "
-                    "throughout the entire period.\n\n"
+                    "of 8 % and N content in protein of 15 % (Table S2). We have chosen to use a constant protein content due to a lack of detailed data, but "
+                    "as seen in Figure 3 in \citet{bakken_nitrogen_2026}, there seems to have been a consistent decrease in protein content of fodder "
+                    "in the period 2007-2023 from around 155 to around 145 g/kg. \n\n"
                     "In addition to harvested (slått) forage above, this flow includes grazing on agricultural land (innmark), which the harvest "
                     "statistics do not cover. This is taken from Budsjettnemnda for jordbruket's Totalkalkylen \"Eng, beite\" series "
                     "(\\citet{bfj_totalkalkylen_2025}), 1000 FEm/year, calculated by BFJ as 200 FEm/daa on innmarksbeite plus 18 FEm/daa aftermath "
@@ -1595,7 +1610,10 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                 display_name = "Mineral Fertilizer for Agriculture"
                 description = (
                     "**MP.OP-AG.SM-Mineral fertilizer-Nmix** is domestically produced mineral fertilizer used in agriculture, found as "
-                    "(total domestic use) – (import), where both use and import are given in FAOSTAT Fertilizer by nutrient \\\\citep{fao_fertilizer_2025}."
+                    "(total domestic use) – (import), where both use and import are given in FAOSTAT Fertilizer by nutrient \\\\citep{fao_fertilizer_2025}. "
+                    "FAOSTAT Fertilizer by nutrient has not yet published a 2024 figure at the time of writing; the 2024 value is a flat "
+                    "carry-forward of 2023, with additional uncertainty (±50%) applied to reflect that it is not a real, independently "
+                    "observed value."
                 )
             elif "n2o" in norm:
                 exact_flow_code = "MP.OP-AT.AT-Emissions-N2O"
@@ -1674,7 +1692,10 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                 display_name = "Mineral Fertilizer for HS"
                 description = (
                     "**MP.OP-HS.HS-Mineral fertilizer-Nmix**: as advised by \\\\citet{schappi_annexes_2025}, we assume a default value of 2% of total mineral "
-                    "fertilizer for non-agricultural use. Data for fertilizer use in agriculture are taken from FAOSTAT Fertilizer by nutrient \\\\citep{fao_fertilizer_2025}."
+                    "fertilizer for non-agricultural use. Data for fertilizer use in agriculture are taken from FAOSTAT Fertilizer by nutrient \\\\citep{fao_fertilizer_2025}. "
+                    "FAOSTAT Fertilizer by nutrient has not yet published a 2024 figure at the time of writing; the 2024 value is a flat "
+                    "carry-forward of 2023, with additional uncertainty (±50%) applied to reflect that it is not a real, independently "
+                    "observed value."
                 )
             elif "untreated" in norm and "op" in norm:
                 exact_flow_code = "MP.OP-HY.SW-Untreated wastewater-Nmix"
@@ -1715,7 +1736,12 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
             elif "fertilizer" in norm and "export" in norm:
                 exact_flow_code = "MP.OP-RW.RW-Mineral fertilizer export-Nmix"
                 display_name = "Mineral Fertilizer Export"
-                description = "**MP.OP-RW.RW-Mineral fertilizer export-Nmix** is taken from FAOSTAT Fertilizer by nutrient \\\\citep{fao_fertilizer_2025}."
+                description = (
+                    "**MP.OP-RW.RW-Mineral fertilizer export-Nmix** is taken from FAOSTAT Fertilizer by nutrient \\\\citep{fao_fertilizer_2025}. "
+                    "FAOSTAT Fertilizer by nutrient has not yet published a 2024 figure at the time of writing; the 2024 value is a flat "
+                    "carry-forward of 2023, with additional uncertainty (±50%) applied to reflect that it is not a real, independently "
+                    "observed value."
+                )
             elif "other" in norm and "goods" in norm and "export" in norm:
                 exact_flow_code = "MP.OP-RW.RW-Other goods export-Nmix"
                 display_name = "Other Goods Export"

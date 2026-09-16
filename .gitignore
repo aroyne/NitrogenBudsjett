@@ -207,3 +207,6 @@ CLAUDE.md
 
 # Print-figurer til artikkelen (lokal mappe, ikke synces)
 article_figures/
+
+# Artikkelmanus (lokal fil, ikke synces)
+Artikkelmanus.docx

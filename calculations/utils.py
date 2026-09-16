@@ -42,6 +42,65 @@ def report_missing_years(flow_code, missing_years, results,
         })
 
 
+def add_flat_carryforward_year(results, flow_code, collected_years, from_year, to_year, dataset_noise, data_sources):
+    """
+    Appends a flat carry-forward placeholder for to_year, repeating
+    flow_code's already-computed from_year value with the standard
+    'trend interpolation' uncertainty (N_parameters.xlsx dataset_uncertainties,
+    +/-50% PERT) layered on top of whatever noise from_year's value already
+    carries - the same two-noise-sources pattern used elsewhere in this
+    project for interpolated/extrapolated years. Used when an upstream source
+    (e.g. FAOSTAT) has stopped updating and no real to_year figure exists yet.
+    No-op if to_year is already collected or from_year has no result to copy.
+    """
+    if to_year in collected_years:
+        return
+    base_value = next((r['value'] for r in results if r['flow_name'] == flow_code and r['year'] == from_year), None)
+    if base_value is None or pd.isna(base_value):
+        return
+    value = base_value * dataset_noise['trend interpolation']
+    collected_years.add(to_year)
+    results.append({
+        'flow_name': flow_code,
+        'year': to_year,
+        'value': value,
+        'comment': 'ok',
+        'data_sources': data_sources,
+    })
+
+
+def add_trend_extrapolated_year(results, flow_code, collected_years, fit_years, to_year, dataset_noise, data_sources):
+    """
+    Appends a linear-trend-extrapolated placeholder for to_year: fits a
+    least-squares line through flow_code's already-computed values for
+    fit_years and evaluates it at to_year, with the standard
+    'trend interpolation' uncertainty (+/-50% PERT) layered on top, same
+    two-noise-source pattern as add_flat_carryforward_year. Used instead of
+    a flat carry-forward when a flow has a clear multi-year trend that a
+    flat value would systematically over- or undershoot. No-op if to_year
+    is already collected or fewer than two fit_years have a result to fit.
+    """
+    if to_year in collected_years:
+        return
+    points = [(r['year'], r['value']) for r in results
+              if r['flow_name'] == flow_code and r['year'] in fit_years and not pd.isna(r['value'])]
+    if len(points) < 2:
+        return
+    years_arr = np.array([p[0] for p in points], dtype=float)
+    values_arr = np.array([p[1] for p in points], dtype=float)
+    slope, intercept = np.polyfit(years_arr, values_arr, 1)
+    trend_value = slope * to_year + intercept
+    value = trend_value * dataset_noise['trend interpolation']
+    collected_years.add(to_year)
+    results.append({
+        'flow_name': flow_code,
+        'year': to_year,
+        'value': value,
+        'comment': 'ok',
+        'data_sources': data_sources,
+    })
+
+
 def read_year_value_row(sheet,
                         year_values=None,
                         year_row=9,

@@ -37,8 +37,9 @@ def _add_fo_denitrification_emissions_mc(results, preloaded_data, current_params
     """
     Shared implementation for FS.FO forest-soil denitrification emissions (N2O and
     N2, both reported by UNFCCC CRT Table 4 for forest land).
-    preloaded_data['fs_unfccc_emissions_raw'] <- data_files/N2O_NOx_HS_FS.xlsx,
-    column 3 = FS.FO N2O (kt), rows 5-38 = years 2023 down to 1990.
+    preloaded_data['fs_unfccc_emissions_raw'] <- UNFCCC CRT Table4
+    (data_loader.py's crt_n2o_hs_fs method, reading directly from the
+    NOR-CRT-2026-... folder), column 3 = FS.FO N2O (kt).
     N2 is not reported directly - it is estimated as a fixed N2:N2O ratio applied
     to the same N2O series (n2_n2o_ratio_key='forest_N2_to_N2O_ratio', ratio 19.5
     per Schäppi et al. 2025); pass n2_n2o_ratio_key=None for the N2O flow itself.
@@ -50,7 +51,7 @@ def _add_fo_denitrification_emissions_mc(results, preloaded_data, current_params
     N2O_to_N = float(current_params.get("N2O_to_N_factor"))
     n2_n2o_ratio = float(current_params.get(n2_n2o_ratio_key)) if n2_n2o_ratio_key else 1.0
 
-    for row in range(5, 39):
+    for row in range(len(df_unfccc)):
         year = int(df_unfccc.iloc[row, 0])
         collected_years.add(year)
 

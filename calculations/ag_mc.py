@@ -7,6 +7,8 @@ from calculations.utils import (
     read_year_value_row,
     report_missing_years,
     load_crltap_emissions_to_N,
+    add_flat_carryforward_year,
+    add_trend_extrapolated_year,
 )
 from calculations.shared_flow_calculations import (
     find_industrial_crop_products,
@@ -14,7 +16,7 @@ from calculations.shared_flow_calculations import (
     )
 
 # CRLTAP category codes for the two AG subsectors, used to select which rows of
-# the CRLTAP inventory (webdabData1863365.txt, loaded as 'ag_crltap_raw_lines')
+# the CRLTAP inventory (webdabData1868031.txt, loaded as 'ag_crltap_raw_lines')
 # to sum for each subsector's NH3/NOx emissions.
 # SM = Soil Management: direct/indirect emissions from synthetic fertilizer and
 # crop residue N applied to soil (CRLTAP 3D) plus agricultural residue burning
@@ -206,8 +208,11 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
     key_05772 = '05772'
     noise_05772_val = dataset_noise[key_05772]
 
-    # 'ssb_13648_raw' <- data_files/13648_20251117-154625.xlsx: SSB table 13648
-    # (agricultural yield), covers 2021-2024
+    # 'ssb_13648_raw' <- data_files/13648_20260916-101847.xlsx: SSB table 13648
+    # (agricultural yield), covers 2021-2025. Laid out with years down rows
+    # (from row 5) and crops across columns, unlike every other year-range
+    # table in this file (which puts years across columns) - SSB changed this
+    # table's orientation in the 2026-09-16 export.
     # 'ssb_05772_raw' <- data_files/05772_20251210-142618.xlsx: SSB table 05772
     # (agricultural yield), covers 2000-2020
     # 'grovfor_old_raw' <- data_files/grovfor_før_2000.xlsx: historical hay/silage
@@ -218,15 +223,22 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
 
     year_entries = {}
 
-    for col_idx in range(1, 5):
-        year_val = df_13648.iloc[3, col_idx]
-        val5 = df_13648.iloc[4, col_idx]  # Eng til slått
-        val6 = df_13648.iloc[5, col_idx]  # Grøntfôr- og silovekstar
-
-        if pd.notna(year_val) and pd.notna(val5) and pd.notna(val6):
+    for row_idx in range(5, df_13648.shape[0]):
+        year_val = df_13648.iloc[row_idx, 0]
+        if pd.isna(year_val):
+            continue
+        try:
             year = int(year_val)
-            if year not in EXPECTED_YEARS:
-                continue
+        except (TypeError, ValueError):
+            # Row 0 stops being a year once the year block ends (footer text
+            # such as "Tal for 2024 er framleis førebels...").
+            continue
+        if year not in EXPECTED_YEARS:
+            continue
+        val5 = df_13648.iloc[row_idx, 1]  # Eng til slått
+        val6 = df_13648.iloc[row_idx, 2]  # Grøntfôr- og silovekstar
+
+        if pd.notna(val5) and pd.notna(val6):
             base_value = (float(val5) + float(val6)) * N_content
             year_entries[year] = {'value': base_value * noise_13648_val, 'data_sources': 'SSB table 13648'}
 
@@ -295,7 +307,7 @@ def _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset
     Shared implementation for CRLTAP-derived NH3/NOx emissions of an AG subsector
     (soil management or manure management). `sectors` is AG_SM_CRLTAP_SECTORS or
     AG_MM_CRLTAP_SECTORS above; `pollutant` is 'NH3' or 'NOx'. Reads
-    preloaded_data['ag_crltap_raw_lines'] <- data_files/webdabData1863365.txt
+    preloaded_data['ag_crltap_raw_lines'] <- data_files/webdabData1868031.txt
     (CRLTAP Inventory Submissions).
     """
     collected_years = set()
@@ -333,10 +345,10 @@ def _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset
 def _add_ag_n2o_emissions_mc(results, preloaded_data, current_params, dataset_noise, flow_code, value_col, dataset_key):
     """
     Shared implementation for AG subsector N2O emissions. Both subsectors are
-    columns of the same compilation: preloaded_data['unfccc_ark1_raw'] <-
-    data_files/N2O_NOx_AG.xlsx (N2O and NOx emissions from agriculture, UNFCCC
-    CRT Table 3), loaded without headers - column 1 = 'N2O, MM', column 2 =
-    'N2O, SM'. Rows 4-37 = years 2023 down to 1990. dataset_key differs by caller
+    columns of the same series: preloaded_data['unfccc_ark1_raw'] <- UNFCCC
+    CRT Table3 (data_loader.py's crt_n2o_ag method, reading directly from
+    the NOR-CRT-2026-... folder), column 1 = "3.B. Manure management" N2O,
+    column 2 = "3.D. Agricultural soils" N2O. dataset_key differs by caller
     since Norway NID Annexes 2025, Annex 2 gives manure management (IPCC 3B,
     'UNFCCC_N2O_agri_manure') and soil emissions (IPCC 3D, 'UNFCCC_N2O_agri_soils')
     different N2O uncertainty ("Fac2" vs "Fac3").
@@ -349,7 +361,7 @@ def _add_ag_n2o_emissions_mc(results, preloaded_data, current_params, dataset_no
     noise_val = dataset_noise[dataset_key]
     df_unfccc = preloaded_data.get('unfccc_ark1_raw')
 
-    for r_idx in range(4, 38):
+    for r_idx in range(len(df_unfccc)):
         year_val = df_unfccc.iloc[r_idx, 0]
         ton_val = df_unfccc.iloc[r_idx, value_col]
 
@@ -377,9 +389,9 @@ def _add_ag_n2o_emissions_mc(results, preloaded_data, current_params, dataset_no
 def _add_ag_leaching_mc(results, preloaded_data, dataset_noise, flow_code, value_col):
     """
     Shared implementation for AG subsector Nr leaching/runoff. Both subsectors
-    are columns of the same compilation: preloaded_data['ag_leaching_csv'] <-
-    data_files/Nr_AG--HY.csv (Nr runoff and leaching from soil/manure
-    management, UNFCCC CRT Table 3). value_col is 'Nr_SM' or 'Nr_MM'.
+    are columns of the same series: preloaded_data['ag_leaching_csv'] <-
+    UNFCCC CRT Tables 3.D/3.B(b) (data_loader.py's crt_nr_ag method, reading
+    directly from the NOR-CRT-2026-... folder). value_col is 'Nr_SM' or 'Nr_MM'.
     """
     collected_years = set()
     data_sources = 'UNFCCC CRT'
@@ -449,10 +461,18 @@ def _add_animal_products_flow_mc(results, preloaded_data, current_params, datase
                 'data_sources': data_sources
             })
 
+    # FAOSTAT "Crops and livestock products" has not published 2024 yet, and
+    # this series is stable year to year (<5% variation 2018-2023), so a flat
+    # carry-forward is about as good as any alternative.
+    add_flat_carryforward_year(
+        results, flow_code, collected_years, 2023, 2024, dataset_noise,
+        data_sources='flat carry-forward from 2023 (FAOSTAT Crops and livestock products not yet released for 2024)'
+    )
+
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
 
-    
+
 def _add_non_edible_animal_products_flow_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'AG.MM-MP.OP-Non-edible animal products-Nmix'
     collected_years = set()
@@ -497,8 +517,17 @@ def _add_non_edible_animal_products_flow_mc(results, preloaded_data, current_par
                 'data_sources': data_sources
             })
 
+    # FAOSTAT "Crops and livestock products" has not published 2024 yet.
+    # This flow has a clear declining trend (2018-2023), so a flat
+    # carry-forward would systematically overstate 2024 - fit a line through
+    # the last 5 years instead.
+    add_trend_extrapolated_year(
+        results, flow_code, collected_years, range(2019, 2024), 2024, dataset_noise,
+        data_sources='trend-extrapolated from 2019-2023 (FAOSTAT Crops and livestock products not yet released for 2024)'
+    )
+
     missing_years = EXPECTED_YEARS - collected_years
-    report_missing_years(flow_code, missing_years, results)    
+    report_missing_years(flow_code, missing_years, results)
     
 def _add_manure_application_flow_mc(results, preloaded_data, current_params, dataset_noise):
     """
@@ -609,16 +638,25 @@ def _add_live_animal_export_mc(results, preloaded_data, current_params, dataset_
             val = total_N_per_year[year]
             
             results.append({
-                'flow_name': flow_code, 
-                'year': year, 
+                'flow_name': flow_code,
+                'year': year,
                 'value': float(val),
-                'comment': comment, 
+                'comment': comment,
                 'data_sources': data_sources
             })
-            
+
+    # FAOSTAT "Crops and livestock products" has not published 2024 yet; this
+    # flow is tiny and noisy (~0.02 ktN, no discernible trend), so a flat
+    # carry-forward is a more honest reflection of "we don't know" than
+    # fitting a trend to noise.
+    add_flat_carryforward_year(
+        results, flow_code, collected_years, 2023, 2024, dataset_noise,
+        data_sources='flat carry-forward from 2023 (FAOSTAT Crops and livestock products not yet released for 2024)'
+    )
+
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
-    
+
 
 def _add_N2_emissions_soil_management_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'AG.SM-AT.AT-Emissions-N2'
