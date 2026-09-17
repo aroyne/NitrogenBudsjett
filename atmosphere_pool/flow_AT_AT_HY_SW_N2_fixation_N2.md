@@ -10,9 +10,11 @@ nav_order: 14
 <iframe src="../output_files/plots/AT_AT_HY_SW_N2_fixation_N2.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
+<!-- MANUAL:FLOW_DESCRIPTION:START -->
 **AT.AT-HY.SW-N2 fixation-N2**
 
 According to NIBIO (NIBIO, 2026), the surface water area is 20 457 km2 https://arealbarometer.nibio.no/nb/norge/. According to (Schäppi et al., 2025), the biological fixation rate can vary between < 0.1 tN/km2 in ologotrophic and mesotrophic lakes to up to 10 tN/km2 in eutrophic lakes. Most lakes in Norway are not eutrophic and we use a median value of 0.1 tN/km2, with highest and lowest values of 0 and 2 tN/km2.
+<!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References
 

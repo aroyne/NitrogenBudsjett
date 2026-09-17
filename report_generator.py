@@ -82,6 +82,61 @@ def get_flow_image_markdown(exact_flow_code, filename, plot_dir, target_format, 
     return f"![{exact_flow_code}]({relative_depth}{plot_dir}/{filename})"
 
 
+def _extract_manual_block(existing_path, block_name):
+    """
+    Returns the text saved between a page's <!-- MANUAL:{block_name}:START/END -->
+    markers, or None if the page or the markers don't exist yet. Lets a page's
+    hand-edited narrative text survive being regenerated for its auto-managed
+    parts (frontmatter, heading, plot embed).
+    """
+    if not os.path.exists(existing_path):
+        return None
+    with open(existing_path, 'r', encoding='utf-8') as f:
+        existing_content = f.read()
+    start_marker = f"<!-- MANUAL:{block_name}:START -->"
+    end_marker = f"<!-- MANUAL:{block_name}:END -->"
+    match = re.search(re.escape(start_marker) + r'\n(.*?)\n' + re.escape(end_marker), existing_content, re.DOTALL)
+    return match.group(1) if match else None
+
+
+def _wrap_manual_block(text, block_name):
+    return f"<!-- MANUAL:{block_name}:START -->\n{text}\n<!-- MANUAL:{block_name}:END -->\n"
+
+
+def write_page_with_manual_block(full_path, header_block, default_body, block_name):
+    """
+    Writes an .md page whose top (frontmatter, heading, plot embed - built by
+    the caller into header_block) is always regenerated fresh, while the
+    narrative body below it is preserved verbatim from any existing hand-edit,
+    found via the block's MANUAL markers. default_body only seeds the block
+    the first time this exact page is written; once the markers exist, this
+    function never overwrites what's between them.
+    """
+    existing_text = _extract_manual_block(full_path, block_name)
+    body = existing_text if existing_text is not None else default_body
+    with open(full_path, 'w', encoding='utf-8') as f:
+        f.write(header_block)
+        f.write(_wrap_manual_block(body, block_name))
+
+
+def write_flow_page(full_flow_path, display_name, parent_title, nav_order,
+                     exact_flow_code, filename, plot_dir, target_format,
+                     default_description, bib_filename):
+    """
+    Writes a single flow's .md page via write_page_with_manual_block, then
+    appends the References section (unaffected by the manual-block mechanism -
+    still fully rebuilt for every page by the later, global
+    fix_all_citations_in_folder pass).
+    """
+    header_block = (
+        f"---\nlayout: default\ntitle: {display_name}\nparent: {parent_title}\nnav_order: {nav_order}\n---\n\n"
+        f"# {display_name}\n\n{get_flow_image_markdown(exact_flow_code, filename, plot_dir, target_format)}\n\n### Flow Description\n"
+    )
+    write_page_with_manual_block(full_flow_path, header_block, default_description, "FLOW_DESCRIPTION")
+    with open(full_flow_path, 'a', encoding='utf-8') as f:
+        append_bibtex_references(f, bib_filename)
+
+
 def append_bibtex_references(file_handle, bib_filename=None):
     """
     Writes a placeholder References section. The real, APA7-formatted
@@ -391,20 +446,24 @@ def build_landing_page(output_filename, current_date_str, bib_filename, target_f
         
 def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename, target_format):
     """Genererer alle sider knyttet til Atmosphere (AT) poolen med ren LaTeX-siteringssyntaks."""
-    with open(os.path.join(at_folder, "pool_atmosphere.md"), 'w', encoding='utf-8') as f:
-        f.write("---\nlayout: default\ntitle: 7. Atmosphere (AT)\nnav_order: 8\nhas_children: true\n---\n\n")
-        f.write("# Pool: 7. Atmosphere (AT)\n\nThis section contains all documented nitrogen flows leaving the Atmosphere pool.\n")
-        f.write(get_balance_image_markdown("AT", plot_files, plot_dir, relative_depth="../", target_format=target_format))
-        f.write("\n### Atmospheric Nitrogen Deposition Overview\n\n")
-        f.write(DEPOSITION_TEXT)
-        f.write("\n### Flows that are zero or neglected:\n\n")
-        f.write("* **AT.AT-EF.EC-Combustion N2 fixation-N2**, **AT.AT-EF.IC-Combustion N2 fixation-N2** and **AT.AT-EF.OE-Combustion N2 fixation-N2** "
-                "are neglected because we have chosen to ignore nitrogen fixation in combustion processes. In fuel combustion, some bound N is "
-                "converted to NOx, and some atmospheric N2 is also converted to N2. The amount of resulting NOx depends on the combustion conditions "
-                "and on the use of catalytic converters. It is possible to estimate an N2 fixation rate based on mass balance, but we have chosen not "
-                "to do so because it does not add useful understanding of the flows of reactive N in the NNB.\n")
-        f.write("* **AT.AT-HY.CW-Deposition-OXN**, **AT.AT-HY.CW-Deposition-RDN** and **AT.AT-HY.CW-N2 fixation-N2** are neglected because we lack an "
-                "accurate area for coastal waters and do not attempt to make a mass balance for CW. \n")
+    pool_header_block = (
+        "---\nlayout: default\ntitle: 7. Atmosphere (AT)\nnav_order: 8\nhas_children: true\n---\n\n"
+        "# Pool: 7. Atmosphere (AT)\n\nThis section contains all documented nitrogen flows leaving the Atmosphere pool.\n"
+        + get_balance_image_markdown("AT", plot_files, plot_dir, relative_depth="../", target_format=target_format)
+        + "\n"
+    )
+    pool_default_body = (
+        "### Atmospheric Nitrogen Deposition Overview\n\n" + DEPOSITION_TEXT +
+        "\n### Flows that are zero or neglected:\n\n"
+        "* **AT.AT-EF.EC-Combustion N2 fixation-N2**, **AT.AT-EF.IC-Combustion N2 fixation-N2** and **AT.AT-EF.OE-Combustion N2 fixation-N2** "
+        "are neglected because we have chosen to ignore nitrogen fixation in combustion processes. In fuel combustion, some bound N is "
+        "converted to NOx, and some atmospheric N2 is also converted to N2. The amount of resulting NOx depends on the combustion conditions "
+        "and on the use of catalytic converters. It is possible to estimate an N2 fixation rate based on mass balance, but we have chosen not "
+        "to do so because it does not add useful understanding of the flows of reactive N in the NNB.\n"
+        "* **AT.AT-HY.CW-Deposition-OXN**, **AT.AT-HY.CW-Deposition-RDN** and **AT.AT-HY.CW-N2 fixation-N2** are neglected because we lack an "
+        "accurate area for coastal waters and do not attempt to make a mass balance for CW."
+    )
+    write_page_with_manual_block(os.path.join(at_folder, "pool_atmosphere.md"), pool_header_block, pool_default_body, "POOL_TEXT")
 
 
     menu_counter = 1
@@ -438,89 +497,86 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename, targe
         elif "rwrw" in norm and "outflow" in norm and "oxn" in norm: exact_flow_code, display_name = "AT.AT-RW.RW-Atmospheric outflow-OXN", "Atmospheric Outflow (Oxidized N)"
         elif "rwrw" in norm and "outflow" in norm and "rdn" in norm: exact_flow_code, display_name = "AT.AT-RW.RW-Atmospheric outflow-RDN", "Atmospheric Outflow (Reduced N)"
 
-        with open(full_flow_path, 'w', encoding='utf-8') as f:
-            f.write(f"---\nlayout: default\ntitle: {display_name}\nparent: 7. Atmosphere (AT)\nnav_order: {menu_counter}\n---\n\n")
-            menu_counter += 1
-            f.write(f"# {display_name}\n\n{get_flow_image_markdown(exact_flow_code, filename, plot_dir, target_format)}\n\n### Flow Description\n")
+        if exact_flow_code == "AT.AT-AG.SM-Biological N2 fixation-N2":
+            default_description = ("\\citet{schappi_annexes_2025} advises using data from the EUROSTAT Gross nutrient balance, but there "
+                "is an error in this dataset for Norway which is currently being corrected (as of February 2026; personal correspondence, "
+                "EUROSTAT). According to the EUROSTAT metadata, the BNF in this statistic is calculated based on the area of leguminous crops and "
+                "fixation coefficients. The production of leguminous crops (peas, beans etc) in Norway is very low and we assume that agricultural "
+                "BNF is for the most part determined by leguminous crops such as clover grown on pastures and in fodder production.\n\n"
+                "\\citet{bleken_nitrogen_1997} based their estimate for BNF from the sale of clover seeds: a sale of about 145 t seeds was "
+                "estimated to be used to plant 95 000 ha of grass/clover mixtures (655 ha/t seeds). Together with a rate of BNF of 80 kgN/ha on "
+                "this area, they found a total of 7.6 ktN per year and summed up to 8 ktN to account for BNF from free-living organisms and "
+                "other sources. The rate of 80 kgN/ha agrees relatively well with later studies of agricultural BNF in Norway, where average "
+                "values between 10 and 100 kgN/ha have been found; the highest values in particularly productive areas were up to 260 kgN/ha "
+                "\\citet{hansen_engbelgvekster_2020}.\n\n"
+                "Yearly statistics of clover "
+                "seed sales are not available, but according to NIBIO Totalkalkylen (NIBIO, 2025b), the area where grass/clover mixes may be "
+                "sown for pasture and fodder production (fulldyrka eng) has remained constant to within about 3 % from 1995 up to today. Our "
+                "best estimate for BNF, and for consistency with the previous study, is therefore to assume a constant value of 8 ktN/year. "
+                "In Sweden \\citep{moldan_where_2025} the value was found to be 34 kT in 2015, which is more in line with the values found before 2000.")
+        elif exact_flow_code in ["AT.AT-AG.SM-Deposition-OXN", "AT.AT-AG.SM-Deposition-RDN"]:
+            default_description = f"**{exact_flow_code}**\n\n" + DEPOSITION_REFERENCE.format(land_class="agricultural soils")
+        elif exact_flow_code in ["AT.AT-FS.FO-Deposition-OXN", "AT.AT-FS.FO-Deposition-RDN"]:
+            default_description = f"**{exact_flow_code}**\n\n" + DEPOSITION_REFERENCE.format(land_class="forest")
+        elif exact_flow_code in ["AT.AT-FS.OL-Deposition-OXN", "AT.AT-FS.OL-Deposition-RDN"]:
+            default_description = f"**{exact_flow_code}**\n\n" + DEPOSITION_REFERENCE.format(land_class="other land")
+        elif exact_flow_code in ["AT.AT-HS.HS-Deposition-OXN", "AT.AT-HS.HS-Deposition-RDN"]:
+            default_description = f"**{exact_flow_code}**\n\n" + DEPOSITION_REFERENCE.format(land_class="settlements")
+        elif exact_flow_code in ["AT.AT-HY.SW-Deposition-OXN","AT.AT-HY.SW-Deposition-RDN"]:
+            default_description = (f"**{exact_flow_code}**\n\n" + DEPOSITION_REFERENCE.format(land_class="surface waters") +
+                    "For comparison, the data used in the TEOTIL model gives 3.5 ktN in 2013 and "
+                    "3.0 ktN in 2023 - a similar declining trend to our combined OXN+RDN values (about 9.4 and 8.1 ktN for the same years), "
+                    "but substantially lower in magnitude, likely reflecting different datasets and different data treatment. ")
+        elif exact_flow_code == "AT.AT-FS.FO-N2 fixation-N2":
+            default_description = ("Following the Swedish NBB \\citet{moldan_where_2025}, we use an N-fixation "
+                    "rate of 1.5 kg/ha/year and a forested area of 12.0 mill ha as given by SSB for 2019-2023 (table 14368); we assume this value is "
+                    "constant for our entire time period. This gives an annual N-fixation rate of 18.0 ktN. For comparison, the value for Sweden "
+                    "in 2015 was found to be 39.5 ktN \\citet{moldan_where_2025}.")
+        elif exact_flow_code == "AT.AT-FS.OL-N2 fixation-N2":
+            default_description = ("We use N2 fixation rates from Table 62 in \\citet{schappi_annexes_2025} together with land type areas calculated from the CORINE land cover "
+                    "inventory \\citet{european_environment_agency_corine_2019}. "
+                    "In the Swedish NNB \\citep{moldan_where_2025}, N2 fixation in the OL compartment was considered negligible. "
+                    "Note that in our model, OL includes what \\citet{moldan_where_2025} treat as a separate wetland (WL) compartment. Broken down by land type, "
+                    "our OL fixation is dominated by peat bogs (84%, based on a CORINE-derived area of 2.1 million ha), with a smaller contribution from coastal "
+                    "wetlands; freshwater marshes contribute negligibly. This total (27 ktN) is therefore not directly comparable to \\citet{moldan_where_2025}'s "
+                    "\"negligible\" OL estimate, but instead corresponds closely to their separate WL estimate of about 30 ktN \\citep{jutterstrom_swedish_2020}.")
+        elif exact_flow_code == "AT.AT-HY.SW-N2 fixation-N2":
+            default_description = (f"**{exact_flow_code}**\n\n" + "According to NIBIO \\citep{nibio_arealbarometer_2026}, the surface water area is 20 457 km2 "
+                    "https://arealbarometer.nibio.no/nb/norge/. According to \\citep{schappi_annexes_2025}, the biological fixation rate can vary "
+                    "between < 0.1 tN/km2 in ologotrophic and mesotrophic lakes to up to 10 tN/km2 in eutrophic lakes. Most lakes in Norway are not "
+                    "eutrophic and we use a median value of 0.1 tN/km2, with highest and lowest values of 0 and 2 tN/km2.")
+        elif exact_flow_code == "AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2":
+            default_description = (f"**{exact_flow_code}**\n\n" + "is found through mass balance where we use data from FAOSTAT Fertilizer by nutrient, domestic "
+                    "fertilizer production, and adjusted for trade in ammonia using SSB trade data (table 08801): imported ammonia is subtracted "
+                    "(not domestically fixed) and exported ammonia is added back (domestically fixed before leaving the country). This combined value "
+                    "is smoothed with a centered 3-year moving average, since actual ammonia production is a continuous industrial process and "
+                    "presumably much steadier than the underlying trade statistics suggest on their own - annual trade figures are sensitive to "
+                    "shipment timing around year-end and to inventory/stock effects, which can otherwise dominate the apparent year-to-year change. "
+                    "The result is floored at zero, since a negative N2-fixation flow has no physical meaning. FAOSTAT Fertilizer by nutrient has "
+                    "not yet published a 2024 figure at the time of writing; the 2024 value is a flat carry-forward of 2023, with additional "
+                    "uncertainty (±50%) applied to reflect that it is not a real, independently observed value.")
+        elif exact_flow_code == "AT.AT-RW.RW-Atmospheric outflow-OXN":
+            default_description = (f"**{exact_flow_code}**\n\n" + "is found using source-receptor data from \\citep{emep_sr_2024}, as advised by \\citep{schappi_annexes_2025}. "
+                    "The EMEP source-receptor tables are not published for every year: 1984-1996 use the average of 1997-2001 (the earliest "
+                    "available years); the single missing years 2011, 2015 and 2022 use the average of the surrounding years; and 2019-2020 "
+                    "are linearly interpolated between 2018 and 2021. The EMEP source-receptor tables have not been updated for 2024 at the "
+                    "time of writing; since this flow shows a smooth, consistent decline over 2019-2023, the 2024 value is extrapolated "
+                    "from a linear fit to that period rather than a flat carry-forward, with additional uncertainty (±50%) applied to "
+                    "reflect that it is not a real, independently observed value.")
+        elif exact_flow_code == "AT.AT-RW.RW-Atmospheric outflow-RDN":
+            default_description = (f"**{exact_flow_code}**\n\n" + "is found using source-receptor data from \\citep{emep_sr_2024}, as advised by \\citep{schappi_annexes_2025}. "
+                    "The EMEP source-receptor tables are not published for every year: 1984-1996 use the average of 1997-2001 (the earliest "
+                    "available years); the single missing years 2011, 2015 and 2022 use the average of the surrounding years; and 2019-2020 "
+                    "are linearly interpolated between 2018 and 2021. The EMEP source-receptor tables have not been updated for 2024 at the "
+                    "time of writing; since this flow shows a smooth, consistent decline over 2019-2023, the 2024 value is extrapolated "
+                    "from a linear fit to that period rather than a flat carry-forward, with additional uncertainty (±50%) applied to "
+                    "reflect that it is not a real, independently observed value.")
+        else:
+            default_description = f"*Flow details for {exact_flow_code}*\n"
 
-            if exact_flow_code == "AT.AT-AG.SM-Biological N2 fixation-N2":
-                f.write("\\citet{schappi_annexes_2025} advises using data from the EUROSTAT Gross nutrient balance, but there "
-                    "is an error in this dataset for Norway which is currently being corrected (as of February 2026; personal correspondence, "
-                    "EUROSTAT). According to the EUROSTAT metadata, the BNF in this statistic is calculated based on the area of leguminous crops and "
-                    "fixation coefficients. The production of leguminous crops (peas, beans etc) in Norway is very low and we assume that agricultural "
-                    "BNF is for the most part determined by leguminous crops such as clover grown on pastures and in fodder production.\n\n"
-                    "\\citet{bleken_nitrogen_1997} based their estimate for BNF from the sale of clover seeds: a sale of about 145 t seeds was "
-                    "estimated to be used to plant 95 000 ha of grass/clover mixtures (655 ha/t seeds). Together with a rate of BNF of 80 kgN/ha on "
-                    "this area, they found a total of 7.6 ktN per year and summed up to 8 ktN to account for BNF from free-living organisms and "
-                    "other sources. The rate of 80 kgN/ha agrees relatively well with later studies of agricultural BNF in Norway, where average "
-                    "values between 10 and 100 kgN/ha have been found; the highest values in particularly productive areas were up to 260 kgN/ha "
-                    "\\citet{hansen_engbelgvekster_2020}.\n\n"
-                    "Yearly statistics of clover "
-                    "seed sales are not available, but according to NIBIO Totalkalkylen (NIBIO, 2025b), the area where grass/clover mixes may be "
-                    "sown for pasture and fodder production (fulldyrka eng) has remained constant to within about 3 % from 1995 up to today. Our "
-                    "best estimate for BNF, and for consistency with the previous study, is therefore to assume a constant value of 8 ktN/year. "
-                    "In Sweden \\citep{moldan_where_2025} the value was found to be 34 kT in 2015, which is more in line with the values found before 2000.")
-            elif exact_flow_code in ["AT.AT-AG.SM-Deposition-OXN", "AT.AT-AG.SM-Deposition-RDN"]:
-                f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_REFERENCE.format(land_class="agricultural soils"))
-            elif exact_flow_code in ["AT.AT-FS.FO-Deposition-OXN", "AT.AT-FS.FO-Deposition-RDN"]:
-                f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_REFERENCE.format(land_class="forest"))
-            elif exact_flow_code in ["AT.AT-FS.OL-Deposition-OXN", "AT.AT-FS.OL-Deposition-RDN"]:
-                f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_REFERENCE.format(land_class="other land"))
-            elif exact_flow_code in ["AT.AT-HS.HS-Deposition-OXN", "AT.AT-HS.HS-Deposition-RDN"]:
-                f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_REFERENCE.format(land_class="settlements"))
-            elif exact_flow_code in ["AT.AT-HY.SW-Deposition-OXN","AT.AT-HY.SW-Deposition-RDN"]:
-                f.write(f"**{exact_flow_code}**\n\n" + DEPOSITION_REFERENCE.format(land_class="surface waters") +
-                        "For comparison, the data used in the TEOTIL model gives 3.5 ktN in 2013 and "
-                        "3.0 ktN in 2023 - a similar declining trend to our combined OXN+RDN values (about 9.4 and 8.1 ktN for the same years), "
-                        "but substantially lower in magnitude, likely reflecting different datasets and different data treatment. ")
-            elif exact_flow_code == "AT.AT-FS.FO-N2 fixation-N2":
-                f.write("Following the Swedish NBB \\citet{moldan_where_2025}, we use an N-fixation "
-                        "rate of 1.5 kg/ha/year and a forested area of 12.0 mill ha as given by SSB for 2019-2023 (table 14368); we assume this value is "
-                        "constant for our entire time period. This gives an annual N-fixation rate of 18.0 ktN. For comparison, the value for Sweden "
-                        "in 2015 was found to be 39.5 ktN \\citet{moldan_where_2025}.")
-            elif exact_flow_code == "AT.AT-FS.OL-N2 fixation-N2":
-                f.write("We use N2 fixation rates from Table 62 in \\citet{schappi_annexes_2025} together with land type areas calculated from the CORINE land cover "
-                        "inventory \\citet{european_environment_agency_corine_2019}. "
-                        "In the Swedish NNB \\citep{moldan_where_2025}, N2 fixation in the OL compartment was considered negligible. "
-                        "Note that in our model, OL includes what \\citet{moldan_where_2025} treat as a separate wetland (WL) compartment. Broken down by land type, "
-                        "our OL fixation is dominated by peat bogs (84%, based on a CORINE-derived area of 2.1 million ha), with a smaller contribution from coastal "
-                        "wetlands; freshwater marshes contribute negligibly. This total (27 ktN) is therefore not directly comparable to \\citet{moldan_where_2025}'s "
-                        "\"negligible\" OL estimate, but instead corresponds closely to their separate WL estimate of about 30 ktN \\citep{jutterstrom_swedish_2020}.")
-            elif exact_flow_code == "AT.AT-HY.SW-N2 fixation-N2":
-                f.write(f"**{exact_flow_code}**\n\n" + "According to NIBIO \\citep{nibio_arealbarometer_2026}, the surface water area is 20 457 km2 "
-                        "https://arealbarometer.nibio.no/nb/norge/. According to \\citep{schappi_annexes_2025}, the biological fixation rate can vary "
-                        "between < 0.1 tN/km2 in ologotrophic and mesotrophic lakes to up to 10 tN/km2 in eutrophic lakes. Most lakes in Norway are not "
-                        "eutrophic and we use a median value of 0.1 tN/km2, with highest and lowest values of 0 and 2 tN/km2.")
-            elif exact_flow_code == "AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2":
-                f.write(f"**{exact_flow_code}**\n\n" + "is found through mass balance where we use data from FAOSTAT Fertilizer by nutrient, domestic "
-                        "fertilizer production, and adjusted for trade in ammonia using SSB trade data (table 08801): imported ammonia is subtracted "
-                        "(not domestically fixed) and exported ammonia is added back (domestically fixed before leaving the country). This combined value "
-                        "is smoothed with a centered 3-year moving average, since actual ammonia production is a continuous industrial process and "
-                        "presumably much steadier than the underlying trade statistics suggest on their own - annual trade figures are sensitive to "
-                        "shipment timing around year-end and to inventory/stock effects, which can otherwise dominate the apparent year-to-year change. "
-                        "The result is floored at zero, since a negative N2-fixation flow has no physical meaning. FAOSTAT Fertilizer by nutrient has "
-                        "not yet published a 2024 figure at the time of writing; the 2024 value is a flat carry-forward of 2023, with additional "
-                        "uncertainty (±50%) applied to reflect that it is not a real, independently observed value.")
-            elif exact_flow_code == "AT.AT-RW.RW-Atmospheric outflow-OXN":
-                f.write(f"**{exact_flow_code}**\n\n" + "is found using source-receptor data from \\citep{emep_sr_2024}, as advised by \\citep{schappi_annexes_2025}. "
-                        "The EMEP source-receptor tables are not published for every year: 1984-1996 use the average of 1997-2001 (the earliest "
-                        "available years); the single missing years 2011, 2015 and 2022 use the average of the surrounding years; and 2019-2020 "
-                        "are linearly interpolated between 2018 and 2021. The EMEP source-receptor tables have not been updated for 2024 at the "
-                        "time of writing; since this flow shows a smooth, consistent decline over 2019-2023, the 2024 value is extrapolated "
-                        "from a linear fit to that period rather than a flat carry-forward, with additional uncertainty (±50%) applied to "
-                        "reflect that it is not a real, independently observed value.")
-            elif exact_flow_code == "AT.AT-RW.RW-Atmospheric outflow-RDN":
-                f.write(f"**{exact_flow_code}**\n\n" + "is found using source-receptor data from \\citep{emep_sr_2024}, as advised by \\citep{schappi_annexes_2025}. "
-                        "The EMEP source-receptor tables are not published for every year: 1984-1996 use the average of 1997-2001 (the earliest "
-                        "available years); the single missing years 2011, 2015 and 2022 use the average of the surrounding years; and 2019-2020 "
-                        "are linearly interpolated between 2018 and 2021. The EMEP source-receptor tables have not been updated for 2024 at the "
-                        "time of writing; since this flow shows a smooth, consistent decline over 2019-2023, the 2024 value is extrapolated "
-                        "from a linear fit to that period rather than a flat carry-forward, with additional uncertainty (±50%) applied to "
-                        "reflect that it is not a real, independently observed value.")
-            else:
-                f.write(f"*Flow details for {exact_flow_code}*\n\n")
-
-            append_bibtex_references(f, bib_filename)
+        write_flow_page(full_flow_path, display_name, "7. Atmosphere (AT)", menu_counter,
+                         exact_flow_code, filename, plot_dir, target_format, default_description, bib_filename)
+        menu_counter += 1
 
 def process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename, target_format):
     """Genererer alle sider knyttet til Rest of the World (RW) poolen med oppdaterte LaTeX-sitat-referanser."""
@@ -2081,17 +2137,13 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
     ]
 
     print("[RAPPORT] Sletter gamle midlertidige filer fra pool-mappene for å unngå rot...")
-    # Slett gamle filer i rotmappen (f.eks. gamle index.md eller feilplasserte filer)
+    # Slett gamle filer i rotmappen (f.eks. gamle index.md eller feilplasserte filer
+    # fra før pool-mappe-strukturen fantes). Filene inni selve pool-mappene slettes IKKE
+    # lenger her - write_flow_page/write_page_with_manual_block leser og bevarer hver
+    # sides hånd-redigerte tekst (MANUAL-markørene) i stedet for å starte med blanke ark.
     for f_old in os.listdir('.'):
         if (f_old.startswith("flow_") or f_old.startswith("pool_") or f_old.startswith("subpool_")) and f_old.endswith(".md"):
             os.remove(f_old)
-            
-    # Slett gamle filer inni selve pool-mappene, slik at vi starter med blanke ark
-    for folder in pool_folders:
-        if os.path.exists(folder):
-            for f_old in os.listdir(folder):
-                if f_old.endswith(".md"):
-                    os.remove(os.path.join(folder, f_old))
 
     print("[RAPPORT] Bygger hierarkisk dokumentasjonsportal med egne pool-mapper...")
 

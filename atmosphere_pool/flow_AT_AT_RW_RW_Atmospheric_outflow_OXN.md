@@ -10,9 +10,11 @@ nav_order: 16
 <iframe src="../output_files/plots/AT_AT_RW_RW_Atmospheric_outflow_OXN.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
+<!-- MANUAL:FLOW_DESCRIPTION:START -->
 **AT.AT-RW.RW-Atmospheric outflow-OXN**
 
 is found using source-receptor data from (EMEP, 2024), as advised by (Schäppi et al., 2025). The EMEP source-receptor tables are not published for every year: 1984-1996 use the average of 1997-2001 (the earliest available years); the single missing years 2011, 2015 and 2022 use the average of the surrounding years; and 2019-2020 are linearly interpolated between 2018 and 2021. The EMEP source-receptor tables have not been updated for 2024 at the time of writing; since this flow shows a smooth, consistent decline over 2019-2023, the 2024 value is extrapolated from a linear fit to that period rather than a flat carry-forward, with additional uncertainty (±50%) applied to reflect that it is not a real, independently observed value.
+<!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References
 
