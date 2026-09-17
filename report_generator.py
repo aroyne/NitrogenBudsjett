@@ -505,12 +505,18 @@ def process_atmosphere_pool(at_folder, plot_files, plot_dir, bib_filename, targe
                 f.write(f"**{exact_flow_code}**\n\n" + "is found using source-receptor data from \\citep{emep_sr_2024}, as advised by \\citep{schappi_annexes_2025}. "
                         "The EMEP source-receptor tables are not published for every year: 1984-1996 use the average of 1997-2001 (the earliest "
                         "available years); the single missing years 2011, 2015 and 2022 use the average of the surrounding years; and 2019-2020 "
-                        "are linearly interpolated between 2018 and 2021.")
+                        "are linearly interpolated between 2018 and 2021. The EMEP source-receptor tables have not been updated for 2024 at the "
+                        "time of writing; since this flow shows a smooth, consistent decline over 2019-2023, the 2024 value is extrapolated "
+                        "from a linear fit to that period rather than a flat carry-forward, with additional uncertainty (±50%) applied to "
+                        "reflect that it is not a real, independently observed value.")
             elif exact_flow_code == "AT.AT-RW.RW-Atmospheric outflow-RDN":
                 f.write(f"**{exact_flow_code}**\n\n" + "is found using source-receptor data from \\citep{emep_sr_2024}, as advised by \\citep{schappi_annexes_2025}. "
                         "The EMEP source-receptor tables are not published for every year: 1984-1996 use the average of 1997-2001 (the earliest "
                         "available years); the single missing years 2011, 2015 and 2022 use the average of the surrounding years; and 2019-2020 "
-                        "are linearly interpolated between 2018 and 2021.")
+                        "are linearly interpolated between 2018 and 2021. The EMEP source-receptor tables have not been updated for 2024 at the "
+                        "time of writing; since this flow shows a smooth, consistent decline over 2019-2023, the 2024 value is extrapolated "
+                        "from a linear fit to that period rather than a flat carry-forward, with additional uncertainty (±50%) applied to "
+                        "reflect that it is not a real, independently observed value.")
             else:
                 f.write(f"*Flow details for {exact_flow_code}*\n\n")
 
@@ -593,7 +599,10 @@ def process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename
                 "Is found from source-receptor data from EMEP, as advised by \\citep{schappi_annexes_2025}. There is a change "
                 "in methodology in the EMEP reporting between 2002 and 2003 data. The EMEP source-receptor tables are not published "
                 "for every year: 1984-1996 use the average of 1997-2001 (the earliest available years); the single missing years "
-                "2011, 2015 and 2022 use the average of the surrounding years; and 2019-2020 are linearly interpolated between 2018 and 2021."
+                "2011, 2015 and 2022 use the average of the surrounding years; and 2019-2020 are linearly interpolated between 2018 and 2021. "
+                "The EMEP source-receptor tables have not been updated for 2024 at the time of writing; unlike the outflow direction, this flow "
+                "(N arriving from other countries) does not show a clean multi-year trend, so the 2024 value is a flat carry-forward of 2023, "
+                "with additional uncertainty (±50%) applied to reflect that it is not a real, independently observed value."
             )
         elif "inflow" in norm and "rdn" in norm:
             exact_flow_code = "RW.RW-AT.AT-Atmospheric inflow-RDN"
@@ -602,7 +611,10 @@ def process_rest_of_the_world_pool(rw_folder, plot_files, plot_dir, bib_filename
                 "Is found from source-receptor data from EMEP, as advised by \\citep{schappi_annexes_2025}. There is a change "
                 "in methodology in the EMEP reporting between 2002 and 2003 data. The EMEP source-receptor tables are not published "
                 "for every year: 1984-1996 use the average of 1997-2001 (the earliest available years); the single missing years "
-                "2011, 2015 and 2022 use the average of the surrounding years; and 2019-2020 are linearly interpolated between 2018 and 2021."
+                "2011, 2015 and 2022 use the average of the surrounding years; and 2019-2020 are linearly interpolated between 2018 and 2021. "
+                "The EMEP source-receptor tables have not been updated for 2024 at the time of writing; unlike the outflow direction, this flow "
+                "(N arriving from other countries) does not show a clean multi-year trend, so the 2024 value is a flat carry-forward of 2023, "
+                "with additional uncertainty (±50%) applied to reflect that it is not a real, independently observed value."
             )
         elif "fuel" in norm and "import" in norm and "transport" not in norm:
             exact_flow_code = "RW.RW-EF.EC-Fuel import-Nmix"
@@ -849,12 +861,18 @@ def process_agriculture_pool(ag_folder, plot_files, plot_dir, bib_filename, targ
                 display_name = "Food crop products"
                 description = ("Food crop products are taken from EUROSTAT Gross nutrient balance as advised by \\\\citet{schappi_annexes_2025}: «Nutrient "
                     "removal by harvest of crops» minus «Industrial crops». «Ornamenal crops», which should also be removed, are negligible in Norway. "
-                    "For the 2017-2019 gap in the source data, we linearly interpolate between the 2016 and 2020 values. ")
+                    "For the 2017-2019 gap in the source data, we linearly interpolate between the 2016 and 2020 values. Eurostat GNB has not yet "
+                    "published a 2024 figure at the time of writing; since 2023 itself looks like an unusually low outlier, the 2024 value is a "
+                    "3-year average of 2021-2023 rather than a flat carry-forward of 2023 alone, with additional uncertainty (±50%) applied "
+                    "to reflect that it is not a real, independently observed value. ")
             elif "industrial" in norm:
                 exact_flow_code = "AG.SM-MP.OP-Crop products for industrial use-Nmix"
                 display_name = "Crop products for industrial use"
                 description = ("Crop products for industrial use is taken from EUROSTAT Gross nutrient balance as advised by "
-                    "\\\\citet{schappi_annexes_2025}. For years with missing data, we have filled in the average of all other years. ")
+                    "\\\\citet{schappi_annexes_2025}. For years with missing data, we have filled in the average of all other years. Eurostat GNB "
+                    "has not yet published a 2024 figure at the time of writing; the 2024 value is a 3-year average of 2021-2023 (this flow is "
+                    "small and volatile with no clear trend), with additional uncertainty (±50%) applied to reflect that it is not a real, "
+                    "independently observed value. ")
         with open(full_flow_path, 'w', encoding='utf-8') as f:
             f.write(f"---\nlayout: default\ntitle: {display_name}\nparent: {parent_subpool}\n")
             if 'MM' in parent_subpool:
@@ -953,7 +971,7 @@ def process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename, target_f
             elif "leaching" in norm:
                 exact_flow_code = "FS.FO-HY.SW-Leaching-Nmix"
                 display_name = "Forest Leaching"
-                description = "Found in data supplied by NIVA, produced in the TEOTIL3 model \\\\citep{sample_teotil3_2024}. For the period 1990-2012, we have used TEOTIL data published by Miljødirektoratet for nitrogen from nitrogen flows that reach the coast, where we have found that values for leaching from forest in the period 2013-2023 are a fraction 0.59 of what is reported by Miljødirektoratet as «Bakgrunn», to within a 2% error."
+                description = "Found in data supplied by NIVA, produced in the TEOTIL3 model \\\\citep{sample_teotil3_2024}. For the period 1990-2012, we have used TEOTIL data published by Miljødirektoratet for nitrogen from nitrogen flows that reach the coast, where we have found that values for leaching from forest in the period 2013-2023 are a fraction 0.59 of what is reported by Miljødirektoratet as «Bakgrunn», to within a 2% error. TEOTIL3 has not been updated for 2024 at the time of writing; the 2024 value is a flat carry-forward of 2023, with additional uncertainty (±50%) applied to reflect that it is not a real, independently observed value."
             elif "roundwood" in norm or "industrial" in norm:
                 exact_flow_code = "FS.FO-MP.OP-Industrial round wood-Nmix"
                 display_name = "Industrial Round Wood"
@@ -984,7 +1002,9 @@ def process_forests_pool(fs_folder, plot_files, plot_dir, bib_filename, target_f
                     "where it is aggregated with the value for WL. For the period 1990-2012, we have used TEOTIL data published by "
                     "Miljødirektoratet for nitrogen from nitrogen flows that reach the coast, where we have found that values for leaching "
                     "from other land in the period 2013-2023 are a fraction 0.41 of what is reported by Miljødirektoratet as «Bakgrunn», "
-                    "to within a 3 % error. ")
+                    "to within a 3 % error. TEOTIL3 has not been updated for 2024 at the time of writing; the 2024 value is a flat "
+                    "carry-forward of 2023, with additional uncertainty (±50%) applied to reflect that it is not a real, "
+                    "independently observed value. ")
 
         with open(full_flow_path, 'w', encoding='utf-8') as f:
             f.write(f"---\nlayout: default\ntitle: {display_name}\nparent: {parent_subpool}\n")
@@ -1091,14 +1111,18 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename, targ
                 description = ("N2 is taken from data on N retention in surface waters supplied by NIVA, produced in the TEOTIL3 model "
                     "\\citet{sample_teotil3_2024}, by assuming that all N retained in SW is lost to denitrification, with an assumed fraction "
                     "1 % as N2O and the rest as N2. For years prior to 2013, we have used a retention rate of 7 % which is the typical "
-                    "value from the NIVA data and calculated the denitrification amount as 0.07/(1-0.07)* **HY.SW-HY.CW-Inflow to coastal waters-Nmix**.")
+                    "value from the NIVA data and calculated the denitrification amount as 0.07/(1-0.07)* **HY.SW-HY.CW-Inflow to coastal waters-Nmix**. "
+                    "TEOTIL3 has not been updated for 2024 at the time of writing; the 2024 value is a flat carry-forward of 2023, with additional "
+                    "uncertainty (±50%) applied to reflect that it is not a real, independently observed value.")
             elif "emissionsn2o" in norm:
                 exact_flow_code = "HY.SW-AT.AT-Emissions-N2O"
                 display_name = "Surface water N2O emissions"
                 description = ("Uses data on N retention in surface waters supplied by NIVA, produced in the TEOTIL3 model \\citet{sample_teotil3_2024}, "
                                "and assuming that all N retained in SW is lost to denitrification, with an assumed fraction 1 % as N2O and the rest as N2. "
                                "For years prior to 2013, the same 7 % retention rate is applied to **HY.SW-HY.CW-Inflow to coastal waters-Nmix** as for "
-                               "the N2 flow, with the N2O fraction taken from the resulting denitrification amount.")
+                               "the N2 flow, with the N2O fraction taken from the resulting denitrification amount. TEOTIL3 has not been updated for 2024 "
+                               "at the time of writing; the 2024 value is a flat carry-forward of 2023, with additional uncertainty (±50%) applied to "
+                               "reflect that it is not a real, independently observed value.")
             elif "inflow" in norm:
                 exact_flow_code = "HY.SW-HY.CW-Inflow to coastal waters-Nmix"
                 display_name = "Inflow to coastal waters"
@@ -1108,7 +1132,8 @@ def process_hydrosphere_pool(hy_folder, plot_files, plot_dir, bib_filename, targ
                     "*PR.WW-HY.CW-Treated wastewater discharge-Nmix* (which already assigns all treated wastewater discharge to CW). Before 2013, "
                     "we use values from table 7.2 in \\citet{sample_kildefordelte_2025}, which is already broken down by source category, so only "
                     "the background, built-up area, industry and agriculture columns are summed - aquaculture and sewage are excluded directly "
-                    "rather than subtracted.")
+                    "rather than subtracted. TEOTIL3 has not been updated for 2024 at the time of writing; the 2024 value is a flat carry-forward "
+                    "of 2023, with additional uncertainty (±50%) applied to reflect that it is not a real, independently observed value.")
         elif filename.upper().startswith("HY_CW_"):
             parent_subpool = "Coastal Water (HY.CW)"
             if "wildcatch" in norm:
@@ -1223,7 +1248,9 @@ def process_humans_and_settlements_pool(hs_folder, plot_files, plot_dir, bib_fil
                 "For 1990-2012, we use the 'Bebygd' (built-up area) column of the Miljødirektoratet compilation of coastal N loading by source "
                 "\\\\citep{sample_kildefordelte_2025}. From 2013 onward, we switch to the 'urban' component of the TEOTIL3 model outputs from NIVA "
                 "\\\\citep{sample_teotil3_2024}, which supersedes the Miljødirektoratet figures where the two overlap. In both periods, a retention "
-                "fraction is applied to account for N retained before reaching surface water (5% most likely, ranging 0-20%, following TEOTIL3)."
+                "fraction is applied to account for N retained before reaching surface water (5% most likely, ranging 0-20%, following TEOTIL3). "
+                "TEOTIL3 has not been updated for 2024 at the time of writing; the 2024 value is a flat carry-forward of 2023, with additional "
+                "uncertainty (±50%) applied to reflect that it is not a real, independently observed value."
             )
         elif "household" in norm and "waste" in norm:
             exact_flow_code = "HS.HS-PR.SO-Household waste-Nmix"
@@ -1567,7 +1594,9 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                     "based on the information given in the statistic. If no information on connection status was given we have assigned the values to Untreated wastewater. "
                     "The database does not distinguish between emissions to surface and coastal waters, so even though several large industries discharge their wastewater "
                     "to the coast, we assign this entire flow to SW in order to avoid double counting.\n\n"
-                    "The values reported before for 1989-1992 are significantly lower than for later years. We therefore extrapolate back to 1990 using the mean value for 1994-1998."
+                    "The values reported before for 1989-1992 are significantly lower than for later years. We therefore extrapolate back to 1990 using the mean value for 1994-1998. "
+                    "Miljødirektoratet's data has not been updated for 2024 at the time of writing; the 2024 value is a flat carry-forward of 2023, with additional "
+                    "uncertainty (±50%) applied to reflect that it is not a real, independently observed value."
                 )
             elif "wastewater" in norm and "fp" in norm:
                 exact_flow_code = "MP.FP-PR.WW-Food industry wastewater-Nmix"
@@ -1577,7 +1606,9 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                     "from individual industries, where industries are categorized as belonging to OP or FP, and their connection status to the municipal wastewater, "
                     "based on the information given in the statistic. If no information on connection status was given we have assigned the values to Untreated wastewater. "
                     "The database does not distinguish between emissions to surface and coastal waters, so even though several large industries discharge their wastewater "
-                    "to the coast, we assign this entire flow to SW in order to avoid double counting."
+                    "to the coast, we assign this entire flow to SW in order to avoid double counting. Miljødirektoratet's data has not been updated for 2024 at the "
+                    "time of writing; the 2024 value is a flat carry-forward of 2023, with additional uncertainty (±50%) applied to reflect that it is not a "
+                    "real, independently observed value."
                 )
             elif "waste" in norm and "fp" in norm:
                 exact_flow_code = "MP.FP-PR.SO-Food industry waste-Nmix"
@@ -1708,7 +1739,8 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                     "These emissions are also reported by Miljødirektoratet \\\\citep{miljodirektoratet_norske_2025}, but "
                     "as of February 2026 the publicly available data did not include information on connection to municipal wastewater. The database does not distinguish "
                     "between emissions to surface and coastal waters, so even though several large industries discharge their wastewater to the coast, we assign this entire "
-                    "flow to SW in order to avoid double counting."
+                    "flow to SW in order to avoid double counting. Miljødirektoratet's data has not been updated for 2024 at the time of writing; the 2024 value is a "
+                    "flat carry-forward of 2023, with additional uncertainty (±50%) applied to reflect that it is not a real, independently observed value."
                 )
             elif "waste" in norm and "op" in norm and not "water" in norm:
                 exact_flow_code = "MP.OP-PR.SO-Other industry waste-Nmix"
@@ -1731,7 +1763,9 @@ def process_materials_pool(mp_folder, plot_files, plot_dir, bib_filename, target
                     "**MP.OP-PR.WW-Other industry wastewater-Nmix** is found using data from Miljødirektoratet (personal communication, 2026) on emissions to "
                     "water from individual industries, where industries are categorized as belonging to OP or FP based on the information given in the statistic, and counting "
                     "those that are not reported to be connected to municipal wastewater treatment. These emissions are also reported by Miljødirektoratet \\\\citep{miljodirektoratet_norske_2025}, but as of "
-                    "February 2026 the publicly available data did not include information on connection to municipal wastewater."
+                    "February 2026 the publicly available data did not include information on connection to municipal wastewater. Miljødirektoratet's data has not "
+                    "been updated for 2024 at the time of writing; the 2024 value is a flat carry-forward of 2023, with additional uncertainty (±50%) applied "
+                    "to reflect that it is not a real, independently observed value."
                 )
             elif "fertilizer" in norm and "export" in norm:
                 exact_flow_code = "MP.OP-RW.RW-Mineral fertilizer export-Nmix"

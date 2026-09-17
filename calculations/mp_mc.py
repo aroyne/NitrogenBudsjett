@@ -376,6 +376,13 @@ def _add_food_industry_wastewater_mc(results, preloaded_data, current_params, da
                 'data_sources': data_sources
             })
 
+    # Miljødirektoratet's "Norske utslipp" data has not been updated for
+    # 2024; carry the 2023 value forward with extra uncertainty.
+    add_flat_carryforward_year(
+        results, flow_code, collected_years, 2023, 2024, dataset_noise,
+        data_sources='flat carry-forward from 2023 (Miljødirektoratet Norske utslipp not updated for 2024)'
+    )
+
     # Reported against the full EXPECTED_YEARS range (not target_years) so
     # years past this flow's source-data cutoff still get the usual 'not
     # done' placeholder row, instead of having no row at all for that year.
@@ -680,11 +687,18 @@ def _add_fp_untreated_wastewater_mc(results, preloaded_data, current_params, dat
             'data_sources': src
         })
 
+    # Miljødirektoratet's "Norske utslipp" data has not been updated for
+    # 2024; carry the 2023 value forward with extra uncertainty.
+    add_flat_carryforward_year(
+        results, flow_code, collected_years, 2023, 2024, dataset_noise,
+        data_sources='flat carry-forward from 2023 (Miljødirektoratet Norske utslipp not updated for 2024)'
+    )
+
     # Reported against the full EXPECTED_YEARS range (not target_years) so
     # years past this flow's source-data cutoff still get the usual 'not
     # done' placeholder row, instead of having no row at all for that year.
     missing_years = EXPECTED_YEARS - collected_years
-    report_missing_years(flow_code, missing_years, results)    
+    report_missing_years(flow_code, missing_years, results)
 
     
 def _add_aquaculture_feed_mc(results, preloaded_data, current_params, dataset_noise):
@@ -909,10 +923,10 @@ def _add_other_industry_wastewater_mc(results, preloaded_data, current_params, d
         (df_categories['kategori'] == 'OP') &
         (df_categories['kommunalt nett?'].str.lower() == 'ja')
     ]
-    
+
     emissions_filtered = emissions[emissions['AnleggNavn'].isin(categories_keep['Virksomhet'])]
     sum_by_year = emissions_filtered.groupby(['År'])['Mengde'].sum().reset_index()
-    
+
     for index, row in sum_by_year.iterrows():
         year = int(row['År'])
         if year in target_years:
@@ -927,6 +941,13 @@ def _add_other_industry_wastewater_mc(results, preloaded_data, current_params, d
                 'comment': 'ok',
                 'data_sources': data_sources
             })
+
+    # Miljødirektoratet's "Norske utslipp" data has not been updated for
+    # 2024; carry the 2023 value forward with extra uncertainty.
+    add_flat_carryforward_year(
+        results, flow_code, collected_years, 2023, 2024, dataset_noise,
+        data_sources='flat carry-forward from 2023 (Miljødirektoratet Norske utslipp not updated for 2024)'
+    )
 
     # Reported against the full EXPECTED_YEARS range (not target_years) so
     # years past this flow's source-data cutoff still get the usual 'not
@@ -1233,6 +1254,13 @@ def _add_op_untreated_wastewater_mc(results, preloaded_data, current_params, dat
                 'comment': 'ok',
                 'data_sources': data_sources
             })
+
+    # Miljødirektoratet's "Norske utslipp" data has not been updated for
+    # 2024; carry the 2023 value forward with extra uncertainty.
+    add_flat_carryforward_year(
+        results, flow_code, collected_years, 2023, 2024, dataset_noise,
+        data_sources='flat carry-forward from 2023 (Miljødirektoratet Norske utslipp not updated for 2024)'
+    )
 
     # Reported against the full EXPECTED_YEARS range (not target_years) so
     # years past this flow's source-data cutoff still get the usual 'not

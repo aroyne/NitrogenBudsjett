@@ -101,6 +101,35 @@ def add_trend_extrapolated_year(results, flow_code, collected_years, fit_years, 
     })
 
 
+def add_multi_year_average_year(results, flow_code, collected_years, avg_years, to_year, dataset_noise, data_sources):
+    """
+    Appends a placeholder for to_year using the average of flow_code's
+    already-computed values for avg_years, with the standard
+    'trend interpolation' uncertainty (+/-50% PERT) layered on top, same
+    pattern as add_flat_carryforward_year/add_trend_extrapolated_year. Used
+    when the single most recent year looks like an outlier and a short
+    multi-year average is a more representative anchor than either a flat
+    carry-forward or a fitted trend. No-op if to_year is already collected
+    or none of avg_years have a result.
+    """
+    if to_year in collected_years:
+        return
+    values = [r['value'] for r in results
+              if r['flow_name'] == flow_code and r['year'] in avg_years and not pd.isna(r['value'])]
+    if not values:
+        return
+    avg_value = sum(values) / len(values)
+    value = avg_value * dataset_noise['trend interpolation']
+    collected_years.add(to_year)
+    results.append({
+        'flow_name': flow_code,
+        'year': to_year,
+        'value': value,
+        'comment': 'ok',
+        'data_sources': data_sources,
+    })
+
+
 def read_year_value_row(sheet,
                         year_values=None,
                         year_row=9,

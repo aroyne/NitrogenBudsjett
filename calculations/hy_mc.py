@@ -10,7 +10,8 @@ import pandas as pd
 
 from calculations.utils import (
     EXPECTED_YEARS,
-    report_missing_years
+    report_missing_years,
+    add_flat_carryforward_year
 )
 from calculations.shared_flow_calculations import (
     find_aquaculture_production,
@@ -137,6 +138,14 @@ def _add_inflow_to_coastal_waters(results, preloaded_data, current_params, datas
                     'comment': 'ok',
                     'data_sources': 'NIVA TEOTIL3'
                 })
+
+    # TEOTIL3 has not been updated for 2024; carry the 2023 value forward
+    # with extra uncertainty rather than leave the flow silent for a year
+    # the source will eventually cover.
+    add_flat_carryforward_year(
+        results, flow_code, collected_years, 2023, 2024, dataset_noise,
+        data_sources='flat carry-forward from 2023 (TEOTIL3 not updated for 2024)'
+    )
 
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
@@ -296,6 +305,23 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
                             'comment': 'ok', 'data_sources': 'Calculation model'})
             results.append({'flow_name': flow_n2o, 'year': year, 'value': hist_ret_val * fraction_N2O,
                             'comment': 'ok', 'data_sources': 'Calculation model'})
+
+    # TEOTIL3 has not been updated for 2024; carry the 2023 value forward
+    # with extra uncertainty rather than leave the flow silent for a year
+    # the source will eventually cover. collected_years is shared by both
+    # flows (they're always added together above), so each call gets its
+    # own copy - otherwise the first call marking 2024 "collected" would
+    # make the second call's no-op guard skip flow_n2o entirely.
+    cy_n2, cy_n2o = set(collected_years), set(collected_years)
+    add_flat_carryforward_year(
+        results, flow_n2, cy_n2, 2023, 2024, dataset_noise,
+        data_sources='flat carry-forward from 2023 (TEOTIL3 not updated for 2024)'
+    )
+    add_flat_carryforward_year(
+        results, flow_n2o, cy_n2o, 2023, 2024, dataset_noise,
+        data_sources='flat carry-forward from 2023 (TEOTIL3 not updated for 2024)'
+    )
+    collected_years |= cy_n2 | cy_n2o
 
     # Missing-year bookkeeping (years 1990 onward only) - both flows need this,
     # not just flow_n2, or flow_n2o silently ends up with fewer rows.

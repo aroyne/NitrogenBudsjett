@@ -9,7 +9,8 @@ from calculations.utils import (
     EXPECTED_YEARS,
     report_missing_years,
     process_generic_trade_flow,
-    add_flat_carryforward_year
+    add_flat_carryforward_year,
+    add_trend_extrapolated_year
 )
 
 def execute_calculations_at(preloaded_data, current_params, dataset_noise, current_trade_factors):
@@ -370,6 +371,16 @@ def _add_atmospheric_outflow_mc(results, flow_code, value_col, df_atm, current_p
             'comment': comment,
             'data_sources': data_sources
         })
+
+    # EMEP's source-receptor tables have not been updated for 2024. This
+    # flow (N leaving Norway) shows a smooth, consistent multi-year decline
+    # driven substantially by Norway's own declining emissions, so a linear
+    # trend fit to 2019-2023 is extended to 2024 rather than a flat
+    # carry-forward.
+    add_trend_extrapolated_year(
+        results, flow_code, collected_years, range(2019, 2024), 2024, dataset_noise,
+        data_sources='trend-extrapolated from 2019-2023 (EMEP source-receptor tables not updated for 2024)'
+    )
 
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)

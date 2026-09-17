@@ -11,7 +11,8 @@ import numpy as np
 
 from calculations.utils import (
     EXPECTED_YEARS,
-    report_missing_years
+    report_missing_years,
+    add_flat_carryforward_year
 )
 from calculations.shared_flow_calculations import find_industrial_round_wood
 
@@ -129,6 +130,14 @@ def _add_land_leaching_mc(results, preloaded_data, current_params, dataset_noise
             'flow_name': flow_code, 'year': year, 'value': value,
             'comment': 'ok', 'data_sources': data_sources
         })
+
+    # TEOTIL3 has not been updated for 2024; carry the 2023 value forward
+    # with extra uncertainty rather than leave the flow silent for a year
+    # the source will eventually cover.
+    add_flat_carryforward_year(
+        results, flow_code, collected_years, 2023, 2024, dataset_noise,
+        data_sources='flat carry-forward from 2023 (TEOTIL3 not updated for 2024)'
+    )
 
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)

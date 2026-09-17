@@ -9,6 +9,7 @@ from calculations.utils import (
     load_crltap_emissions_to_N,
     add_flat_carryforward_year,
     add_trend_extrapolated_year,
+    add_multi_year_average_year,
 )
 from calculations.shared_flow_calculations import (
     find_industrial_crop_products,
@@ -144,9 +145,18 @@ def _add_food_crop_products_flow_mc(results, preloaded_data, current_params, dat
                 'data_sources': 'interpolated (Eurostat GNB gap)'
             })
 
+    # Eurostat GNB has not published 2024 yet, and 2023 itself looks like an
+    # unusually low outlier (well below the 2016-2022 range), so a 3-year
+    # average (2021-2023) is used as a more representative anchor than a
+    # flat carry-forward of 2023 alone.
+    add_multi_year_average_year(
+        results, flow_code, collected_years, range(2021, 2024), 2024, dataset_noise,
+        data_sources='3-year average of 2021-2023 (Eurostat GNB not yet released for 2024)'
+    )
+
     missing_years = EXPECTED_YEARS - collected_years
-    report_missing_years(flow_code, missing_years, results)    
-    
+    report_missing_years(flow_code, missing_years, results)
+
 def _add_industrial_crop_products_flow_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'AG.SM-MP.OP-Crop products for industrial use-Nmix'
     collected_years = set()
@@ -171,10 +181,18 @@ def _add_industrial_crop_products_flow_mc(results, preloaded_data, current_param
             'data_sources': data_sources
         })
 
+    # Eurostat GNB has not published 2024 yet; this flow is small and
+    # volatile with no clear trend, so a 3-year average (2021-2023) is used
+    # as a more representative anchor than a flat carry-forward of 2023 alone.
+    add_multi_year_average_year(
+        results, flow_code, collected_years, range(2021, 2024), 2024, dataset_noise,
+        data_sources='3-year average of 2021-2023 (Eurostat GNB not yet released for 2024)'
+    )
+
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
-    
-    
+
+
 def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_noise):
     """
     Harvested (slått) forage from SSB yield statistics, plus grazing directly

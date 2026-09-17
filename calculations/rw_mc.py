@@ -351,5 +351,14 @@ def _add_atmospheric_inflow_mc(results, flow_code, value_col, df_rw, current_par
             'data_sources': data_sources
         })
 
+    # EMEP's source-receptor tables have not been updated for 2024. Unlike
+    # the outflow direction, this flow (N arriving from other countries) is
+    # noisier without a clean multi-year trend, so a flat carry-forward of
+    # 2023 is used rather than a fitted trend.
+    add_flat_carryforward_year(
+        results, flow_code, collected_years, 2023, 2024, dataset_noise,
+        data_sources='flat carry-forward from 2023 (EMEP source-receptor tables not updated for 2024)'
+    )
+
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
