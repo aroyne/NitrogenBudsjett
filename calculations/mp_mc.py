@@ -1387,7 +1387,12 @@ def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trad
     flow_code = 'MP.OP-HS.HS-Consumer goods-Nmix'
     collected_years = set()
 
-    target_years = {y for y in EXPECTED_YEARS if 1990 <= y <= 2023}
+    # All 11 inflow/outflow components now have a 2024 value (several via
+    # extrapolation from their own confirmed-unavailable sources - see
+    # calculations/utils.py's add_flat_carryforward_year and friends), so
+    # 2024 is included here too; the n_in==N_IN/n_out==N_OUT check below
+    # still catches any component that turns out to be missing it.
+    target_years = {y for y in EXPECTED_YEARS if 1990 <= y <= 2024}
 
     N_IN = 6
     N_OUT = 5
@@ -1533,7 +1538,14 @@ def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trad
         if n_in == N_IN and n_out == N_OUT:
             value = in_val - out_val
             comment = 'ok'
-            data_sources = 'Massebalanse (Inflows - Outflows)'
+            if year == 2024:
+                # Several of the 11 components are themselves extrapolated
+                # for 2024 (their own sources haven't published it yet) -
+                # flagged here rather than left indistinguishable from a
+                # year built entirely from real, measured components.
+                data_sources = 'Massebalanse (Inflows - Outflows), partly extrapolated components for 2024'
+            else:
+                data_sources = 'Massebalanse (Inflows - Outflows)'
         else:
             value = 0.0
             comment = f'not done'

@@ -673,12 +673,22 @@ def find_industrial_crop_products(df_gnb_sheet30, dataset_noise):
     # mean of all other years.
     if year_values:
         mean_value = float(np.mean(list(year_values.values())))
-        
+
         for year in range(2017, 2020):
             value_interp = mean_value * noise_interp_val
-                
+
             year_values[year] = value_interp
-            
+
+    # Eurostat GNB has not published 2024 yet, and 2023 alone looks like a
+    # low outlier, so a 3-year average of 2021-2023 is used instead of a
+    # flat carry-forward (matches AG.SM-MP.OP-Crop products for industrial
+    # use-Nmix's own report_generator.py description). Computed here rather
+    # than only in ag_mc.py's wrapper so mp_mc.py's consumer-goods mass
+    # balance, which calls this function directly, sees the same value.
+    if 2024 not in year_values and all(y in year_values for y in (2021, 2022, 2023)):
+        avg_value = sum(year_values[y] for y in (2021, 2022, 2023)) / 3.0
+        year_values[2024] = avg_value * noise_interp_val
+
     return year_values
 
 def find_industrial_round_wood(preloaded_data, current_params, dataset_noise):
@@ -841,11 +851,23 @@ def find_non_edible_animal_products(df_hides_clean, df_wool, df_sheep, current_p
                 value += (avg_sheep * float(wool_pr_sheep) * float(N_content_wool) * 1e-6 * float(noise_ssb)) * float(noise_trend)
                 
         year_values[year] = value
-        
+
+    # FAOSTAT Crops and livestock products has not published 2024 yet. This
+    # flow has a clear declining trend (2018-2023), so a flat carry-forward
+    # would overstate 2024 - fit a line through the last 5 years instead
+    # (matches AG.MM-MP.OP-Non-edible animal products-Nmix's own
+    # report_generator.py description). Computed here rather than only in
+    # ag_mc.py's wrapper so mp_mc.py's consumer-goods mass balance, which
+    # calls this function directly, sees the same value.
+    fit_years = [y for y in range(2019, 2024) if y in year_values]
+    if len(fit_years) >= 2:
+        slope, intercept = np.polyfit(fit_years, [year_values[y] for y in fit_years], 1)
+        year_values[2024] = (slope * 2024 + intercept) * float(noise_trend)
+
     return year_values
 
-    
-def find_recycling(preloaded_data, current_params, current_trade_factors, dataset_noise, 
+
+def find_recycling(preloaded_data, current_params, current_trade_factors, dataset_noise,
                     prepared_trade_recycling, prepared_trade_reuse, trade_params):
     year_values = {y: 0.0 for y in range(1990, 2025)}
     

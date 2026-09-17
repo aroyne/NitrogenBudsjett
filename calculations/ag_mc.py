@@ -8,7 +8,6 @@ from calculations.utils import (
     report_missing_years,
     load_crltap_emissions_to_N,
     add_flat_carryforward_year,
-    add_trend_extrapolated_year,
     add_multi_year_average_year,
 )
 from calculations.shared_flow_calculations import (
@@ -167,27 +166,24 @@ def _add_industrial_crop_products_flow_mc(results, preloaded_data, current_param
     # Sheet 30 (Eurostat Gross nutrient balance, nutrient removal by harvest of
     # industrial crops)
     df_gnb_sheet30 = preloaded_data.get('gnb_sheet30_raw')
+    # find_industrial_crop_products already extrapolates 2024 (3-year average
+    # of 2021-2023 - this flow is small and volatile with no clear trend, so
+    # that's a more representative anchor than a flat carry-forward of 2023
+    # alone) - done there rather than here so mp_mc.py's consumer-goods mass
+    # balance, which calls the same function directly, sees the same value.
     year_values = find_industrial_crop_products(df_gnb_sheet30, dataset_noise)
 
     for year, value in year_values.items():
         if year not in EXPECTED_YEARS:
             continue
-        collected_years.add(year)        
+        collected_years.add(year)
         results.append({
             'flow_name': flow_code,
             'year': year,
             'value': float(value),
             'comment': comment,
-            'data_sources': data_sources
+            'data_sources': data_sources if year != 2024 else '3-year average of 2021-2023 (Eurostat GNB not yet released for 2024)'
         })
-
-    # Eurostat GNB has not published 2024 yet; this flow is small and
-    # volatile with no clear trend, so a 3-year average (2021-2023) is used
-    # as a more representative anchor than a flat carry-forward of 2023 alone.
-    add_multi_year_average_year(
-        results, flow_code, collected_years, range(2021, 2024), 2024, dataset_noise,
-        data_sources='3-year average of 2021-2023 (Eurostat GNB not yet released for 2024)'
-    )
 
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
@@ -506,6 +502,11 @@ def _add_non_edible_animal_products_flow_mc(results, preloaded_data, current_par
     df_wool = preloaded_data.get('wool_production')
     df_sheep = preloaded_data.get('ssb_sheep_numbers')
     
+    # find_non_edible_animal_products already extrapolates 2024 (this flow
+    # has a clear declining trend 2018-2023, so a fitted line through
+    # 2019-2023 is used rather than a flat carry-forward) - done there
+    # rather than here so mp_mc.py's consumer-goods mass balance, which
+    # calls the same function directly, sees the same value.
     year_values = find_non_edible_animal_products(
         df_hides_clean, df_wool, df_sheep, current_params, dataset_noise
     )
@@ -520,7 +521,9 @@ def _add_non_edible_animal_products_flow_mc(results, preloaded_data, current_par
             # to a real gap in ssb_sheep_numbers for that year. This branching
             # must mirror the one there exactly to keep the reported source in
             # sync with how the value was actually computed.
-            if year > 2004:
+            if year == 2024:
+                data_sources = 'trend-extrapolated from 2019-2023 (FAOSTAT Crops and livestock products not yet released for 2024)'
+            elif year > 2004:
                 data_sources = 'FAOSTAT Crops and livestock products + Landbruksdirektoratet'
             elif year != 2001:
                 data_sources = 'FAOSTAT Crops and livestock products + Landbruksdirektoratet + SSB, extrapolated'
@@ -534,15 +537,6 @@ def _add_non_edible_animal_products_flow_mc(results, preloaded_data, current_par
                 'comment': comment,
                 'data_sources': data_sources
             })
-
-    # FAOSTAT "Crops and livestock products" has not published 2024 yet.
-    # This flow has a clear declining trend (2018-2023), so a flat
-    # carry-forward would systematically overstate 2024 - fit a line through
-    # the last 5 years instead.
-    add_trend_extrapolated_year(
-        results, flow_code, collected_years, range(2019, 2024), 2024, dataset_noise,
-        data_sources='trend-extrapolated from 2019-2023 (FAOSTAT Crops and livestock products not yet released for 2024)'
-    )
 
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
