@@ -188,6 +188,7 @@ data_files/
 *.xlsx
 *.xls
 *.csv
+*.csv.gz
 
 # N_parameters.xlsx is tracked (unlike everything else above) so the
 # manually-compiled parameter values and their sources are checkable by

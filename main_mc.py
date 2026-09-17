@@ -50,6 +50,14 @@ def parse_arguments():
         action='store_true',
         help="Skip writing results to the official Excel report"
     )
+    parser.add_argument(
+        '--export-raw-mc',
+        action='store_true',
+        help="Also export every individual MC iteration's per-flow-year values "
+             "(not just the median/percentile summary) to "
+             "output_files/MC_Raw_Simulations.csv.gz, for uncertainty-aware "
+             "trend analysis (e.g. nue_analysis.py)"
+    )
     return parser.parse_args()
 
 
@@ -488,6 +496,13 @@ def main():
                 
     elapsed_time = time.time() - start_time
     print(f"[SUKSESS] Simulering av {args.nsim} runder fullført på {elapsed_time:.4f} sekunder.")
+
+    if args.export_raw_mc:
+        print("[INFO] Eksporterer rå per-iterasjon-data (--export-raw-mc)...")
+        raw_df = pd.DataFrame(all_mc_records)
+        raw_path = 'output_files/MC_Raw_Simulations.csv.gz'
+        raw_df.to_csv(raw_path, index=False, compression='gzip')
+        print(f"[SUKSESS] Rådata skrevet til {raw_path} ({len(raw_df):,} rader).")
 
     # 3. STATISTICAL ANALYSIS, EXCEL EXPORT AND PLOTTING
     summary_df = process_and_export_mc_results(all_mc_records)
