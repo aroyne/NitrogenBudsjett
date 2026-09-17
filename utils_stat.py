@@ -132,9 +132,9 @@ def plot_pool_balance_interactive(df_flows, pool_code, output_dir="output_files/
         ),
         xaxis=dict(
             title="Year",
-            range=[1990, 2023],
+            range=[1990, 2024],
             tickmode='array',
-            tickvals=list(np.arange(1990, 2021, 5)) + [2023],
+            tickvals=list(np.arange(1990, 2021, 5)) + [2024],
             gridcolor='rgba(200, 200, 200, 0.4)',
             showspikes=True,      
             spikethickness=1,
@@ -306,8 +306,8 @@ def plot_pool_balance(df_flows, pool_code, output_dir="output_files/plots"):
     ax.set_ylabel("Nitrogen Flow (kt N / year)", fontsize=10)
     
     # --- AKSEBEGRENSNINGER ---
-    ax.set_xlim(1990, 2023)
-    custom_ticks = list(np.arange(1990, 2021, 5)) + [2023]
+    ax.set_xlim(1990, 2024)
+    custom_ticks = list(np.arange(1990, 2021, 5)) + [2024]
     ax.set_xticks(custom_ticks)
     ax.grid(True, linestyle='--', alpha=0.4)
 
