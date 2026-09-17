@@ -17,7 +17,7 @@ The hydrosphere ecosystem is split into three operational modules. Explore them 
 
 ---
 
-## Interactive Mass Balance Overview (1990-2023)
+## Interactive Mass Balance Overview (1990-2024)
 
 Hover over the chart to inspect specific streams, or click legend items to toggle visibility.
 

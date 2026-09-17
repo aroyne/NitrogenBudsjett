@@ -14,7 +14,7 @@ This pool covers chemical, processing, food, and manufacturing industries in Nor
 
 ---
 
-## Interactive Mass Balance Overview (1990-2023)
+## Interactive Mass Balance Overview (1990-2024)
 
 Hover over the chart to inspect specific streams, or click legend items to toggle visibility.
 

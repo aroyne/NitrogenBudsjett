@@ -19,7 +19,7 @@ This pool is divided into four operational sub-pools. Explore them using the sid
 
 ---
 
-## Interactive Mass Balance Overview (1990-2023)
+## Interactive Mass Balance Overview (1990-2024)
 
 Hover over the chart to inspect specific streams, or click legend items to toggle visibility.
 

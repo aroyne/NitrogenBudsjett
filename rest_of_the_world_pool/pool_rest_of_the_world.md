@@ -12,7 +12,7 @@ This section contains all documented nitrogen inflows and transfers originating 
 
 ---
 
-## Interactive Mass Balance Overview (1990-2023)
+## Interactive Mass Balance Overview (1990-2024)
 
 Hover over the chart to inspect specific streams, or click legend items to toggle visibility.
 

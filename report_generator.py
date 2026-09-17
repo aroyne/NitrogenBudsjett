@@ -47,7 +47,7 @@ def get_balance_image_markdown(pool_code, plot_files, plot_dir, relative_depth="
         if balance_file in plot_files:
             return (
                 f"\n---\n\n"
-                f"## Mass Balance Overview (1990-2023)\n\n"
+                f"## Mass Balance Overview (1990-2024)\n\n"
                 f"The chart below illustrates the integrated nitrogen mass balance for **{pool_code}**. "
                 f"It includes total system inflows (positive stack), total outflows (negative stack), "
                 f"and the net balance line with estimated uncertainty bounds (±1σ).\n\n"
@@ -58,7 +58,7 @@ def get_balance_image_markdown(pool_code, plot_files, plot_dir, relative_depth="
         if balance_file in plot_files:
             return (
                 f"\n---\n\n"
-                f"## Interactive Mass Balance Overview (1990-2023)\n\n"
+                f"## Interactive Mass Balance Overview (1990-2024)\n\n"
                 f"Hover over the chart to inspect specific streams, or click legend items to toggle visibility.\n\n"
                 f'<iframe src="{relative_depth}{plot_dir}/{balance_file}" '
                 f'width="100%" height="600px" frameborder="0" scrolling="no"></iframe>\n'            )
