@@ -10,7 +10,7 @@ nav_order: 7
 <iframe src="../output_files/plots/AG_MM_MP_OP_Non_edible_animal_products_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
-Schäppi et al. (2025) advises using FAOSTAT Commodity Balances (non-food). For Norway this statistic only contains wool for 4 individual years and we therefore use data for wool from Landbruksdirektoratet (Landbruksdirektoratet, 2025) for 2005-2024; for earlier years, we use the number of sheep (SSB table 03710) and extrapolate from a linear regression found between sheep and wool for 2005-2024. In addition, we use numbers for raw hides and skins from FAOSTAT Crops and livestock products. N contents are taken from Schäppi et al. (2025).
+Schäppi et al. (2025) advises using FAOSTAT Commodity Balances (non-food). For Norway this statistic only contains wool for 4 individual years and we therefore use data for wool from Landbruksdirektoratet (Landbruksdirektoratet, 2025) for 2005-2024; for earlier years, we use the number of sheep (SSB table 03710) and extrapolate from a linear regression found between sheep and wool for 2005-2024. In addition, we use numbers for raw hides and skins from FAOSTAT Crops and livestock products. N contents are taken from Schäppi et al. (2025). FAOSTAT Crops and livestock products has not yet published a 2024 figure at the time of writing; since this flow shows a clear declining trend over 2018-2023, the 2024 value is extrapolated from a linear fit to 2019-2023 rather than a flat carry-forward, with additional uncertainty (±50%) applied to reflect that it is not a real, independently observed value.
 
 ### References
 

@@ -10,7 +10,7 @@ nav_order: 6
 <iframe src="../output_files/plots/AG_MM_MP_FP_Animal_products_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
-Taken from FAOSTAT Crops and livestock products, with N contents taken from Schäppi et al. (2025).
+Taken from FAOSTAT Crops and livestock products, with N contents taken from Schäppi et al. (2025). FAOSTAT Crops and livestock products has not yet published a 2024 figure at the time of writing; the 2024 value is a flat carry-forward of 2023 (this flow is stable year to year, varying less than 5% over 2018-2023), with additional uncertainty (±50%) applied to reflect that it is not a real, independently observed value.
 
 ### References
 
