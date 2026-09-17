@@ -10,5 +10,6 @@ nav_order: 11
 <iframe src="../output_files/plots/PR_SO_RW_RW_Export_for_reuse_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
+<!-- MANUAL:FLOW_DESCRIPTION:START -->
 **PR.SO-RW.RW-Export for reuse-Nmix** is exported used textiles. Data taken from trade data, SSB table 08801.
-
+<!-- MANUAL:FLOW_DESCRIPTION:END -->

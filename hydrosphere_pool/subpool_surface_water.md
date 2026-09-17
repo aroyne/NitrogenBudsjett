@@ -17,7 +17,10 @@ Hover over the chart to inspect specific streams, or click legend items to toggl
 
 <iframe src="../output_files/plots/balance_HY_SW.html" width="100%" height="600px" frameborder="0" scrolling="no"></iframe>
 
+<!-- MANUAL:POOL_TEXT:START -->
 ### Flows that are zero or neglected:
 
 * **HY.SW-AT.AT-Emissions-NOx** is assumed negligible.
 * **HY.SW-RW.RW-Export of surface water-Nmix** is assumed negligible due to Norwegian topography.
+
+<!-- MANUAL:POOL_TEXT:END -->

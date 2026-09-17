@@ -10,7 +10,9 @@ nav_order: 3
 <iframe src="../output_files/plots/EF_IC_AT_AT_Emissions_NOx.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
-EF.IC-AT.AT-Emissions-NOx denotes NOx emissions from fuel combustion in industry. We have used data from CLRTAP Inventory Submissions EMEP (2025) as advised by Schäppi et al. (2025), using the categories given in Table 12.
+<!-- MANUAL:FLOW_DESCRIPTION:START -->
+EF.IC-AT.AT-Emissions-NOx denotes NOx emissions from fuel combustion in industry. We have used data from CLRTAP Inventory Submissions EMEP (2025)<!--cite:emep_officially_2025--> as advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, using the categories given in Table 12.  
+<!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References
 

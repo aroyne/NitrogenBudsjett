@@ -17,11 +17,14 @@ Hover over the chart to inspect specific streams, or click legend items to toggl
 
 <iframe src="../output_files/plots/balance_AG_SM.html" width="100%" height="600px" frameborder="0" scrolling="no"></iframe>
 
+<!-- MANUAL:POOL_TEXT:START -->
 ### Flows that are zero or neglected:
 
-* **AG.SM-HY.SW-Overland flow-Nmix**, **AG.SM-FS.OL-Overland flow-Nmix** and **AG.SM-FS.WL-Overland flow-Nmix** are neglected as suggested by Schäppi et al. (2025): «In a first approximation it can be assumed that N losses to hydrosphere or forests and semi-natural vegetation occur mainly via leaching. If no country specific data is available on fractions for overland flow of N, the overland flows can be neglected for simplification purposes». is not included because all runoff and leaching is included in Leaching.
+* **AG.SM-HY.SW-Overland flow-Nmix**, **AG.SM-FS.OL-Overland flow-Nmix** and **AG.SM-FS.WL-Overland flow-Nmix** are neglected as suggested by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->: «In a first approximation it can be assumed that N losses to hydrosphere or forests and semi-natural vegetation occur mainly via leaching. If no country specific data is available on fractions for overland flow of N, the overland flows can be neglected for simplification purposes». is not included because all runoff and leaching is included in Leaching.
 * **AG.SM-PR.SO-Farm crops substrate-Nmix** is farm crops substrate for biofuels production and composting. According to data in SSB table 12359 «Biologisk behandling av avfall, etter materialtype (1 000 tonn) 2017 – 2023» for category «Landbruksavfall, etande”, these values are small enough to be neglected. Since we only have values given for a few years, we have chosen to neglect this flow.
 * **AG.SM-HY.SW-Overland flow-Nmix** is not included because all runoff and leaching is included in  **AG.SM-HY.SW-Leaching-Nmix**.
+
+<!-- MANUAL:POOL_TEXT:END -->
 
 ### References
 

@@ -18,11 +18,14 @@ Hover over the chart to inspect specific streams, or click legend items to toggl
 
 <iframe src="../output_files/plots/balance_RW.html" width="100%" height="600px" frameborder="0" scrolling="no"></iframe>
 
+<!-- MANUAL:POOL_TEXT:START -->
 ### Flows that are zero or neglected:
 
 * **RW.RW-MP.FP-Sea fish (landings)-Nmix** is set to zero because all wild fish catch is accounted for under HY.
-* **RW.RW-AG.SM-Manure import-Nmix** is assumed small and neglected based on regional boundary assumptions for agricultural surpluses (Schulte-Uebbing et al., 2022).
+* **RW.RW-AG.SM-Manure import-Nmix** is assumed small and neglected based on regional boundary assumptions for agricultural surpluses (Schulte-Uebbing et al., 2022)<!--cite:schulte-uebbing_planetary_2022-->.
 * **RW.RW-HY.SW-Import of surface water-Nmix** are assumed negligible due to Norwegian topography.
+
+<!-- MANUAL:POOL_TEXT:END -->
 
 ### References
 

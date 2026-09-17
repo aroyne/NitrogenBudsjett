@@ -10,5 +10,6 @@ nav_order: 2
 <iframe src="../output_files/plots/PR_SO_AT_AT_Emissions_N2O.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
+<!-- MANUAL:FLOW_DESCRIPTION:START -->
 **PR.SO-AT.AT-Emissions-N2O** is taken from UNFCCC Common reporting tables, Table 4, where we have included emissions from landfills, waste incineration and biofuel production. 
-
+<!-- MANUAL:FLOW_DESCRIPTION:END -->

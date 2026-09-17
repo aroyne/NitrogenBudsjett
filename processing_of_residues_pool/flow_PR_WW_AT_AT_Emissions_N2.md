@@ -10,5 +10,6 @@ nav_order: 2
 <iframe src="../output_files/plots/PR_WW_AT_AT_Emissions_N2.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
+<!-- MANUAL:FLOW_DESCRIPTION:START -->
 Found by using data on N emissions and removal rates from the six wastewater treatment plants that were equipped with nitrogen removal through 2024, joined by a seventh (Hokksund) from 2025. Where specific data on nitrogen removal fraction were missing we assumed a default 70 %, and we extrapolated or interpolated between existing data where reported emission data were missing. The amount of N released as N2 was calculated as N_released*removal_rate/(1-removal_rate). 
-
+<!-- MANUAL:FLOW_DESCRIPTION:END -->

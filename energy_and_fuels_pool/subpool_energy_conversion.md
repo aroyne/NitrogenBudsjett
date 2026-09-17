@@ -16,12 +16,14 @@ has_children: true
 Hover over the chart to inspect specific streams, or click legend items to toggle visibility.
 
 <iframe src="../output_files/plots/balance_EF_EC.html" width="100%" height="600px" frameborder="0" scrolling="no"></iframe>
-This subpool includes extraction of fossil fuels from geological sources, which is a large sector in Norway. Because of this there is no mass balance for EF.EC; nitrogen bound to extracted fuels arise in the sector, and outflows are therefore significantly larger than inflows. 
-
+<!-- MANUAL:POOL_TEXT:START -->
+This subpool includes extraction of fossil fuels from geological sources, which is a large sector in Norway. Because of this there is no mass balance for EF.EC; nitrogen bound to extracted fuels arise in the sector, and outflows are therefore significantly larger than inflows.
 
 ### Flows that are zero or neglected:
 
-* **EF.EC-AT.AT-Emissions-NH3**: : Data from CLRTAP Inventory Submissions EMEP (2025) as advised by Schäppi et al. (2025), using the categories given in Table 11, give values that are consistently below 0.001 ktN/year, which is negligible in this context.
+* **EF.EC-AT.AT-Emissions-NH3**: : Data from CLRTAP Inventory Submissions EMEP (2025)<!--cite:emep_officially_2025--> as advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, using the categories given in Table 11, give values that are consistently below 0.001 ktN/year, which is negligible in this context.
+
+<!-- MANUAL:POOL_TEXT:END -->
 
 ### References
 

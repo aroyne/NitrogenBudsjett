@@ -7,8 +7,6 @@ has_children: true
 
 # Pool: 1. Energy and fuels (EF)
 
-In the guidelines, there are N2 flows assigned to and from EF sectors associated with nitrogen conversions in the combustion process. We have chosen to ignore these here because they can only be found by mass balance but by doing so, they may hide other imbalances that could be significant. They also do not make any significant contributions to the flows of reactive N. Note on subpools: it is not always clear where flows end up. For example, industrial waste fuels from MP.OP is assigned to manufacturing industries EC.IC, meaning that waste for fuel is kept within the industrial sector. This is not necessarily the case. 
-
 This pool is divided into four operational sub-pools. Explore them using the side menu or links below:
 
 * [Energy conversion (EF.EC)](subpool_energy_conversion.html)
@@ -24,3 +22,8 @@ This pool is divided into four operational sub-pools. Explore them using the sid
 Hover over the chart to inspect specific streams, or click legend items to toggle visibility.
 
 <iframe src="../output_files/plots/balance_EF.html" width="100%" height="600px" frameborder="0" scrolling="no"></iframe>
+
+<!-- MANUAL:POOL_TEXT:START -->
+In the guidelines, there are N2 flows assigned to and from EF sectors associated with nitrogen conversions in the combustion process. We have chosen to ignore these here because they can only be found by mass balance but by doing so, they may hide other imbalances that could be significant. They also do not make any significant contributions to the flows of reactive N. Note on subpools: it is not always clear where flows end up. For example, industrial waste fuels from MP.OP is assigned to manufacturing industries EC.IC, meaning that waste for fuel is kept within the industrial sector. This is not necessarily the case.
+
+<!-- MANUAL:POOL_TEXT:END -->

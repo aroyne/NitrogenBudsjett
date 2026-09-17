@@ -7,8 +7,6 @@ has_children: true
 
 # Pool: 8. Hydrosphere (HY)
 
-We have chosen to not include the pool groundwater (GW) because N concentrations and dynamics in Norway are largely unknown (kvaerno_2024).
-
 The hydrosphere ecosystem is split into three operational modules. Explore them below:
 
 * [Surface Water (HY.SW)](subpool_surface_water.html)
@@ -23,6 +21,11 @@ Hover over the chart to inspect specific streams, or click legend items to toggl
 
 <iframe src="../output_files/plots/balance_HY.html" width="100%" height="600px" frameborder="0" scrolling="no"></iframe>
 
+<!-- MANUAL:POOL_TEXT:START -->
+We have chosen to not include the pool groundwater (GW) because N concentrations and dynamics in Norway are largely unknown (Kværnø et al., 2024)<!--cite:kvaerno_agritil_2024-->.
+
+<!-- MANUAL:POOL_TEXT:END -->
+
 ### References
 
-
+* Kværnø, S. H., Fischer, F., & Bechmann, M. (2024). *AGRITIL - Nutrient loss model for agriculture Modelling soil, organic carbon, nitrogen and phosphorus losses from Norwegian agricultural areas to surface water*.

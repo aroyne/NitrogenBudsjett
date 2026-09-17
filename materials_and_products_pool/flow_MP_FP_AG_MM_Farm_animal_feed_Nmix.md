@@ -10,11 +10,13 @@ nav_order: 1
 <iframe src="../output_files/plots/MP_FP_AG_MM_Farm_animal_feed_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
-**MP.FP-AG.MM-Farm animal feed-Nmix** is feed to farm animals. We have used data on domestic feed supply from Landbruksdirektoratet (Landbruksdirektoratet, 2025) and used the detailed composition of animal feed given in Eidem & Ruud (2022) together with protein contents from FAO (2021) and specific Jones factors from FAO (2023) to get nitrogen contents.
+<!-- MANUAL:FLOW_DESCRIPTION:START -->
+**MP.FP-AG.MM-Farm animal feed-Nmix** is feed to farm animals. We have used data on domestic feed supply from Landbruksdirektoratet (Landbruksdirektoratet, 2025)<!--cite:landbruksdirektoratet_kraftforstatistikk_2025--> and used the detailed composition of animal feed given in Eidem & Ruud (2022)<!--cite:eidem_for-_2022--> together with protein contents from FAO (2021)<!--cite:fao_annex_2021--> and specific Jones factors from FAO (2023)<!--cite:fao_chapter_2023--> to get nitrogen contents.
 
-N content is applied separately by raw-material type, derived from the feed composition, protein content and Jones factor sources above: 0.0197 kgN/kg for carbohydrate raw materials and 0.0648 kgN/kg for protein raw materials. NIBIO Totalkalkylen gives statistics for total amount of feed to Norwegian farm animals between 1959 and 2026. Table 6.10 in Bruholt & Longva (1994) gives the domestically produced fraction of farm animal feed between 1985 and 1994. We combine these data to find values before 2000, using an average import fraction for 1995-1999. The 2000-2003 gap between the two source series is bridged with a linear interpolation.
+N content is applied separately by raw-material type, derived from the feed composition, protein content and Jones factor sources above: 0.0197 kgN/kg for carbohydrate raw materials and 0.0648 kgN/kg for protein raw materials. NIBIO Totalkalkylen gives statistics for total amount of feed to Norwegian farm animals between 1959 and 2026. Table 6.10 in Bruholt & Longva (1994)<!--cite:bruholt_jordbruksstatistikk_1994--> gives the domestically produced fraction of farm animal feed between 1985 and 1994. We combine these data to find values before 2000, using an average import fraction for 1995-1999. The 2000-2003 gap between the two source series is bridged with a linear interpolation.
 
-Hohmann-Marriott (2025) found the domestic supply of animal feed in 2010 to be around 35 ktN, based on FAO statistics of production, export and import of seed cake, which is a dominant ingredient in farm animal feed. This is less than we found when combining domestic and imported animal feed. *(Note: This estimate might be too low, as it leads to a surplus here and a deficit in the AG.MM pool).*
+Hohmann-Marriott (2025)<!--cite:hohmann-marriott_nitrogen_2025--> found the domestic supply of animal feed in 2010 to be around 35 ktN, based on FAO statistics of production, export and import of seed cake, which is a dominant ingredient in farm animal feed. This is less than we found when combining domestic and imported animal feed. *(Note: This estimate might be too low, as it leads to a surplus here and a deficit in the AG.MM pool).*
+<!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References
 

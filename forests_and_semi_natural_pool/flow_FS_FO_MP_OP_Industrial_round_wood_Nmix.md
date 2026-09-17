@@ -10,7 +10,9 @@ nav_order: 5
 <iframe src="../output_files/plots/FS_FO_MP_OP_Industrial_round_wood_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
-Taken from FAOSTAT Forestry production and trade: industrial roundwood, which gives values under bark. The values given here are very close to those reported in SSB table 08979 “Avvirkning for salg (1 000 m³) 1996 – 2024”. We have also compared with data in Eurostat, which gives total amount of round removed (over or under bark) including use for firewood in households and industry. Following the Swedish NBB (Jutterström et al., 2020), we use an average wood density of 0.45 t/m3 for all wood categories, and stem-only N-contents of 1.2 kg/t for coniferous and 1.4 kg/t for non-coniferous trees, since roundwood removals consist mainly of stem wood, not foliage, branches and roots. The whole-tree value is instead used for fuel wood (see FS.FO-EF.OE-Fuel wood for households-Nmix).
+<!-- MANUAL:FLOW_DESCRIPTION:START -->
+Taken from FAOSTAT Forestry production and trade: industrial roundwood, which gives values under bark. The values given here are very close to those reported in SSB table 08979 “Avvirkning for salg (1 000 m³) 1996 – 2024”. We have also compared with data in Eurostat, which gives total amount of round removed (over or under bark) including use for firewood in households and industry. Following the Swedish NBB (Jutterström et al., 2020)<!--cite:jutterstrom_swedish_2020-->, we use an average wood density of 0.45 t/m3 for all wood categories, and stem-only N-contents of 1.2 kg/t for coniferous and 1.4 kg/t for non-coniferous trees, since roundwood removals consist mainly of stem wood, not foliage, branches and roots. The whole-tree value is instead used for fuel wood (see FS.FO-EF.OE-Fuel wood for households-Nmix).
+<!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References
 

@@ -10,6 +10,7 @@ nav_order: 6
 <iframe src="../output_files/plots/PR_SO_HS_HS_Biologically_treated_organic_waste_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
+<!-- MANUAL:FLOW_DESCRIPTION:START -->
 **PR.SO-HS.HS-Biologically treated organic waste-Nmix** includes all forms of organic waste except sewage sludge that is organically treated and used in agricultural soils. Biological treatment of organic waste includes both composting and biogas production, but in Norway, most of the waste composted in the municipal waste sector is used on the private sector, not in agriculture.
 
 SSB statistics on composted organic waste also includes some composted wastewater sludge, but there is no exact statistics on the amount.
@@ -19,4 +20,4 @@ From 2018, we use data on the disposal of biologically produced waste from SSB t
 For 2012-2017, we use data on composted organic waste from SSB table 10513 “Avfallsregnskap for Norge (1 000 tonn) and scale the nitrogen value in 2018 for consistency.
 
 There are no official data prior to 2012, but we know that there was organic waste composted and used in the private sector. In lack of other data we extrapolate the 2012 value back to 1990.
-
+<!-- MANUAL:FLOW_DESCRIPTION:END -->

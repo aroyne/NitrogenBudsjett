@@ -10,7 +10,9 @@ nav_order: 1
 <iframe src="../output_files/plots/FS_FO_AT_AT_Emissions_N2.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
-Calculated based on N2O emissions from UNFCCC Common reporting tables, Table 4 and assuming a mean N2:N2O ratio of 19.5 as discussed by Schäppi et al. (2025).
+<!-- MANUAL:FLOW_DESCRIPTION:START -->
+Calculated based on N2O emissions from UNFCCC Common reporting tables, Table 4 and assuming a mean N2:N2O ratio of 19.5 as discussed by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
+<!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References
 

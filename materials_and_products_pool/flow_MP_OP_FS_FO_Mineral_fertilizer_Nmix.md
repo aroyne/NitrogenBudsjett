@@ -10,7 +10,9 @@ nav_order: 6
 <iframe src="../output_files/plots/MP_OP_FS_FO_Mineral_fertilizer_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
-**MP.OP-FS.FO-Mineral fertilizer-Nmix** is nitrogen for forest fertilization. This flow is not part of the guidelines but has been added because it is a significant flow in Norway, as was also done in the Swedish NNB (Moldan et al., 2025). We have used data from SSB on area of forest fertilized and assumed a standard value of 15 kgN/da (Dalen, 2017). Fertilized area before 1997 is taken from Figure 2 in Landbruksdirektoratet (2021).
+<!-- MANUAL:FLOW_DESCRIPTION:START -->
+**MP.OP-FS.FO-Mineral fertilizer-Nmix** is nitrogen for forest fertilization. This flow is not part of the guidelines but has been added because it is a significant flow in Norway, as was also done in the Swedish NNB (Moldan et al., 2025)<!--cite:moldan_where_2025-->. We have used data from SSB on area of forest fertilized and assumed a standard value of 15 kgN/da (Dalen, 2017)<!--cite:dalen_lonnsomt_2017-->. Fertilized area before 1997 is taken from Figure 2 in Landbruksdirektoratet (2021)<!--cite:landbruksdirektoratet_vurdering_2021-->.
+<!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References
 

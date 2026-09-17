@@ -10,5 +10,6 @@ nav_order: 5
 <iframe src="../output_files/plots/PR_WW_HY_CW_Treated_wastewater_discharge_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
+<!-- MANUAL:FLOW_DESCRIPTION:START -->
 Taken from SSB table 05280 *Totale utslipp av fosfor og nitrogen fra avløpssektoren*. Data back to 1997 are found in the series SSB Naturressurser og miljø. Due to lack of available data we set the values in 1990-1996 to be equal to that in 1997. 
-
+<!-- MANUAL:FLOW_DESCRIPTION:END -->

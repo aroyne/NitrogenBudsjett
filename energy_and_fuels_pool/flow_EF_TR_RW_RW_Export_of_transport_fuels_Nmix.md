@@ -10,5 +10,6 @@ nav_order: 4
 <iframe src="../output_files/plots/EF_TR_RW_RW_Export_of_transport_fuels_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
+<!-- MANUAL:FLOW_DESCRIPTION:START -->
 EF.TR-RW.RW-Export of transport fuels-Nmix is export of fuels for transport. We use trade data in SSB table 08801 to account for all petroleum products assumed to be used in the transport sector..
-
+<!-- MANUAL:FLOW_DESCRIPTION:END -->

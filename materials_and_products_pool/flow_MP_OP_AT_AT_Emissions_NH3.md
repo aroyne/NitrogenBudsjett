@@ -10,7 +10,9 @@ nav_order: 3
 <iframe src="../output_files/plots/MP_OP_AT_AT_Emissions_NH3.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
-We have used data from CLRTAP Inventory Submissions (EMEP, 2025) as advised by Schäppi et al. (2025), using the categories given in Table 20.
+<!-- MANUAL:FLOW_DESCRIPTION:START -->
+We have used data from CLRTAP Inventory Submissions (EMEP, 2025)<!--cite:emep_officially_2025--> as advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, using the categories given in Table 20.
+<!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References
 

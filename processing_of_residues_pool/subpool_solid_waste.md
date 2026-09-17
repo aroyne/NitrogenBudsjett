@@ -16,10 +16,14 @@ has_children: true
 Hover over the chart to inspect specific streams, or click legend items to toggle visibility.
 
 <iframe src="../output_files/plots/balance_PR_SO.html" width="100%" height="600px" frameborder="0" scrolling="no"></iframe>
+
+<!-- MANUAL:POOL_TEXT:START -->
 We have added the flow *PR.SO-EF.EC-Waste to energy-Nmix* to better account for the Norwegian waste management system and statistics. This accounts for all waste incineration. Although the SSB data does separate between incineration with and without energy recovery for use, the fraction for energy reuse has consistently been around or above 80% since 1995, and we therefore for simplicity assign the entire waste incineration process to the EF.EC sector.
 
- It is expected that there should be a surplus for all years because landfilled waste stays in the PR sector and thus does not represent an outflow. The fraction of waste to landfill has been decreasing. 
+It is expected that there should be a surplus for all years because landfilled waste stays in the PR sector and thus does not represent an outflow. The fraction of waste to landfill has been decreasing.
+
 ### Flows that are zero or neglected:
 
 * **PR.SO-EF.IC-Biofuels-Nmix**, **PR.SO-EF.TR-Biofuels-Nmix** and **PR.SO-EF.OE-Biofuels-Nmix** are neglected because diesel and biogas contain very little nitrogen. We assume the N in waste to be processed is lost as emissions or retained in digestates from the biofuel production process. 
 * The guidelines recommends assigning separate flows for compost and biofuel digestate used on the AG and HS pools. However, the SSB statistics for treatment and use of organic waste does not separate between different treatment methods when it comes to end use. We have therefore decided to combine these flows to one called “biologically treated waste” to agriculture, and one to HS. 
+<!-- MANUAL:POOL_TEXT:END -->

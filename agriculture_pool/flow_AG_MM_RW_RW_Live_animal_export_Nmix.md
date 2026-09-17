@@ -10,7 +10,9 @@ nav_order: 8
 <iframe src="../output_files/plots/AG_MM_RW_RW_Live_animal_export_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
-Taken from FAOSTAT Crop and livestock products, assuming typical weights of animals from various sources, average 16 % protein in whole animal based on typical values in Schäppi et al. (2025) and Jones factor 6.25 for nitrogen to protein (standard). FAOSTAT Crops and livestock products has not yet published a 2024 figure at the time of writing; the 2024 value is a flat carry-forward of 2023 (this flow is small and does not show a discernible trend), with additional uncertainty (±50%) applied to reflect that it is not a real, independently observed value.
+<!-- MANUAL:FLOW_DESCRIPTION:START -->
+Taken from FAOSTAT Crop and livestock products, assuming typical weights of animals from various sources, average 16 % protein in whole animal based on typical values in Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> and Jones factor 6.25 for nitrogen to protein (standard). FAOSTAT Crops and livestock products has not yet published a 2024 figure at the time of writing; the 2024 value is a flat carry-forward of 2023 (this flow is small and does not show a discernible trend), with additional uncertainty (±50%) applied to reflect that it is not a real, independently observed value.
+<!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References
 

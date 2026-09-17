@@ -10,7 +10,9 @@ nav_order: 7
 <iframe src="../output_files/plots/EF_EC_RW_RW_Fuel_export_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
 ### Flow Description
-EF.EC-RW.RW-Fuel export-Nmix is the nitrogen content in exported fuels. We use trade data in SSB table 08801 to account for all petroleum products excluding those assumed to be used in the transport sector. Crude oil (HS code 2709) dominates this flow, accounting for over 99% of its N content: it is assigned an average N content of 0.25% (range 0.02-1.5%) from Schäppi et al. (2025), giving a total flow on the order of 150-210 ktN/year (2013-2023) - broadly consistent with the Norway-specific crude oil N content and export estimate of Hohmann-Marriott (2025). Natural gas exports (HS code 2711) are not captured here: they are a comparably large export by mass and energy content, but natural gas itself has negligible nitrogen content and is therefore not expected to materially affect the national N budget.
+<!-- MANUAL:FLOW_DESCRIPTION:START -->
+EF.EC-RW.RW-Fuel export-Nmix is the nitrogen content in exported fuels. We use trade data in SSB table 08801 to account for all petroleum products excluding those assumed to be used in the transport sector. Crude oil (HS code 2709) dominates this flow, accounting for over 99% of its N content: it is assigned an average N content of 0.25% (range 0.02-1.5%) from Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, giving a total flow on the order of 150-210 ktN/year (2013-2023) - broadly consistent with the Norway-specific crude oil N content and export estimate of Hohmann-Marriott (2025)<!--cite:hohmann-marriott_nitrogen_2025-->. Natural gas exports (HS code 2711) are not captured here: they are a comparably large export by mass and energy content, but natural gas itself has negligible nitrogen content and is therefore not expected to materially affect the national N budget.
+<!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References
 
