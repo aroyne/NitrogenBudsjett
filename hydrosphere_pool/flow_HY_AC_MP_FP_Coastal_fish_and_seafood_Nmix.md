@@ -11,7 +11,7 @@ nav_order: 3
 
 ### Flow Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-Calculated using data from Fiskeridirektoratet (2025)<!--cite:fiskeridirektoratet_06002_2025--> on sold farmed fish (extended back to 1984 using a historical compilation), assuming 2.8 % nitrogen content in fish and shellfish (Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, p. 254).
+Calculated using data from Fiskeridirektoratet (2025)<!--cite:fiskeridirektoratet_06002_2025--> on sold farmed fish (extended back to 1984 using a historical compilation), assuming 2.8 % nitrogen content in fish and shellfish (Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, p. 254). This value matches the measured whole-body composition of Norwegian farmed salmon (17.5 % protein, i.e. 2.8 % N; \citet{ytrestoyl_utilisation_2015}). The flow also includes fish that die in the pens or are discarded at slaughter, since these are taken out of the sea (mainly to ensilage) rather than released to coastal water. Losses are reported by Fiskeridirektoratet (table A.05.021a) as numbers of fish by cause from 2007 onward; only dead fish and slaughterhouse discards are included here, while escaped fish and other losses remain part of the losses to coastal water. Numbers are converted to biomass with an average weight of 0.7 kg per lost fish (Torrissen et al., 2016, Havforskningsinstituttet, Rapport fra havforskningen 21-2016, citing Iversen et al., 2015). Before 2007, lost-fish N is estimated from the 2007-2011 average ratio of lost-fish N to harvested N.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References

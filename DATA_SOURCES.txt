@@ -82,6 +82,11 @@ downloaded 16.09.2026
 SSB table 13695: food/drink amounts sold per person per day, by nutrient content (2018-2025). 2018-2023 republished alongside this export (store-sample weighting adjustment, SSB's own footnote), not comparable to the earlier 29.01.2026 download of this table
 downloaded 16.09.2026
 
+A.05.021a_20260924-142624.xlsx
+Fiskeridirektoratet A.05.021a: losses in food fish production of salmon, rainbow trout and trout by cause (dead fish, slaughterhouse discards, escapes, other), 1000 fish, 1998-2025 (by cause from 2007)
+https://statistikkbanken.fiskeridir.no/PxWeb/pxweb/no/Fiskeridirektoratet/
+downloaded 24.09.2026
+
 A.06.002_20251111-140559.xlsx
 Fiskeridirektoratet table A.06.002 Akvakultur (aquaculture). Matfisk (food fish): sales of salmon, rainbow trout and trout, by county, species, year and statistical variable
 downloaded 11.11.2025

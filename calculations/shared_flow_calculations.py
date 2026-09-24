@@ -54,6 +54,41 @@ def find_aquaculture_production(df_aqua_modern, df_aqua_old, current_params, dat
     return aquaculture_production
 
 
+def find_recovered_lost_fish_N(df_losses, aquaculture_production, current_params, dataset_noise):
+    """
+    N in farmed salmon/trout that die in the pens or are discarded at
+    slaughter (Fiskeridirektoratet A.05.021a, 'Dødfisk' + 'Utkast slakteri').
+    These fish are taken out of the sea and go to ensilage, so their N is
+    counted in HY.AC-MP.FP-Coastal fish and seafood-Nmix rather than as a loss
+    to coastal water. Escaped fish and 'Annet' (other losses, which may
+    include counting errors) are left out and remain part of the losses to
+    coastal water.
+
+    Losses are reported as numbers of fish only, so biomass is estimated with
+    an average weight per lost fish (lost_fish_avg_weight; HI 2016, Torrissen
+    et al., citing Iversen et al. 2015). Losses by cause are reported from
+    2007 only; for earlier years, the 2007-2011 average ratio of lost-fish N
+    to harvested N is applied to each year's harvested N.
+    """
+    weight = float(current_params.get('lost_fish_avg_weight'))
+    fish_N_frac = float(current_params.get('fish_N_frac'))
+    noise_aqua = dataset_noise['Fiskeridirektoratet']
+    noise_trend = dataset_noise['trend interpolation']
+
+    lost_N = {}
+    for year, row in df_losses.iterrows():
+        if year >= 2007:
+            # 1000 fish * kg/fish = tonnes; / 1000 -> kt
+            lost_N[year] = (row['dead'] + row['discarded']) * weight / 1000.0 * fish_N_frac * noise_aqua
+
+    ratio = np.mean([lost_N[y] / aquaculture_production[y] for y in range(2007, 2012)])
+    for year, harvest_N in aquaculture_production.items():
+        if year < 2007:
+            lost_N[year] = harvest_N * ratio * noise_trend
+
+    return lost_N
+
+
 def _get_apparent_aquafeed_retention(year, current_params):
     """
     Apparent whole-fish N retention for farmed salmon in a given year:

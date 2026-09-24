@@ -15,6 +15,7 @@ from calculations.utils import (
 )
 from calculations.shared_flow_calculations import (
     find_aquaculture_production,
+    find_recovered_lost_fish_N,
     find_treated_wastewater_discharge,
     get_aquafeed_budget
 )
@@ -39,7 +40,12 @@ def execute_calculations_hy(preloaded_data, current_params, dataset_noise):
     _add_wild_shellfish_and_macroalgae(results, preloaded_data, current_params, dataset_noise)
     _add_surface_water_emissions(results, preloaded_data, current_params, dataset_noise, outflow_tracker)
     _add_wild_fish_catch(results, preloaded_data, current_params, dataset_noise)
-    _add_aquaculture_internal_flows(results, aqua_production_dict, current_params, dataset_noise)
+    # 'aqua_losses' <- A.05.021a_20260924-142624.xlsx (data_loader.py DATA_MAP):
+    # Fiskeridirektoratet losses of farmed salmon/trout by cause, 1000 fish
+    lost_fish_N_dict = find_recovered_lost_fish_N(
+        preloaded_data['aqua_losses'], aqua_production_dict, current_params, dataset_noise
+    )
+    _add_aquaculture_internal_flows(results, aqua_production_dict, lost_fish_N_dict, current_params, dataset_noise)
     
     return results
 
@@ -391,7 +397,7 @@ def _add_wild_fish_catch(results, preloaded_data, current_params, dataset_noise)
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
 
-def _add_aquaculture_internal_flows(results, aquaculture_production_dict, current_params, dataset_noise):
+def _add_aquaculture_internal_flows(results, aquaculture_production_dict, lost_fish_N_dict, current_params, dataset_noise):
     flow_harvest = 'HY.AC-MP.FP-Coastal fish and seafood-Nmix'
     flow_waste = 'HY.AC-HY.CW-Waste feed-Nmix'
     flow_excretia = 'HY.AC-HY.CW-Excretia-Nmix'
@@ -402,9 +408,11 @@ def _add_aquaculture_internal_flows(results, aquaculture_production_dict, curren
         if year in EXPECTED_YEARS:
             collected_years.add(year)
 
-            # 1. Harvested fish leaving the pool.
+            # 1. Fish leaving the pool: sold fish plus dead and discarded fish
+            # taken out of the sea (see find_recovered_lost_fish_N).
+            lost_fish_N = lost_fish_N_dict[year]
             results.append({
-                'flow_name': flow_harvest, 'year': year, 'value': fish_harvested_N,
+                'flow_name': flow_harvest, 'year': year, 'value': fish_harvested_N + lost_fish_N,
                 'comment': 'ok', 'data_sources': 'Fiskeridirektoratet'
             })
 
@@ -412,8 +420,14 @@ def _add_aquaculture_internal_flows(results, aquaculture_production_dict, curren
             # splits harvested N into the same underlying feed budget used by
             # MP.FP-HY.AC-Feed to coastal aquaculture-Nmix and RW.RW-HY.AC-
             # Aquaculture feed import-Nmix (see its docstring), so all three
-            # flows stay mass-balance consistent.
+            # flows stay mass-balance consistent. The budget is built from
+            # sold fish only, since the apparent retention it uses (Aas et al.
+            # 2022) is a whole-system figure that already counts lost fish as
+            # unretained feed N.
             _, _, waste_val, excretia_val = get_aquafeed_budget(fish_harvested_N, year, current_params, dataset_noise)
+            # Lost fish ate feed that stayed in their bodies rather than being
+            # excreted, so their N is taken out of excretion.
+            excretia_val -= lost_fish_N
 
             results.append({
                 'flow_name': flow_waste, 'year': year, 'value': waste_val,

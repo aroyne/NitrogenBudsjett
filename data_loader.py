@@ -128,6 +128,7 @@ def load_all_data(selected_pools):
         'feed_raavarer_norsk': ({'mp'}, 'data_files/Årlig råvareforbruk.xlsx', 'excel_feed_raavarer_norsk', {}),
         'feed_raavarer_import': ({'rw'}, 'data_files/Årlig råvareforbruk.xlsx', 'excel_feed_raavarer_import', {}),        'feed_totalkalkyle': ({'rw','mp'}, 'data_files/NibioStatistics-4.xlsx', 'excel_feed_totalkalkyle', {}),
         'aqua_data': ({'hy', 'rw', 'mp'}, 'data_files/A.06.002_20251111-140559.xlsx', 'excel_aquaculture', {}),
+        'aqua_losses': ({'hy'}, 'data_files/A.05.021a_20260924-142624.xlsx', 'excel_aqua_losses', {}),
         'fao_live_animals_all': ({'ag', 'rw'}, 'data_files/FAOSTAT_data_en_9-24-2026-3.csv', 'csv_live_animals', {}),
         'hy_kyst_tilforsel': ({'hy','fs','hs'}, 'data_files/Tilførsel av nitrogen til kystområdene fordelt på kilder.xlsx', 'excel', {'sheet_name': 'Data fra Miljødirektoratet'}),
         'hy_teotil3': ({'hy','fs','hs'}, 'data_files/teotil3_n_summary.xlsx', 'openpyxl_teotil', {}),
@@ -484,6 +485,16 @@ def load_all_data(selected_pools):
                 'year': df_old.iloc[1:11, 0].astype(int),
                 'value': df_old.iloc[1:11, 1].astype(float)
             }).reset_index(drop=True)
+
+        elif method == 'excel_aqua_losses':
+            # Fiskeridirektoratet A.05.021a: rows 3-86 hold one row per year and
+            # species (year given only on each year's first row), columns Annet,
+            # Dødfisk, Rømming, Utkast slakteri, in 1000 fish. Only dead fish and
+            # slaughterhouse discards are kept - the fish taken out of the sea.
+            df_loss = pd.read_excel(filepath, header=None).iloc[3:87, :6]
+            df_loss.columns = ['year', 'species', 'other', 'dead', 'escaped', 'discarded']
+            df_loss['year'] = df_loss['year'].ffill().astype(int)
+            preloaded[key] = df_loss.groupby('year')[['dead', 'discarded']].sum().astype(float)
 
         elif method == 'csv_live_animals':
             df_fao_raw = pd.read_csv(filepath)
