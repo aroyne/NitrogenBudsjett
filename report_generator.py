@@ -313,7 +313,7 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
                 with open(file_path, 'r', encoding='utf-8') as f:
                     content = f.read()
 
-                if '\\citep' in content or '\\citet' in content:
+                if '\\citep' in content or '\\citet' in content or '<!--cite:' in content:
                     raw_keys = re.findall(r'\\+cite[pt]\{\s*([^}]+)\s*\}', content)
                     tag_keys = re.findall(r'<!--cite:([^>]+)-->', content)
                     cited_keys = set()
