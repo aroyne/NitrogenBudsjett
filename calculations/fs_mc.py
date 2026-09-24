@@ -25,10 +25,10 @@ def execute_calculations_fs(preloaded_data, current_params, dataset_noise):
 
     _add_fo_denitrification_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'FS.FO-AT.AT-Emissions-N2O', 'UNFCCC CRT')
     _add_fo_denitrification_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'FS.FO-AT.AT-Emissions-N2', 'UNFCCC CRT + Butterbach-Bahl et al. (2013)', n2_n2o_ratio_key='forest_N2_to_N2O_ratio')
-    _add_land_leaching_mc(results, preloaded_data, current_params, dataset_noise, 'FS.FO-HY.SW-Leaching-Nmix', 'FO_leaching_bg_fraction')
+    _add_land_leaching_mc(results, preloaded_data, current_params, dataset_noise, 'FS.FO-HY.SW-Leaching-Nmix', 'FO_leaching_bg_fraction', 10)
     _add_industrial_round_wood_mc(results, preloaded_data, current_params, dataset_noise)
     _add_fuel_wood_for_households_mc(results, preloaded_data, current_params, dataset_noise)
-    _add_land_leaching_mc(results, preloaded_data, current_params, dataset_noise, 'FS.OL-HY.SW-Leaching-Nmix', 'OL_leaching_bg_fraction')
+    _add_land_leaching_mc(results, preloaded_data, current_params, dataset_noise, 'FS.OL-HY.SW-Leaching-Nmix', 'OL_leaching_bg_fraction', 8)
     _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise)
 
     return results
@@ -71,22 +71,22 @@ def _add_fo_denitrification_emissions_mc(results, preloaded_data, current_params
     report_missing_years(flow_code, missing_years, results)
     
         
-def _add_land_leaching_mc(results, preloaded_data, current_params, dataset_noise, flow_code, frac_key):
+def _add_land_leaching_mc(results, preloaded_data, current_params, dataset_noise, flow_code, frac_key, teotil3_col):
     """
     Forest (FS.FO) or other land (FS.OL) leaching to surface water, selected by
-    flow_code/frac_key. Two data eras, per Sample et al. (2024):
+    flow_code/frac_key/teotil3_col. Two data eras, per Sample et al. (2024):
     - 1990-2012: preloaded_data['hy_kyst_tilforsel'] <- data_files/Tilførsel av
       nitrogen til kystområdene fordelt på kilder.xlsx (Miljødirektoratet's older
       "Kysttilførsel" compilation), column 3 = 'Bakgrunn' (diffuse background N
       loading, not split by land type). Each land type's share of this is
       estimated as a fixed fraction (frac_key: FO_leaching_bg_fraction ~ 0.59,
-      OL_leaching_bg_fraction ~ 0.42), calibrated by comparing to the newer
-      TEOTIL3 split over the overlapping 2013-2023 period.
+      OL_leaching_bg_fraction ~ 0.41): 'Bakgrunn' matches TEOTIL3's
+      upland + wood to within ~2 % over 2013-2023, and wood makes up 0.56-0.60
+      of that sum.
     - 2013-2023: preloaded_data['hy_teotil3_by_source'] <- data_files/
-      teotil3_n_summary.xlsx, column 10 = 'wood_totn_tonnes'. TEOTIL3 does not
-      split forest from other land, so this same column is the source for both
-      flows - FS.FO and FS.OL leaching are identical for 2013-2023 by
-      construction, not by coincidence.
+      teotil3_n_summary.xlsx, teotil3_col = 10 ('wood_totn_tonnes') for
+      forest and 8 ('upland_totn_tonnes': mountain, heath and wetland) for
+      other land.
     The two eras must not overlap at 2013: Kysttilførsel stops at 2012 so TEOTIL3
     is the sole source for 2013 onward. A shared year in both loops would add two
     rows for that year within a single simulation, biasing its MC median/CI (see
@@ -122,7 +122,7 @@ def _add_land_leaching_mc(results, preloaded_data, current_params, dataset_noise
         year = int(df_teotil3.iloc[r, 0])
         collected_years.add(year)
 
-        raw_val = float(df_teotil3.iloc[r, 10]) / 1000
+        raw_val = float(df_teotil3.iloc[r, teotil3_col]) / 1000
         noise_val = dataset_noise[dataset_key]
         value = raw_val * noise_val
 
