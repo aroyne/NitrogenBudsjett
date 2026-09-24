@@ -15,18 +15,36 @@ Re-run whenever the underlying model output changes (i.e. after any
 main_mc.py run that regenerates MC_Reporting_Statistics.xlsx) to refresh the
 numbers used in the article.
 
-Only the run's median values are used (no re-sampling of the MC
-distributions) - this mirrors how the numbers were derived and reported in
-the article's supporting analysis.
+Each series is reported twice over:
+- from the run's median values (MC_Reporting_Statistics.xlsx), with a
+  Mann-Kendall p-value and a Theil-Sen slope with its 95 % confidence
+  interval. These describe how well the trend is determined given the
+  year-to-year scatter of the median series only.
+- from every individual MC iteration (MC_Raw_Simulations.csv.gz), recomputing
+  the same series and Theil-Sen trend within each simulation and reporting
+  the 2.5-97.5 percentile range. This carries the model's own parameter and
+  data uncertainty into the trend. Much of that uncertainty is systematic
+  (the same perturbed parameter applies to every year of a simulation), so
+  it is strongly correlated between years - a trend interval built from
+  per-year +/-1 sigma values would overstate it, which is why the trend is
+  computed per iteration instead.
+
+MC_Raw_Simulations.csv.gz is only written when main_mc.py is run with
+--export-raw-mc, so run it as `main_mc.py --pool all --nsim 1000
+--export-raw-mc` before this script.
 """
 
+import functools
 import itertools
+import os
 from math import erf, sqrt
 
 import numpy as np
 import pandas as pd
 
 STATS_FILE = 'output_files/MC_Reporting_Statistics.xlsx'
+RAW_FILE = 'output_files/MC_Raw_Simulations.csv.gz'
+Z_95 = 1.959964  # two-sided 95 % standard normal quantile
 ANALYSIS_YEARS = range(1990, 2025)  # the only years with complete flow coverage for all pools
 
 
@@ -38,15 +56,21 @@ ANALYSIS_YEARS = range(1990, 2025)  # the only years with complete flow coverage
 # Mann-Kendall for significance (robust to non-normal residuals and outliers),
 # Theil-Sen for the slope (median of all pairwise slopes, robust to outliers).
 
+def _mann_kendall_variance(values):
+    """Variance of the Mann-Kendall S statistic, with the standard tie
+    correction."""
+    n = len(values)
+    _, counts = np.unique(values, return_counts=True)
+    tie_term = np.sum(counts * (counts - 1) * (2 * counts + 5))
+    return (n * (n - 1) * (2 * n + 5) - tie_term) / 18.0
+
+
 def mann_kendall(values):
     """Returns (S, Z, p_value) for the two-sided Mann-Kendall trend test."""
     values = np.asarray(values, dtype=float)
     n = len(values)
     S = sum(np.sign(values[j] - values[i]) for i, j in itertools.combinations(range(n), 2))
-
-    _, counts = np.unique(values, return_counts=True)
-    tie_term = np.sum(counts * (counts - 1) * (2 * counts + 5))
-    var_S = (n * (n - 1) * (2 * n + 5) - tie_term) / 18.0
+    var_S = _mann_kendall_variance(values)
 
     if S > 0:
         Z = (S - 1) / sqrt(var_S)
@@ -75,6 +99,25 @@ def theil_sen(years, values):
     return slope, intercept
 
 
+def theil_sen_ci(years, values, z=Z_95):
+    """Non-parametric confidence interval for the Theil-Sen slope (Sen 1968;
+    Gilbert 1987, section 16.5): with N ordered pairwise slopes and
+    C = z * sqrt(Var(S)) from the Mann-Kendall variance, the bounds are the
+    M1-th and (M2+1)-th slopes, M1 = (N - C) / 2 and M2 = (N + C) / 2."""
+    years = np.asarray(years, dtype=float)
+    values = np.asarray(values, dtype=float)
+    n = len(values)
+    slopes = np.sort([
+        (values[j] - values[i]) / (years[j] - years[i])
+        for i, j in itertools.combinations(range(n), 2)
+        if years[j] != years[i]
+    ])
+    c = z * sqrt(_mann_kendall_variance(values))
+    m1 = int(round((len(slopes) - c) / 2))
+    m2 = int(round((len(slopes) + c) / 2))
+    return slopes[m1 - 1], slopes[m2]
+
+
 def trend_report(years, values, start_year, end_year):
     """Runs Mann-Kendall + Theil-Sen on a (years, values) series and returns a
     dict with the fitted start/end values, percent change between them (via
@@ -84,8 +127,16 @@ def trend_report(years, values, start_year, end_year):
     fit_start = intercept + slope * start_year
     fit_end = intercept + slope * end_year
     pct_change = 100 * (fit_end - fit_start) / abs(fit_start) if fit_start != 0 else float('nan')
+    # The slope's confidence bounds are expressed as percent change over the
+    # same fitted start value, so they are directly comparable to pct_change.
+    slope_lo, slope_hi = theil_sen_ci(years, values)
+    span = end_year - start_year
     return {
         'sen_slope_per_year': slope,
+        'sen_slope_lo': slope_lo,
+        'sen_slope_hi': slope_hi,
+        'pct_change_lo': 100 * slope_lo * span / abs(fit_start),
+        'pct_change_hi': 100 * slope_hi * span / abs(fit_start),
         'fit_start': fit_start,
         'fit_end': fit_end,
         'pct_change': pct_change,
@@ -173,6 +224,7 @@ FOOD_EXPORT_TYPES = {'korn/planter', 'kjøtt/fisk/meieri/egg', 'mat'}
 FISH_EXPORT_KONV = 'fish_fresh_frozen'
 
 
+@functools.lru_cache(maxsize=None)
 def food_export_excluding_fish(years=ANALYSIS_YEARS):
     """MP.FP-RW.RW-Food export-Nmix, with the fish_fresh_frozen konv category
     removed. Norway's fish exports (the vast majority of Food export by mass)
@@ -405,70 +457,152 @@ NOX_FLOWS_ALL_POOLS = [
 ]
 
 
-def nox_emissions_per_capita(years=ANALYSIS_YEARS):
+@functools.lru_cache(maxsize=None)
+def _population():
+    """SSB table 06913, population on 1 January (loaded once per run)."""
+    from data_loader import load_all_data
+    preloaded = load_all_data({'mp'})
+    return preloaded['ssb_06913']['Befolkning 1. januar']
+
+
+def nox_emissions_per_capita(df, years=ANALYSIS_YEARS):
     """Total national NOx emissions (summed across every pool that reports an
     '-AT.AT-Emissions-NOx' flow), in grams of N per person per year. This is
     the nitrogen-equivalent mass tracked throughout the model, not the
     conventional kg-NOx (or NO2-equivalent) per capita figure used in
     emissions-reporting contexts - divide by NOx_to_N_factor to convert to a
     NOx-mass basis if a directly comparable figure is needed."""
-    from data_loader import load_all_data
-    preloaded = load_all_data({'mp'})
-    pop = preloaded['ssb_06913']['Befolkning 1. januar']
-
-    df = load_stats()
     total_nox_kt = sum_flows(df, NOX_FLOWS_ALL_POOLS, years)
-    return total_nox_kt * 1.0e9 / pop.reindex(years)  # kt N -> g N, / population
+    return total_nox_kt * 1.0e9 / _population().reindex(years)  # kt N -> g N, / population
+
+
+# =============================================================================
+# Per-iteration MC uncertainty
+# =============================================================================
+
+MC_FLOWS = sorted(set(
+    FERTILIZER_SM + DEPOSITION_SM + BNF_SM + MANURE_APPLICATION + GRAZING_UTMARK + FODDER_CROPS
+    + FARM_ANIMAL_FEED + FEED_IMPORT + FOOD_CROP_PRODUCTS + INDUSTRIAL_CROP_PRODUCTS + ANIMAL_PRODUCTS
+    + NON_EDIBLE_ANIMAL_PRODUCTS + FOOD_PRODUCTS_CONSUMED + FOOD_EXPORT_TOTAL + WILD_CATCH + AQUACULTURE_FEED
+    + MM_IN_FULL + MM_OUT_FULL + SM_IN_FULL + SM_OUT_FULL + AG_LEACHING + AG_ATMOSPHERIC_LOSSES
+    + NOX_FLOWS_ALL_POOLS
+))
+
+
+def load_raw_simulations(years=ANALYSIS_YEARS):
+    """One small DataFrame per MC iteration, holding that iteration's value
+    for every flow used here. The value goes in a 'median' column so every
+    question function (which reads flow values via flow_series) runs
+    unchanged on a single iteration.
+
+    main_mc.py writes the raw file just before the statistics file in the
+    same run, so a raw file much older than the statistics file comes from
+    an earlier run and would silently mix two model versions."""
+    age_gap = os.path.getmtime(STATS_FILE) - os.path.getmtime(RAW_FILE)
+    if not 0 <= age_gap < 600:
+        raise RuntimeError(
+            f"{RAW_FILE} is not from the same main_mc.py run as {STATS_FILE} "
+            f"(modified {age_gap / 3600:.1f} h apart). Rerun main_mc.py with --export-raw-mc."
+        )
+    raw = pd.read_csv(RAW_FILE, usecols=['flow_name', 'year', 'value', 'sim_id'])
+    raw = raw[raw['flow_name'].isin(MC_FLOWS) & raw['year'].isin(list(years))]
+    duplicated = raw.duplicated(['sim_id', 'flow_name', 'year']).sum()
+    if duplicated:
+        raise ValueError(f"{duplicated} duplicated (sim_id, flow_name, year) rows in {RAW_FILE}")
+    raw = raw.rename(columns={'value': 'median'})
+    return [g for _, g in raw.groupby('sim_id')]
+
+
+def mc_trend_interval(series_fn, sims, years=ANALYSIS_YEARS):
+    """Recomputes one series and its Theil-Sen trend within every MC
+    iteration. Returns the 2.5/50/97.5 percentiles of the start- and
+    end-period averages and of the percent change, plus the share of
+    iterations whose trend has the same sign as the median one."""
+    years = list(years)
+    rows = []
+    for sim_df in sims:
+        series = series_fn(sim_df)
+        slope, intercept = theil_sen(years, series.values)
+        fit_start = intercept + slope * years[0]
+        fit_end = intercept + slope * years[-1]
+        rows.append({
+            'avg_start': series.loc[years[0]:years[0] + 2].mean(),
+            'avg_end': series.loc[years[-1] - 2:years[-1]].mean(),
+            'pct_change': 100 * (fit_end - fit_start) / abs(fit_start),
+        })
+    res = pd.DataFrame(rows)
+    q = res.quantile([0.025, 0.5, 0.975])
+    same_sign = (np.sign(res['pct_change']) == np.sign(q.loc[0.5, 'pct_change'])).mean()
+    return q, same_sign, len(res)
 
 
 # =============================================================================
 # Report
 # =============================================================================
 
-def _print_series_summary(label, series, years=ANALYSIS_YEARS):
+def _print_series_summary(label, series, series_fn=None, sims=None, years=ANALYSIS_YEARS):
+    """series_fn (a function of one iteration's DataFrame) enables the MC
+    interval; series built partly from data outside the MC (e.g. FAOSTAT
+    item-level production) are reported without one."""
     years = list(years)
     trend = trend_report(years, series.values, years[0], years[-1])
     avg_start = series.loc[years[0]:years[0] + 2].mean()
     avg_end = series.loc[years[-1] - 2:years[-1]].mean()
     print(f"\n{label}")
     print(f"  {years[0]}-{years[0]+2} avg: {avg_start:.2f}   {years[-1]-2}-{years[-1]} avg: {avg_end:.2f}")
-    print(f"  Theil-Sen: {trend['sen_slope_per_year']:.4f}/yr  "
+    print(f"  Theil-Sen: {trend['sen_slope_per_year']:.4f}/yr "
+          f"[95% CI {trend['sen_slope_lo']:.4f} to {trend['sen_slope_hi']:.4f}]  "
           f"(fit {years[0]}: {trend['fit_start']:.2f} -> fit {years[-1]}: {trend['fit_end']:.2f}, "
-          f"{trend['pct_change']:+.1f}%)")
+          f"{trend['pct_change']:+.1f}% [95% CI {trend['pct_change_lo']:+.1f} to {trend['pct_change_hi']:+.1f}%])")
     print(f"  Mann-Kendall: Z={trend['mk_Z']:.3f}  p={trend['mk_p']:.5f}")
+    if series_fn is None:
+        print("  MC interval: not available (series uses data outside the MC)")
+        return
+    q, same_sign, n_sims = mc_trend_interval(series_fn, sims, years)
+    print(f"  MC ({n_sims} iterations, 2.5-97.5 %): "
+          f"{years[0]}-{years[0]+2} avg {q.loc[0.025, 'avg_start']:.2f} to {q.loc[0.975, 'avg_start']:.2f}   "
+          f"{years[-1]-2}-{years[-1]} avg {q.loc[0.025, 'avg_end']:.2f} to {q.loc[0.975, 'avg_end']:.2f}")
+    print(f"  MC trend: {q.loc[0.5, 'pct_change']:+.1f}% "
+          f"[{q.loc[0.025, 'pct_change']:+.1f} to {q.loc[0.975, 'pct_change']:+.1f}%], "
+          f"same sign as median trend in {100 * same_sign:.1f}% of iterations")
 
 
 def main():
     df = load_stats()
+    sims = load_raw_simulations()
     years = list(ANALYSIS_YEARS)
 
     print("=" * 78)
     print("NUE and AG mass-balance report")
-    print(f"Source: {STATS_FILE}   Years: {years[0]}-{years[-1]}")
+    print(f"Source: {STATS_FILE} + {RAW_FILE} ({len(sims)} iterations)   Years: {years[0]}-{years[-1]}")
     print("=" * 78)
 
-    _print_series_summary("Q1a: AG whole NUE (%), external flows only", q1a_ag_whole_nue(df))
-    _print_series_summary("Q1b: AG.MM alone NUE (%)", q1b_ag_mm_nue(df))
-    _print_series_summary("Q1c: AG.SM alone NUE (%)", q1c_ag_sm_nue(df))
+    def show(label, fn, mc=True):
+        _print_series_summary(label, fn(df), fn if mc else None, sims)
 
-    naive_nue, corrected_nue = q2_corrected_ag_whole_nue(df)
-    _print_series_summary("Q2: naive AG-whole NUE (%) (= Q1a, repeated for comparison)", naive_nue)
-    _print_series_summary("Q2: corrected AG-whole NUE (%) (imported feed at domestic-equivalent N-cost)", corrected_nue)
+    show("Q1a: AG whole NUE (%), external flows only", q1a_ag_whole_nue)
+    show("Q1b: AG.MM alone NUE (%)", q1b_ag_mm_nue)
+    show("Q1c: AG.SM alone NUE (%)", q1c_ag_sm_nue)
+
+    show("Q2: naive AG-whole NUE (%) (= Q1a, repeated for comparison)", lambda d: q2_corrected_ag_whole_nue(d)[0])
+    show("Q2: corrected AG-whole NUE (%) (imported feed at domestic-equivalent N-cost)", lambda d: q2_corrected_ag_whole_nue(d)[1])
     _print_series_summary("Q2 (context): poultry+turkey+pork share of Animal products N (%)", poultry_pork_share_of_animal_products())
 
-    _print_series_summary("Q3: food-system NUE (%), land-based, excl. aquaculture", q3_food_system_nue(df))
-    _print_series_summary("Q3 (comparison): food-system NUE (%), incl. wild catch and aquaculture", q3_food_system_nue_incl_fish(df))
+    # Q3's non-fish food export uses median trade N-factors (see
+    # food_export_excluding_fish), so its MC interval leaves out that small
+    # term's own uncertainty.
+    show("Q3: food-system NUE (%), land-based, excl. aquaculture", q3_food_system_nue)
+    show("Q3 (comparison): food-system NUE (%), incl. wild catch and aquaculture", q3_food_system_nue_incl_fish)
 
-    _print_series_summary("AG.MM full mass balance (kt N/yr, in - out)", ag_mm_balance(df))
-    _print_series_summary("AG.SM full mass balance (kt N/yr, in - out)", ag_sm_balance(df))
-    _print_series_summary("AG total mass balance (kt N/yr, MM + SM)", ag_total_balance(df))
+    show("AG.MM full mass balance (kt N/yr, in - out)", ag_mm_balance)
+    show("AG.SM full mass balance (kt N/yr, in - out)", ag_sm_balance)
+    show("AG total mass balance (kt N/yr, MM + SM)", ag_total_balance)
 
-    per_ha = ag_per_hectare(df)
-    _print_series_summary(f"AG leaching per hectare (kg N/ha/yr, area={AGRICULTURAL_AREA_HA:,} ha)", per_ha['leaching_kgN_ha'])
-    _print_series_summary(f"AG atmospheric losses per hectare (kg N/ha/yr, area={AGRICULTURAL_AREA_HA:,} ha)", per_ha['atmospheric_kgN_ha'])
-    _print_series_summary(f"AG soil N input per hectare (kg N/ha/yr, area={AGRICULTURAL_AREA_HA:,} ha)", per_ha['input_kgN_ha'])
+    show(f"AG leaching per hectare (kg N/ha/yr, area={AGRICULTURAL_AREA_HA:,} ha)", lambda d: ag_per_hectare(d)['leaching_kgN_ha'])
+    show(f"AG atmospheric losses per hectare (kg N/ha/yr, area={AGRICULTURAL_AREA_HA:,} ha)", lambda d: ag_per_hectare(d)['atmospheric_kgN_ha'])
+    show(f"AG soil N input per hectare (kg N/ha/yr, area={AGRICULTURAL_AREA_HA:,} ha)", lambda d: ag_per_hectare(d)['input_kgN_ha'])
 
-    _print_series_summary("National NOx emissions per capita (g N/person/yr)", nox_emissions_per_capita())
+    show("National NOx emissions per capita (g N/person/yr)", nox_emissions_per_capita)
 
     print("\n" + "=" * 78)
 
