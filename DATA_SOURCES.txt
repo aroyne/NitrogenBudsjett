@@ -107,27 +107,20 @@ egentilvirket_bioenergi_industri.xlsx
 Historical self-produced bioenergy in the pulp/paper industry, used to backfill SSB table 08205 before 1998
 data from Spilde, D. & Aasestad, K. (2004). Energibruk i norsk industri: 1991-2001. Statistisk Sentralbyrå
 
-FAOSTAT_data_en_11-12-2025.csv
-Crop and livestock products - import and export of live animals
-downloaded 12.11.2025
+FAOSTAT_data_en_9-24-2026-3.csv
+Crop and livestock products - import and export of live animals, 1961-2024
+https://www.fao.org/faostat/en/#data/TCL
+downloaded 24.09.2026
 
-FAOSTAT_data_en_11-12-2025-2.csv
-Fertilizer by nutrient, export quantity
+FAOSTAT_data_en_9-24-2026-2.csv
+Fertilizer by nutrient, nutrient nitrogen N (total): production, agricultural use, import and export quantity, 1961-2024
 https://www.fao.org/faostat/en/#data/RFN
-downloaded 12.11.2025
+downloaded 24.09.2026
 
-FAOSTAT_data_en_11-18-2025.csv
-Crop and livestock products: production quantity, animal products
+FAOSTAT_data_en_9-24-2026.csv
+Crop and livestock products: production quantity, all items (crops and livestock), 1961-2024
 https://www.fao.org/faostat/en/#data/QCL
-
-FAOSTAT_data_en_11-21-2025.csv
-Fertilizer by nutrient, agricultural use
-https://www.fao.org/faostat/en/#data/RFN
-downloaded 21.11.2025
-
-FAOSTAT_data_en_11-25-2025.csv
-Fertiliser by nutrient, domestic production
-downloaded 25.11.2025
+downloaded 24.09.2026
 
 FAOSTAT_data_en_2-20-2026.csv
 Forestry production and trade

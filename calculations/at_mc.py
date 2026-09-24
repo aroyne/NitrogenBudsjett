@@ -9,7 +9,6 @@ from calculations.utils import (
     EXPECTED_YEARS,
     report_missing_years,
     process_generic_trade_flow,
-    add_flat_carryforward_year,
     add_trend_extrapolated_year
 )
 
@@ -161,33 +160,59 @@ def _add_OP_N2_fixation_mc(results, preloaded_data, current_params, ammonia_impo
     
     dataset_key = 'Fertilizer by nutrient'
     data_sources = 'FAOSTAT Fertilizer by nutrient + SSB (3-year moving average)'
+    noise_val = dataset_noise[dataset_key]
 
-    # 'faostat_fertilizer_production' <- data_files/FAOSTAT_data_en_11-25-2025.csv:
-    # FAOSTAT Fertilizer by nutrient, domestic production (downloaded 25.11.2025)
-    df_faostat = preloaded_data['faostat_fertilizer_production']
+    # 'faostat_fertilizer_production', 'faostat_fertilizer_use' and
+    # 'fao_mineral_fertilizer' <- data_files/FAOSTAT_data_en_9-24-2026-2.csv
+    # (FAOSTAT Fertilizers by Nutrient, nutrient nitrogen N total; split by
+    # element in data_loader.py)
+    df_prod = preloaded_data['faostat_fertilizer_production']
+    df_use = preloaded_data['faostat_fertilizer_use']
+    df_trade = preloaded_data['fao_mineral_fertilizer']
+
+    reported_production = df_prod[df_prod['Flag'] != 'I'].set_index('Year')['Value']
+    ag_use = df_use.set_index('Year')['Value']
+    fert_import = df_trade[df_trade['Element'] == 'Import quantity'].set_index('Year')['Value']
+    fert_export = df_trade[df_trade['Element'] == 'Export quantity'].set_index('Year')['Value']
+
+    # Non-agricultural fertilizer use (MP.OP-HS.HS-Mineral fertilizer-Nmix),
+    # scaled from FAOSTAT's agricultural use with the same share as in
+    # mp_mc.py's _add_hs_mineral_fertilizer_mc.
+    nonag_share = float(current_params.get("fert_nonag_share_of_total_use"))
+    nonag_over_ag = nonag_share / (1.0 - nonag_share)
 
     raw_values = {}
-    for _, row in df_faostat.iterrows():
-        year = int(row['Year'])
-        if year in ammonia_import_dict:  # Data finnes fra handelsstart (1988)
-            if year not in EXPECTED_YEARS:
-                continue
+    for year in sorted(EXPECTED_YEARS):
+        if year not in ammonia_import_dict:  # SSB trade data starts in 1988
+            continue
+        if year not in ag_use.index:
+            continue
 
-            base_faostat = float(row['Value']) / 1000  # tN -> ktN
+        # FAOSTAT reports domestic fertilizer N production directly up to
+        # 2001; from 2002 onward the Production element is imputed (flag I)
+        # and has not been revised along with FAOSTAT's own export figures,
+        # so it no longer matches them. For imputed years, production is
+        # instead derived from the MP.OP fertilizer balance: everything
+        # leaving MP.OP as fertilizer (export, agricultural use not covered by
+        # import, non-agricultural use) must have been produced domestically.
+        if year in reported_production.index:
+            production = float(reported_production[year])
+        else:
+            production = (float(fert_export[year]) + float(ag_use[year]) - float(fert_import[year])
+                          + float(ag_use[year]) * nonag_over_ag)
 
-            noise_val = dataset_noise[dataset_key]
-            perturbed_faostat = base_faostat * noise_val
+        perturbed_production = production / 1000 * noise_val  # tN -> ktN
 
-            # Mass balance proxy for domestic industrial N2 fixation via ammonia
-            # synthesis: FAOSTAT-reported domestic fertilizer N production, minus
-            # imported ammonia N (not fixed domestically), plus exported ammonia N
-            # (fixed domestically but leaving before being counted as production).
-            # Known to be a noisy proxy - see atmosphere_pool/flow_AT_AT_MP_OP_
-            # Ammonia_synthesis_N2_fixation_N2.md.
-            # Export presence is sporadic (SSB tab 08801 has no NH3 export row in 1991,
-            # 2003, 2006, 2007 - no shipments that year, not missing data), so a missing
-            # year defaults to 0 rather than requiring the key like import does.
-            raw_values[year] = perturbed_faostat - ammonia_import_dict[year] + ammonia_export_dict.get(year, 0.0)
+        # Mass balance proxy for domestic industrial N2 fixation via ammonia
+        # synthesis: domestic fertilizer N production, minus imported ammonia
+        # N (not fixed domestically), plus exported ammonia N (fixed
+        # domestically but leaving before being counted as production).
+        # Known to be a noisy proxy - see atmosphere_pool/flow_AT_AT_MP_OP_
+        # Ammonia_synthesis_N2_fixation_N2.md.
+        # Export presence is sporadic (SSB tab 08801 has no NH3 export row in 1991,
+        # 2003, 2006, 2007 - no shipments that year, not missing data), so a missing
+        # year defaults to 0 rather than requiring the key like import does.
+        raw_values[year] = perturbed_production - ammonia_import_dict[year] + ammonia_export_dict.get(year, 0.0)
 
     # Smoothed with a centered 3-year moving average (partial window at the
     # series' edges): the underlying trade statistics are reported per
@@ -216,14 +241,6 @@ def _add_OP_N2_fixation_mc(results, preloaded_data, current_params, ammonia_impo
             'comment': comment,
             'data_sources': data_sources
         })
-
-    # FAOSTAT "Fertilizers by Nutrient" has not published 2024 yet; carry the
-    # already-smoothed 2023 value forward with extra uncertainty rather than
-    # leave the flow silent for a year FAOSTAT will eventually cover.
-    add_flat_carryforward_year(
-        results, flow_code, collected_years, 2023, 2024, dataset_noise,
-        data_sources='flat carry-forward from 2023 (FAOSTAT fertilizer data not yet released for 2024)'
-    )
 
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)

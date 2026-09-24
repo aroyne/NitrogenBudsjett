@@ -219,7 +219,7 @@ def _add_live_animal_import_mc(results, preloaded_data, current_params, dataset_
     flow_code = 'RW.RW-AG.MM-Live animal import-Nmix'
     collected_years = set()
     
-    # 'fao_live_animals' <- FAOSTAT_data_en_11-12-2025.csv (data_loader.py
+    # 'fao_live_animals' <- FAOSTAT_data_en_9-24-2026-3.csv (data_loader.py
     # DATA_MAP, 'csv_live_animals' method): FAOSTAT crop and livestock
     # products, import quantity of live animals
     final_data = preloaded_data.get('fao_live_animals')
@@ -258,15 +258,6 @@ def _add_live_animal_import_mc(results, preloaded_data, current_params, dataset_
                 'comment': 'ok', 'data_sources': 'FAOSTAT'
             })
 
-    # FAOSTAT "Crops and livestock products" has not published 2024 yet; this
-    # flow is tiny and noisy (~0.02 ktN, no discernible trend), so a flat
-    # carry-forward is a more honest reflection of "we don't know" than
-    # fitting a trend to noise.
-    add_flat_carryforward_year(
-        results, flow_code, collected_years, 2023, 2024, dataset_noise,
-        data_sources='flat carry-forward from 2023 (FAOSTAT Crops and livestock products not yet released for 2024)'
-    )
-
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
 
@@ -275,9 +266,9 @@ def _add_mineral_fertilizer_import_mc(results, preloaded_data, current_params, d
     flow_code = 'RW.RW-AG.SM-Mineral fertilizer import-Nmix'
     collected_years = set()
     
-    # 'fao_mineral_fertilizer' <- FAOSTAT_data_en_11-12-2025-2.csv
-    # (data_loader.py DATA_MAP): FAOSTAT fertilizer by nutrient, export
-    # quantity (also used here for its import-quantity rows)
+    # 'fao_mineral_fertilizer' <- FAOSTAT_data_en_9-24-2026-2.csv
+    # (data_loader.py DATA_MAP, split by element): FAOSTAT fertilizer by
+    # nutrient, import and export quantity
     final_data = preloaded_data.get('fao_mineral_fertilizer')
     key_fert = 'Fertilizer by nutrient'
     noise_fert = dataset_noise[key_fert]
@@ -298,14 +289,6 @@ def _add_mineral_fertilizer_import_mc(results, preloaded_data, current_params, d
                 'flow_name': flow_code, 'year': year, 'value': value_kt,
                 'comment': 'ok', 'data_sources': 'FAOSTAT'
             })
-
-    # FAOSTAT "Fertilizers by Nutrient" has not published 2024 yet; carry the
-    # 2023 value forward with extra uncertainty rather than leave the flow
-    # silent for a year FAOSTAT will eventually cover.
-    add_flat_carryforward_year(
-        results, flow_code, collected_years, 2023, 2024, dataset_noise,
-        data_sources='flat carry-forward from 2023 (FAOSTAT fertilizer data not yet released for 2024)'
-    )
 
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)

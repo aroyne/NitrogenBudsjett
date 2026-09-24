@@ -7,7 +7,6 @@ from calculations.utils import (
     read_year_value_row,
     report_missing_years,
     load_crltap_emissions_to_N,
-    add_flat_carryforward_year,
     add_multi_year_average_year,
 )
 from calculations.shared_flow_calculations import (
@@ -445,8 +444,9 @@ def _add_animal_products_flow_mc(results, preloaded_data, current_params, datase
     data_sources = 'FAOSTAT Crops and livestock products'
     comment = 'ok'
 
-    # 'fao_animal_production_clean' <- data_files/FAOSTAT_data_en_11-18-2025.csv
-    # (Crop and livestock products: production quantity, animal products)
+    # 'fao_animal_production_clean' <- data_files/FAOSTAT_data_en_9-24-2026.csv
+    # (Crop and livestock products: production quantity, restricted in
+    # data_loader.py to individual livestock products, no aggregates)
     df_fao = preloaded_data.get('fao_animal_production_clean')
     key_fao = 'Crops and livestock products'
     noise_val = dataset_noise[key_fao]
@@ -475,14 +475,6 @@ def _add_animal_products_flow_mc(results, preloaded_data, current_params, datase
                 'data_sources': data_sources
             })
 
-    # FAOSTAT "Crops and livestock products" has not published 2024 yet, and
-    # this series is stable year to year (<5% variation 2018-2023), so a flat
-    # carry-forward is about as good as any alternative.
-    add_flat_carryforward_year(
-        results, flow_code, collected_years, 2023, 2024, dataset_noise,
-        data_sources='flat carry-forward from 2023 (FAOSTAT Crops and livestock products not yet released for 2024)'
-    )
-
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
 
@@ -492,7 +484,7 @@ def _add_non_edible_animal_products_flow_mc(results, preloaded_data, current_par
     collected_years = set()
     comment = 'ok'
 
-    # 'fao_hides_clean' <- data_files/FAOSTAT_data_en_11-18-2025.csv (Crop and
+    # 'fao_hides_clean' <- data_files/FAOSTAT_data_en_9-24-2026.csv (Crop and
     # livestock products, hides production quantity)
     # 'wool_production' <- data_files/ull.xlsx (wool delivered to slaughterhouses,
     # 2005-2024, compiled from Landbruksdirektoratet raw data)
@@ -502,11 +494,6 @@ def _add_non_edible_animal_products_flow_mc(results, preloaded_data, current_par
     df_wool = preloaded_data.get('wool_production')
     df_sheep = preloaded_data.get('ssb_sheep_numbers')
     
-    # find_non_edible_animal_products already extrapolates 2024 (this flow
-    # has a clear declining trend 2018-2023, so a fitted line through
-    # 2019-2023 is used rather than a flat carry-forward) - done there
-    # rather than here so mp_mc.py's consumer-goods mass balance, which
-    # calls the same function directly, sees the same value.
     year_values = find_non_edible_animal_products(
         df_hides_clean, df_wool, df_sheep, current_params, dataset_noise
     )
@@ -521,9 +508,7 @@ def _add_non_edible_animal_products_flow_mc(results, preloaded_data, current_par
             # to a real gap in ssb_sheep_numbers for that year. This branching
             # must mirror the one there exactly to keep the reported source in
             # sync with how the value was actually computed.
-            if year == 2024:
-                data_sources = 'trend-extrapolated from 2019-2023 (FAOSTAT Crops and livestock products not yet released for 2024)'
-            elif year > 2004:
+            if year > 2004:
                 data_sources = 'FAOSTAT Crops and livestock products + Landbruksdirektoratet'
             elif year != 2001:
                 data_sources = 'FAOSTAT Crops and livestock products + Landbruksdirektoratet + SSB, extrapolated'
@@ -618,7 +603,7 @@ def _add_live_animal_export_mc(results, preloaded_data, current_params, dataset_
     comment = 'ok'
     data_sources = 'FAOSTAT Crops and livestock products'
 
-    # 'fao_live_animals_export' <- data_files/FAOSTAT_data_en_11-12-2025.csv
+    # 'fao_live_animals_export' <- data_files/FAOSTAT_data_en_9-24-2026-3.csv
     final_data = preloaded_data.get('fao_live_animals_export')
     prot_frac = float(current_params.get("live_animal_protein_frac"))
     prot_to_N = float(current_params.get("Jones_factor"))
@@ -656,15 +641,6 @@ def _add_live_animal_export_mc(results, preloaded_data, current_params, dataset_
                 'comment': comment,
                 'data_sources': data_sources
             })
-
-    # FAOSTAT "Crops and livestock products" has not published 2024 yet; this
-    # flow is tiny and noisy (~0.02 ktN, no discernible trend), so a flat
-    # carry-forward is a more honest reflection of "we don't know" than
-    # fitting a trend to noise.
-    add_flat_carryforward_year(
-        results, flow_code, collected_years, 2023, 2024, dataset_noise,
-        data_sources='flat carry-forward from 2023 (FAOSTAT Crops and livestock products not yet released for 2024)'
-    )
 
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)

@@ -7,7 +7,8 @@ generic per-method loading loop below and end up under their own dict key,
 but a handful of methods load one workbook and split it into several output
 keys instead - for those, the DATA_MAP key itself (e.g. 'ag_gnb', 'ag_grovfor',
 'aqua_data', 'avlop_sewage', 'hy_teotil3', 'fs_obb_grazing',
-'fao_live_animals_all', 'ag_faostat_production_all', 'ag_manure_crt') exists only to gate
+'fao_live_animals_all', 'ag_faostat_production_all', 'fao_fertilizer_all',
+'ag_manure_crt') exists only to gate
 loading by pool membership and is never read back; the actual data lives
 under the differently-named keys set inside that method's branch.
 """
@@ -122,14 +123,12 @@ def load_all_data(selected_pools):
     # Format: 'preloaded_key': ( {relevant_pools}, 'filepath', 'load_method', {extra_kwargs} )
     DATA_MAP = {
         'atm_in_out': ({'at', 'rw'}, 'data_files/atm_in_out.xlsx', 'excel', {'sheet_name': 'Ark1', 'header': None}),
-        'faostat_fertilizer_production': ({'at'}, 'data_files/FAOSTAT_data_en_11-25-2025.csv', 'csv', {}),
-        'faostat_fertilizer_use': ({'mp'}, 'data_files/FAOSTAT_data_en_11-21-2025.csv', 'csv', {}),
-        'fao_mineral_fertilizer': ({'rw', 'mp'}, 'data_files/FAOSTAT_data_en_11-12-2025-2.csv', 'csv', {}),
+        'fao_fertilizer_all': ({'at', 'mp', 'rw'}, 'data_files/FAOSTAT_data_en_9-24-2026-2.csv', 'csv_faostat_fertilizer', {}),
         'deposition_data': ({'at', 'ag'}, 'data_files/N_per_class_period_distributed_unallocated_long.csv', 'csv', {}),
         'feed_raavarer_norsk': ({'mp'}, 'data_files/Årlig råvareforbruk.xlsx', 'excel_feed_raavarer_norsk', {}),
         'feed_raavarer_import': ({'rw'}, 'data_files/Årlig råvareforbruk.xlsx', 'excel_feed_raavarer_import', {}),        'feed_totalkalkyle': ({'rw','mp'}, 'data_files/NibioStatistics-4.xlsx', 'excel_feed_totalkalkyle', {}),
         'aqua_data': ({'hy', 'rw', 'mp'}, 'data_files/A.06.002_20251111-140559.xlsx', 'excel_aquaculture', {}),
-        'fao_live_animals_all': ({'ag', 'rw'}, 'data_files/FAOSTAT_data_en_11-12-2025.csv', 'csv_live_animals', {}),
+        'fao_live_animals_all': ({'ag', 'rw'}, 'data_files/FAOSTAT_data_en_9-24-2026-3.csv', 'csv_live_animals', {}),
         'hy_kyst_tilforsel': ({'hy','fs','hs'}, 'data_files/Tilførsel av nitrogen til kystområdene fordelt på kilder.xlsx', 'excel', {'sheet_name': 'Data fra Miljødirektoratet'}),
         'hy_teotil3': ({'hy','fs','hs'}, 'data_files/teotil3_n_summary.xlsx', 'openpyxl_teotil', {}),
         'hy_art_raw': ({'hy'}, 'data_files/art.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Sheet 1'}),
@@ -142,7 +141,7 @@ def load_all_data(selected_pools):
         'ag_crltap_raw_lines': ({'ag','ef','mp','pr'}, 'data_files/webdabData1868031.txt', 'text_lines', {}),
         'unfccc_ark1_raw': ({'ag'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_n2o_ag', {}),
         'ag_leaching_csv': ({'ag'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_nr_ag', {}),
-        'ag_faostat_production_all': ({'ag','mp'}, 'data_files/FAOSTAT_data_en_11-18-2025.csv', 'csv_faostat_production', {}),
+        'ag_faostat_production_all': ({'ag','mp'}, 'data_files/FAOSTAT_data_en_9-24-2026.csv', 'csv_faostat_production', {}),
         'wool_production': ({'ag','mp'}, 'data_files/ull.xlsx', 'excel', {'skiprows': 3}),
         'ssb_sheep_numbers': ({'ag','mp'}, 'data_files/03710_20260128-152225.xlsx', 'excel', {'skiprows': 2}),
         'fs_unfccc_emissions_raw': ({'fs'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_n2o_hs_fs', {}),
@@ -234,11 +233,17 @@ def load_all_data(selected_pools):
                 preloaded[key] = preloaded[key][['År', 'Husdyr (sau)']].copy()
 
         elif method == 'csv':
-            df = pd.read_csv(filepath, **kwargs)
-            if key in ['faostat_fertilizer', 'fao_mineral_fertilizer', 'faostat_fertilizer_production']:
-                preloaded[key] = df[['Year', 'Element', 'Value']].copy()
-            else:
-                preloaded[key] = df
+            preloaded[key] = pd.read_csv(filepath, **kwargs)
+
+        elif method == 'csv_faostat_fertilizer':
+            # One FAOSTAT Fertilizers by Nutrient export (Nutrient nitrogen N
+            # total) holding all four elements, split by element. Production
+            # keeps its Flag column, since at_mc.py only uses the reported
+            # figure where FAOSTAT has not imputed it.
+            df_fert = pd.read_csv(filepath)
+            preloaded['faostat_fertilizer_production'] = df_fert[df_fert['Element'] == 'Production'][['Year', 'Element', 'Value', 'Flag']].copy()
+            preloaded['faostat_fertilizer_use'] = df_fert[df_fert['Element'] == 'Agricultural Use'][['Year', 'Element', 'Value']].copy()
+            preloaded['fao_mineral_fertilizer'] = df_fert[df_fert['Element'].isin(['Import quantity', 'Export quantity'])][['Year', 'Element', 'Value']].copy()
         elif method == 'text_lines':
             with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                 preloaded[key] = f.readlines()
@@ -518,9 +523,31 @@ def load_all_data(selected_pools):
             preloaded['grovfor_old_raw'] = pd.DataFrame(list(wb_old['Ark1'].values))
 
         elif method == 'csv_faostat_production':
+            # The FAOSTAT export covers every crop and livestock item for Norway,
+            # including aggregates ('Meat, Total', 'Sheep and Goat Meat') and
+            # sub-items of other rows ('Raw milk of cattle' within 'Milk, Total').
+            # Only the individual livestock products below are summed into
+            # AG.MM-MP.FP-Animal products, so aggregates are never counted on
+            # top of their own components. Each item needs a matching
+            # prod_<item> row in N_parameters.xlsx's animal_products sheet.
+            animal_product_items = [
+                'Game meat, fresh, chilled or frozen',
+                'Horse meat, fresh or chilled',
+                'Meat of cattle with the bone, fresh or chilled',
+                'Meat of chickens, fresh or chilled',
+                'Meat of ducks, fresh or chilled',
+                'Meat of geese, fresh or chilled',
+                'Meat of goat, fresh or chilled',
+                'Meat of pig with the bone, fresh or chilled',
+                'Meat of rabbits and hares, fresh or chilled',
+                'Meat of sheep, fresh or chilled',
+                'Meat of turkeys, fresh or chilled',
+                'Other meat of mammals, fresh or chilled',
+                'Eggs Primary',
+                'Milk, Total',
+            ]
             df_fao = pd.read_csv(filepath)
-            preloaded['ag_faostat_production'] = df_fao
-            preloaded['fao_animal_production_clean'] = df_fao[(df_fao['Element'] == 'Production') & (df_fao['Value'] != 0) & (~df_fao['Item'].str.contains('hides', case=False, na=False))][['Item', 'Year', 'Value']].copy()
+            preloaded['fao_animal_production_clean'] = df_fao[(df_fao['Element'] == 'Production') & (df_fao['Value'] != 0) & (df_fao['Item'].isin(animal_product_items))][['Item', 'Year', 'Value']].copy()
             preloaded['fao_hides_clean'] = df_fao[(df_fao['Element'] == 'Production') & (df_fao['Value'] != 0) & (df_fao['Item'].str.contains('hides', case=False, na=False))][['Item', 'Year', 'Value']].copy()
 
         elif method == 'openpyxl_obb_grazing':

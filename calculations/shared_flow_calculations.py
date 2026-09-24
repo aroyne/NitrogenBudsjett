@@ -824,7 +824,7 @@ def find_non_edible_animal_products(df_hides_clean, df_wool, df_sheep, current_p
     df_hides['N_amount'] = df_hides['Value'] * float(N_content_hides) * 1e-5 * float(noise_faostat)
     total_N_per_year = df_hides.groupby('Year')['N_amount'].sum().to_dict()
 
-    for year in range(1990, 2024):
+    for year in range(1990, 2025):
         value = total_N_per_year.get(year, 0.0)
 
         if year > 2004:
@@ -851,18 +851,6 @@ def find_non_edible_animal_products(df_hides_clean, df_wool, df_sheep, current_p
                 value += (avg_sheep * float(wool_pr_sheep) * float(N_content_wool) * 1e-6 * float(noise_ssb)) * float(noise_trend)
                 
         year_values[year] = value
-
-    # FAOSTAT Crops and livestock products has not published 2024 yet. This
-    # flow has a clear declining trend (2018-2023), so a flat carry-forward
-    # would overstate 2024 - fit a line through the last 5 years instead
-    # (matches AG.MM-MP.OP-Non-edible animal products-Nmix's own
-    # report_generator.py description). Computed here rather than only in
-    # ag_mc.py's wrapper so mp_mc.py's consumer-goods mass balance, which
-    # calls this function directly, sees the same value.
-    fit_years = [y for y in range(2019, 2024) if y in year_values]
-    if len(fit_years) >= 2:
-        slope, intercept = np.polyfit(fit_years, [year_values[y] for y in fit_years], 1)
-        year_values[2024] = (slope * 2024 + intercept) * float(noise_trend)
 
     return year_values
 
