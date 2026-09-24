@@ -231,7 +231,14 @@ def get_short_author(raw_author_str):
     else:
         return f"{last_names[0]} et al."
 
-def fix_all_citations_in_folder(folder_path, bib_filename):
+def fix_all_citations_in_folder(paths, bib_filename):
+    """
+    Resolves \\citep/\\citet markup and rebuilds the References list on
+    every .md file in paths (generated pages, or folders of them). Each page
+    is rewritten from its first '### References' line onward, so only report
+    output may be passed - never the project root, which also holds notes
+    and other hand-written Markdown.
+    """
     if not os.path.exists(bib_filename):
         print(f"Bib-fil ikke funnet: {bib_filename}")
         return
@@ -305,7 +312,14 @@ def fix_all_citations_in_folder(folder_path, bib_filename):
 
 
     # 2. Gå igjennom alle filer
-    for root, dirs, files in os.walk(folder_path):
+    def _walk(paths):
+        for path in paths:
+            if os.path.isfile(path):
+                yield os.path.dirname(path) or '.', [], [os.path.basename(path)]
+            else:
+                yield from os.walk(path)
+
+    for root, dirs, files in _walk(paths):
         for filename in files:
             if filename.endswith(".md"):
                 file_path = os.path.join(root, filename)
@@ -2287,11 +2301,9 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
     os.makedirs(pool_folders[8], exist_ok=True)
     process_rest_of_the_world_pool(pool_folders[8], plot_files, plot_dir, bib_filename, target_format)
 
-    # 11. Fikse format på referanser i ALLE mapper automatisk
-    # Siden fix_all_citations_in_folder bruker os.walk(), vil "." (gjeldende mappe) 
-    # gjøre at den finkjemmer både rotmappen og alle undermappene vi nettopp lagde.
+    # 11. Resolve citations and rebuild References on the generated pages only.
     print("[RAPPORT] Konverterer LaTeX-siteringer til ren tekst...")
-    fix_all_citations_in_folder(".", bib_filename)
+    fix_all_citations_in_folder(pool_folders + [output_filename], bib_filename)
 
     print("[RAPPORT] Portalbygging fullført suksessfullt!")
 
