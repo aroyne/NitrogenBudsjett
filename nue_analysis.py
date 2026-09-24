@@ -27,7 +27,7 @@ import numpy as np
 import pandas as pd
 
 STATS_FILE = 'output_files/MC_Reporting_Statistics.xlsx'
-ANALYSIS_YEARS = range(1990, 2024)  # the only years with complete flow coverage for all pools
+ANALYSIS_YEARS = range(1990, 2025)  # the only years with complete flow coverage for all pools
 
 
 # =============================================================================
@@ -376,7 +376,7 @@ def ag_total_balance(df, years=ANALYSIS_YEARS):
 # this area). A single recent-vintage value, not a historical time series -
 # this project does not currently load a yearly agricultural-area dataset, so
 # it is treated as constant across all years. Revisit if a proper time series
-# becomes available, since Norway's agricultural area has drifted over 1990-2023.
+# becomes available, since Norway's agricultural area has drifted over 1990-2024.
 AGRICULTURAL_AREA_HA = 1_132_693
 
 AG_LEACHING = ['AG.SM-HY.SW-Leaching-Nmix', 'AG.MM-HY.SW-Leaching-Nmix']
