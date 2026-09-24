@@ -11,7 +11,7 @@ nav_order: 12
 
 ### Flow Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-**MP.OP-RW.RW-Mineral fertilizer export-Nmix** is taken from FAOSTAT Fertilizer by nutrient (FAO, 2025)<!--cite:fao_fertilizer_2025-->. FAOSTAT Fertilizer by nutrient has not yet published a 2024 figure at the time of writing; the 2024 value is a flat carry-forward of 2023, with additional uncertainty (±50%) applied to reflect that it is not a real, independently observed value.
+**MP.OP-RW.RW-Mineral fertilizer export-Nmix** is taken from FAOSTAT Fertilizer by nutrient (FAO, 2025)<!--cite:fao_fertilizer_2025-->.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References

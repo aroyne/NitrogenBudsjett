@@ -6,7 +6,7 @@ nav_order: 1
 
 # Nitrogen Budget for Norway
 
-**Last Updated:** September 17, 2026
+**Last Updated:** September 24, 2026
 
 {: .label .label-red }
 Work in Progress
@@ -30,7 +30,7 @@ The diagram below illustrates the integrated nitrogen economy of Norway. Use the
 ---
 
 For flows connected to the hydrosphere, and for land-relateds emissions and nitrogen deposition, we only consider the Norwegian mainland. For emissions to air reported through the UNFCCC framework we also include emissions from Norwegian economic activity on Svalbard (these are minor and mainly related to coal extraction, which has now been discontinued). We also include emissions and N flows that originate in petroleum extraction on the Norwegian continental shelf.
-This NNB is built using the guidelines from (Winiwarter et al., 2025). Where flows are omitted or added to better fit the Norwegian nitrogen system, this is commented.
+This NNB is built using the guidelines from (Winiwarter et al., 2025)<!--cite:winiwarter_inms_2025-->. Where flows are omitted or added to better fit the Norwegian nitrogen system, this is commented.
 
 ### References
 

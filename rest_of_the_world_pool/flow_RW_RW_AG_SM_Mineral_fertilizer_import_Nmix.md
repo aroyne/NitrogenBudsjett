@@ -11,7 +11,7 @@ nav_order: 3
 
 ### Flow Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-Is taken from FAOSTAT Fertilizer by nutrient FAO (2025)<!--cite:fao_fertilizer_2025-->. Because anhydrous ammonia is not used directly as fertilizer in Norway, it is not counted as a fertilizer in this particular FAO statistic. We therefore account for NH3 import in the flow **RW.RW-MP.OP-Ammonia import-Nmix**. FAOSTAT Fertilizer by nutrient has not yet published a 2024 figure at the time of writing; the 2024 value is a flat carry-forward of 2023, with additional uncertainty (±50%) applied to reflect that it is not a real, independently observed value.
+Is taken from FAOSTAT Fertilizer by nutrient FAO (2025)<!--cite:fao_fertilizer_2025-->. Because anhydrous ammonia is not used directly as fertilizer in Norway, it is not counted as a fertilizer in this particular FAO statistic. We therefore account for NH3 import in the flow **RW.RW-MP.OP-Ammonia import-Nmix**.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References
