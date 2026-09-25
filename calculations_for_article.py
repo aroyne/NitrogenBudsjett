@@ -714,6 +714,127 @@ def ww_n2_removal_share(df, years=ANALYSIS_YEARS):
     return 100 * n2 / (n2 + sum_flows(df, WW_DISCHARGE, years))
 
 
+# Every flow crossing the HS.HS pool boundary (HS has one subpool).
+HS_IN_FULL = [
+    'AT.AT-HS.HS-Deposition-OXN', 'AT.AT-HS.HS-Deposition-RDN',
+    'MP.FP-HS.HS-Food products-Nmix',
+    'MP.OP-HS.HS-Consumer goods-Nmix',
+    'MP.OP-HS.HS-Mineral fertilizer-Nmix',
+    'PR.SO-HS.HS-Biologically treated organic waste-Nmix',
+    'PR.WW-HS.HS-Sewage sludge fertilizer-Nmix',
+]
+HS_OUT_FULL = [
+    'HS.HS-AT.AT-Emissions-NH3',
+    'HS.HS-AT.AT-LUC emissions-N2O',
+    'HS.HS-HY.SW-Overland flow-Nmix',
+    'HS.HS-PR.SO-Household waste-Nmix',
+    'HS.HS-PR.WW-Municipal wastewater-Nmix',
+]
+HOUSEHOLD_WASTE = ['HS.HS-PR.SO-Household waste-Nmix']
+MUNICIPAL_WASTEWATER = ['HS.HS-PR.WW-Municipal wastewater-Nmix']
+
+
+def hs_balance(df, years=ANALYSIS_YEARS):
+    """HS pool balance (kt N/yr): inflows minus outflows."""
+    return sum_flows(df, HS_IN_FULL, years) - sum_flows(df, HS_OUT_FULL, years)
+
+
+def hs_inputs(df, years=ANALYSIS_YEARS):
+    """All inflows to HS (kt N/yr)."""
+    return sum_flows(df, HS_IN_FULL, years)
+
+
+def hs_outputs(df, years=ANALYSIS_YEARS):
+    """All outflows from HS (kt N/yr)."""
+    return sum_flows(df, HS_OUT_FULL, years)
+
+
+def hs_food_and_consumer_goods_share(df, years=ANALYSIS_YEARS):
+    """Food products + consumer goods as a share of HS inflows (%)."""
+    return 100 * sum_flows(df, FOOD_PRODUCTS_CONSUMED + CONSUMER_GOODS, years) / hs_inputs(df, years)
+
+
+def hs_waste_and_wastewater_share(df, years=ANALYSIS_YEARS):
+    """Household waste + municipal wastewater as a share of HS outflows (%)."""
+    return 100 * sum_flows(df, HOUSEHOLD_WASTE + MUNICIPAL_WASTEWATER, years) / hs_outputs(df, years)
+
+
+def household_waste(df, years=ANALYSIS_YEARS):
+    """Household and settlement waste (kt N/yr)."""
+    return sum_flows(df, HOUSEHOLD_WASTE, years)
+
+
+# Household waste (HS.HS-PR.SO) split by source sector. Rows and column
+# offsets mirror shared_flow_calculations.find_household_waste exactly and
+# must be kept in sync with it. Table 05282 (1995-2011) covers construction,
+# services and households; table 10514 (2012-) also includes the energy and
+# water/sewage/waste-management sectors. 1990-1994 is extrapolated from
+# waste per person in find_household_waste and has no sector split.
+HOUSEHOLD_WASTE_SECTORS = {
+    'ssb_05282': {'first_year': 1995, 'last_year': 2011,
+                  'sectors': {'Construction': 5, 'Services': 6, 'Households': 9},
+                  'rows': {6: 'paper', 8: 'plastic', 11: 'wood', 12: 'textiles', 13: 'wet_organic',
+                           16: 'other_materials', 17: 'hazardous', 18: 'contaminated_masses'}},
+    'ssb_10514': {'first_year': 2012, 'last_year': 2024,
+                  'sectors': {'Energy supply': 4, 'Water, sewage, waste': 5, 'Construction': 6,
+                              'Services': 7, 'Households': 9},
+                  'rows': {6: 'wet_organic', 7: 'park_garden', 8: 'wood', 10: 'paper', 16: 'plastic',
+                           18: 'textiles', 21: 'hazardous', 22: 'mixed_waste', 23: 'other_materials',
+                           24: 'contaminated_masses'}},
+}
+
+
+@functools.lru_cache(maxsize=None)
+def _waste_tables():
+    """SSB tables 05282 and 10514 (loaded once per run)."""
+    from data_loader import load_all_data
+    preloaded = load_all_data({'hs'})
+    return preloaded['ssb_05282'], preloaded['ssb_10514']
+
+
+def household_waste_by_sector(waste_N):
+    """Household waste N (kt N/yr) per source sector and year, for a dict of
+    N fractions per waste category (kg N/kg). Dataset noise is left out: it
+    multiplies every sector equally and cancels in the shares."""
+    tables = dict(zip(['ssb_05282', 'ssb_10514'], _waste_tables()))
+    out = {}
+    for key, spec in HOUSEHOLD_WASTE_SECTORS.items():
+        d = tables[key]
+        for col in range(1, d.shape[1]):
+            label = str(d.iloc[3, col]).strip()
+            if not label.replace('.0', '').isdigit():
+                continue
+            year = int(float(label))
+            if not spec['first_year'] <= year <= spec['last_year']:
+                continue
+            out[year] = {sector: sum(float(d.iloc[row, col + offset]) * waste_N[cat]
+                                     for row, cat in spec['rows'].items()) / 1000.0  # tonnes -> kt
+                         for sector, offset in spec['sectors'].items()}
+    return pd.DataFrame(out).T.sort_index().fillna(0.0)
+
+
+def household_waste_sector_shares(n_draws=1000, seed=MC_RESAMPLE_SEED, years=(1995, 2011, 2012, 2023, 2024)):
+    """Sector shares (%) of household waste N in the given years: the value
+    with median N fractions, and the 2.5/50/97.5 percentiles over n_draws
+    draws of the waste N fractions (waste_fractions sheet, same
+    perturbation as main_mc.generate_mc_parameters_fast)."""
+    from main_mc import _draw_perturbed_value
+    wf = pd.read_excel('parameters/N_parameters.xlsx', sheet_name='waste_fractions')
+    wf = wf.set_index('waste_category')
+    base = household_waste_by_sector(wf['N_frac'].to_dict())
+    base_share = 100 * base.div(base.sum(axis=1), axis=0).loc[list(years)]
+    np.random.seed(seed)
+    draws = []
+    for _ in range(n_draws):
+        waste_N = {cat: _draw_perturbed_value(r.N_frac, r.lower_bound, r.upper_bound, r.uncertainty_type, r.distribution_type)
+                   for cat, r in wf.iterrows()}
+        t = household_waste_by_sector(waste_N).loc[list(years)]
+        draws.append(100 * t.div(t.sum(axis=1), axis=0))
+    stacked = pd.concat(draws, keys=range(n_draws))
+    q = stacked.groupby(level=1).quantile([0.025, 0.5, 0.975]).unstack()
+    return base_share, q
+
+
 # =============================================================================
 # Consumer goods, food flows and per-capita values
 # =============================================================================
@@ -769,7 +890,7 @@ MC_FLOWS = sorted(set(
     + NON_EDIBLE_ANIMAL_PRODUCTS + FOOD_PRODUCTS_CONSUMED + FOOD_EXPORT_TOTAL + WILD_CATCH + AQUACULTURE_FEED
     + MM_IN_FULL + MM_OUT_FULL + SM_IN_FULL + SM_OUT_FULL + AG_LEACHING + AG_ATMOSPHERIC_LOSSES
     + NOX_FLOWS_ALL_POOLS + EF_IN_FULL + EF_OUT_FULL + AMMONIA_IMPORT + FERTILIZER_EXPORT + CONSUMER_GOODS + FOOD_IMPORT
-    + MP_FP_IN_FULL + MP_FP_OUT_FULL + PR_SO_IN_FULL + PR_SO_OUT_FULL + PR_WW_IN_FULL + PR_WW_OUT_FULL
+    + MP_FP_IN_FULL + MP_FP_OUT_FULL + HS_IN_FULL + HS_OUT_FULL + PR_SO_IN_FULL + PR_SO_OUT_FULL + PR_WW_IN_FULL + PR_WW_OUT_FULL
 ))
 
 
@@ -886,6 +1007,12 @@ SERIES = [
     ('ammonia_import', "Ammonia import (kt N/yr)", ammonia_import, True),
     ('fertilizer_export', "Mineral fertilizer export (kt N/yr)", fertilizer_export, True),
     ('balance_mp_fp', "MP.FP subpool mass balance (kt N/yr, in - out)", mp_fp_balance, True),
+    ('hs_inputs', "HS pool inputs (kt N/yr)", hs_inputs, True),
+    ('hs_outputs', "HS pool outputs (kt N/yr)", hs_outputs, True),
+    ('balance_hs', "HS pool mass balance (kt N/yr, in - out)", hs_balance, True),
+    ('hs_food_cg_share', "Food products + consumer goods, share of HS inputs (%)", hs_food_and_consumer_goods_share, True),
+    ('hs_waste_ww_share', "Household waste + municipal wastewater, share of HS outputs (%)", hs_waste_and_wastewater_share, True),
+    ('household_waste', "Household and settlement waste (kt N/yr)", household_waste, True),
     ('pr_inputs', "PR pool inputs (kt N/yr)", pr_inputs, True),
     ('pr_outputs', "PR pool outputs (kt N/yr)", pr_outputs, True),
     ('balance_pr', "PR pool mass balance (kt N/yr, in - out)", pr_balance, True),
@@ -975,6 +1102,31 @@ def period_mean_interval(result, start_year, end_year, years=ANALYSIS_YEARS, see
         'mc_i': tuple(np.percentile(matrix.mean(axis=1), [2.5, 50, 97.5])),
         'mc_ii': tuple(np.percentile(resampled.mean(axis=1), [2.5, 50, 97.5])),
     }
+
+
+# Ratios between two single years, per MC iteration.
+YEAR_RATIOS = {
+    'household_waste': [(1990, 2017), (1995, 2017)],
+}
+
+
+def year_ratio_interval(result, start_year, end_year, years=ANALYSIS_YEARS):
+    """end_year / start_year for the median series, and the 2.5/50/97.5
+    percentiles of the same ratio across MC iterations (variant (i); each
+    iteration's own two years)."""
+    years = list(years)
+    m = result['mc']['matrix']
+    ratio = m[:, years.index(end_year)] / m[:, years.index(start_year)]
+    return {
+        'median_series': result['series'].loc[end_year] / result['series'].loc[start_year],
+        'mc_i': tuple(np.percentile(ratio, [2.5, 50, 97.5])),
+    }
+
+
+def year_ratios(results, ratios=YEAR_RATIOS):
+    """year_ratio_interval for every entry in YEAR_RATIOS."""
+    by_key = {r['key']: r for r in results}
+    return {(key, a, b): year_ratio_interval(by_key[key], a, b) for key, spans in ratios.items() for a, b in spans}
 
 
 def period_means(results, periods=PERIOD_MEANS):
