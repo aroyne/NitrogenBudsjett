@@ -307,6 +307,36 @@ def q1c_ag_sm_nue(df, years=ANALYSIS_YEARS):
     return 100 * out / inp
 
 
+# Inputs and outputs of Q1c, one row each, for the decomposition table.
+AG_SM_NUE_COMPONENTS = [
+    ('Mineral fertilizer', 'in', FERTILIZER_SM),
+    ('Manure application', 'in', MANURE_APPLICATION),
+    ('Deposition', 'in', DEPOSITION_SM),
+    ('Biological N2 fixation', 'in', BNF_SM),
+    ('Fodder crops', 'out', FODDER_CROPS),
+    ('Food crop products', 'out', FOOD_CROP_PRODUCTS),
+    ('Crop products for industrial use', 'out', INDUSTRIAL_CROP_PRODUCTS),
+]
+
+
+def ag_sm_nue_decomposition(df, years=ANALYSIS_YEARS):
+    """Start/end period averages and 1990-2024 trend (median series) for each
+    input and output of Q1c, plus the input and output totals, to show which
+    flows drive the AG.SM NUE trend."""
+    years = list(years)
+    rows = []
+    groups = [(name, side, flows) for name, side, flows in AG_SM_NUE_COMPONENTS]
+    for side in ('in', 'out'):
+        groups.append((f"Total {side}puts", side, [f for _, sd, fl in AG_SM_NUE_COMPONENTS if sd == side for f in fl]))
+    for name, side, flows in groups:
+        s = sum_flows(df, flows, years)
+        rows.append({'component': name, 'side': side,
+                     'avg_start': s.loc[years[0]:years[0] + 2].mean(),
+                     'avg_end': s.loc[years[-1] - 2:years[-1]].mean(),
+                     **trend_report(years, s.values, years[0], years[-1])})
+    return pd.DataFrame(rows)
+
+
 # =============================================================================
 # Question 2: how much does imported feed flatter the naive AG-whole NUE?
 # =============================================================================
