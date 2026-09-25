@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Nitrogen use efficiency (NUE) and mass-balance trend calculations for the
-article. Reads output_files/MC_Reporting_Statistics.xlsx (produced by
-main_mc.py) and reports median-based NUE ratios and mass balances for a set
-of questions defined and discussed while writing the article, each with a
-Mann-Kendall significance test and a Theil-Sen slope estimate.
+All calculations on the model output that the article needs, collected in
+one place: nitrogen use efficiency (NUE) at several system boundaries, AG
+mass balances, per-hectare and per-capita figures, each with trend
+statistics. Reads output_files/MC_Reporting_Statistics.xlsx and
+output_files/MC_Raw_Simulations.csv.gz (both produced by main_mc.py).
+The methods and current results are documented in
+claude_tekst/2026-09-25_calculations_for_article_metodenotat.md.
 
 Run directly to print a full report to stdout:
 
-    python3 nue_analysis.py
+    python3 calculations_for_article.py
 
 Re-run whenever the underlying model output changes (i.e. after any
 main_mc.py run that regenerates MC_Reporting_Statistics.xlsx) to refresh the
@@ -516,8 +518,8 @@ def load_raw_simulations(years=ANALYSIS_YEARS):
 def mc_trend_interval(series_fn, sims, years=ANALYSIS_YEARS):
     """Recomputes one series and its Theil-Sen trend within every MC
     iteration. Returns the 2.5/50/97.5 percentiles of the start- and
-    end-period averages and of the percent change, plus the share of
-    iterations whose trend has the same sign as the median one."""
+    end-period averages, the slope and the percent change, plus the share
+    of iterations whose trend has the same sign as the median one."""
     years = list(years)
     rows = []
     for sim_df in sims:
@@ -528,82 +530,108 @@ def mc_trend_interval(series_fn, sims, years=ANALYSIS_YEARS):
         rows.append({
             'avg_start': series.loc[years[0]:years[0] + 2].mean(),
             'avg_end': series.loc[years[-1] - 2:years[-1]].mean(),
+            'slope': slope,
             'pct_change': 100 * (fit_end - fit_start) / abs(fit_start),
         })
     res = pd.DataFrame(rows)
     q = res.quantile([0.025, 0.5, 0.975])
-    same_sign = (np.sign(res['pct_change']) == np.sign(q.loc[0.5, 'pct_change'])).mean()
+    same_sign = (np.sign(res['slope']) == np.sign(q.loc[0.5, 'slope'])).mean()
     return q, same_sign, len(res)
+
+
+# =============================================================================
+# Series reported for the article
+# =============================================================================
+
+# (key, label, series function of one DataFrame, MC interval available?)
+# A series built partly from data outside the MC (FAOSTAT item-level
+# production for the poultry/pork share) is reported without an MC interval.
+# Q3's non-fish food export uses median trade N-factors (see
+# food_export_excluding_fish), so its MC interval leaves out that small
+# term's own uncertainty.
+SERIES = [
+    ('q1a', "Q1a: AG whole NUE (%), external flows only", q1a_ag_whole_nue, True),
+    ('q1b', "Q1b: AG.MM alone NUE (%)", q1b_ag_mm_nue, True),
+    ('q1c', "Q1c: AG.SM alone NUE (%)", q1c_ag_sm_nue, True),
+    ('q2_naive', "Q2: naive AG-whole NUE (%) (= Q1a, repeated for comparison)", lambda d: q2_corrected_ag_whole_nue(d)[0], True),
+    ('q2_corrected', "Q2: corrected AG-whole NUE (%) (imported feed at domestic-equivalent N-cost)", lambda d: q2_corrected_ag_whole_nue(d)[1], True),
+    ('q2_poultry_pork_share', "Q2 (context): poultry+turkey+pork share of Animal products N (%)", lambda d: poultry_pork_share_of_animal_products(), False),
+    ('q3', "Q3: food-system NUE (%), land-based, excl. aquaculture", q3_food_system_nue, True),
+    ('q3_incl_fish', "Q3 (comparison): food-system NUE (%), incl. wild catch and aquaculture", q3_food_system_nue_incl_fish, True),
+    ('balance_mm', "AG.MM full mass balance (kt N/yr, in - out)", ag_mm_balance, True),
+    ('balance_sm', "AG.SM full mass balance (kt N/yr, in - out)", ag_sm_balance, True),
+    ('balance_ag', "AG total mass balance (kt N/yr, MM + SM)", ag_total_balance, True),
+    ('leaching_per_ha', f"AG leaching per hectare (kg N/ha/yr, area={AGRICULTURAL_AREA_HA:,} ha)", lambda d: ag_per_hectare(d)['leaching_kgN_ha'], True),
+    ('atmospheric_per_ha', f"AG atmospheric losses per hectare (kg N/ha/yr, area={AGRICULTURAL_AREA_HA:,} ha)", lambda d: ag_per_hectare(d)['atmospheric_kgN_ha'], True),
+    ('input_per_ha', f"AG soil N input per hectare (kg N/ha/yr, area={AGRICULTURAL_AREA_HA:,} ha)", lambda d: ag_per_hectare(d)['input_kgN_ha'], True),
+    ('nox_per_capita', "National NOx emissions per capita (g N/person/yr)", nox_emissions_per_capita, True),
+]
+
+
+def summarize_series(key, label, series_fn, mc, df, sims, years=ANALYSIS_YEARS):
+    """All reported statistics for one series: the median series itself,
+    its start/end period averages, the trend statistics from trend_report,
+    and (if mc) the per-iteration MC percentiles from mc_trend_interval."""
+    years = list(years)
+    series = series_fn(df)
+    result = {
+        'key': key,
+        'label': label,
+        'series': series,
+        'avg_start': series.loc[years[0]:years[0] + 2].mean(),
+        'avg_end': series.loc[years[-1] - 2:years[-1]].mean(),
+        'trend': trend_report(years, series.values, years[0], years[-1]),
+        'mc': None,
+    }
+    if mc:
+        q, same_sign, n_sims = mc_trend_interval(series_fn, sims, years)
+        result['mc'] = {'quantiles': q, 'same_sign': same_sign, 'n_sims': n_sims}
+    return result
+
+
+def compute_all():
+    """Summaries for every series in SERIES, in order."""
+    df = load_stats()
+    sims = load_raw_simulations()
+    return [summarize_series(key, label, fn, mc, df, sims) for key, label, fn, mc in SERIES], len(sims)
 
 
 # =============================================================================
 # Report
 # =============================================================================
 
-def _print_series_summary(label, series, series_fn=None, sims=None, years=ANALYSIS_YEARS):
-    """series_fn (a function of one iteration's DataFrame) enables the MC
-    interval; series built partly from data outside the MC (e.g. FAOSTAT
-    item-level production) are reported without one."""
+def print_summary(result, years=ANALYSIS_YEARS):
     years = list(years)
-    trend = trend_report(years, series.values, years[0], years[-1])
-    avg_start = series.loc[years[0]:years[0] + 2].mean()
-    avg_end = series.loc[years[-1] - 2:years[-1]].mean()
-    print(f"\n{label}")
-    print(f"  {years[0]}-{years[0]+2} avg: {avg_start:.2f}   {years[-1]-2}-{years[-1]} avg: {avg_end:.2f}")
+    trend = result['trend']
+    print(f"\n{result['label']}")
+    print(f"  {years[0]}-{years[0]+2} avg: {result['avg_start']:.2f}   {years[-1]-2}-{years[-1]} avg: {result['avg_end']:.2f}")
     print(f"  Theil-Sen: {trend['sen_slope_per_year']:.4f}/yr "
           f"[95% CI {trend['sen_slope_lo']:.4f} to {trend['sen_slope_hi']:.4f}]  "
           f"(fit {years[0]}: {trend['fit_start']:.2f} -> fit {years[-1]}: {trend['fit_end']:.2f}, "
           f"{trend['pct_change']:+.1f}% [95% CI {trend['pct_change_lo']:+.1f} to {trend['pct_change_hi']:+.1f}%])")
     print(f"  Mann-Kendall: Z={trend['mk_Z']:.3f}  p={trend['mk_p']:.5f}")
-    if series_fn is None:
+    if result['mc'] is None:
         print("  MC interval: not available (series uses data outside the MC)")
         return
-    q, same_sign, n_sims = mc_trend_interval(series_fn, sims, years)
-    print(f"  MC ({n_sims} iterations, 2.5-97.5 %): "
+    q = result['mc']['quantiles']
+    print(f"  MC ({result['mc']['n_sims']} iterations, 2.5-97.5 %): "
           f"{years[0]}-{years[0]+2} avg {q.loc[0.025, 'avg_start']:.2f} to {q.loc[0.975, 'avg_start']:.2f}   "
           f"{years[-1]-2}-{years[-1]} avg {q.loc[0.025, 'avg_end']:.2f} to {q.loc[0.975, 'avg_end']:.2f}")
-    print(f"  MC trend: {q.loc[0.5, 'pct_change']:+.1f}% "
-          f"[{q.loc[0.025, 'pct_change']:+.1f} to {q.loc[0.975, 'pct_change']:+.1f}%], "
-          f"same sign as median trend in {100 * same_sign:.1f}% of iterations")
+    print(f"  MC trend: {q.loc[0.5, 'slope']:.4f}/yr [{q.loc[0.025, 'slope']:.4f} to {q.loc[0.975, 'slope']:.4f}], "
+          f"{q.loc[0.5, 'pct_change']:+.1f}% [{q.loc[0.025, 'pct_change']:+.1f} to {q.loc[0.975, 'pct_change']:+.1f}%], "
+          f"same sign as median trend in {100 * result['mc']['same_sign']:.1f}% of iterations")
 
 
 def main():
-    df = load_stats()
-    sims = load_raw_simulations()
+    results, n_sims = compute_all()
     years = list(ANALYSIS_YEARS)
 
     print("=" * 78)
-    print("NUE and AG mass-balance report")
-    print(f"Source: {STATS_FILE} + {RAW_FILE} ({len(sims)} iterations)   Years: {years[0]}-{years[-1]}")
+    print("Calculations for the article: NUE, AG mass balances, per-hectare and per-capita figures")
+    print(f"Source: {STATS_FILE} + {RAW_FILE} ({n_sims} iterations)   Years: {years[0]}-{years[-1]}")
     print("=" * 78)
-
-    def show(label, fn, mc=True):
-        _print_series_summary(label, fn(df), fn if mc else None, sims)
-
-    show("Q1a: AG whole NUE (%), external flows only", q1a_ag_whole_nue)
-    show("Q1b: AG.MM alone NUE (%)", q1b_ag_mm_nue)
-    show("Q1c: AG.SM alone NUE (%)", q1c_ag_sm_nue)
-
-    show("Q2: naive AG-whole NUE (%) (= Q1a, repeated for comparison)", lambda d: q2_corrected_ag_whole_nue(d)[0])
-    show("Q2: corrected AG-whole NUE (%) (imported feed at domestic-equivalent N-cost)", lambda d: q2_corrected_ag_whole_nue(d)[1])
-    _print_series_summary("Q2 (context): poultry+turkey+pork share of Animal products N (%)", poultry_pork_share_of_animal_products())
-
-    # Q3's non-fish food export uses median trade N-factors (see
-    # food_export_excluding_fish), so its MC interval leaves out that small
-    # term's own uncertainty.
-    show("Q3: food-system NUE (%), land-based, excl. aquaculture", q3_food_system_nue)
-    show("Q3 (comparison): food-system NUE (%), incl. wild catch and aquaculture", q3_food_system_nue_incl_fish)
-
-    show("AG.MM full mass balance (kt N/yr, in - out)", ag_mm_balance)
-    show("AG.SM full mass balance (kt N/yr, in - out)", ag_sm_balance)
-    show("AG total mass balance (kt N/yr, MM + SM)", ag_total_balance)
-
-    show(f"AG leaching per hectare (kg N/ha/yr, area={AGRICULTURAL_AREA_HA:,} ha)", lambda d: ag_per_hectare(d)['leaching_kgN_ha'])
-    show(f"AG atmospheric losses per hectare (kg N/ha/yr, area={AGRICULTURAL_AREA_HA:,} ha)", lambda d: ag_per_hectare(d)['atmospheric_kgN_ha'])
-    show(f"AG soil N input per hectare (kg N/ha/yr, area={AGRICULTURAL_AREA_HA:,} ha)", lambda d: ag_per_hectare(d)['input_kgN_ha'])
-
-    show("National NOx emissions per capita (g N/person/yr)", nox_emissions_per_capita)
-
+    for result in results:
+        print_summary(result)
     print("\n" + "=" * 78)
 
 

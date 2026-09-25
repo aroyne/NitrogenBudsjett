@@ -56,7 +56,7 @@ def parse_arguments():
         help="Also export every individual MC iteration's per-flow-year values "
              "(not just the median/percentile summary) to "
              "output_files/MC_Raw_Simulations.csv.gz, for uncertainty-aware "
-             "trend analysis (e.g. nue_analysis.py)"
+             "trend analysis (calculations_for_article.py)"
     )
     return parser.parse_args()
 
