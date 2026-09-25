@@ -426,6 +426,29 @@ def ag_total_balance(df, years=ANALYSIS_YEARS):
     return ag_mm_balance(df, years) + ag_sm_balance(df, years)
 
 
+def ag_losses_total(df, years=ANALYSIS_YEARS):
+    """All N losses from agriculture (kt N/yr): NH3, N2O, NOx and N2
+    (denitrification) to the atmosphere plus leaching to water, from both
+    AG.MM and AG.SM."""
+    return sum_flows(df, AG_ATMOSPHERIC_LOSSES + AG_LEACHING, years)
+
+
+def fodder_loss_to_close_mm(df, years=ANALYSIS_YEARS):
+    """Share of Fodder crops (%) that would have to be lost between field and
+    feed trough for the AG.MM balance to be zero. A loss L removes L x Fodder
+    crops from MM's input and SM's output at the same time, so the AG total
+    balance is unchanged; it only moves surplus from MM to SM. Fodder crops
+    includes innmark grazing, where silage losses do not apply, so the share
+    of harvested fodder alone would be higher."""
+    return 100 * ag_mm_balance(df, years) / sum_flows(df, FODDER_CROPS, years)
+
+
+def fodder_loss_to_close_sm(df, years=ANALYSIS_YEARS):
+    """Share of Fodder crops (%) that would have to be lost for the AG.SM
+    balance to be zero (see fodder_loss_to_close_mm)."""
+    return -100 * ag_sm_balance(df, years) / sum_flows(df, FODDER_CROPS, years)
+
+
 # =============================================================================
 # Per-hectare and per-capita normalisations
 # =============================================================================
@@ -718,6 +741,9 @@ SERIES = [
     ('balance_mm', "AG.MM full mass balance (kt N/yr, in - out)", ag_mm_balance, True),
     ('balance_sm', "AG.SM full mass balance (kt N/yr, in - out)", ag_sm_balance, True),
     ('balance_ag', "AG total mass balance (kt N/yr, MM + SM)", ag_total_balance, True),
+    ('ag_losses', "AG total N losses (kt N/yr, NH3 + N2O + NOx + N2 + leaching)", ag_losses_total, True),
+    ('fodder_loss_mm', "Fodder crops loss needed to close the AG.MM balance (% of Fodder crops)", fodder_loss_to_close_mm, True),
+    ('fodder_loss_sm', "Fodder crops loss needed to close the AG.SM balance (% of Fodder crops)", fodder_loss_to_close_sm, True),
     ('leaching_per_ha', f"AG leaching per hectare (kg N/ha/yr, area={AGRICULTURAL_AREA_HA:,} ha)", lambda d: ag_per_hectare(d)['leaching_kgN_ha'], True),
     ('atmospheric_per_ha', f"AG atmospheric losses per hectare (kg N/ha/yr, area={AGRICULTURAL_AREA_HA:,} ha)", lambda d: ag_per_hectare(d)['atmospheric_kgN_ha'], True),
     ('input_per_ha', f"AG soil N input per hectare (kg N/ha/yr, area={AGRICULTURAL_AREA_HA:,} ha)", lambda d: ag_per_hectare(d)['input_kgN_ha'], True),
@@ -738,7 +764,8 @@ SERIES = [
 def summarize_series(key, label, series_fn, mc, df, sims, years=ANALYSIS_YEARS):
     """All reported statistics for one series: the median series itself,
     its start/end period averages, the trend statistics from trend_report,
-    and (if mc) the MC percentiles under both error structures: variant (i)
+    and (if mc) the per-year MC percentiles and the MC percentiles under
+    both error structures: variant (i)
     from mc_trend_interval and variant (ii) from
     mc_trend_interval_independent_years."""
     years = list(years)
@@ -756,7 +783,11 @@ def summarize_series(key, label, series_fn, mc, df, sims, years=ANALYSIS_YEARS):
     if mc:
         matrix = mc_series_matrix(series_fn, sims, years)
         q, same_sign, n_sims = mc_trend_interval(matrix, years)
-        result['mc'] = {'quantiles': q, 'same_sign': same_sign, 'n_sims': n_sims}
+        # Per-year 2.5 / 50 / 97.5 percentiles across iterations.
+        year_q = np.nanpercentile(matrix, [2.5, 50, 97.5], axis=0)
+        result['mc'] = {'quantiles': q, 'same_sign': same_sign, 'n_sims': n_sims,
+                        'year_values': {y: tuple(year_q[:, i]) for i, y in enumerate(years)},
+                        'matrix': matrix}
         q, same_sign, n_resamples = mc_trend_interval_independent_years(matrix, years)
         result['mc_independent_years'] = {'quantiles': q, 'same_sign': same_sign, 'n_resamples': n_resamples}
     return result
@@ -775,6 +806,38 @@ SEGMENTS = {
     'food_products_per_capita': [(1990, 2005), (2005, 2024)],
     'food_export': [(1990, 2000), (2000, 2006), (2006, 2010), (2010, 2024)],
 }
+
+
+# Period averages other than the standard 1990-1992 / 2022-2024 ones.
+PERIOD_MEANS = {
+    'ag_losses': [(1990, 1991)],
+}
+
+
+def period_mean_interval(result, start_year, end_year, years=ANALYSIS_YEARS, seed=MC_RESAMPLE_SEED):
+    """Mean of the median series over start_year-end_year, with the
+    2.5/50/97.5 percentiles of the same mean across MC iterations under
+    variant (i) (each iteration's own years) and variant (ii) (each year
+    drawn from a random iteration, as in mc_trend_interval_independent_years)."""
+    years = list(years)
+    cols = [years.index(y) for y in range(start_year, end_year + 1)]
+    matrix = result['mc']['matrix'][:, cols]
+    rng = np.random.default_rng(seed)
+    picks = rng.integers(0, matrix.shape[0], size=matrix.shape)
+    resampled = matrix[picks, np.arange(matrix.shape[1])]
+    return {
+        'median_series': result['series'].loc[start_year:end_year].mean(),
+        'mc_i': tuple(np.percentile(matrix.mean(axis=1), [2.5, 50, 97.5])),
+        'mc_ii': tuple(np.percentile(resampled.mean(axis=1), [2.5, 50, 97.5])),
+    }
+
+
+def period_means(results, periods=PERIOD_MEANS):
+    """period_mean_interval for every entry in PERIOD_MEANS, keyed by
+    (series key, start year, end year)."""
+    by_key = {r['key']: r for r in results}
+    return {(key, a, b): period_mean_interval(by_key[key], a, b)
+            for key, spans in periods.items() for a, b in spans}
 
 
 def segment_trends(results, segments=SEGMENTS):
@@ -834,6 +897,10 @@ def main():
     print("=" * 78)
     for result in results:
         print_summary(result)
+    print("\nOther period averages")
+    for (key, a, b), m in period_means(results).items():
+        print(f"  {key} {a}-{b}: {m['median_series']:.2f}  MC (i) {m['mc_i'][1]:.2f} [{m['mc_i'][0]:.2f}, {m['mc_i'][2]:.2f}]"
+              f"  MC (ii) {m['mc_ii'][1]:.2f} [{m['mc_ii'][0]:.2f}, {m['mc_ii'][2]:.2f}]")
     print("\nSub-period trends (median series)")
     for (key, a, b), trend in segment_trends(results).items():
         print(f"  {key} {a}-{b}: {trend['pct_change']:+.1f}% "
