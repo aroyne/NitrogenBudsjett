@@ -102,10 +102,11 @@ def theil_sen(years, values):
 
 
 def theil_sen_ci(years, values, z=Z_95):
-    """Non-parametric confidence interval for the Theil-Sen slope (Sen 1968;
-    Gilbert 1987, section 16.5): with N ordered pairwise slopes and
-    C = z * sqrt(Var(S)) from the Mann-Kendall variance, the bounds are the
-    M1-th and (M2+1)-th slopes, M1 = (N - C) / 2 and M2 = (N + C) / 2."""
+    """Non-parametric confidence interval for the Theil-Sen slope (Hollander
+    & Wolfe 1973, as given in Gilbert 1987, section 16.5): with N ordered
+    pairwise slopes and C = z * sqrt(Var(S)) from the Mann-Kendall
+    variance, the bounds are the M1-th and (M2+1)-th slopes,
+    M1 = (N - C) / 2 and M2 = (N + C) / 2."""
     years = np.asarray(years, dtype=float)
     values = np.asarray(values, dtype=float)
     n = len(values)
