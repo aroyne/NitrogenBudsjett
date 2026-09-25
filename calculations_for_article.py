@@ -780,6 +780,26 @@ HY_INTERNAL = ['HY.SW-HY.CW-Inflow to coastal waters-Nmix', 'HY.AC-HY.CW-Excreti
                'HY.AC-HY.CW-Waste feed-Nmix']
 
 
+INFLOW_TO_COASTAL_WATERS = ['HY.SW-HY.CW-Inflow to coastal waters-Nmix']
+AQUACULTURE_PRODUCTION = ['HY.AC-MP.FP-Coastal fish and seafood-Nmix']
+AQUACULTURE_EXCRETA = ['HY.AC-HY.CW-Excretia-Nmix']
+AQUACULTURE_WASTE_FEED = ['HY.AC-HY.CW-Waste feed-Nmix']
+TREATED_WASTEWATER = ['PR.WW-HY.CW-Treated wastewater discharge-Nmix']
+WILD_CATCH_AND_SHELLFISH = ['HY.CW-MP.FP-Fish (wild catch)-Nmix', 'HY.CW-MP.FP-Shellfish-Nmix']
+CW_INPUTS = INFLOW_TO_COASTAL_WATERS + AQUACULTURE_EXCRETA + AQUACULTURE_WASTE_FEED + TREATED_WASTEWATER
+
+
+def cw_input_share(df, flows, years=ANALYSIS_YEARS):
+    """Share (%) of all inflows to HY.CW made up by flows."""
+    return 100 * sum_flows(df, flows, years) / sum_flows(df, CW_INPUTS, years)
+
+
+def excreta_share_of_aquafeed(df, years=ANALYSIS_YEARS):
+    """Aquaculture excreta as a share of all aquaculture feed, domestic and
+    imported (%)."""
+    return 100 * sum_flows(df, AQUACULTURE_EXCRETA, years) / sum_flows(df, AQUACULTURE_FEED, years)
+
+
 def _pool_flows(df, prefix, direction):
     """Flow names into ('in') or out of ('out') the pool or subpool whose
     code starts with prefix, excluding flows internal to it."""
@@ -898,23 +918,32 @@ def household_waste_by_sector(waste_N):
     return pd.DataFrame(out).T.sort_index().fillna(0.0)
 
 
-def household_waste_sector_shares(n_draws=1000, seed=MC_RESAMPLE_SEED, years=(1995, 2011, 2012, 2023, 2024)):
-    """Sector shares (%) of household waste N in the given years: the value
-    with median N fractions, and the 2.5/50/97.5 percentiles over n_draws
-    draws of the waste N fractions (waste_fractions sheet, same
-    perturbation as main_mc.generate_mc_parameters_fast)."""
+HOUSEHOLD_WASTE_SHARE_PERIODS = [(1995, 1997), (2009, 2011), (2012, 2014), (2022, 2024)]
+
+
+def _period_share(table, periods):
+    """Sector shares (%) of the summed N in each period."""
+    rows = {f"{a}–{b}": table.loc[a:b].sum() for a, b in periods}
+    t = pd.DataFrame(rows).T
+    return 100 * t.div(t.sum(axis=1), axis=0)
+
+
+def household_waste_sector_shares(n_draws=1000, seed=MC_RESAMPLE_SEED, periods=HOUSEHOLD_WASTE_SHARE_PERIODS):
+    """Sector shares (%) of household waste N summed over each period: the
+    value with median N fractions, and the 2.5/50/97.5 percentiles over
+    n_draws draws of the waste N fractions (waste_fractions sheet, same
+    perturbation as main_mc.generate_mc_parameters_fast). The periods
+    bracket the switch from table 05282 to 10514 in 2012."""
     from main_mc import _draw_perturbed_value
     wf = pd.read_excel('parameters/N_parameters.xlsx', sheet_name='waste_fractions')
     wf = wf.set_index('waste_category')
-    base = household_waste_by_sector(wf['N_frac'].to_dict())
-    base_share = 100 * base.div(base.sum(axis=1), axis=0).loc[list(years)]
+    base_share = _period_share(household_waste_by_sector(wf['N_frac'].to_dict()), periods)
     np.random.seed(seed)
     draws = []
     for _ in range(n_draws):
         waste_N = {cat: _draw_perturbed_value(r.N_frac, r.lower_bound, r.upper_bound, r.uncertainty_type, r.distribution_type)
                    for cat, r in wf.iterrows()}
-        t = household_waste_by_sector(waste_N).loc[list(years)]
-        draws.append(100 * t.div(t.sum(axis=1), axis=0))
+        draws.append(_period_share(household_waste_by_sector(waste_N), periods))
     stacked = pd.concat(draws, keys=range(n_draws))
     q = stacked.groupby(level=1).quantile([0.025, 0.5, 0.975]).unstack()
     return base_share, q
@@ -1107,6 +1136,14 @@ SERIES = [
     ('bnf_total', "Biological N2 fixation, all pools (kt N/yr)", bnf_total, True),
     ('bnf_share_fs_ol', "Share of biological N2 fixation in FS.OL (%)", lambda d: 100 * sum_flows(d, ['AT.AT-FS.OL-N2 fixation-N2']) / bnf_total(d), True),
     ('cross_border_net', "Atmospheric cross-border inflow minus outflow, OXN + RDN (kt N/yr)", cross_border_net_inflow, True),
+    ('inflow_coastal', "Inflow to coastal waters, HY.SW to HY.CW (kt N/yr)", lambda d: sum_flows(d, INFLOW_TO_COASTAL_WATERS), True),
+    ('aquaculture_production', "Aquaculture production, HY.AC to MP.FP (kt N/yr)", lambda d: sum_flows(d, AQUACULTURE_PRODUCTION), True),
+    ('excreta_share_feed', "Aquaculture excreta, share of aquaculture feed (%)", excreta_share_of_aquafeed, True),
+    ('cw_share_excreta', "Aquaculture excreta, share of HY.CW inputs (%)", lambda d: cw_input_share(d, AQUACULTURE_EXCRETA), True),
+    ('cw_share_ac', "Aquaculture excreta + waste feed, share of HY.CW inputs (%)", lambda d: cw_input_share(d, AQUACULTURE_EXCRETA + AQUACULTURE_WASTE_FEED), True),
+    ('cw_share_sw', "Inflow from HY.SW, share of HY.CW inputs (%)", lambda d: cw_input_share(d, INFLOW_TO_COASTAL_WATERS), True),
+    ('cw_share_ww', "Treated wastewater, share of HY.CW inputs (%)", lambda d: cw_input_share(d, TREATED_WASTEWATER), True),
+    ('cw_share_catch', "Wild catch + shellfish, relative to HY.CW inputs (%)", lambda d: cw_input_share(d, WILD_CATCH_AND_SHELLFISH), True),
     ('balance_hy', "HY pool mass balance (kt N/yr, in - out)", lambda d: pool_balance(d, 'HY'), True),
     ('balance_hy_sw', "HY.SW subpool mass balance (kt N/yr)", lambda d: pool_balance(d, 'HY.SW'), True),
     ('balance_hy_cw', "HY.CW subpool mass balance (kt N/yr)", lambda d: pool_balance(d, 'HY.CW'), True),
@@ -1139,7 +1176,7 @@ SERIES = [
 def summarize_series(key, label, series_fn, mc, df, sims, years=ANALYSIS_YEARS):
     """All reported statistics for one series: the median series itself,
     its start/end period averages, the trend statistics from trend_report,
-    and (if mc) the per-year MC percentiles and the MC percentiles under
+    and (if mc) the per-iteration matrix and the MC percentiles under
     both error structures: variant (i)
     from mc_trend_interval and variant (ii) from
     mc_trend_interval_independent_years."""
@@ -1158,11 +1195,7 @@ def summarize_series(key, label, series_fn, mc, df, sims, years=ANALYSIS_YEARS):
     if mc:
         matrix = mc_series_matrix(series_fn, sims, years)
         q, same_sign, n_sims = mc_trend_interval(matrix, years)
-        # Per-year 2.5 / 50 / 97.5 percentiles across iterations.
-        year_q = np.nanpercentile(matrix, [2.5, 50, 97.5], axis=0)
-        result['mc'] = {'quantiles': q, 'same_sign': same_sign, 'n_sims': n_sims,
-                        'year_values': {y: tuple(year_q[:, i]) for i, y in enumerate(years)},
-                        'matrix': matrix}
+        result['mc'] = {'quantiles': q, 'same_sign': same_sign, 'n_sims': n_sims, 'matrix': matrix}
         q, same_sign, n_resamples = mc_trend_interval_independent_years(matrix, years)
         result['mc_independent_years'] = {'quantiles': q, 'same_sign': same_sign, 'n_resamples': n_resamples}
     return result
@@ -1187,11 +1220,6 @@ SEGMENTS = {
 # Period averages other than the standard 1990-1992 / 2022-2024 ones.
 PERIOD_MEANS = {
     'ag_losses': [(1990, 1991)],
-    'deposition_total': [(2023, 2023)],
-    'deposition_share_fs': [(2023, 2023)],
-    'deposition_ag': [(2023, 2023)],
-    'bnf_total': [(2023, 2023)],
-    'ww_n2_removal_share': [(2023, 2023)],
 }
 
 
@@ -1213,29 +1241,33 @@ def period_mean_interval(result, start_year, end_year, years=ANALYSIS_YEARS, see
     }
 
 
-# Ratios between two single years, per MC iteration.
-YEAR_RATIOS = {
-    'household_waste': [(1990, 2017), (1995, 2017)],
+# Ratios between two period averages, per MC iteration: (start period, end period).
+PERIOD_RATIOS = {
+    'household_waste': [((1990, 1992), (2022, 2024)), ((1995, 1997), (2022, 2024))],
+    'aquaculture_production': [((1990, 1992), (2022, 2024))],
 }
 
 
-def year_ratio_interval(result, start_year, end_year, years=ANALYSIS_YEARS):
-    """end_year / start_year for the median series, and the 2.5/50/97.5
-    percentiles of the same ratio across MC iterations (variant (i); each
-    iteration's own two years)."""
+def period_ratio_interval(result, start, end, years=ANALYSIS_YEARS):
+    """Mean over the end period divided by mean over the start period, for
+    the median series and as 2.5/50/97.5 percentiles across MC iterations
+    (variant (i); each iteration's own years)."""
     years = list(years)
     m = result['mc']['matrix']
-    ratio = m[:, years.index(end_year)] / m[:, years.index(start_year)]
+    cols = lambda a, b: [years.index(y) for y in range(a, b + 1)]
+    ratio = m[:, cols(*end)].mean(axis=1) / m[:, cols(*start)].mean(axis=1)
+    s = result['series']
     return {
-        'median_series': result['series'].loc[end_year] / result['series'].loc[start_year],
+        'median_series': s.loc[end[0]:end[1]].mean() / s.loc[start[0]:start[1]].mean(),
         'mc_i': tuple(np.percentile(ratio, [2.5, 50, 97.5])),
     }
 
 
-def year_ratios(results, ratios=YEAR_RATIOS):
-    """year_ratio_interval for every entry in YEAR_RATIOS."""
+def period_ratios(results, ratios=PERIOD_RATIOS):
+    """period_ratio_interval for every entry in PERIOD_RATIOS, keyed by
+    (series key, start period, end period)."""
     by_key = {r['key']: r for r in results}
-    return {(key, a, b): year_ratio_interval(by_key[key], a, b) for key, spans in ratios.items() for a, b in spans}
+    return {(key, a, b): period_ratio_interval(by_key[key], a, b) for key, spans in ratios.items() for a, b in spans}
 
 
 def period_means(results, periods=PERIOD_MEANS):
