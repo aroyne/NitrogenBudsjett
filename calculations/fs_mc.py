@@ -14,7 +14,7 @@ from calculations.utils import (
     report_missing_years,
     add_flat_carryforward_year
 )
-from calculations.shared_flow_calculations import find_industrial_round_wood
+from calculations.shared_flow_calculations import find_industrial_round_wood, find_teotil2_bias_corrected
 
 def execute_calculations_fs(preloaded_data, current_params, dataset_noise):
     """
@@ -74,39 +74,37 @@ def _add_fo_denitrification_emissions_mc(results, preloaded_data, current_params
 def _add_land_leaching_mc(results, preloaded_data, current_params, dataset_noise, flow_code, frac_key, teotil3_col):
     """
     Forest (FS.FO) or other land (FS.OL) leaching to surface water, selected by
-    flow_code/frac_key/teotil3_col. Two data eras, per Sample et al. (2024):
-    - 1990-2012: preloaded_data['hy_kyst_tilforsel'] <- data_files/Tilførsel av
-      nitrogen til kystområdene fordelt på kilder.xlsx (Miljødirektoratet's older
-      "Kysttilførsel" compilation), column 3 = 'Bakgrunn' (diffuse background N
-      loading, not split by land type). Each land type's share of this is
-      estimated as a fixed fraction (frac_key: FO_leaching_bg_fraction ~ 0.59,
-      OL_leaching_bg_fraction ~ 0.41): 'Bakgrunn' matches TEOTIL3's
-      upland + wood to within ~2 % over 2013-2023, and wood makes up 0.56-0.60
-      of that sum.
+    flow_code/frac_key/teotil3_col. Two data eras:
+    - 1990-2012: TEOTIL2 natural diffuse loss (forest, mountain, lakes and
+      agricultural background, not split by land type), bias-corrected to the
+      TEOTIL3 wood + upland level, see find_teotil2_bias_corrected in
+      shared_flow_calculations.py. Each land type's share of this is a fixed
+      fraction (frac_key: FO_leaching_bg_fraction ~ 0.59,
+      OL_leaching_bg_fraction ~ 0.41), matching wood's share of wood + upland
+      in TEOTIL3 (0.56-0.60 over 2013-2023).
     - 2013-2023: preloaded_data['hy_teotil3_by_source'] <- data_files/
       teotil3_n_summary.xlsx, teotil3_col = 10 ('wood_totn_tonnes') for
       forest and 8 ('upland_totn_tonnes': mountain, heath and wetland) for
       other land.
-    The two eras must not overlap at 2013: Kysttilførsel stops at 2012 so TEOTIL3
-    is the sole source for 2013 onward. A shared year in both loops would add two
-    rows for that year within a single simulation, biasing its MC median/CI (see
-    the groupby(['flow_name', 'year']) aggregation in utils_stat.py).
+    The two eras must not overlap: the TEOTIL2 series stops at the year before
+    TEOTIL3 starts. A shared year in both loops would add two rows for that
+    year within a single simulation, biasing its MC median/CI (see the
+    groupby(['flow_name', 'year']) aggregation in utils_stat.py).
     """
     collected_years = set()
     data_sources = 'TEOTIL'
     dataset_key = 'TEOTIL'
 
-    df_kyst = preloaded_data.get('hy_kyst_tilforsel')
+    teotil2 = find_teotil2_bias_corrected(preloaded_data)
     df_teotil3 = preloaded_data.get('hy_teotil3_by_source')
 
     frac = float(current_params.get(frac_key))
 
-    # 1990-2012 (Kysttilførsel, rows 0-22)
-    for r in range(0, 23):
-        year = int(df_kyst.iloc[r, 0])
+    # 1990-2012 (TEOTIL2, bias-corrected)
+    for year, raw_val in teotil2['forest_and_other_land'].items():
+        year = int(year)
         collected_years.add(year)
 
-        raw_val = float(df_kyst.iloc[r, 3]) / 1000
         noise_val = dataset_noise[dataset_key]
         perturbed_raw = raw_val * noise_val
 
@@ -114,7 +112,7 @@ def _add_land_leaching_mc(results, preloaded_data, current_params, dataset_noise
 
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok', 'data_sources': data_sources
+            'comment': 'ok', 'data_sources': 'NIVA TEOTIL2, bias-corrected to TEOTIL3'
         })
 
     # 2013-2023 (TEOTIL3, row 0 is the header, rows 1-11 = years 2013-2023)

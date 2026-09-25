@@ -1059,3 +1059,100 @@ def find_treated_wastewater_discharge(df_05280, df_utslipp, dataset_noise):
 
     return ww_discharge
 
+
+
+def _teotil3_table(df_raw):
+    """
+    Turns one raw sheet of teotil3_n_summary.xlsx (as loaded by
+    data_loader.py's 'openpyxl_teotil' method, header in row 0) into a
+    year-indexed DataFrame in tonnes N. Columns without a header are
+    spreadsheet scratch columns and are dropped.
+    """
+    df = df_raw.iloc[1:].copy()
+    df.columns = df_raw.iloc[0]
+    df = df.loc[:, df.columns.notna()]
+    df = df[df['year'].notna()]
+    df['year'] = df['year'].astype(int)
+    return df.set_index('year').astype(float)
+
+
+def find_teotil2_bias_corrected(preloaded_data):
+    """
+    TEOTIL2 national totals for the years before TEOTIL3 starts, bias-corrected
+    to the TEOTIL3 level. Used by hy_mc.py, fs_mc.py and hs_mc.py for 1990-2012.
+
+    Follows the method NIVA uses to extend TEOTIL3 back to 1990 (Sample et al.
+    2024; teotil3_reporting): each TEOTIL2 series is multiplied by a fixed
+    factor F = mean(TEOTIL3) / mean(TEOTIL2) over the years both models cover,
+    so the two series have the same mean there and there is no step when the
+    model switches. The factors are computed per category rather than for a
+    combined total, because the two models differ most for urban areas and
+    agriculture, and a single factor would carry that difference over to the
+    background series.
+
+    All TEOTIL2 years come from the same model run in the NIVANorge/teotil2
+    repository. Published series for 1990-1995 (Miljødirektoratet's
+    "Tilførsel av nitrogen til kystområdene", and NIVA's teotil3_reporting)
+    splice in results from an older TEOTIL version for those years, with 40-50 %
+    higher background loading than this TEOTIL2 run gives for the same years.
+
+    TEOTIL2 values (`accum_*`) are inputs to the coast after retention in lakes
+    and rivers; the TEOTIL3 source columns in teotil3_n_summary.xlsx are
+    inputs to surface water before retention. The ratio F absorbs this
+    difference in level for each category.
+
+    Returns a DataFrame indexed by year (the TEOTIL2 years before the first
+    TEOTIL3 year), in kt N, without MC noise:
+      'forest_and_other_land' - TEOTIL2 natural diffuse loss scaled to TEOTIL3
+          wood + upland, the quantity fs_mc.py splits into FS.FO and FS.OL.
+      'urban' - TEOTIL2 urban scaled to TEOTIL3 urban (before retention), as
+          used by hs_mc.py. TEOTIL2 urban is the same value in every year, so
+          this series is flat.
+      'diffuse_to_coast' - background, agriculture, urban and industry, each
+          scaled to its TEOTIL3 counterpart before retention, then multiplied
+          by the share of these inputs that TEOTIL3 delivers to the coast. Used
+          by hy_mc.py for HY.SW-HY.CW.
+    """
+    # 'teotil2_national' <- teotil2_nasjonale_totaler.csv (data_loader.py
+    # DATA_MAP): TEOTIL2 national totals, accum_* columns summed over the main
+    # catchments 001-247 and 315, kt N, made by data_files/teotil2_nasjonale_totaler.py
+    t2 = preloaded_data['teotil2_national'].set_index('year')
+    # 'hy_teotil3_by_source'/'hy_teotil3_to_coast' <- teotil3_n_summary.xlsx
+    # (data_loader.py DATA_MAP): N flows extracted from TEOTIL3 by NIVA, tonnes N
+    t3 = _teotil3_table(preloaded_data['hy_teotil3_by_source']) / 1000.0
+    t3_to_coast = _teotil3_table(preloaded_data['hy_teotil3_to_coast'])['totn_to-coast_tonnes'] / 1000.0
+
+    overlap = t2.index.intersection(t3.index)
+    years_before_t3 = t2.index[t2.index < t3.index.min()]
+
+    def factor(t3_series, t2_series):
+        return t3_series.loc[overlap].mean() / t2_series.loc[overlap].mean()
+
+    # TEOTIL2 'nat_diff' covers forest, mountain, lakes and the background
+    # part of agricultural land; TEOTIL3 splits these into separate columns.
+    t3_background = (t3['wood_totn_tonnes'] + t3['upland_totn_tonnes']
+                     + t3['lake_totn_tonnes'] + t3['agriculture-background_totn_tonnes'])
+    t3_forest_and_other_land = t3['wood_totn_tonnes'] + t3['upland_totn_tonnes']
+    categories = {
+        'background': (t3_background, t2['nat_diff_tot-n_kt']),
+        'agriculture': (t3['agriculture_totn_tonnes'], t2['agri_diff_tot-n_kt'] + t2['agri_pt_tot-n_kt']),
+        'urban': (t3['urban_totn_tonnes'], t2['urban_tot-n_kt']),
+        'industry': (t3['industry_totn_tonnes'], t2['ind_tot-n_kt']),
+    }
+    scaled = {name: factor(t3_s, t2_s) * t2_s.loc[years_before_t3]
+              for name, (t3_s, t2_s) in categories.items()}
+
+    # Share of the four categories that reaches the coast in TEOTIL3: total to
+    # coast minus the sources that have their own flows in the model
+    # (aquaculture and wastewater), relative to the same categories before
+    # retention.
+    t3_diffuse_to_coast = (t3_to_coast - t3['aquaculture_totn_tonnes']
+                           - t3['large-wastewater_totn_tonnes'] - t3['spredt_totn_tonnes'])
+    t3_diffuse_before_retention = sum(t3_s for t3_s, _ in categories.values())
+    to_coast_share = t3_diffuse_to_coast.loc[overlap].mean() / t3_diffuse_before_retention.loc[overlap].mean()
+
+    return pd.DataFrame({
+        'forest_and_other_land': factor(t3_forest_and_other_land, t2['nat_diff_tot-n_kt']) * t2['nat_diff_tot-n_kt'].loc[years_before_t3],
+        'urban': scaled['urban'],
+        'diffuse_to_coast': sum(scaled.values()) * to_coast_share,
+    })

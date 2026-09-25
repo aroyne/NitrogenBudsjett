@@ -247,6 +247,10 @@ Tab_08801_1988_2024.csv
 SSB table 08801: UTENRIKSHANDEL ETTER LAND OG VAREKODE (HS). Full Norwegian import/export statistics 1988-2024, all countries and HS commodity codes
 https://www.ssb.no/utenriksokonomi/utenrikshandel/artikler/import-og-eksport-alle-land-og-varenummer
 
+teotil2_nasjonale_totaler.csv
+TEOTIL2 national annual totals 1990-2022: accum_* columns (N and P inputs to the coast after retention, by source, kt; discharge m3/s; area km2) summed over the outlets of the main river basins 001-247 and 315
+made with data_files/teotil2_nasjonale_totaler.py from the per-regine result files data/norway_annual_output_data/teotil2_results_{year}.csv at https://github.com/NIVANorge/teotil2, commit bf3c380 (20.05.2025), downloaded 25.09.2026
+
 teotil3_n_summary.xlsx
 Relevant N flows extracted from the TEOTIL model
 by James Sample, January 2026
@@ -255,6 +259,7 @@ Tilførsel av nitrogen til kystområdene fordelt på kilder.xlsx
 Nitrogen loading to Norwegian coastal areas by source (aquaculture, sewage, background, built-up area, industry, agriculture)
 https://www.miljodirektoratet.no/ansvarsomrader/overvaking-arealplanlegging/miljoovervaking/overvakingsprogrammer/forurensning-og-klimagasser/teotil/
 downloaded 06.11.2025
+not used in the model calculations; only used for comparison in article_figures/make_teotil_comparison.py
 
 ull.xlsx
 Wool delivered to slaughterhouses per year, 2005-2024

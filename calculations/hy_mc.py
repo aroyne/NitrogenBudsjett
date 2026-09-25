@@ -17,6 +17,7 @@ from calculations.shared_flow_calculations import (
     find_aquaculture_production,
     find_recovered_lost_fish_N,
     find_treated_wastewater_discharge,
+    find_teotil2_bias_corrected,
     get_aquafeed_budget
 )
 
@@ -68,39 +69,25 @@ def _add_inflow_to_coastal_waters(results, preloaded_data, current_params, datas
         dataset_noise=dataset_noise
     )
 
-    # Earlier years (1990-2012): Miljødirektoratet's coastal N-loading compilation.
-    # 'hy_kyst_tilforsel' <- Tilførsel av nitrogen til kystområdene fordelt på
-    # kilder.xlsx (data_loader.py DATA_MAP): N loading to Norwegian coastal
-    # areas by source, 1990-2023
-    df_kyst = preloaded_data.get('hy_kyst_tilforsel')
+    # 1990-2012: TEOTIL2 background, agriculture, urban and industry reaching
+    # the coast, bias-corrected to TEOTIL3 (see find_teotil2_bias_corrected).
+    # Aquaculture and wastewater are not included - they have their own flows.
+    teotil2 = find_teotil2_bias_corrected(preloaded_data)
+    for year, raw_val in teotil2['diffuse_to_coast'].items():
+        year = int(year)
+        collected_years.add(year)
+        val = raw_val * noise_teotil
 
-    for i in range(len(df_kyst)):
-        val_at_col0 = str(df_kyst.iloc[i, 0]).strip()
-        if val_at_col0.lower() in ['year', 'år', 'årstall', 'nan', '']:
-            continue
+        outflow_tracker.loc[year, 'entries'] = 1
+        outflow_tracker.loc[year, 'value'] = val
 
-        year = int(float(val_at_col0))
-        if year in EXPECTED_YEARS:
-            collected_years.add(year)
-            # Columns 3-6: Bakgrunn (background), Bebygd (built-up/urban),
-            # Industri, Jordbruk (agriculture). Akvakultur (col 1) and Avløp
-            # (col 2) are deliberately excluded - they're covered by the
-            # dedicated aquaculture and wastewater flows.
-            val = (float(df_kyst.iloc[i, 3]) + float(df_kyst.iloc[i, 4]) +
-                   float(df_kyst.iloc[i, 5]) + float(df_kyst.iloc[i, 6])) / 1000.0
-            val *= noise_teotil
+        results.append({
+            'flow_name': flow_code, 'year': year, 'value': val,
+            'comment': 'ok',
+            'data_sources': 'NIVA TEOTIL2, bias-corrected to TEOTIL3'
+        })
 
-            outflow_tracker.loc[year, 'entries'] = 1
-            outflow_tracker.loc[year, 'value'] = val
-
-            results.append({
-                'flow_name': flow_code, 'year': year, 'value': val,
-                'comment': 'ok',
-                'data_sources': 'Miljødirektoratet / TEOTIL'
-            })
-
-    # Later years (2013 onward): TEOTIL3 model matrices, superseding the
-    # Miljødirektoratet figures above for overlapping years.
+    # 2013 onward: TEOTIL3 model matrices.
     # 'hy_teotil3_to_coast'/'hy_teotil3_by_source' <- teotil3_n_summary.xlsx
     # (data_loader.py DATA_MAP): relevant N flows extracted from the TEOTIL
     # model, 2013 onward
@@ -134,16 +121,11 @@ def _add_inflow_to_coastal_waters(results, preloaded_data, current_params, datas
             outflow_tracker.loc[year, 'entries'] = 1
             outflow_tracker.loc[year, 'value'] = val
 
-            existing_posts = [p for p in results if p['flow_name'] == flow_code and p['year'] == year]
-            if existing_posts:
-                existing_posts[0]['value'] = val
-                existing_posts[0]['comment'] = 'ok'
-            else:
-                results.append({
-                    'flow_name': flow_code, 'year': year, 'value': val,
-                    'comment': 'ok',
-                    'data_sources': 'NIVA TEOTIL3'
-                })
+            results.append({
+                'flow_name': flow_code, 'year': year, 'value': val,
+                'comment': 'ok',
+                'data_sources': 'NIVA TEOTIL3'
+            })
 
     # TEOTIL3 has not been updated for 2024; carry the 2023 value forward
     # with extra uncertainty rather than leave the flow silent for a year

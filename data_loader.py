@@ -130,7 +130,7 @@ def load_all_data(selected_pools):
         'aqua_data': ({'hy', 'rw', 'mp'}, 'data_files/A.06.002_20251111-140559.xlsx', 'excel_aquaculture', {}),
         'aqua_losses': ({'hy'}, 'data_files/A.05.021a_20260924-142624.xlsx', 'excel_aqua_losses', {}),
         'fao_live_animals_all': ({'ag', 'rw'}, 'data_files/FAOSTAT_data_en_9-24-2026-3.csv', 'csv_live_animals', {}),
-        'hy_kyst_tilforsel': ({'hy','fs','hs'}, 'data_files/Tilførsel av nitrogen til kystområdene fordelt på kilder.xlsx', 'excel', {'sheet_name': 'Data fra Miljødirektoratet'}),
+        'teotil2_national': ({'hy','fs','hs'}, 'data_files/teotil2_nasjonale_totaler.csv', 'csv', {}),
         'hy_teotil3': ({'hy','fs','hs'}, 'data_files/teotil3_n_summary.xlsx', 'openpyxl_teotil', {}),
         'hy_art_raw': ({'hy'}, 'data_files/art.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Sheet 1'}),
         'hy_fiske_old_raw': ({'hy'}, 'data_files/fiske_1990_2000.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Ark1'}),

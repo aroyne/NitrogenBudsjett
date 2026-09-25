@@ -12,7 +12,7 @@ from calculations.utils import (
     report_missing_years,
     add_flat_carryforward_year,
 )
-from calculations.shared_flow_calculations import find_household_waste
+from calculations.shared_flow_calculations import find_household_waste, find_teotil2_bias_corrected
 
 def execute_calculations_hs(preloaded_data, current_params, dataset_noise, current_trade_factors=None):
     results = []
@@ -184,67 +184,48 @@ def _add_overland_flow_urban_mc(results, preloaded_data, current_params, dataset
     noise_data = dataset_noise[dataset_key]
     noise_interp = dataset_noise['trend interpolation']
 
-    # 'hy_kyst_tilforsel' <- Tilførsel av nitrogen til kystområdene fordelt på
-    # kilder.xlsx (data_loader.py DATA_MAP): Miljødirektoratet N loading to
-    # Norwegian coastal areas by source, 1990-2023
-    df_kyst = preloaded_data.get('hy_kyst_tilforsel')
     # 'hy_teotil3_by_source' <- teotil3_n_summary.xlsx (data_loader.py
     # DATA_MAP): relevant N flows extracted from the TEOTIL model, 2013 onward
     df_t3 = preloaded_data.get('hy_teotil3_by_source')
 
-    # Historical period (Miljødirektoratet), 1990-2023.
-    if df_kyst is not None:
-        for idx, row in df_kyst.iterrows():
-            val_at_col0 = str(row.iloc[0]).strip()
+    # 1990-2012: TEOTIL2 urban, bias-corrected to the TEOTIL3 urban level
+    # (see find_teotil2_bias_corrected). TEOTIL2 uses the same urban value in
+    # every year, so the series carries no information about the trend; the
+    # trend-interpolation noise reflects that.
+    teotil2 = find_teotil2_bias_corrected(preloaded_data)
+    for year, raw_val in teotil2['urban'].items():
+        year = int(year)
+        collected_years.add(year)
+        value = raw_val * noise_data * noise_interp * (1.0 - ret)
+        results.append({
+            'flow_name': flow_code, 'year': year, 'value': value,
+            'comment': 'ok', 'data_sources': 'NIVA TEOTIL2, bias-corrected to TEOTIL3'
+        })
 
-            # Skip text header rows if the sheet layout shifts on reload.
-            if val_at_col0.lower() in ['year', 'år', 'årstall', 'nan', '']:
+    # 2013 onward: TEOTIL3. The TEOTIL2 series above stops the year before
+    # TEOTIL3 starts, so the two periods never share a year.
+    for idx, row in df_t3.iterrows():
+        val_at_col0 = str(row.iloc[0]).strip()
+
+        # Skip text header rows if the sheet layout shifts on reload.
+        if val_at_col0.lower() in ['year', 'år', 'årstall', 'nan', '']:
+            continue
+
+        year = int(float(val_at_col0))
+        raw_val = row.iloc[9]  # 'urban_totn_tonnes' column
+
+        if pd.notna(raw_val):
+            if year not in EXPECTED_YEARS:
                 continue
 
-            year = int(float(val_at_col0))
-            raw_val = row.iloc[4]  # 'Bebygd' (built-up/urban) column
+            collected_years.add(year)
+            val_p = float(raw_val)*noise_data
+            value = (val_p / 1000.0) * (1.0 - ret)
 
-            if pd.notna(raw_val) and year in EXPECTED_YEARS:
-                collected_years.add(year)
-                val_p = float(raw_val)*noise_data*noise_interp
-                value = (val_p / 1000.0) * (1.0 - ret)
-                results.append({
-                    'flow_name': flow_code, 'year': year, 'value': value,
-                    'comment': 'ok', 'data_sources': 'Miljødirektoratet'
-                })
-
-    # Newer period (TEOTIL3), 2013 onward - takes precedence over the
-    # historical source for overlapping years. Both sources are joined by
-    # (flow_name, year) downstream in process_and_export_mc_results, which
-    # can't tell two rows for the same year apart within one simulation, so
-    # any historical row for a year TEOTIL3 also covers must be removed here
-    # rather than left to be summed/averaged alongside it.
-    if df_t3 is not None:
-        for idx, row in df_t3.iterrows():
-            val_at_col0 = str(row.iloc[0]).strip()
-
-            # Skip text header rows if the sheet layout shifts on reload.
-            if val_at_col0.lower() in ['year', 'år', 'årstall', 'nan', '']:
-                continue
-
-            year = int(float(val_at_col0))
-            raw_val = row.iloc[9]  # 'urban_totn_tonnes' column
-
-            if pd.notna(raw_val):
-                if year not in EXPECTED_YEARS:
-                    continue
-
-                if year in collected_years:
-                    results[:] = [x for x in results if not (x['flow_name'] == flow_code and x['year'] == year)]
-
-                collected_years.add(year)
-                val_p = float(raw_val)*noise_data
-                value = (val_p / 1000.0) * (1.0 - ret)
-
-                results.append({
-                    'flow_name': flow_code, 'year': year, 'value': value,
-                    'comment': 'ok', 'data_sources': 'TEOTIL3'
-                })
+            results.append({
+                'flow_name': flow_code, 'year': year, 'value': value,
+                'comment': 'ok', 'data_sources': 'TEOTIL3'
+            })
 
     # TEOTIL3 has not been updated for 2024; carry the 2023 value forward
     # with extra uncertainty rather than leave the flow silent for a year
