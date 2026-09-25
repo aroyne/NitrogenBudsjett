@@ -714,6 +714,91 @@ def ww_n2_removal_share(df, years=ANALYSIS_YEARS):
     return 100 * n2 / (n2 + sum_flows(df, WW_DISCHARGE, years))
 
 
+# Atmosphere (AT). AT has one subpool, so every flow with AT.AT at one end
+# crosses the boundary. The flows are grouped by N species from the last
+# part of the flow name: reduced N (NH3 emissions, RDN deposition and
+# transport), oxidised N (NOx emissions, OXN deposition and transport), N2
+# (fixation out, denitrification N2 in) and N2O (emissions only).
+AMMONIA_SYNTHESIS = ['AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2']
+BNF_ALL = ['AT.AT-AG.SM-Biological N2 fixation-N2', 'AT.AT-FS.FO-N2 fixation-N2',
+           'AT.AT-FS.OL-N2 fixation-N2', 'AT.AT-HY.SW-N2 fixation-N2']
+AT_SPECIES = {'RDN': ('-NH3', '-RDN'), 'OXN': ('-NOx', '-OXN'), 'N2': ('-N2',), 'N2O': ('-N2O',)}
+
+
+def _at_flows(df, species=None, direction=None):
+    """Flow names with AT.AT at one end, optionally filtered by species
+    (key of AT_SPECIES) and direction ('in' = into AT, 'out' = out of AT)."""
+    names = []
+    for f in df['flow_name'].unique():
+        source, target = f.split('-')[0], f.split('-')[1]
+        if 'AT.AT' not in (source, target):
+            continue
+        if direction == 'in' and target != 'AT.AT':
+            continue
+        if direction == 'out' and source != 'AT.AT':
+            continue
+        if species is not None and not f.endswith(AT_SPECIES[species]):
+            continue
+        names.append(f)
+    return sorted(names)
+
+
+def at_balance(df, years=ANALYSIS_YEARS, species=None, exclude=()):
+    """AT balance (kt N/yr), inflows minus outflows, for one species group or
+    all; flows in exclude are left out."""
+    inflows = [f for f in _at_flows(df, species, 'in') if f not in exclude]
+    outflows = [f for f in _at_flows(df, species, 'out') if f not in exclude]
+    return sum_flows(df, inflows, years) - sum_flows(df, outflows, years)
+
+
+def deposition_total(df, years=ANALYSIS_YEARS):
+    """Total N deposition to all Norwegian land and freshwater classes (kt N/yr)."""
+    return sum_flows(df, [f for f in _at_flows(df, direction='out') if '-Deposition-' in f], years)
+
+
+def deposition_share(df, target_prefix, years=ANALYSIS_YEARS):
+    """Share (%) of total deposition going to pools whose code starts with target_prefix."""
+    flows = [f for f in _at_flows(df, direction='out') if '-Deposition-' in f and f.split('-')[1].startswith(target_prefix)]
+    return 100 * sum_flows(df, flows, years) / deposition_total(df, years)
+
+
+def bnf_total(df, years=ANALYSIS_YEARS):
+    """Biological N2 fixation, all pools (kt N/yr)."""
+    return sum_flows(df, BNF_ALL, years)
+
+
+def cross_border_net_inflow(df, years=ANALYSIS_YEARS):
+    """Atmospheric inflow from abroad minus outflow to abroad, OXN + RDN (kt N/yr)."""
+    inflow = ['RW.RW-AT.AT-Atmospheric inflow-OXN', 'RW.RW-AT.AT-Atmospheric inflow-RDN']
+    outflow = ['AT.AT-RW.RW-Atmospheric outflow-OXN', 'AT.AT-RW.RW-Atmospheric outflow-RDN']
+    return sum_flows(df, inflow, years) - sum_flows(df, outflow, years)
+
+
+# Hydrosphere (HY): SW, CW and AC. The transfers between them cancel in the
+# pool total.
+HY_INTERNAL = ['HY.SW-HY.CW-Inflow to coastal waters-Nmix', 'HY.AC-HY.CW-Excretia-Nmix',
+               'HY.AC-HY.CW-Waste feed-Nmix']
+
+
+def _pool_flows(df, prefix, direction):
+    """Flow names into ('in') or out of ('out') the pool or subpool whose
+    code starts with prefix, excluding flows internal to it."""
+    names = []
+    for f in df['flow_name'].unique():
+        source, target = f.split('-')[0], f.split('-')[1]
+        inside_s, inside_t = source.startswith(prefix), target.startswith(prefix)
+        if inside_s and inside_t:
+            continue
+        if (direction == 'in' and inside_t) or (direction == 'out' and inside_s):
+            names.append(f)
+    return sorted(names)
+
+
+def pool_balance(df, prefix, years=ANALYSIS_YEARS):
+    """Balance (kt N/yr) of the pool or subpool whose code starts with prefix."""
+    return sum_flows(df, _pool_flows(df, prefix, 'in'), years) - sum_flows(df, _pool_flows(df, prefix, 'out'), years)
+
+
 # Every flow crossing the HS.HS pool boundary (HS has one subpool).
 HS_IN_FULL = [
     'AT.AT-HS.HS-Deposition-OXN', 'AT.AT-HS.HS-Deposition-RDN',
@@ -892,6 +977,9 @@ MC_FLOWS = sorted(set(
     + NOX_FLOWS_ALL_POOLS + EF_IN_FULL + EF_OUT_FULL + AMMONIA_IMPORT + FERTILIZER_EXPORT + CONSUMER_GOODS + FOOD_IMPORT
     + MP_FP_IN_FULL + MP_FP_OUT_FULL + HS_IN_FULL + HS_OUT_FULL + PR_SO_IN_FULL + PR_SO_OUT_FULL + PR_WW_IN_FULL + PR_WW_OUT_FULL
 ))
+# The AT and HY series select their flows by name (_at_flows, _pool_flows),
+# so every flow touching AT.AT or HY is kept as well.
+MC_FLOW_PATTERN = r'AT\.AT|HY\.'
 
 
 def load_raw_simulations(years=ANALYSIS_YEARS):
@@ -910,7 +998,8 @@ def load_raw_simulations(years=ANALYSIS_YEARS):
             f"(modified {age_gap / 3600:.1f} h apart). Rerun main_mc.py with --export-raw-mc."
         )
     raw = pd.read_csv(RAW_FILE, usecols=['flow_name', 'year', 'value', 'sim_id'])
-    raw = raw[raw['flow_name'].isin(MC_FLOWS) & raw['year'].isin(list(years))]
+    keep = raw['flow_name'].isin(MC_FLOWS) | raw['flow_name'].str.contains(MC_FLOW_PATTERN, regex=True)
+    raw = raw[keep & raw['year'].isin(list(years))]
     duplicated = raw.duplicated(['sim_id', 'flow_name', 'year']).sum()
     if duplicated:
         raise ValueError(f"{duplicated} duplicated (sim_id, flow_name, year) rows in {RAW_FILE}")
@@ -1007,6 +1096,21 @@ SERIES = [
     ('ammonia_import', "Ammonia import (kt N/yr)", ammonia_import, True),
     ('fertilizer_export', "Mineral fertilizer export (kt N/yr)", fertilizer_export, True),
     ('balance_mp_fp', "MP.FP subpool mass balance (kt N/yr, in - out)", mp_fp_balance, True),
+    ('balance_at', "AT pool mass balance (kt N/yr, in - out)", at_balance, True),
+    ('balance_at_excl_nh3_synthesis', "AT balance excl. ammonia synthesis N2 fixation (kt N/yr)", lambda d: at_balance(d, exclude=AMMONIA_SYNTHESIS), True),
+    ('balance_at_rdn', "AT balance, reduced N (NH3 emissions, RDN deposition and transport) (kt N/yr)", lambda d: at_balance(d, species='RDN'), True),
+    ('balance_at_oxn', "AT balance, oxidised N (NOx emissions, OXN deposition and transport) (kt N/yr)", lambda d: at_balance(d, species='OXN'), True),
+    ('ammonia_synthesis', "Ammonia synthesis N2 fixation (kt N/yr)", lambda d: sum_flows(d, AMMONIA_SYNTHESIS), True),
+    ('deposition_total', "Total N deposition, land and freshwater (kt N/yr)", deposition_total, True),
+    ('deposition_share_fs', "Share of deposition to FS (%)", lambda d: deposition_share(d, 'FS'), True),
+    ('deposition_ag', "Deposition to agricultural soil AG.SM (kt N/yr)", lambda d: sum_flows(d, DEPOSITION_SM), True),
+    ('bnf_total', "Biological N2 fixation, all pools (kt N/yr)", bnf_total, True),
+    ('bnf_share_fs_ol', "Share of biological N2 fixation in FS.OL (%)", lambda d: 100 * sum_flows(d, ['AT.AT-FS.OL-N2 fixation-N2']) / bnf_total(d), True),
+    ('cross_border_net', "Atmospheric cross-border inflow minus outflow, OXN + RDN (kt N/yr)", cross_border_net_inflow, True),
+    ('balance_hy', "HY pool mass balance (kt N/yr, in - out)", lambda d: pool_balance(d, 'HY'), True),
+    ('balance_hy_sw', "HY.SW subpool mass balance (kt N/yr)", lambda d: pool_balance(d, 'HY.SW'), True),
+    ('balance_hy_cw', "HY.CW subpool mass balance (kt N/yr)", lambda d: pool_balance(d, 'HY.CW'), True),
+    ('balance_hy_ac', "HY.AC subpool mass balance (kt N/yr)", lambda d: pool_balance(d, 'HY.AC'), True),
     ('hs_inputs', "HS pool inputs (kt N/yr)", hs_inputs, True),
     ('hs_outputs', "HS pool outputs (kt N/yr)", hs_outputs, True),
     ('balance_hs', "HS pool mass balance (kt N/yr, in - out)", hs_balance, True),
@@ -1070,6 +1174,7 @@ def summarize_series(key, label, series_fn, mc, df, sims, years=ANALYSIS_YEARS):
 # 2006, rises to 2010 and is flat after; food products to households are
 # flat until 2005.
 SEGMENTS = {
+    'balance_hy': [(1990, 1997), (1997, 2024)],
     'consumer_goods': [(1990, 1995), (1995, 2004), (2005, 2024)],
     'consumer_goods_per_capita': [(1990, 1995), (1995, 2024), (2005, 2024)],
     'food_import': [(1990, 2010), (2010, 2024)],
@@ -1082,6 +1187,10 @@ SEGMENTS = {
 # Period averages other than the standard 1990-1992 / 2022-2024 ones.
 PERIOD_MEANS = {
     'ag_losses': [(1990, 1991)],
+    'deposition_total': [(2023, 2023)],
+    'deposition_share_fs': [(2023, 2023)],
+    'deposition_ag': [(2023, 2023)],
+    'bnf_total': [(2023, 2023)],
     'ww_n2_removal_share': [(2023, 2023)],
 }
 
