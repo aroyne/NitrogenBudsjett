@@ -29,7 +29,10 @@ Each series is reported twice over:
   (the same perturbed parameter applies to every year of a simulation), so
   it is strongly correlated between years - a trend interval built from
   per-year +/-1 sigma values would overstate it, which is why the trend is
-  computed per iteration instead.
+  computed per iteration instead. Since the true error structure lies
+  between fully correlated and fully independent between years, the trend
+  is also recomputed with years drawn independently from different
+  iterations, and the two intervals are reported together as bounds.
 
 MC_Raw_Simulations.csv.gz is only written when main_mc.py is run with
 --export-raw-mc, so run it as `main_mc.py --pool all --nsim 1000
@@ -47,6 +50,7 @@ import pandas as pd
 STATS_FILE = 'output_files/MC_Reporting_Statistics.xlsx'
 RAW_FILE = 'output_files/MC_Raw_Simulations.csv.gz'
 Z_95 = 1.959964  # two-sided 95 % standard normal quantile
+MC_RESAMPLE_SEED = 20260925  # fixed seed so variant (ii) resampling is reproducible
 ANALYSIS_YEARS = range(1990, 2025)  # the only years with complete flow coverage for all pools
 
 
@@ -516,21 +520,26 @@ def load_raw_simulations(years=ANALYSIS_YEARS):
     return [g for _, g in raw.groupby('sim_id')]
 
 
-def mc_trend_interval(series_fn, sims, years=ANALYSIS_YEARS):
-    """Recomputes one series and its Theil-Sen trend within every MC
-    iteration. Returns the 2.5/50/97.5 percentiles of the start- and
-    end-period averages, the slope and the percent change, plus the share
-    of iterations whose trend has the same sign as the median one."""
+def mc_series_matrix(series_fn, sims, years=ANALYSIS_YEARS):
+    """One row per MC iteration, one column per year: the series recomputed
+    from that iteration's own flow values."""
+    return np.array([series_fn(sim_df).reindex(list(years)).values for sim_df in sims])
+
+
+def _trend_percentiles(matrix, years):
+    """Theil-Sen trend and period averages for every row of matrix (one time
+    series per row). Returns the 2.5/50/97.5 percentiles of the start- and
+    end-period averages, the slope and the percent change, plus the share of
+    rows whose slope has the same sign as the median slope."""
     years = list(years)
     rows = []
-    for sim_df in sims:
-        series = series_fn(sim_df)
-        slope, intercept = theil_sen(years, series.values)
+    for values in matrix:
+        slope, intercept = theil_sen(years, values)
         fit_start = intercept + slope * years[0]
         fit_end = intercept + slope * years[-1]
         rows.append({
-            'avg_start': series.loc[years[0]:years[0] + 2].mean(),
-            'avg_end': series.loc[years[-1] - 2:years[-1]].mean(),
+            'avg_start': values[:3].mean(),
+            'avg_end': values[-3:].mean(),
             'slope': slope,
             'pct_change': 100 * (fit_end - fit_start) / abs(fit_start),
         })
@@ -538,6 +547,33 @@ def mc_trend_interval(series_fn, sims, years=ANALYSIS_YEARS):
     q = res.quantile([0.025, 0.5, 0.975])
     same_sign = (np.sign(res['slope']) == np.sign(q.loc[0.5, 'slope'])).mean()
     return q, same_sign, len(res)
+
+
+def mc_trend_interval(matrix, years=ANALYSIS_YEARS):
+    """Variant (i), errors fully correlated in time: each MC iteration is one
+    consistent time series, since every perturbed parameter and dataset noise
+    factor applies to all years of that iteration."""
+    return _trend_percentiles(matrix, years)
+
+
+def mc_trend_interval_independent_years(matrix, years=ANALYSIS_YEARS, n_resamples=None, seed=MC_RESAMPLE_SEED):
+    """Variant (ii), errors independent between years: each synthetic time
+    series takes every year from a randomly drawn MC iteration, so a value
+    for one year is combined with values for other years from other
+    iterations. All flows within a year still come from the same iteration
+    (the whole iteration's state that year is one data point). This is valid
+    because every series here is computed year by year - its value for year
+    t depends only on flows in year t.
+
+    Together with variant (i) this brackets the trend uncertainty: the true
+    error structure lies between fully correlated (systematic errors, e.g. a
+    wrong N content applies to every year) and fully independent (random
+    year-to-year errors, e.g. reporting errors in annual statistics)."""
+    n_sims, n_years = matrix.shape
+    rng = np.random.default_rng(seed)
+    picks = rng.integers(0, n_sims, size=(n_resamples or n_sims, n_years))
+    resampled = matrix[picks, np.arange(n_years)]
+    return _trend_percentiles(resampled, years)
 
 
 # =============================================================================
@@ -572,7 +608,9 @@ SERIES = [
 def summarize_series(key, label, series_fn, mc, df, sims, years=ANALYSIS_YEARS):
     """All reported statistics for one series: the median series itself,
     its start/end period averages, the trend statistics from trend_report,
-    and (if mc) the per-iteration MC percentiles from mc_trend_interval."""
+    and (if mc) the MC percentiles under both error structures: variant (i)
+    from mc_trend_interval and variant (ii) from
+    mc_trend_interval_independent_years."""
     years = list(years)
     series = series_fn(df)
     result = {
@@ -583,10 +621,14 @@ def summarize_series(key, label, series_fn, mc, df, sims, years=ANALYSIS_YEARS):
         'avg_end': series.loc[years[-1] - 2:years[-1]].mean(),
         'trend': trend_report(years, series.values, years[0], years[-1]),
         'mc': None,
+        'mc_independent_years': None,
     }
     if mc:
-        q, same_sign, n_sims = mc_trend_interval(series_fn, sims, years)
+        matrix = mc_series_matrix(series_fn, sims, years)
+        q, same_sign, n_sims = mc_trend_interval(matrix, years)
         result['mc'] = {'quantiles': q, 'same_sign': same_sign, 'n_sims': n_sims}
+        q, same_sign, n_resamples = mc_trend_interval_independent_years(matrix, years)
+        result['mc_independent_years'] = {'quantiles': q, 'same_sign': same_sign, 'n_resamples': n_resamples}
     return result
 
 
@@ -618,9 +660,13 @@ def print_summary(result, years=ANALYSIS_YEARS):
     print(f"  MC ({result['mc']['n_sims']} iterations, 2.5-97.5 %): "
           f"{years[0]}-{years[0]+2} avg {q.loc[0.025, 'avg_start']:.2f} to {q.loc[0.975, 'avg_start']:.2f}   "
           f"{years[-1]-2}-{years[-1]} avg {q.loc[0.025, 'avg_end']:.2f} to {q.loc[0.975, 'avg_end']:.2f}")
-    print(f"  MC trend: {q.loc[0.5, 'slope']:.4f}/yr [{q.loc[0.025, 'slope']:.4f} to {q.loc[0.975, 'slope']:.4f}], "
+    print(f"  MC trend (i), errors correlated in time: {q.loc[0.5, 'slope']:.4f}/yr [{q.loc[0.025, 'slope']:.4f} to {q.loc[0.975, 'slope']:.4f}], "
           f"{q.loc[0.5, 'pct_change']:+.1f}% [{q.loc[0.025, 'pct_change']:+.1f} to {q.loc[0.975, 'pct_change']:+.1f}%], "
           f"same sign as median trend in {100 * result['mc']['same_sign']:.1f}% of iterations")
+    q = result['mc_independent_years']['quantiles']
+    print(f"  MC trend (ii), errors independent between years: {q.loc[0.5, 'slope']:.4f}/yr [{q.loc[0.025, 'slope']:.4f} to {q.loc[0.975, 'slope']:.4f}], "
+          f"{q.loc[0.5, 'pct_change']:+.1f}% [{q.loc[0.025, 'pct_change']:+.1f} to {q.loc[0.975, 'pct_change']:+.1f}%], "
+          f"same sign as median trend in {100 * result['mc_independent_years']['same_sign']:.1f}% of resamples")
 
 
 def main():
