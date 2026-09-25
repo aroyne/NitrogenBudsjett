@@ -484,6 +484,51 @@ def nox_emissions_per_capita(df, years=ANALYSIS_YEARS):
 
 
 # =============================================================================
+# Energy and fuels (EF) pool balance, ammonia import and fertilizer export
+# =============================================================================
+
+# Every flow crossing the EF pool boundary. The internal EF.EC -> EF.IC/EF.OE/
+# EF.TR fuel transfers are left out, as in the pool balance plots
+# (utils_stat.process_and_export_mc_results), since they cancel within EF.
+EF_IN_FULL = [
+    'FS.FO-EF.OE-Fuel wood for households-Nmix',
+    'MP.OP-EF.IC-Industrial waste fuels-Nmix',
+    'PR.SO-EF.EC-Waste to energy-Nmix',
+    'RW.RW-EF.EC-Fuel import-Nmix',
+    'RW.RW-EF.TR-Import of transport fuel-Nmix',
+]
+EF_OUT_FULL = [
+    'EF.EC-AT.AT-Emissions-N2O', 'EF.EC-AT.AT-Emissions-NOx',
+    'EF.IC-AT.AT-Emissions-N2O', 'EF.IC-AT.AT-Emissions-NH3', 'EF.IC-AT.AT-Emissions-NOx',
+    'EF.OE-AT.AT-Emissions-N2O', 'EF.OE-AT.AT-Emissions-NH3', 'EF.OE-AT.AT-Emissions-NOx',
+    'EF.TR-AT.AT-Emissions-N2O', 'EF.TR-AT.AT-Emissions-NH3', 'EF.TR-AT.AT-Emissions-NOx',
+    'EF.EC-MP.OP-Fuel used as feedstock-Nmix',
+    'EF.EC-RW.RW-Fuel export-Nmix',
+    'EF.TR-RW.RW-Export of transport fuels-Nmix',
+]
+# The ammonia import flow name has a space before '-Nmix', exactly as defined
+# in rw_mc.py.
+AMMONIA_IMPORT = ['RW.RW-MP.OP-Ammonia import -Nmix']
+FERTILIZER_EXPORT = ['MP.OP-RW.RW-Mineral fertilizer export-Nmix']
+
+
+def ef_balance(df, years=ANALYSIS_YEARS):
+    """Overall EF pool balance (kt N/yr): all inflows minus all outflows
+    across the pool boundary."""
+    return sum_flows(df, EF_IN_FULL, years) - sum_flows(df, EF_OUT_FULL, years)
+
+
+def ammonia_import(df, years=ANALYSIS_YEARS):
+    """Ammonia import (kt N/yr)."""
+    return sum_flows(df, AMMONIA_IMPORT, years)
+
+
+def fertilizer_export(df, years=ANALYSIS_YEARS):
+    """Mineral fertilizer export (kt N/yr)."""
+    return sum_flows(df, FERTILIZER_EXPORT, years)
+
+
+# =============================================================================
 # Per-iteration MC uncertainty
 # =============================================================================
 
@@ -492,7 +537,7 @@ MC_FLOWS = sorted(set(
     + FARM_ANIMAL_FEED + FEED_IMPORT + FOOD_CROP_PRODUCTS + INDUSTRIAL_CROP_PRODUCTS + ANIMAL_PRODUCTS
     + NON_EDIBLE_ANIMAL_PRODUCTS + FOOD_PRODUCTS_CONSUMED + FOOD_EXPORT_TOTAL + WILD_CATCH + AQUACULTURE_FEED
     + MM_IN_FULL + MM_OUT_FULL + SM_IN_FULL + SM_OUT_FULL + AG_LEACHING + AG_ATMOSPHERIC_LOSSES
-    + NOX_FLOWS_ALL_POOLS
+    + NOX_FLOWS_ALL_POOLS + EF_IN_FULL + EF_OUT_FULL + AMMONIA_IMPORT + FERTILIZER_EXPORT
 ))
 
 
@@ -602,6 +647,9 @@ SERIES = [
     ('atmospheric_per_ha', f"AG atmospheric losses per hectare (kg N/ha/yr, area={AGRICULTURAL_AREA_HA:,} ha)", lambda d: ag_per_hectare(d)['atmospheric_kgN_ha'], True),
     ('input_per_ha', f"AG soil N input per hectare (kg N/ha/yr, area={AGRICULTURAL_AREA_HA:,} ha)", lambda d: ag_per_hectare(d)['input_kgN_ha'], True),
     ('nox_per_capita', "National NOx emissions per capita (g N/person/yr)", nox_emissions_per_capita, True),
+    ('balance_ef', "EF overall mass balance (kt N/yr, in - out)", ef_balance, True),
+    ('ammonia_import', "Ammonia import (kt N/yr)", ammonia_import, True),
+    ('fertilizer_export', "Mineral fertilizer export (kt N/yr)", fertilizer_export, True),
 ]
 
 
