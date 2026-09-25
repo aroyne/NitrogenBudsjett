@@ -13,11 +13,15 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 import plotly.graph_objects as go
 
-def plot_pool_balance_interactive(df_flows, pool_code, output_dir="output_files/plots"):
+def plot_pool_balance_interactive(df_flows, pool_code, net_interval, output_dir="output_files/plots"):
     """
     Genererer et INTERAKTIVT og RESPONSIVT balansediagram (HTML) for en spesifikk pool eller subpool.
     Inngående strømmer stables oppover (positive), utgående strømmer stables nedover (negative).
     Viser KUN info for strømmen musen er nærmest.
+
+    net_interval: (lower, upper) Series by year, the 2.5-97.5 percentiles of
+    the pool's net balance computed within each MC iteration (see
+    _net_balance_interval).
     """
     os.makedirs(output_dir, exist_ok=True)
     
@@ -36,12 +40,9 @@ def plot_pool_balance_interactive(df_flows, pool_code, output_dir="output_files/
     df_in_grouped = df_in.groupby(['year', 'flow_name'])['value'].sum().unstack(fill_value=0).reindex(all_years, fill_value=0)
     df_out_grouped = df_out.groupby(['year', 'flow_name'])['value'].sum().unstack(fill_value=0).reindex(all_years, fill_value=0)
     
-    # Beregn netto balanse og akkumulert usikkerhet
-    df_in_total_unc = df_in.groupby('year')['uncertainty'].apply(lambda x: np.sqrt((x**2).sum())).reindex(all_years, fill_value=0)
-    df_out_total_unc = df_out.groupby('year')['uncertainty'].apply(lambda x: np.sqrt((x**2).sum())).reindex(all_years, fill_value=0)
-    
     net_balance = df_in_grouped.sum(axis=1) - df_out_grouped.sum(axis=1)
-    combined_unc = np.sqrt(df_in_total_unc**2 + df_out_total_unc**2)
+    band_lo = net_interval[0].reindex(all_years)
+    band_hi = net_interval[1].reindex(all_years)
 
     # Opprett tom Plotly-figur
     fig = go.Figure()
@@ -87,7 +88,7 @@ def plot_pool_balance_interactive(df_flows, pool_code, output_dir="output_files/
     # --- 4. USIKKERHETSBÅND ---
     fig.add_trace(go.Scatter(
         x=all_years,
-        y=net_balance + combined_unc,
+        y=band_hi,
         mode='lines',
         line=dict(width=0),
         showlegend=False,
@@ -95,12 +96,12 @@ def plot_pool_balance_interactive(df_flows, pool_code, output_dir="output_files/
     ))
     fig.add_trace(go.Scatter(
         x=all_years,
-        y=net_balance - combined_unc,
+        y=band_lo,
         mode='lines',
         line=dict(width=0),
         fill='tonexty',
         fillcolor='rgba(0, 0, 0, 0.12)',
-        name='Uncertainty (±1σ)',
+        name='95% interval (MC)',
         hoverinfo='skip',
         legendgroup="Netto",
         legendgrouptitle_text="══ NET BALANCE ══"
@@ -117,10 +118,10 @@ def plot_pool_balance_interactive(df_flows, pool_code, output_dir="output_files/
             "<b>Net Balance</b><br>" +
             "År: %{x}<br>" +
             "Netto: %{y:.3f} kt N/year<br>" +
-            "Usikkerhet: ±%{text:.3f}<br>" +
+            "95% interval: %{customdata[0]:.3f} – %{customdata[1]:.3f}<br>" +
             "<extra></extra>"
         ),
-        text=combined_unc,
+        customdata=np.stack([band_lo.values, band_hi.values], axis=-1),
         legendgroup="Netto"
     ))
 
@@ -237,12 +238,16 @@ def plot_flow_timeseries_interactive(df_flow, flow_name, output_dir="output_file
     return safe_filename
 
 
-def plot_pool_balance(df_flows, pool_code, output_dir="output_files/plots"):
+def plot_pool_balance(df_flows, pool_code, net_interval, output_dir="output_files/plots"):
     """
     Genererer et balansediagram for en spesifikk pool eller subpool.
     Deler legenden inn i to ryddige blokker: "Inngående strømmer" og "Utgående strømmer",
     og viser den fulle flomkoden (flow_name) for hver strøm.
     Rekkefølgen i legendene matcher stablingen i plottet (visuelt ovenfra og ned).
+
+    net_interval: (lower, upper) Series by year, the 2.5-97.5 percentiles of
+    the pool's net balance computed within each MC iteration (see
+    _net_balance_interval).
     """
     os.makedirs(output_dir, exist_ok=True)
 
@@ -258,23 +263,17 @@ def plot_pool_balance(df_flows, pool_code, output_dir="output_files/plots"):
     df_in_grouped = df_in.groupby(['year', 'flow_name'])['value'].sum().unstack(fill_value=0)
     df_out_grouped = df_out.groupby(['year', 'flow_name'])['value'].sum().unstack(fill_value=0)
     
-    # Hent usikkerhetene (kvadratrot av summen av kvadrater)
-    df_in_unc = df_in.groupby('year')['uncertainty'].apply(lambda x: np.sqrt((x**2).sum()))
-    df_out_unc = df_out.groupby('year')['uncertainty'].apply(lambda x: np.sqrt((x**2).sum()))
-    
     # Sørg for at alle årstall er synkronisert (1984-2025)
     all_years = sorted(list(set(df_flows['year'])))
     df_in_grouped = df_in_grouped.reindex(all_years, fill_value=0)
     df_out_grouped = df_out_grouped.reindex(all_years, fill_value=0)
-    df_in_unc = df_in_unc.reindex(all_years, fill_value=0)
-    df_out_unc = df_out_unc.reindex(all_years, fill_value=0)
 
-    # 3. Beregn netto balanse og akkumulert usikkerhet
+    # 3. Beregn netto balanse og usikkerhetsbåndet
     total_in = df_in_grouped.sum(axis=1)
     total_out = df_out_grouped.sum(axis=1)
     net_balance = total_in - total_out
-    
-    combined_unc = np.sqrt(df_in_unc**2 + df_out_unc**2)
+    band_lo = net_interval[0].reindex(all_years)
+    band_hi = net_interval[1].reindex(all_years)
 
     # 4. Plottingen
     fig, ax = plt.subplots(figsize=(11, 6), dpi=300)
@@ -296,7 +295,7 @@ def plot_pool_balance(df_flows, pool_code, output_dir="output_files/plots"):
     
     # Tegn den svarte balanselinjen og usikkerhetsbåndet
     line_balance, = ax.plot(all_years, net_balance, color='black', linewidth=2, zorder=5)
-    poly_unc = ax.fill_between(all_years, net_balance - combined_unc, net_balance + combined_unc, 
+    poly_unc = ax.fill_between(all_years, band_lo, band_hi, 
                                color='black', alpha=0.12, zorder=4, linestyle='--')
     
     # Styling av akser
@@ -334,7 +333,7 @@ def plot_pool_balance(df_flows, pool_code, output_dir="output_files/plots"):
     # 2. Opprett den første legenden for INNGÅENDE (øverst til høyre)
     # Vi inkluderer Net Balance og Uncertainty øverst i denne blokken
     top_handles = [line_balance, poly_unc] + in_handles_sorted
-    top_labels = ['Net Balance (Inn - Ut)', 'Uncertainty (±1σ)'] + in_labels_sorted
+    top_labels = ['Net Balance (Inn - Ut)', '95% interval (MC)'] + in_labels_sorted
     
     legend_in = ax.legend(
         top_handles, 
@@ -942,6 +941,32 @@ def extract_source_target(flow_name):
     return parts[0].strip(), parts[1].strip()
 
 
+def _net_balance_interval(df_all, source, target, pool_code, lo=2.5, hi=97.5):
+    """
+    2.5-97.5 percentiles, by year, of a pool's or sub-pool's net balance
+    (inflows minus outflows) computed within each MC iteration. Summing the
+    flows inside each iteration keeps the correlation between them - shared
+    parameters, and flows derived from each other such as mass-balance
+    residuals - which a band built from each flow's standard deviation in
+    quadrature would ignore. Flows are selected with the same rule as the
+    balance plots: for a top-level pool, main-pool codes with internal flows
+    between its own sub-pools removed; for a sub-pool, its full code.
+    source/target: each row's source and target sub-pool codes (as from
+    extract_source_target), split once for all pools by the caller.
+    """
+    if '.' not in pool_code:
+        source = source.str.split('.').str[0]
+        target = target.str.split('.').str[0]
+        keep = source != target
+    else:
+        keep = pd.Series(True, index=df_all.index)
+    sign = (target.str.startswith(pool_code) & keep).astype(float) - (source.str.startswith(pool_code) & keep).astype(float)
+    signed = df_all.assign(signed=df_all['value'].fillna(0.0) * sign)
+    net = signed[sign != 0].groupby(['year', 'sim_id'])['signed'].sum()
+    q = net.groupby(level='year').quantile([lo / 100, hi / 100]).unstack()
+    return q.iloc[:, 0], q.iloc[:, 1]
+
+
 def process_and_export_mc_results(all_records):
     """
     Receives a list of dictionaries from ALL MC iterations.
@@ -1119,9 +1144,10 @@ def process_and_export_mc_results(all_records):
     df_balance_input['source'] = [r[0] for r in res]
     df_balance_input['target'] = [r[1] for r in res]
     
-    # plot_pool_balance forventer kolonnene 'value' og 'uncertainty'
+    # The balance plots use each flow's median; the Sankey diagram also reads
+    # 'uncertainty' (the flow's standard deviation).
     df_balance_input['value'] = df_balance_input['median']
-    df_balance_input['uncertainty'] = df_balance_input['std']  # Bruker standardavviket som 1σ usikkerhet
+    df_balance_input['uncertainty'] = df_balance_input['std']
     
     # 2. Hent ut alle unike pool-koder som faktisk er til stede i dataene
     all_codes = set(df_balance_input['source'].unique()) | set(df_balance_input['target'].unique())
@@ -1144,6 +1170,12 @@ def process_and_export_mc_results(all_records):
 
     print(f"[PLOTTING] Detected active pools for balance plots: {pools_to_plot}")
     
+    # Source/target sub-pool codes for every MC record, split once here rather
+    # than inside _net_balance_interval for each pool.
+    flow_ends = df_all_trimmed['flow_name'].str.upper().str.strip().str.split('-', n=2, expand=True)
+    flow_source = flow_ends[0].str.strip()
+    flow_target = flow_ends[1].str.strip()
+
     print("[PLOTTING] Executing balance plots for active system pools...")
     for pool in pools_to_plot:
         # Lag en kopi av dataene for denne spesifikke iterasjonen
@@ -1162,8 +1194,9 @@ def process_and_export_mc_results(all_records):
             df_temppool['source'] = df_temppool['source_main']
             df_temppool['target'] = df_temppool['target_main']
             
-        plot_pool_balance(df_temppool, pool, output_dir=plot_dir)
-        plot_pool_balance_interactive(df_temppool, pool, output_dir=plot_dir)
+        net_interval = _net_balance_interval(df_all_trimmed, flow_source, flow_target, pool)
+        plot_pool_balance(df_temppool, pool, net_interval, output_dir=plot_dir)
+        plot_pool_balance_interactive(df_temppool, pool, net_interval, output_dir=plot_dir)
 
     print("\n[PLOTTING] Generating global interactive Sankey diagram across all years...")
     plot_global_sankey_interactive(df_balance_input, output_dir=plot_dir)
