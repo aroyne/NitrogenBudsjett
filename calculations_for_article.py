@@ -529,6 +529,51 @@ def fertilizer_export(df, years=ANALYSIS_YEARS):
 
 
 # =============================================================================
+# Consumer goods, food flows and per-capita values
+# =============================================================================
+
+# Consumer goods is the MP.OP residual (six inflows minus five outflows, with
+# fertilizer-production intermediates removed from both trade terms), see
+# mp_mc._add_consumer_goods_mc.
+CONSUMER_GOODS = ['MP.OP-HS.HS-Consumer goods-Nmix']
+FOOD_IMPORT = ['RW.RW-MP.FP-Food import-Nmix']
+
+
+def consumer_goods(df, years=ANALYSIS_YEARS):
+    """Consumer goods delivered to households (kt N/yr)."""
+    return sum_flows(df, CONSUMER_GOODS, years)
+
+
+def consumer_goods_per_capita(df, years=ANALYSIS_YEARS):
+    """Consumer goods per person (kg N/person/yr), population on 1 January
+    from SSB table 06913."""
+    return consumer_goods(df, years) * 1.0e6 / _population().reindex(years)  # kt N -> kg N, / population
+
+
+def food_import(df, years=ANALYSIS_YEARS):
+    """Food import (kt N/yr)."""
+    return sum_flows(df, FOOD_IMPORT, years)
+
+
+def food_products_consumed(df, years=ANALYSIS_YEARS):
+    """Food products to households (kt N/yr). mp_mc._add_food_products_mc
+    builds this from SSB per-person intake/consumption surveys (tables 06376,
+    10249, 13695) times population, plus pet food, so it follows population
+    by construction and cannot reflect changes in food waste."""
+    return sum_flows(df, FOOD_PRODUCTS_CONSUMED, years)
+
+
+def food_products_per_capita(df, years=ANALYSIS_YEARS):
+    """Food products to households per person (kg N/person/yr)."""
+    return food_products_consumed(df, years) * 1.0e6 / _population().reindex(years)  # kt N -> kg N, / population
+
+
+def food_export(df, years=ANALYSIS_YEARS):
+    """Total food export including fish (kt N/yr)."""
+    return sum_flows(df, FOOD_EXPORT_TOTAL, years)
+
+
+# =============================================================================
 # Per-iteration MC uncertainty
 # =============================================================================
 
@@ -537,7 +582,7 @@ MC_FLOWS = sorted(set(
     + FARM_ANIMAL_FEED + FEED_IMPORT + FOOD_CROP_PRODUCTS + INDUSTRIAL_CROP_PRODUCTS + ANIMAL_PRODUCTS
     + NON_EDIBLE_ANIMAL_PRODUCTS + FOOD_PRODUCTS_CONSUMED + FOOD_EXPORT_TOTAL + WILD_CATCH + AQUACULTURE_FEED
     + MM_IN_FULL + MM_OUT_FULL + SM_IN_FULL + SM_OUT_FULL + AG_LEACHING + AG_ATMOSPHERIC_LOSSES
-    + NOX_FLOWS_ALL_POOLS + EF_IN_FULL + EF_OUT_FULL + AMMONIA_IMPORT + FERTILIZER_EXPORT
+    + NOX_FLOWS_ALL_POOLS + EF_IN_FULL + EF_OUT_FULL + AMMONIA_IMPORT + FERTILIZER_EXPORT + CONSUMER_GOODS + FOOD_IMPORT
 ))
 
 
@@ -650,6 +695,12 @@ SERIES = [
     ('balance_ef', "EF overall mass balance (kt N/yr, in - out)", ef_balance, True),
     ('ammonia_import', "Ammonia import (kt N/yr)", ammonia_import, True),
     ('fertilizer_export', "Mineral fertilizer export (kt N/yr)", fertilizer_export, True),
+    ('consumer_goods', "Consumer goods to households (kt N/yr)", consumer_goods, True),
+    ('consumer_goods_per_capita', "Consumer goods per capita (kg N/person/yr)", consumer_goods_per_capita, True),
+    ('food_import', "Food import (kt N/yr)", food_import, True),
+    ('food_products', "Food products to households (kt N/yr)", food_products_consumed, True),
+    ('food_products_per_capita', "Food products to households per capita (kg N/person/yr)", food_products_per_capita, True),
+    ('food_export', "Food export incl. fish (kt N/yr)", food_export, True),
 ]
 
 
@@ -678,6 +729,31 @@ def summarize_series(key, label, series_fn, mc, df, sims, years=ANALYSIS_YEARS):
         q, same_sign, n_resamples = mc_trend_interval_independent_years(matrix, years)
         result['mc_independent_years'] = {'quantiles': q, 'same_sign': same_sign, 'n_resamples': n_resamples}
     return result
+
+
+# Sub-periods for series whose 1990-2024 trend hides distinct phases. The
+# boundaries are read off the median series: Consumer goods steps up in
+# 1993-1995 and again around 2005; food export rises to 2000, is flat to
+# 2006, rises to 2010 and is flat after; food products to households are
+# flat until 2005.
+SEGMENTS = {
+    'consumer_goods': [(1990, 1995), (1995, 2004), (2005, 2024)],
+    'consumer_goods_per_capita': [(1990, 1995), (1995, 2024), (2005, 2024)],
+    'food_import': [(1990, 2010), (2010, 2024)],
+    'food_products': [(1990, 2005), (2005, 2024)],
+    'food_products_per_capita': [(1990, 2005), (2005, 2024)],
+    'food_export': [(1990, 2000), (2000, 2006), (2006, 2010), (2010, 2024)],
+}
+
+
+def segment_trends(results, segments=SEGMENTS):
+    """trend_report on each sub-period of the median series, keyed by
+    (series key, start year, end year)."""
+    by_key = {r['key']: r['series'] for r in results}
+    return {
+        (key, a, b): trend_report(list(range(a, b + 1)), by_key[key].loc[a:b].values, a, b)
+        for key, periods in segments.items() for a, b in periods
+    }
 
 
 def compute_all():
@@ -727,6 +803,10 @@ def main():
     print("=" * 78)
     for result in results:
         print_summary(result)
+    print("\nSub-period trends (median series)")
+    for (key, a, b), trend in segment_trends(results).items():
+        print(f"  {key} {a}-{b}: {trend['pct_change']:+.1f}% "
+              f"[95% CI {trend['pct_change_lo']:+.1f} to {trend['pct_change_hi']:+.1f}]  MK p={trend['mk_p']:.4f}")
     print("\n" + "=" * 78)
 
 
