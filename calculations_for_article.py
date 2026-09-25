@@ -528,6 +528,35 @@ def fertilizer_export(df, years=ANALYSIS_YEARS):
     return sum_flows(df, FERTILIZER_EXPORT, years)
 
 
+# Every flow crossing the MP.FP (food processing) subpool boundary. There are
+# no MP.FP <-> MP.OP transfers in the model.
+MP_FP_IN_FULL = [
+    'AG.MM-MP.FP-Animal products-Nmix',
+    'AG.SM-MP.FP-Food crop products-Nmix',
+    'HY.AC-MP.FP-Coastal fish and seafood-Nmix',
+    'HY.CW-MP.FP-Fish (wild catch)-Nmix',
+    'HY.CW-MP.FP-Shellfish-Nmix',
+    'RW.RW-MP.FP-Food import-Nmix',
+]
+MP_FP_OUT_FULL = [
+    'MP.FP-AG.MM-Farm animal feed-Nmix',
+    'MP.FP-AG.SM-Seeds and planting material -Nmix',
+    'MP.FP-HS.HS-Food products-Nmix',
+    'MP.FP-HY.AC-Feed to coastal aquaculture-Nmix',
+    'MP.FP-HY.SW-Untreated wastewater-Nmix',
+    'MP.FP-PR.SO-Food industry waste-Nmix',
+    'MP.FP-PR.WW-Food industry wastewater-Nmix',
+    'MP.FP-RW.RW-Feed export-Nmix',
+    'MP.FP-RW.RW-Food export-Nmix',
+]
+
+
+def mp_fp_balance(df, years=ANALYSIS_YEARS):
+    """MP.FP subpool balance (kt N/yr): all inflows minus all outflows
+    across the subpool boundary."""
+    return sum_flows(df, MP_FP_IN_FULL, years) - sum_flows(df, MP_FP_OUT_FULL, years)
+
+
 # =============================================================================
 # Consumer goods, food flows and per-capita values
 # =============================================================================
@@ -583,6 +612,7 @@ MC_FLOWS = sorted(set(
     + NON_EDIBLE_ANIMAL_PRODUCTS + FOOD_PRODUCTS_CONSUMED + FOOD_EXPORT_TOTAL + WILD_CATCH + AQUACULTURE_FEED
     + MM_IN_FULL + MM_OUT_FULL + SM_IN_FULL + SM_OUT_FULL + AG_LEACHING + AG_ATMOSPHERIC_LOSSES
     + NOX_FLOWS_ALL_POOLS + EF_IN_FULL + EF_OUT_FULL + AMMONIA_IMPORT + FERTILIZER_EXPORT + CONSUMER_GOODS + FOOD_IMPORT
+    + MP_FP_IN_FULL + MP_FP_OUT_FULL
 ))
 
 
@@ -695,6 +725,7 @@ SERIES = [
     ('balance_ef', "EF overall mass balance (kt N/yr, in - out)", ef_balance, True),
     ('ammonia_import', "Ammonia import (kt N/yr)", ammonia_import, True),
     ('fertilizer_export', "Mineral fertilizer export (kt N/yr)", fertilizer_export, True),
+    ('balance_mp_fp', "MP.FP subpool mass balance (kt N/yr, in - out)", mp_fp_balance, True),
     ('consumer_goods', "Consumer goods to households (kt N/yr)", consumer_goods, True),
     ('consumer_goods_per_capita', "Consumer goods per capita (kg N/person/yr)", consumer_goods_per_capita, True),
     ('food_import', "Food import (kt N/yr)", food_import, True),
