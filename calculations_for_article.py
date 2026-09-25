@@ -610,6 +610,110 @@ def mp_fp_balance(df, years=ANALYSIS_YEARS):
     return sum_flows(df, MP_FP_IN_FULL, years) - sum_flows(df, MP_FP_OUT_FULL, years)
 
 
+# Every flow crossing the PR.SO (solid waste) and PR.WW (wastewater) subpool
+# boundaries. The PR.SO <-> PR.WW transfers (landfill leachate, sewage sludge
+# to landfill) cross the subpool boundaries but cancel in the PR pool total.
+# Landfilled N has no outflow of its own: it stays in PR.SO and shows up as
+# a positive PR.SO balance.
+PR_SO_IN_FULL = [
+    'HS.HS-PR.SO-Household waste-Nmix',
+    'MP.FP-PR.SO-Food industry waste-Nmix',
+    'MP.OP-PR.SO-Other industry waste-Nmix',
+    'PR.WW-PR.SO-Sewage sludge landfill-Nmix',
+    'RW.RW-PR.SO-Solid waste import-Nmix',
+]
+PR_SO_OUT_FULL = [
+    'PR.SO-AG.SM-Biologically treated organic waste-Nmix',
+    'PR.SO-AT.AT-Emissions-N2O', 'PR.SO-AT.AT-Emissions-NH3', 'PR.SO-AT.AT-Emissions-NOx',
+    'PR.SO-EF.EC-Waste to energy-Nmix',
+    'PR.SO-HS.HS-Biologically treated organic waste-Nmix',
+    'PR.SO-HY.SW-Leaching-Nmix',
+    'PR.SO-MP.OP-Recycling-Nmix',
+    'PR.SO-PR.WW-Wastewater from landfills-Nmix',
+    'PR.SO-RW.RW-Export for recycling-Nmix',
+    'PR.SO-RW.RW-Export for reuse-Nmix',
+    'PR.SO-RW.RW-Solid waste export-Nmix',
+]
+PR_WW_IN_FULL = [
+    'HS.HS-PR.WW-Municipal wastewater-Nmix',
+    'MP.FP-PR.WW-Food industry wastewater-Nmix',
+    'MP.OP-PR.WW-Other industry wastewater-Nmix',
+    'PR.SO-PR.WW-Wastewater from landfills-Nmix',
+]
+PR_WW_OUT_FULL = [
+    'PR.WW-AG.SM-Sewage sludge fertilizer-Nmix',
+    'PR.WW-AT.AT-Emissions-N2',
+    'PR.WW-AT.AT-Emissions-N2O',
+    'PR.WW-HS.HS-Sewage sludge fertilizer-Nmix',
+    'PR.WW-HY.CW-Treated wastewater discharge-Nmix',
+    'PR.WW-PR.SO-Sewage sludge landfill-Nmix',
+]
+PR_INTERNAL = ['PR.SO-PR.WW-Wastewater from landfills-Nmix', 'PR.WW-PR.SO-Sewage sludge landfill-Nmix']
+WASTE_TO_ENERGY = ['PR.SO-EF.EC-Waste to energy-Nmix']
+RECYCLING_ALL = ['PR.SO-MP.OP-Recycling-Nmix', 'PR.SO-RW.RW-Export for recycling-Nmix',
+                 'PR.SO-RW.RW-Export for reuse-Nmix']
+WW_N2_REMOVAL = ['PR.WW-AT.AT-Emissions-N2']
+WW_DISCHARGE = ['PR.WW-HY.CW-Treated wastewater discharge-Nmix']
+
+
+def pr_so_balance(df, years=ANALYSIS_YEARS):
+    """PR.SO balance (kt N/yr): inflows minus outflows. Mostly N going to
+    landfill, which has no outflow of its own."""
+    return sum_flows(df, PR_SO_IN_FULL, years) - sum_flows(df, PR_SO_OUT_FULL, years)
+
+
+def pr_ww_balance(df, years=ANALYSIS_YEARS):
+    """PR.WW balance (kt N/yr): inflows minus outflows."""
+    return sum_flows(df, PR_WW_IN_FULL, years) - sum_flows(df, PR_WW_OUT_FULL, years)
+
+
+def pr_balance(df, years=ANALYSIS_YEARS):
+    """PR pool balance (kt N/yr), PR.SO + PR.WW; the internal transfers cancel."""
+    return pr_so_balance(df, years) + pr_ww_balance(df, years)
+
+
+def pr_inputs(df, years=ANALYSIS_YEARS):
+    """All inflows to the PR pool from outside it (kt N/yr)."""
+    return sum_flows(df, [f for f in PR_SO_IN_FULL + PR_WW_IN_FULL if f not in PR_INTERNAL], years)
+
+
+def pr_outputs(df, years=ANALYSIS_YEARS):
+    """All outflows from the PR pool to outside it (kt N/yr)."""
+    return sum_flows(df, [f for f in PR_SO_OUT_FULL + PR_WW_OUT_FULL if f not in PR_INTERNAL], years)
+
+
+def pr_so_inputs(df, years=ANALYSIS_YEARS):
+    """All inflows to PR.SO (kt N/yr)."""
+    return sum_flows(df, PR_SO_IN_FULL, years)
+
+
+def waste_to_energy(df, years=ANALYSIS_YEARS):
+    """Solid waste incinerated for energy (kt N/yr)."""
+    return sum_flows(df, WASTE_TO_ENERGY, years)
+
+
+def recycling_all(df, years=ANALYSIS_YEARS):
+    """Recycling in Norway plus export for recycling and reuse (kt N/yr)."""
+    return sum_flows(df, RECYCLING_ALL, years)
+
+
+def pr_so_balance_share(df, years=ANALYSIS_YEARS):
+    """PR.SO balance (mostly landfill) as a share of PR.SO inflows (%)."""
+    return 100 * pr_so_balance(df, years) / pr_so_inputs(df, years)
+
+
+def waste_to_energy_share(df, years=ANALYSIS_YEARS):
+    """Waste to energy as a share of PR.SO inflows (%)."""
+    return 100 * waste_to_energy(df, years) / pr_so_inputs(df, years)
+
+
+def ww_n2_removal_share(df, years=ANALYSIS_YEARS):
+    """N removed as N2 in wastewater treatment, as a share of N leaving
+    treatment either as N2 or as treated discharge to coastal water (%)."""
+    n2 = sum_flows(df, WW_N2_REMOVAL, years)
+    return 100 * n2 / (n2 + sum_flows(df, WW_DISCHARGE, years))
+
+
 # =============================================================================
 # Consumer goods, food flows and per-capita values
 # =============================================================================
@@ -665,7 +769,7 @@ MC_FLOWS = sorted(set(
     + NON_EDIBLE_ANIMAL_PRODUCTS + FOOD_PRODUCTS_CONSUMED + FOOD_EXPORT_TOTAL + WILD_CATCH + AQUACULTURE_FEED
     + MM_IN_FULL + MM_OUT_FULL + SM_IN_FULL + SM_OUT_FULL + AG_LEACHING + AG_ATMOSPHERIC_LOSSES
     + NOX_FLOWS_ALL_POOLS + EF_IN_FULL + EF_OUT_FULL + AMMONIA_IMPORT + FERTILIZER_EXPORT + CONSUMER_GOODS + FOOD_IMPORT
-    + MP_FP_IN_FULL + MP_FP_OUT_FULL
+    + MP_FP_IN_FULL + MP_FP_OUT_FULL + PR_SO_IN_FULL + PR_SO_OUT_FULL + PR_WW_IN_FULL + PR_WW_OUT_FULL
 ))
 
 
@@ -782,6 +886,16 @@ SERIES = [
     ('ammonia_import', "Ammonia import (kt N/yr)", ammonia_import, True),
     ('fertilizer_export', "Mineral fertilizer export (kt N/yr)", fertilizer_export, True),
     ('balance_mp_fp', "MP.FP subpool mass balance (kt N/yr, in - out)", mp_fp_balance, True),
+    ('pr_inputs', "PR pool inputs (kt N/yr)", pr_inputs, True),
+    ('pr_outputs', "PR pool outputs (kt N/yr)", pr_outputs, True),
+    ('balance_pr', "PR pool mass balance (kt N/yr, in - out)", pr_balance, True),
+    ('balance_pr_so', "PR.SO subpool mass balance (kt N/yr, in - out; mostly landfill)", pr_so_balance, True),
+    ('balance_pr_ww', "PR.WW subpool mass balance (kt N/yr, in - out)", pr_ww_balance, True),
+    ('pr_so_balance_share', "PR.SO balance as share of PR.SO inputs (%)", pr_so_balance_share, True),
+    ('waste_to_energy', "Waste to energy (kt N/yr)", waste_to_energy, True),
+    ('waste_to_energy_share', "Waste to energy as share of PR.SO inputs (%)", waste_to_energy_share, True),
+    ('recycling_all', "Recycling incl. export for recycling and reuse (kt N/yr)", recycling_all, True),
+    ('ww_n2_removal_share', "N removed as N2 in wastewater treatment, share of N2 + treated discharge (%)", ww_n2_removal_share, True),
     ('consumer_goods', "Consumer goods to households (kt N/yr)", consumer_goods, True),
     ('consumer_goods_per_capita', "Consumer goods per capita (kg N/person/yr)", consumer_goods_per_capita, True),
     ('food_import', "Food import (kt N/yr)", food_import, True),
@@ -841,6 +955,7 @@ SEGMENTS = {
 # Period averages other than the standard 1990-1992 / 2022-2024 ones.
 PERIOD_MEANS = {
     'ag_losses': [(1990, 1991)],
+    'ww_n2_removal_share': [(2023, 2023)],
 }
 
 
