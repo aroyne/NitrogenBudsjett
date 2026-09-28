@@ -215,6 +215,11 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
     fodder_prot = float(current_params.get("fodder_protein_frac"))
     Jones = float(current_params.get("Jones_factor"))
     N_content = fodder_prot / Jones
+    # SSB reports eng/høy as dry matter but "Grønfôr- og silovekstar" as
+    # fresh/ensiled weight (farmers report m3 silage, round bales or tonnes
+    # of fresh fodder), while fodder_protein_frac is per kg dry matter. Green
+    # fodder is therefore converted to dry matter before the N content applies.
+    green_dm = float(current_params.get("green_fodder_DM_frac"))
 
     key_13648 = '13648'
     noise_13648_val = dataset_noise[key_13648]
@@ -252,7 +257,7 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
         val6 = df_13648.iloc[row_idx, 2]  # Grøntfôr- og silovekstar
 
         if pd.notna(val5) and pd.notna(val6):
-            base_value = (float(val5) + float(val6)) * N_content
+            base_value = (float(val5) + float(val6) * green_dm) * N_content
             year_entries[year] = {'value': base_value * noise_13648_val, 'data_sources': 'SSB table 13648'}
 
     for col_idx in range(1, 22):
@@ -264,7 +269,7 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
             year = int(year_val)
             if year not in EXPECTED_YEARS:
                 continue
-            base_value = (float(val4) + float(val5)) * N_content
+            base_value = (float(val4) * green_dm + float(val5)) * N_content
             value = base_value * noise_05772_val
             if value < 0:
                 value = 0.0
@@ -273,14 +278,14 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
     # Pre-2000 (SSB Jordbruksstatistikk)
     for r_idx in range(2, 18):
         year_val = df_old.iloc[r_idx, 0]
-        val2 = df_old.iloc[r_idx, 1]  # Grøntfôr- og silovekstar
-        val3 = df_old.iloc[r_idx, 2]  # Høy
+        val2 = df_old.iloc[r_idx, 1]  # Høy
+        val3 = df_old.iloc[r_idx, 2]  # Grønfôr og silovekstar
 
         if pd.notna(year_val) and pd.notna(val2) and pd.notna(val3):
             year = int(year_val)
             if year not in EXPECTED_YEARS:
                 continue
-            base_value = (float(val2) + float(val3)) * N_content
+            base_value = (float(val2) + float(val3) * green_dm) * N_content
             value = base_value * noise_05772_val
             year_entries[year] = {'value': value, 'data_sources': 'SSB Jordbruksstatistikk'}
 
