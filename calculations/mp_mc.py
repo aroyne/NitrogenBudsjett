@@ -195,6 +195,11 @@ def _add_farm_animal_feed_mc(results, preloaded_data, current_params, dataset_no
     
     N_content_carb = float(current_params.get("feed_carb_N_frac"))
     N_content_prot = float(current_params.get("feed_prot_N_frac"))
+    # Soy meal crushed in Norway from imported soybeans is listed as a domestic
+    # raw material in the kraftfôr statistics; it is moved to
+    # RW.RW-AG.MM-Animal feed import-Nmix (rw_mc.py) and subtracted here.
+    # Before 2000 it is taken as a fixed share of total concentrate feed.
+    soy_share = float(current_params.get("soy_meal_share_of_concentrates"))
     
     noise_kraftfor = dataset_noise['Kraftforstatistikk']
     noise_totalkalkylen = dataset_noise['Totalkalkylen']
@@ -220,8 +225,10 @@ def _add_farm_animal_feed_mc(results, preloaded_data, current_params, dataset_no
         val_carb = float(df_raw.iloc[r, 1])
         val_prot = float(df_raw.iloc[r, 2])
         
+        val_soy = float(df_raw.iloc[r, 3])
+        
         value_kt_N = (val_carb * N_content_carb + val_prot * N_content_prot) / 1000.0
-        value_kt_N_noisy = value_kt_N * noise_kraftfor
+        value_kt_N_noisy = (value_kt_N - val_soy * N_content_prot / 1000.0) * noise_kraftfor
         
         if year in EXPECTED_YEARS:
             final_yearly_values[year] = {
@@ -264,7 +271,7 @@ def _add_farm_animal_feed_mc(results, preloaded_data, current_params, dataset_no
             param_key_dom_frac = "feed_historical_dom_frac"
             dom_frac = float(current_params.get(param_key_dom_frac))
 
-        value_kt_N_hist = value_tonn * 1e-3 * N_cont_before_2000 * dom_frac
+        value_kt_N_hist = value_tonn * 1e-3 * (N_cont_before_2000 * dom_frac - N_content_prot * soy_share)
         value_kt_N_hist_noisy = value_kt_N_hist * noise_totalkalkylen
 
         if year in EXPECTED_YEARS and year not in final_yearly_values:

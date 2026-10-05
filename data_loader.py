@@ -113,6 +113,21 @@ def _read_crt_fuel_series(crt_folder, sheet_name, row_specs):
     return values
 
 
+def _read_domestic_soy_meal(filepath, years):
+    """Tonnes of 'Norsk' soy meal per year from the 'Protein' sheet of
+    Årlig råvareforbruk.xlsx, aligned to years. The kraftfôr statistics count
+    soy meal crushed in Norway (Denofa) from imported soybeans as a domestic
+    raw material; the feed flows move it to imported feed. Each raw material
+    has Totalt/Import/Norsk columns under its name in row 3; some cells hold
+    numbers as text with thousand separators."""
+    df = pd.read_excel(filepath, sheet_name='Protein', header=None)
+    col = df.iloc[2].tolist().index('Soyamel') + 2
+    data = df.iloc[4:].dropna(subset=[0])
+    soy = data[col].astype(str).str.replace(' ', '').astype(float)
+    soy.index = data[0].astype(int)
+    return soy.reindex(years).values
+
+
 def load_all_data(selected_pools):
     preloaded = {}
     print(f"\n[DATA_LOADER] Kalles med selected_pools: {selected_pools}")
@@ -454,7 +469,8 @@ def load_all_data(selected_pools):
             preloaded[key] = pd.DataFrame({
                 'year': df.iloc[3:28, 0].astype(int),
                 'value_carb': df.iloc[3:28, 1].astype(float),  # column B (index 1) = domestic carbohydrate raw materials
-                'value_prot': df.iloc[3:28, 7].astype(float)   # column H (index 7) = domestic protein raw materials
+                'value_prot': df.iloc[3:28, 7].astype(float),  # column H (index 7) = domestic protein raw materials
+                'value_soy': _read_domestic_soy_meal(filepath, df.iloc[3:28, 0].astype(int)),
             }).reset_index(drop=True)
 
         elif method == 'excel_feed_raavarer_import':
@@ -462,7 +478,8 @@ def load_all_data(selected_pools):
             preloaded[key] = pd.DataFrame({
                 'year': df.iloc[3:28, 0].astype(int),
                 'value_carb': df.iloc[3:28, 2].astype(float),  # column C (index 2) = imported carbohydrate raw materials
-                'value_prot': df.iloc[3:28, 8].astype(float)   # column I (index 8) = imported protein raw materials
+                'value_prot': df.iloc[3:28, 8].astype(float),  # column I (index 8) = imported protein raw materials
+                'value_soy': _read_domestic_soy_meal(filepath, df.iloc[3:28, 0].astype(int)),
             }).reset_index(drop=True)
 
         elif method == 'excel_feed_totalkalkyle':

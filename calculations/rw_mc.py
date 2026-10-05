@@ -102,6 +102,11 @@ def _add_animal_feed_import_mc(results, preloaded_data, current_params, dataset_
 
     N_content_carb = float(current_params.get("feed_carb_N_frac"))
     N_content_prot = float(current_params.get("feed_prot_N_frac"))
+    # Soy meal crushed in Norway from imported soybeans is listed as a domestic
+    # raw material in the kraftfôr statistics but counted here as imported
+    # feed (and removed from MP.FP-AG.MM-Farm animal feed-Nmix in mp_mc.py).
+    # Before 2000 it is taken as a fixed share of total concentrate feed.
+    soy_share = float(current_params.get("soy_meal_share_of_concentrates"))
     
     param_key_dom_frac = "feed_historical_dom_frac"
     global_dom_frac_fallback = float(current_params.get(param_key_dom_frac))
@@ -126,9 +131,10 @@ def _add_animal_feed_import_mc(results, preloaded_data, current_params, dataset_
 
             base_carb = float(row['value_carb'])
             base_prot = float(row['value_prot'])
+            base_soy = float(row['value_soy'])
 
             value_carb = base_carb * noise_kraft
-            value_prot = base_prot * noise_kraft
+            value_prot = (base_prot + base_soy) * noise_kraft
 
             imported_feed_N = (value_carb * N_content_carb + value_prot * N_content_prot) / 1000
 
@@ -167,7 +173,7 @@ def _add_animal_feed_import_mc(results, preloaded_data, current_params, dataset_
             else:
                 dom_frac = float(row['dom_frac'])
 
-            value_kt_N = feed_tonn * 1e-3 * N_cont_before_2000 * (1 - dom_frac)
+            value_kt_N = feed_tonn * 1e-3 * (N_cont_before_2000 * (1 - dom_frac) + N_content_prot * soy_share)
 
             results.append({
                 'flow_name': flow_code, 'year': year, 'value': value_kt_N,

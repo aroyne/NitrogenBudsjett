@@ -200,6 +200,7 @@ GRAZING_UTMARK = ['FS.OL-AG.MM-Grazing-Nmix']
 FODDER_CROPS = ['AG.SM-AG.MM-Fodder crops-Nmix']  # includes innmark grazing, see ag_mc.py
 FARM_ANIMAL_FEED = ['MP.FP-AG.MM-Farm animal feed-Nmix']
 FEED_IMPORT = ['RW.RW-AG.MM-Animal feed import-Nmix']  # terrestrial livestock feed only, not aquafeed
+FOOD_IMPORT = ['RW.RW-MP.FP-Food import-Nmix']  # soybeans are not part of it; they enter as feed via soy meal
 
 FOOD_CROP_PRODUCTS = ['AG.SM-MP.FP-Food crop products-Nmix']
 INDUSTRIAL_CROP_PRODUCTS = ['AG.SM-MP.OP-Crop products for industrial use-Nmix']
@@ -232,30 +233,48 @@ FISH_EXPORT_KONV = 'fish_fresh_frozen'
 
 
 @functools.lru_cache(maxsize=None)
-def food_export_excluding_fish(years=ANALYSIS_YEARS):
-    """MP.FP-RW.RW-Food export-Nmix, with the fish_fresh_frozen konv category
-    removed. Norway's fish exports (the vast majority of Food export by mass)
-    are not matched by any fertilizer/manure/BNF/deposition input in Q3's
-    denominator, since they come from the sea rather than AG.SM - including
-    them in N_food would inflate food-system NUE without a matching
-    input-side cost. Uses the trade_parameters median value (not
-    MC-perturbed) for a single, reproducible point estimate, since this
-    breakdown isn't carried in MC_Reporting_Statistics.xlsx."""
+def _food_trade_n_by_year(is_import, include_fish, years=ANALYSIS_YEARS):
+    """N in food trade (Food import or Food export) per year from the raw
+    trade data, with or without the fish_fresh_frozen konv category. Uses the
+    trade_parameters median value (not MC-perturbed) for a single,
+    reproducible point estimate, since this breakdown isn't carried in
+    MC_Reporting_Statistics.xlsx."""
     from data_loader import load_all_data
     preloaded = load_all_data({'mp'})
     df_vol = preloaded['compressed_trade_volume']
     trade_params = pd.read_excel('parameters/N_parameters.xlsx', sheet_name='trade_parameters')
     factors = dict(zip(trade_params['param_id'], trade_params['value']))
 
-    is_export = df_vol['impeks'].astype(str).str.strip().isin(['2', '2.0'])
+    direction = ['1', '1.0'] if is_import else ['2', '2.0']
+    is_direction = df_vol['impeks'].astype(str).str.strip().isin(direction)
     is_food = df_vol['type'].astype(str).str.lower().str.strip().isin(FOOD_EXPORT_TYPES)
-    is_not_fish = df_vol['konv'] != FISH_EXPORT_KONV
-    sub = df_vol[is_export & is_food & is_not_fish].copy()
+    keep = is_direction & is_food
+    if not include_fish:
+        keep &= df_vol['konv'] != FISH_EXPORT_KONV
+    sub = df_vol[keep].copy()
     sub['N_amount'] = sub['amount'] * sub['konv'].map(factors).fillna(0.0) / 1e6
 
     yearly = sub.groupby('year')['N_amount'].sum()
     yearly.index = yearly.index.astype(int)
     return yearly.reindex(years, fill_value=0.0)
+
+
+def food_export_excluding_fish(years=ANALYSIS_YEARS):
+    """MP.FP-RW.RW-Food export-Nmix, with the fish_fresh_frozen konv category
+    removed. Norway's fish exports (the vast majority of Food export by mass)
+    are not matched by any fertilizer/BNF/deposition/import input in Q3's
+    denominator, since they come from the sea rather than AG.SM - including
+    them in N_food would inflate food-system NUE without a matching
+    input-side cost."""
+    return _food_trade_n_by_year(False, False, years)
+
+
+def food_import_non_fish_share(years=ANALYSIS_YEARS):
+    """Share of Food import N that is not fish, per year. Q3 excludes fish
+    on the output side (food_export_excluding_fish), so fish import is left
+    out of its input side as well. Applied to the MC flow rather than used as
+    a value, so Food import keeps its MC uncertainty."""
+    return _food_trade_n_by_year(True, False, years) / _food_trade_n_by_year(True, True, years)
 
 # Full mass-balance flow sets (all inflows/outflows, not just the
 # efficiency-scoped subset above) - used for the AG.MM/AG.SM balance
@@ -400,18 +419,22 @@ def poultry_pork_share_of_animal_products(years=ANALYSIS_YEARS):
 
 
 # =============================================================================
-# Question 3: food-system NUE (Hayashi/Erisman-style), land-based, aquaculture
-# excluded. See claude_tekst/2026-09-10_NUE_metodikk_og_beregninger.md for the
-# full discussion of why each term is scoped the way it is - in particular,
-# N_import here is DELIBERATELY feed import only (not food import): food
-# import substitutes for domestic production rather than feeding into it.
+# Question 3: food-system NUE (Erisman et al. 2018 whole food system NUE),
+# land-based, aquaculture excluded: N in food produced and imported divided by
+# newly fixed and imported N. Manure application is internal recycling
+# (AG.MM to AG.SM) of N already counted as feed, so it is not an input. Food
+# import is an input, since imported food is part of domestic consumption in
+# N_food; fish is excluded on both sides. Soy meal from imported soybeans is
+# part of FEED_IMPORT (rw_mc.py). See
+# claude_tekst/2026-09-10_NUE_metodikk_og_beregninger.md.
 # =============================================================================
 
 def q3_food_system_nue(df, years=ANALYSIS_YEARS):
     """N_food = domestic consumption + non-fish food export, i.e. all food
     the system produced whether it was eaten domestically or exported (fish
     export excluded - see food_export_excluding_fish())."""
-    denom = sum_flows(df, FERTILIZER_SM + MANURE_APPLICATION + BNF_SM + DEPOSITION_SM + FEED_IMPORT, years)
+    denom = (sum_flows(df, FERTILIZER_SM + BNF_SM + DEPOSITION_SM + FEED_IMPORT, years)
+             + sum_flows(df, FOOD_IMPORT, years) * food_import_non_fish_share(years))
     n_food = flow_series(df, FOOD_PRODUCTS_CONSUMED[0], years) + food_export_excluding_fish(years)
     return 100 * n_food / denom
 
@@ -426,7 +449,7 @@ def q3_food_system_nue_incl_fish(df, years=ANALYSIS_YEARS):
     food_export_excluding_fish()."""
     denom = sum_flows(
         df,
-        FERTILIZER_SM + MANURE_APPLICATION + BNF_SM + DEPOSITION_SM + FEED_IMPORT
+        FERTILIZER_SM + BNF_SM + DEPOSITION_SM + FEED_IMPORT + FOOD_IMPORT
         + WILD_CATCH + AQUACULTURE_FEED,
         years,
     )
@@ -957,8 +980,6 @@ def household_waste_sector_shares(n_draws=1000, seed=MC_RESAMPLE_SEED, periods=H
 # fertilizer-production intermediates removed from both trade terms), see
 # mp_mc._add_consumer_goods_mc.
 CONSUMER_GOODS = ['MP.OP-HS.HS-Consumer goods-Nmix']
-FOOD_IMPORT = ['RW.RW-MP.FP-Food import-Nmix']
-
 
 def consumer_goods(df, years=ANALYSIS_YEARS):
     """Consumer goods delivered to households (kt N/yr)."""
@@ -1208,14 +1229,21 @@ def summarize_series(key, label, series_fn, mc, df, sims, years=ANALYSIS_YEARS):
 # 2006, rises to 2010 and is flat after; food products to households are
 # flat until 2005.
 SEGMENTS = {
-    # SSB changed the method for eng til slått in 2021 (hay to dry matter, new
-    # sampling), and the step is not corrected; 1995-2020 also avoids the
-    # 1994/1995 change from energy basis to dry-matter basis.
+    # SSB changed the method for eng til slått in 2021 (dry matter percentages
+    # from feed samples, new sampling), and the resulting step in Fodder crops
+    # is not corrected, so series that depend on how N is split between AG.MM
+    # and AG.SM are also reported for 1990-2020. 1995-2020 shows whether the
+    # trend depends on the scaling of the 1984-1994 energy-basis figures.
+    # balance_ag does not depend on the split and is included for comparison.
     'fodder_crops': [(1990, 2020), (1995, 2020)],
     'q1b': [(1990, 2020), (1995, 2020)],
     'q1c': [(1990, 2020), (1995, 2020)],
+    'q2_corrected': [(1990, 2020), (1995, 2020)],
     'balance_mm': [(1990, 2020), (1995, 2020)],
     'balance_sm': [(1990, 2020), (1995, 2020)],
+    'balance_ag': [(1990, 2020)],
+    'fodder_loss_mm': [(1990, 2020)],
+    'fodder_loss_sm': [(1990, 2020)],
     'balance_hy': [(1990, 1997), (1997, 2024)],
     'consumer_goods': [(1990, 1995), (1995, 2004), (2005, 2024)],
     'consumer_goods_per_capita': [(1990, 1995), (1995, 2024), (2005, 2024)],
@@ -1287,14 +1315,29 @@ def period_means(results, periods=PERIOD_MEANS):
             for key, spans in periods.items() for a, b in spans}
 
 
-def segment_trends(results, segments=SEGMENTS):
+def segment_trends(results, segments=SEGMENTS, years=ANALYSIS_YEARS):
     """trend_report on each sub-period of the median series, keyed by
-    (series key, start year, end year)."""
-    by_key = {r['key']: r['series'] for r in results}
-    return {
-        (key, a, b): trend_report(list(range(a, b + 1)), by_key[key].loc[a:b].values, a, b)
-        for key, periods in segments.items() for a, b in periods
-    }
+    (series key, start year, end year). For series with an MC matrix, the
+    same sub-period is also run through MC variants (i) and (ii), which give
+    the first and last three years' averages of the sub-period with MC
+    intervals as well as the trend."""
+    years = list(years)
+    by_key = {r['key']: r for r in results}
+    out = {}
+    for key, periods in segments.items():
+        r = by_key[key]
+        for a, b in periods:
+            span = list(range(a, b + 1))
+            entry = trend_report(span, r['series'].loc[a:b].values, a, b)
+            entry['avg_start'] = r['series'].loc[a:a + 2].mean()
+            entry['avg_end'] = r['series'].loc[b - 2:b].mean()
+            entry['mc_i'] = entry['mc_ii'] = None
+            if r['mc'] is not None:
+                sub = r['mc']['matrix'][:, [years.index(y) for y in span]]
+                entry['mc_i'] = mc_trend_interval(sub, span)
+                entry['mc_ii'] = mc_trend_interval_independent_years(sub, span)
+            out[(key, a, b)] = entry
+    return out
 
 
 def compute_all():
@@ -1348,10 +1391,19 @@ def main():
     for (key, a, b), m in period_means(results).items():
         print(f"  {key} {a}-{b}: {m['median_series']:.2f}  MC (i) {m['mc_i'][1]:.2f} [{m['mc_i'][0]:.2f}, {m['mc_i'][2]:.2f}]"
               f"  MC (ii) {m['mc_ii'][1]:.2f} [{m['mc_ii'][0]:.2f}, {m['mc_ii'][2]:.2f}]")
-    print("\nSub-period trends (median series)")
+    print("\nSub-period trends")
     for (key, a, b), trend in segment_trends(results).items():
         print(f"  {key} {a}-{b}: {trend['pct_change']:+.1f}% "
-              f"[95% CI {trend['pct_change_lo']:+.1f} to {trend['pct_change_hi']:+.1f}]  MK p={trend['mk_p']:.4f}")
+              f"[95% CI {trend['pct_change_lo']:+.1f} to {trend['pct_change_hi']:+.1f}]  MK p={trend['mk_p']:.4f}"
+              f"   {a}-{a+2} avg {trend['avg_start']:.2f}, {b-2}-{b} avg {trend['avg_end']:.2f}")
+        if trend['mc_i'] is None:
+            continue
+        q, same_i, _ = trend['mc_i']
+        _, same_ii, _ = trend['mc_ii']
+        print(f"      MC (i): {a}-{a+2} avg {q.loc[0.025, 'avg_start']:.2f} to {q.loc[0.975, 'avg_start']:.2f}, "
+              f"{b-2}-{b} avg {q.loc[0.025, 'avg_end']:.2f} to {q.loc[0.975, 'avg_end']:.2f}, "
+              f"change {q.loc[0.5, 'pct_change']:+.1f}% [{q.loc[0.025, 'pct_change']:+.1f} to {q.loc[0.975, 'pct_change']:+.1f}%]; "
+              f"same sign as median trend (i) {100 * same_i:.1f}%, (ii) {100 * same_ii:.1f}%")
     print("\n" + "=" * 78)
 
 
