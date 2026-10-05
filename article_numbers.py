@@ -328,30 +328,50 @@ def other_rows(df, sims):
     return sections, singles
 
 
-def write_word_table(rows):
-    """The pool/subpool balance table laid out as in the manuscript (one row
-    per pool or subpool, three value columns), rounded to whole kt N. Copy
-    the value cells in Excel and paste them into the selected cells of the
-    Word table ("Overwrite cells")."""
+# Row labels of the manuscript's NUE table, keyed by the row's 'Beregning'
+# label in nue_rows.
+WORD_NUE_LABELS = {
+    'q1a_ag_whole_nue': 'AG total',
+    'q1b_ag_mm_nue': 'AG.MM',
+    'q1c_ag_sm_nue': 'AG.SM',
+    'q2_corrected_ag_whole_nue': 'AG total corrected for feed import',
+    'q3_food_system_nue': 'Food system, excluding fish/aquaculture',
+    'q3_food_system_nue_incl_fish': 'Food system, including fish/aquaculture',
+}
+
+
+def _word_rows(rows, first_column, label_of):
+    """Rows laid out as in the manuscript's tables, rounded to whole numbers."""
     whole = lambda x: str(round(x))  # noqa: E731 (round() returns an int, so never '-0')
     out = []
     for r in rows:
-        if 'code' not in r:
+        label = label_of(r)
+        if label is None:
             continue
         mark = '†' if r['fodder'] else ''
         out.append({
-            'Pool/subpool': r['code'],
+            first_column: label,
             '1990-1992 median [2.5-97.5 %]': f"{whole(r['start_value'])} [{whole(r['start_ci'][0])}, {whole(r['start_ci'][1])}]",
             '2022-2024 median [2.5-97.5 %]': f"{whole(r['end_value'])} [{whole(r['end_ci'][0])}, {whole(r['end_ci'][1])}]{mark}",
             'Mann-Kendall p': fmt_p(r['p']) + mark,
         })
-    table = pd.DataFrame(out)
+    return pd.DataFrame(out)
+
+
+def write_word_table(pool_rows_, nue_rows_):
+    """The balance and NUE tables laid out as in the manuscript (one sheet
+    each, three value columns), rounded to whole kt N or whole %. Copy the
+    value cells in Excel and paste them into the selected cells of the Word
+    table ("Overwrite cells")."""
+    balances = _word_rows(pool_rows_, 'Pool/subpool', lambda r: r.get('code'))
+    nue = _word_rows(nue_rows_, 'Calculation basis', lambda r: WORD_NUE_LABELS.get(r['function']))
     with pd.ExcelWriter(OUTPUT_WORD_TABLE) as writer:
-        table.to_excel(writer, index=False, sheet_name='Balanser')
+        balances.to_excel(writer, index=False, sheet_name='Balanser')
+        nue.to_excel(writer, index=False, sheet_name='NUE')
         note = pd.DataFrame({'Merknad': [
             "† 2018-2020 i stedet for 2022-2024, og trend testet for 1990-2020 (Fodder crops, SSBs metodeskifte i 2021).",
             "Verdi: median av periodesnittet over MC-iterasjonene (variant (i)). Intervall: 2,5-97,5 % av samme snitt.",
-            "MK p: Mann-Kendall på medianserien. Kt N/år, avrundet til hele tall.",
+            "MK p: Mann-Kendall på medianserien. Balanser i kt N/år, NUE i %, avrundet til hele tall.",
         ]})
         note.to_excel(writer, index=False, sheet_name='Merknader')
     print(f"Skrevet: {OUTPUT_WORD_TABLE}")
@@ -411,7 +431,7 @@ def main():
     parts.append(f"### Andel av husholdnings- og næringsavfall per sektor (%) [MC over N-innhold i avfallet]\n\n"
                  f"`household_waste_sector_shares`\n\n{household_waste_shares_table()}\n")
 
-    write_word_table(pools)
+    write_word_table(pools, nue)
     with open(OUTPUT_NOTE, 'w') as f:
         f.write("\n".join(parts))
     print(f"Skrevet: {OUTPUT_NOTE}")
