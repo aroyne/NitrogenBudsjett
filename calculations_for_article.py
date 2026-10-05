@@ -1032,9 +1032,9 @@ MC_FLOWS = sorted(set(
 MC_FLOW_PATTERN = r'AT\.AT|HY\.'
 
 
-def load_raw_simulations(years=ANALYSIS_YEARS):
+def load_raw_simulations(years=ANALYSIS_YEARS, all_flows=False):
     """One small DataFrame per MC iteration, holding that iteration's value
-    for every flow used here. The value goes in a 'median' column so every
+    for every flow used here (or every flow in the model, if all_flows). The value goes in a 'median' column so every
     question function (which reads flow values via flow_series) runs
     unchanged on a single iteration.
 
@@ -1048,7 +1048,7 @@ def load_raw_simulations(years=ANALYSIS_YEARS):
             f"(modified {age_gap / 3600:.1f} h apart). Rerun main_mc.py with --export-raw-mc."
         )
     raw = pd.read_csv(RAW_FILE, usecols=['flow_name', 'year', 'value', 'sim_id'])
-    keep = raw['flow_name'].isin(MC_FLOWS) | raw['flow_name'].str.contains(MC_FLOW_PATTERN, regex=True)
+    keep = raw['flow_name'].isin(MC_FLOWS) | raw['flow_name'].str.contains(MC_FLOW_PATTERN, regex=True) | all_flows
     raw = raw[keep & raw['year'].isin(list(years))]
     duplicated = raw.duplicated(['sim_id', 'flow_name', 'year']).sum()
     if duplicated:
