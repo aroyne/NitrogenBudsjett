@@ -1117,6 +1117,7 @@ SERIES = [
     ('ag_losses', "AG total N losses (kt N/yr, NH3 + N2O + NOx + N2 + leaching)", ag_losses_total, True),
     ('fodder_loss_mm', "Fodder crops loss needed to close the AG.MM balance (% of Fodder crops)", fodder_loss_to_close_mm, True),
     ('fodder_loss_sm', "Fodder crops loss needed to close the AG.SM balance (% of Fodder crops)", fodder_loss_to_close_sm, True),
+    ('fodder_crops', "Fodder crops incl. innmark grazing (kt N/yr)", lambda d: sum_flows(d, FODDER_CROPS), True),
     ('leaching_per_ha', f"AG leaching per hectare (kg N/ha/yr, area={AGRICULTURAL_AREA_HA:,} ha)", lambda d: ag_per_hectare(d)['leaching_kgN_ha'], True),
     ('atmospheric_per_ha', f"AG atmospheric losses per hectare (kg N/ha/yr, area={AGRICULTURAL_AREA_HA:,} ha)", lambda d: ag_per_hectare(d)['atmospheric_kgN_ha'], True),
     ('input_per_ha', f"AG soil N input per hectare (kg N/ha/yr, area={AGRICULTURAL_AREA_HA:,} ha)", lambda d: ag_per_hectare(d)['input_kgN_ha'], True),
@@ -1207,6 +1208,14 @@ def summarize_series(key, label, series_fn, mc, df, sims, years=ANALYSIS_YEARS):
 # 2006, rises to 2010 and is flat after; food products to households are
 # flat until 2005.
 SEGMENTS = {
+    # SSB changed the method for eng til slått in 2021 (hay to dry matter, new
+    # sampling), and the step is not corrected; 1995-2020 also avoids the
+    # 1994/1995 change from energy basis to dry-matter basis.
+    'fodder_crops': [(1990, 2020), (1995, 2020)],
+    'q1b': [(1990, 2020), (1995, 2020)],
+    'q1c': [(1990, 2020), (1995, 2020)],
+    'balance_mm': [(1990, 2020), (1995, 2020)],
+    'balance_sm': [(1990, 2020), (1995, 2020)],
     'balance_hy': [(1990, 1997), (1997, 2024)],
     'consumer_goods': [(1990, 1995), (1995, 2004), (2005, 2024)],
     'consumer_goods_per_capita': [(1990, 1995), (1995, 2024), (2005, 2024)],

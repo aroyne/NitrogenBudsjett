@@ -215,11 +215,16 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
     fodder_prot = float(current_params.get("fodder_protein_frac"))
     Jones = float(current_params.get("Jones_factor"))
     N_content = fodder_prot / Jones
-    # SSB reports eng/høy as dry matter but "Grønfôr- og silovekstar" as
-    # fresh/ensiled weight (farmers report m3 silage, round bales or tonnes
-    # of fresh fodder), while fodder_protein_frac is per kg dry matter. Green
-    # fodder is therefore converted to dry matter before the N content applies.
+    # SSB reports "Grønfôr- og silovekstar" as fresh/ensiled weight (farmers
+    # report m3 silage, round bales or tonnes of fresh fodder), while
+    # fodder_protein_frac is per kg dry matter. Green fodder is therefore
+    # converted to dry matter before the N content applies.
     green_dm = float(current_params.get("green_fodder_DM_frac"))
+    # SSB reports eng til slått as dry matter from 2021, as hay converted via
+    # dry matter for 1995-2020, and as hay converted on an energy basis before
+    # 1995. The energy-basis figures are scaled to the dry-matter basis so the
+    # series is continuous across 1995.
+    hay_energy_basis = float(current_params.get("hay_energy_to_DM_basis_frac"))
 
     key_13648 = '13648'
     noise_13648_val = dataset_noise[key_13648]
@@ -285,7 +290,10 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
             year = int(year_val)
             if year not in EXPECTED_YEARS:
                 continue
-            base_value = (float(val2) + float(val3) * green_dm) * N_content
+            hay = float(val2)
+            if year < 1995:
+                hay *= hay_energy_basis
+            base_value = (hay + float(val3) * green_dm) * N_content
             value = base_value * noise_05772_val
             year_entries[year] = {'value': value, 'data_sources': 'SSB Jordbruksstatistikk'}
 
