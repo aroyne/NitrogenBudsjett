@@ -225,6 +225,9 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
     # 1995. The energy-basis figures are scaled to the dry-matter basis so the
     # series is continuous across 1995.
     hay_energy_basis = float(current_params.get("hay_energy_to_DM_basis_frac"))
+    # Before 2021 the eng til slått figures are hay weight, converted here to
+    # dry matter to match fodder_protein_frac.
+    hay_dm = float(current_params.get("hay_DM_frac"))
 
     key_13648 = '13648'
     noise_13648_val = dataset_noise[key_13648]
@@ -274,7 +277,7 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
             year = int(year_val)
             if year not in EXPECTED_YEARS:
                 continue
-            base_value = (float(val4) * green_dm + float(val5)) * N_content
+            base_value = (float(val4) * green_dm + float(val5) * hay_dm) * N_content
             value = base_value * noise_05772_val
             if value < 0:
                 value = 0.0
@@ -293,7 +296,7 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
             hay = float(val2)
             if year < 1995:
                 hay *= hay_energy_basis
-            base_value = (hay + float(val3) * green_dm) * N_content
+            base_value = (hay * hay_dm + float(val3) * green_dm) * N_content
             value = base_value * noise_05772_val
             year_entries[year] = {'value': value, 'data_sources': 'SSB Jordbruksstatistikk'}
 
