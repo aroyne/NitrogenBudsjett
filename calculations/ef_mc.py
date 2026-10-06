@@ -22,9 +22,16 @@ from calculations.shared_flow_calculations import find_feedstock_fuel
 # CRLTAP category codes per EF subsector, used to select which rows of the
 # CRLTAP inventory (webdabData1868031.txt, loaded as 'ag_crltap_raw_lines') to
 # sum for each subsector's NH3/NOx emissions.
-CRLTAP_EC_SECTORS = ['1A1a', '1A1b', '1A1c', '1B1a', '1B1b', '1B1c', '1B2ai', '1B2aiv', '1B2av', '1B2b', '1B2c', '1B2d']
+# 1A1a (public electricity and heat, incl. waste incineration with energy recovery) is
+# deliberately left out here: it is counted under PR.SO (PR_SO_CRLTAP_SECTORS in
+# pr_mc.py), cf. Schäppi et al. (2025) ch. 1.4.1.2, and including it in both pools
+# double-counted it.
+CRLTAP_EC_SECTORS = ['1A1b', '1A1c', '1B1a', '1B1b', '1B1c', '1B2ai', '1B2aiv', '1B2av', '1B2b', '1B2c', '1B2d']
 CRLTAP_IC_SECTORS = ['1A2a', '1A2b', '1A2c', '1A2d', '1A2e', '1A2f', '1A2gvii', '1A2gviii']
-CRLTAP_TR_SECTORS = ['1A3ai(i)', '1A3aii(i)', '1A3bi', '1A3bii', '1A3biii', '1A3biv', '1A3bv', '1A3bvi', '1A3bvii', '1A3c', '1A3di(ii)', '1A3dii', '1A3ei', '1A3eii']
+# 1A3aii(ii) (domestic aviation cruise) is a memo item in CLRTAP and not in Schäppi et al.
+# (2025) Table 13, but is included here because it is a domestic emission and the EF.TR
+# fuel input and N2O flows (CRT 1.A.3.a) cover domestic aviation in full.
+CRLTAP_TR_SECTORS = ['1A3ai(i)', '1A3aii(i)', '1A3aii(ii)', '1A3bi', '1A3bii', '1A3biii', '1A3biv', '1A3bv', '1A3bvi', '1A3bvii', '1A3c', '1A3di(ii)', '1A3dii', '1A3ei', '1A3eii']
 CRLTAP_OE_SECTORS = ['1A4ai', '1A4aii', '1A4bi', '1A4bii', '1A4ci', '1A4cii', '1A4ciii', '1A5a', '1A5b']
 
 

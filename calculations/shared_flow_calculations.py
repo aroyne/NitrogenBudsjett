@@ -278,13 +278,18 @@ def find_feedstock_fuel(preloaded_data, current_params, dataset_noise):
 
     noise_energy = float(dataset_noise['11561'])
 
-    GWh_to_TJ_factor = float(current_params.get('GWh_to_TJ_factor'))
+    GWh_per_TJ = float(current_params.get('GWh_per_TJ'))
     coal_NCV         = float(current_params.get('coal_feedstock_NCV'))
     oil_NCV          = float(current_params.get('oil_feedstock_NCV'))
     coal_N_frac      = float(current_params.get('coal_feedstock_N_frac'))
     oil_N_frac       = float(current_params.get('oil_feedstock_N_frac'))
 
     df_energy = preloaded_data.get('ssb_energy_balance_11561')
+    # Share of oil feedstock that is LPG and ethane (SSB 11561, product EP0462-0463),
+    # which has no fuel-bound N (Schäppi 2025 Table 15: ethane 0, LPG *). oil_N_frac
+    # is applied only to the remaining oil products.
+    df_lpg = preloaded_data.get('ssb_feedstock_oil_products_11561')
+    lpg_share = (df_lpg['lpg_og_etan_GWh'] / df_lpg['olje_og_oljeprodukter_ekskl_bio_GWh']).to_dict()
 
     # --- Coal and coal products (rows 38-72, 1990-2024) ---
     for row_idx in range(38, 73):
@@ -296,7 +301,7 @@ def find_feedstock_fuel(preloaded_data, current_params, dataset_noise):
 
         if pd.notna(year_val) and pd.notna(value_val) and value_val != '-':
             year = int(year_val)
-            value = float(value_val) / (GWh_to_TJ_factor * coal_NCV) * coal_N_frac
+            value = float(value_val) / (GWh_per_TJ * coal_NCV) * coal_N_frac
             year_values[year] = year_values.get(year, 0.0) + (value * noise_energy)
 
     # --- Oil and oil products, excl. bio (rows 108-142, 1990-2024) ---
@@ -309,7 +314,8 @@ def find_feedstock_fuel(preloaded_data, current_params, dataset_noise):
 
         if pd.notna(year_val) and pd.notna(value_val) and value_val != '-':
             year = int(year_val)
-            value = float(value_val) / (GWh_to_TJ_factor * oil_NCV) * oil_N_frac
+            non_lpg = float(value_val) * (1.0 - lpg_share[year])
+            value = non_lpg / (GWh_per_TJ * oil_NCV) * oil_N_frac
             year_values[year] = year_values.get(year, 0.0) + (value * noise_energy)
 
     return year_values
@@ -786,7 +792,7 @@ def find_industrial_waste_fuels(df_bio_08205, df_bio_hist, current_params, datas
 
     NCV              = float(current_params.get('firewood_NCV'))
     N_content        = float(current_params.get('firewood_N_frac'))
-    GWh_to_TJ_factor = float(current_params.get('GWh_to_TJ_factor'))
+    GWh_per_TJ = float(current_params.get('GWh_per_TJ'))
 
     arr_08205 = df_bio_08205.values
     arr_hist = df_bio_hist.values
@@ -800,7 +806,7 @@ def find_industrial_waste_fuels(df_bio_08205, df_bio_hist, current_params, datas
 
         year = int(year_val)
         # GWh -> TJ, divide by NCV for kt of fuel, multiply by N_content for kt N
-        value_raw = float(value_val) / GWh_to_TJ_factor / NCV * N_content
+        value_raw = float(value_val) / GWh_per_TJ / NCV * N_content
 
         year_values[year] = value_raw * noise_08205
         if year < 2008:
@@ -815,7 +821,7 @@ def find_industrial_waste_fuels(df_bio_08205, df_bio_hist, current_params, datas
         val_col3 = arr_hist[r, 2]
 
         year = int(year_val)
-        value_raw = (float(val_col2) + float(val_col3)) / GWh_to_TJ_factor / NCV * N_content
+        value_raw = (float(val_col2) + float(val_col3)) / GWh_per_TJ / NCV * N_content
 
         year_values[year] = value_raw * noise_08205
 
