@@ -181,6 +181,30 @@ def sum_flows(df, flow_names, years=ANALYSIS_YEARS):
     return total
 
 
+# SSB changed the method for eng til slått in 2021 (dry matter percentages
+# from feed samples), giving a step in Fodder crops that the model does not
+# correct. For trends across the step, Fodder crops from 2021 on can be scaled
+# down so 2021 matches 2020 (see fodder_crops_level_adjusted).
+FODDER_METHOD_CHANGE_YEAR = 2021
+
+
+def fodder_crops_level_adjusted(df):
+    """Copy of df (the statistics table or one MC iteration) with Fodder crops
+    for FODDER_METHOD_CHANGE_YEAR and later multiplied by the ratio of the
+    year before to that year, so the series has no step at the method change.
+    Applied per MC iteration, the ratio is that iteration's own. The whole
+    flow is scaled, including innmark grazing, which has no step; grazing is
+    about 13 % of the flow, so this differs by under 1 % from scaling eng til
+    slått alone. The ratio also removes any real change from 2020 to 2021."""
+    flow = FODDER_CROPS[0]
+    is_flow = df['flow_name'] == flow
+    values = df.loc[is_flow].set_index('year')['median']
+    ratio = values[FODDER_METHOD_CHANGE_YEAR - 1] / values[FODDER_METHOD_CHANGE_YEAR]
+    out = df.copy()
+    out.loc[is_flow & (out['year'] >= FODDER_METHOD_CHANGE_YEAR), 'median'] *= ratio
+    return out
+
+
 # =============================================================================
 # Flow-name groupings, one place per question so a data/flow-name change only
 # needs to be updated here.

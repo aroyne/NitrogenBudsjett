@@ -9,9 +9,9 @@ Each row gives the mean of the median series over a start and an end period,
 the 2.5-97.5 % interval of the same mean across MC iterations (variant (i):
 each iteration is one consistent time series), and the Mann-Kendall p-value
 of the median series. Series that depend on Fodder crops (how N is split
-between AG.MM and AG.SM) end in 2018-2020 and are tested for trend over
-1990-2020, because SSB changed the method for eng til slått in 2021 and the
-resulting step is not corrected.
+between AG.MM and AG.SM) use Fodder crops scaled down from 2021 on so 2021
+matches 2020 (cfa.fodder_crops_level_adjusted), because SSB changed the
+method for eng til slått in 2021 and the model does not correct the step.
 
 Series definitions are taken from calculations_for_article.py so the two
 scripts cannot disagree; that script's method note
@@ -39,7 +39,6 @@ OUTPUT_WORD_TABLE = 'claude_tekst/artikkeltall_balansetabell.xlsx'
 YEARS = list(cfa.ANALYSIS_YEARS)
 START = (1990, 1992)
 END = (2022, 2024)
-END_FODDER = (2018, 2020)
 
 POOLS = {
     'EF': ['EF.EC', 'EF.IC', 'EF.TR', 'EF.OE'],
@@ -101,11 +100,21 @@ def emissions_total(df, species, years=cfa.ANALYSIS_YEARS):
 # =============================================================================
 
 _MATRICES = {}
+_FODDER_ADJUSTED = {}
+
+
+def fodder_adjusted(df, sims):
+    """df and sims with cfa.fodder_crops_level_adjusted applied (computed once)."""
+    if not _FODDER_ADJUSTED:
+        _FODDER_ADJUSTED['df'] = cfa.fodder_crops_level_adjusted(df)
+        _FODDER_ADJUSTED['sims'] = [cfa.fodder_crops_level_adjusted(sim) for sim in sims]
+    return _FODDER_ADJUSTED['df'], _FODDER_ADJUSTED['sims']
 
 
 def mc_matrix(fn, sims, function):
     """cfa.mc_series_matrix, computed once per series (keyed by its
-    'Beregning' label, which identifies the calculation)."""
+    'Beregning' label, which identifies the calculation, plus whether
+    Fodder crops is adjusted)."""
     if function not in _MATRICES:
         _MATRICES[function] = cfa.mc_series_matrix(fn, sims, YEARS)
     return _MATRICES[function]
@@ -121,28 +130,31 @@ def summarize(label, fn, df, sims, fodder=False, mc=True, function=''):
     """One table row: start/end period means as the median and 2.5-97.5 %
     interval across MC iterations of each iteration's own period mean
     (variant (i)), or of the median series if the row has no MC, and the
-    Mann-Kendall p-value of the median series over 1990-2024 (1990-2020 if
-    fodder). For balances the median of the sum is used rather than the sum
+    Mann-Kendall p-value of the median series over 1990-2024. If fodder,
+    Fodder crops is level-adjusted (see fodder_adjusted). For balances the median of the sum is used rather than the sum
     of the medians, which can fall outside the interval (e.g. HY.AC, which
     balances exactly in every iteration)."""
-    end = END_FODDER if fodder else END
+    end = END
+    if fodder:
+        df, sims = fodder_adjusted(df, sims)
     series = fn(df)
     values = series.reindex(YEARS).values
-    trend_years = [y for y in YEARS if y <= end[1]]
-    _, _, p = cfa.mann_kendall(values[:len(trend_years)])
+    _, _, p = cfa.mann_kendall(values)
     row = {'label': label, 'function': function, 'fodder': fodder, 'end': end,
            'start_value': _mean(values, START), 'end_value': _mean(values, end),
-           'p': p, 'trend_end': trend_years[-1], 'mc': mc}
+           'p': p, 'trend_end': YEARS[-1], 'mc': mc}
     if mc:
-        matrix = mc_matrix(fn, sims, function)
+        matrix = mc_matrix(fn, sims, function + (' [fodder adjusted]' if fodder else ''))
         row['start_value'], *row['start_ci'] = np.percentile(_mean(matrix, START), [50, 2.5, 97.5])
         row['end_value'], *row['end_ci'] = np.percentile(_mean(matrix, end), [50, 2.5, 97.5])
     return row
 
 
-def period_value(label, fn, df, sims, period, function=''):
+def period_value(label, fn, df, sims, period, function='', fodder=False):
     """Mean over one period, median and 2.5-97.5 % across MC iterations."""
-    matrix = mc_matrix(fn, sims, function)
+    if fodder:
+        df, sims = fodder_adjusted(df, sims)
+    matrix = mc_matrix(fn, sims, function + (' [fodder adjusted]' if fodder else ''))
     value, *ci = np.percentile(_mean(matrix, period), [50, 2.5, 97.5])
     return {'label': label, 'function': function, 'period': period, 'value': value, 'ci': ci}
 
@@ -312,8 +324,8 @@ def other_rows(df, sims):
     }
     singles = [
         period_value("Samlede N-tap fra jordbruket (kt N/år)", cfa.ag_losses_total, df, sims, (1990, 1991), 'ag_losses_total'),
-        period_value("Fôrtap som lukker AG.MM-balansen (% av Fodder crops)", cfa.fodder_loss_to_close_mm, df, sims,
-                     (2018, 2020), 'fodder_loss_to_close_mm'),
+        period_value("Fôrtap som lukker AG.MM-balansen (% av Fodder crops) †", cfa.fodder_loss_to_close_mm, df, sims,
+                     END, 'fodder_loss_to_close_mm', fodder=True),
         period_value("N fjernet som N2 i avløpsrensing, andel (%)", cfa.ww_n2_removal_share, df, sims, (2023, 2023),
                      'ww_n2_removal_share'),
         ratio_row("Akvakulturproduksjon, forhold slutt/start", lambda d: cfa.sum_flows(d, cfa.AQUACULTURE_PRODUCTION),
@@ -369,7 +381,7 @@ def write_word_table(pool_rows_, nue_rows_):
         balances.to_excel(writer, index=False, sheet_name='Balanser')
         nue.to_excel(writer, index=False, sheet_name='NUE')
         note = pd.DataFrame({'Merknad': [
-            "† 2018-2020 i stedet for 2022-2024, og trend testet for 1990-2020 (Fodder crops, SSBs metodeskifte i 2021).",
+            "† Fodder crops fra 2021 nedskalert med forholdet 2020/2021 i hver MC-iterasjon (SSBs metodeskifte for eng til slått i 2021).",
             "Verdi: median av periodesnittet over MC-iterasjonene (variant (i)). Intervall: 2,5-97,5 % av samme snitt.",
             "MK p: Mann-Kendall på medianserien. Balanser i kt N/år, NUE i %, avrundet til hele tall.",
         ]})
@@ -414,7 +426,7 @@ def main():
 - Modellkjøring: `{cfa.STATS_FILE}` skrevet {stats_time}, {len(sims)} MC-iterasjoner
 - Git HEAD ved generering: `{head}`
 
-**Lesing av tabellene.** Hver MC-iterasjon gir ett snitt over perioden (variant (i), feil fullt korrelert i tid). Verdien er medianen av disse snittene, og intervallet er 2,5- og 97,5-persentilen. Rader uten MC viser snittet av medianserien. MK p er Mann-Kendall-testen på medianserien. Forholdstall mot 2005 for NOx og NH3 har nesten ingen MC-spredning, fordi usikkerheten i disse er en faktor som er lik for alle år og faller bort i forholdet. Rader merket † avhenger av hvordan Fodder crops fordeler N mellom AG.MM og AG.SM. SSB endret metoden for eng til slått i 2021, og spranget er ikke korrigert, så for disse radene er sluttperioden 2018–20 og trenden testet for 1990–2020. Kolonnen «Beregning» viser funksjonen i `calculations_for_article.py` (eller i dette skriptet), dokumentert i `claude_tekst/2026-09-25_calculations_for_article_metodenotat.md`. Alle balanser er tilførsel minus fraførsel (kt N/år), uten interne strømmer mellom delpooler i samme pool.
+**Lesing av tabellene.** Hver MC-iterasjon gir ett snitt over perioden (variant (i), feil fullt korrelert i tid). Verdien er medianen av disse snittene, og intervallet er 2,5- og 97,5-persentilen. Rader uten MC viser snittet av medianserien. MK p er Mann-Kendall-testen på medianserien. Forholdstall mot 2005 for NOx og NH3 har nesten ingen MC-spredning, fordi usikkerheten i disse er en faktor som er lik for alle år og faller bort i forholdet. Rader merket † avhenger av hvordan Fodder crops fordeler N mellom AG.MM og AG.SM. SSB endret metoden for eng til slått i 2021, og modellen korrigerer ikke spranget. For disse radene er Fodder crops fra 2021 derfor nedskalert med forholdet mellom 2020 og 2021, regnet i hver MC-iterasjon for seg (`fodder_crops_level_adjusted`). Forholdet fjerner også en eventuell reell endring fra 2020 til 2021. Kolonnen «Beregning» viser funksjonen i `calculations_for_article.py` (eller i dette skriptet), dokumentert i `claude_tekst/2026-09-25_calculations_for_article_metodenotat.md`. Alle balanser er tilførsel minus fraførsel (kt N/år), uten interne strømmer mellom delpooler i samme pool.
 
 ## 1. Balanser for pooler og delpooler (kt N/år)
 
