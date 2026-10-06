@@ -70,6 +70,18 @@ downloaded 16.09.2026
 SSB table 11561: Energibalansen (energy balance). Supply and consumption by energy balance item, energy product, year and statistical variable
 downloaded 13.11.2025
 
+11561_feedstock_oljeprodukter.csv
+SSB table 11561: Energibalansen (energy balance), item "11 Netto innenlands forbruk som råstoff" (EB11), split by oil product, GWh, 1990-2025
+downloaded 06.10.2026 from the SSB API (https://data.ssb.no/api/v0/no/table/11561), query: Energibalanse=EB11; EnergiProdukt=EP04IF (oil and oil products excl. bio), EP0462-0463 (LPG and ethane), EP0469 (oil products not elsewhere specified); ContentsCode=EnergibalansenGWh; all years
+columns: year, olje_og_oljeprodukter_ekskl_bio_GWh, lpg_og_etan_GWh, oljeprodukter_ikke_nevnt_andre_steder_GWh
+used for the LPG/ethane share of oil feedstock (zero N) in EF.EC-MP.OP-Fuel used as feedstock-Nmix (shared_flow_calculations.find_feedstock_fuel); the oil total matches the EB11 oil row in 11561_20251113-154607.xlsx
+
+11561_oljeprodukter_sektor.csv
+SSB table 11561: Energibalansen (energy balance), net domestic consumption by sector and oil product, GWh, 1990-2025, long format
+downloaded 06.10.2026 from the SSB API (https://data.ssb.no/api/v0/no/table/11561), query: Energibalanse=EB1201 (12.1 Industri og bergverk), EB1203 (12.3 Andre forbruksgrupper); EnergiProdukt=EP04IF, EP0462-0463, EP0465IF, EP04661, EP04669, EP0467111, EP0467112IF, EP046712, EP046713, EP04672, EP0468, EP0469; ContentsCode=EnergibalansenGWh; all years
+columns: year, sektor, produkt, GWh
+used to weight the N content of CRT "Liquid fuels" by year (data_loader._liquid_fuel_N_by_year): EB1201 for 1.A.2 (EF.EC-EF.IC-Fuel for industry-Nmix) and EB1203 for 1.A.4 + 1.A.5 (EF.EC-EF.OE-Fuel for heating-Nmix); EP0469 (mainly fuel gas from the chemical industry) is left out
+
 12818_20260526-110921.xlsx
 SSB table 12818: Biologisk avfall (1 000 tonn), etter avfallsdisponering og år
 downloaded 26.05.2026
