@@ -22,6 +22,20 @@ from calculations.utils import read_trade_data
 # Suppresses openpyxl's specific header/footer warning.
 warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl.worksheet.header_footer")
 
+# SSB table 06913: population on 1 January, one row per year (1951-2025).
+POPULATION_FILE = 'data_files/06913_20251113-124117.xlsx'
+
+
+def _read_population(filepath):
+    df = pd.read_excel(filepath, skiprows=2, skipfooter=42)
+    return df.set_index('Unnamed: 0')
+
+
+def load_population():
+    """Population on 1 January by year (SSB 06913), as a Series. Used outside
+    the pool calculations, e.g. for the per-capita view of the flow plots."""
+    return _read_population(POPULATION_FILE)['Befolkning 1. januar']
+
 
 def _find_crt_row(sheet, path, header_window=200, item_window=12):
     """
@@ -188,7 +202,7 @@ def load_all_data(selected_pools):
         'ssb_waste_05281': ({'pr', 'mp'}, 'data_files/05281_20260121-140338.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Avfall'}),
         'ssb_05282': ({'hs','mp','pr'}, 'data_files/05282_20260211-091021.xlsx', 'openpyxl_single_sheet', {'sheet_name': '05282'}),
         'ssb_05543_raw': ({'mp'}, 'data_files/05543_20251217-111610.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Areal'}),
-        'ssb_06913': ({'mp'}, 'data_files/06913_20251113-124117.xlsx', 'excel_population', {}),
+        'ssb_06913': ({'mp'}, POPULATION_FILE, 'excel_population', {}),
         'ssb_06376': ({'mp'}, 'data_files/06376_20260129-155937.xlsx', 'excel_ssb_generic', {'sheet': '06376'}),
         'ssb_10249': ({'mp'}, 'data_files/10249_20260129-155747.xlsx', 'excel_ssb_generic', {'sheet': '10249'}),
         'ssb_waste_10513': ({'pr', 'mp'}, 'data_files/10513_20260916-120243.xlsx', 'openpyxl_single_sheet', {'sheet_name': '10513'}),
@@ -610,8 +624,6 @@ def load_all_data(selected_pools):
             preloaded[key] = pd.read_excel(filepath)
 
         elif method == 'excel_population':
-            df = pd.read_excel(filepath, skiprows=2, skipfooter=42)
-            df = df.set_index('Unnamed: 0')
-            preloaded[key] = df
+            preloaded[key] = _read_population(filepath)
 
     return preloaded

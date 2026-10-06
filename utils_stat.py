@@ -12,6 +12,7 @@ import openpyxl
 import matplotlib.pyplot as plt
 from datetime import datetime
 import plotly.graph_objects as go
+from data_loader import load_population
 
 def plot_pool_balance_interactive(df_flows, pool_code, net_interval, output_dir="output_files/plots"):
     """
@@ -175,60 +176,89 @@ def plot_pool_balance_interactive(df_flows, pool_code, net_interval, output_dir=
     return plot_filename
 
 
-def plot_flow_timeseries_interactive(df_flow, flow_name, output_dir="output_files/plots"):
+def plot_flow_timeseries_interactive(df_flow, flow_name, population, output_dir="output_files/plots"):
     """
-    Genererer et interaktivt Plotly-tidsserieplott (HTML) for én enkelt N-strøm:
-    median-linje (most likely value) pluss et skyggelagt 95%-usikkerhetsbånd
-    (2.5-97.5 persentil). Hover viser begge deler for det aktuelle året.
+    Interactive Plotly time-series plot (HTML) for a single N flow: median line
+    (most likely value) plus a shaded 95% uncertainty band (2.5-97.5
+    percentile). Two buttons above the plot switch between the flow in
+    kt N/year and per capita in kg N/person/year.
     """
     os.makedirs(output_dir, exist_ok=True)
 
     df_flow = df_flow.sort_values('year')
     years = df_flow['year']
 
+    # Population on 1 January (SSB 06913). Population is treated as exact, so
+    # the percentiles can be divided by it directly.
+    pop = population.reindex(years).values
+    variants = [
+        (df_flow[['p2_5', 'median', 'p97_5']].values, 'kt N/year', 'Nitrogen Flow (kt N / year)', '.3f', True),
+        # Significant digits rather than fixed decimals: small flows are well
+        # below 0.001 kg N/person/year.
+        (df_flow[['p2_5', 'median', 'p97_5']].values * 1.0e6 / pop[:, None],  # kt N -> kg N
+         'kg N/person/year', 'Nitrogen Flow (kg N / person / year)', '.3g', False),
+    ]
+
     fig = go.Figure()
 
-    fig.add_trace(go.Scatter(
-        x=years, y=df_flow['p97_5'],
-        mode='lines', line=dict(width=0), showlegend=False, hoverinfo='skip'
-    ))
-    fig.add_trace(go.Scatter(
-        x=years, y=df_flow['p2_5'],
-        mode='lines', line=dict(width=0), fill='tonexty',
-        fillcolor='rgba(70, 130, 180, 0.3)',
-        name='95% Confidence Interval (MC)',
-        hoverinfo='skip'
-    ))
-    fig.add_trace(go.Scatter(
-        x=years, y=df_flow['median'],
-        mode='lines', line=dict(color='navy', width=2.5),
-        name='Median (most likely value)',
-        customdata=np.stack([df_flow['p2_5'], df_flow['p97_5']], axis=-1),
-        hovertemplate=(
-            "<b>Year: %{x}</b><br>" +
-            "Most likely value: %{y:.3f} kt N/year<br>" +
-            "95% interval: %{customdata[0]:.3f} – %{customdata[1]:.3f} kt N/year" +
-            "<extra></extra>"
-        )
-    ))
+    for values, unit, _, fmt, visible in variants:
+        p2_5, median, p97_5 = values[:, 0], values[:, 1], values[:, 2]
+        fig.add_trace(go.Scatter(
+            x=years, y=p97_5, visible=visible,
+            mode='lines', line=dict(width=0), showlegend=False, hoverinfo='skip'
+        ))
+        fig.add_trace(go.Scatter(
+            x=years, y=p2_5, visible=visible,
+            mode='lines', line=dict(width=0), fill='tonexty',
+            fillcolor='rgba(70, 130, 180, 0.3)',
+            name='95% Confidence Interval (MC)',
+            hoverinfo='skip'
+        ))
+        fig.add_trace(go.Scatter(
+            x=years, y=median, visible=visible,
+            mode='lines', line=dict(color='navy', width=2.5),
+            name='Median (most likely value)',
+            customdata=np.stack([p2_5, p97_5], axis=-1),
+            hovertemplate=(
+                "<b>Year: %{x}</b><br>" +
+                f"Most likely value: %{{y:{fmt}}} {unit}<br>" +
+                f"95% interval: %{{customdata[0]:{fmt}}} – %{{customdata[1]:{fmt}}} {unit}" +
+                "<extra></extra>"
+            )
+        ))
+
+    n_traces = 3
+    buttons = [
+        dict(label=unit, method='update',
+             args=[{'visible': [j == i for j in range(len(variants)) for _ in range(n_traces)]},
+                   {'yaxis.title.text': axis_title}])
+        for i, (_, unit, axis_title, _, _) in enumerate(variants)
+    ]
 
     fig.update_layout(
-        title=dict(text=flow_name, font=dict(size=13, family="Arial, sans-serif", color="black")),
+        title=dict(text=flow_name, font=dict(size=13, family="Arial, sans-serif", color="black"),
+                   y=0.97, yanchor='top'),
         xaxis=dict(
             title="Year", range=[1984, 2025],
             gridcolor='rgba(200, 200, 200, 0.4)',
             showspikes=True, spikethickness=1, spikedash="dot", spikemode="across"
         ),
         yaxis=dict(
-            title="Nitrogen Flow (kt N / year)",
+            title=variants[0][2],
             gridcolor='rgba(200, 200, 200, 0.4)',
             rangemode='tozero'
         ),
+        updatemenus=[dict(
+            type='buttons', direction='right', buttons=buttons, active=0,
+            x=1.0, xanchor='right', y=1.02, yanchor='bottom',
+            pad=dict(r=0, t=0), font=dict(size=10),
+            bgcolor='white', bordercolor='rgba(150, 150, 150, 0.6)'
+        )],
         hovermode="closest",
         plot_bgcolor='white',
         paper_bgcolor='white',
         legend=dict(x=0.01, y=0.99, xanchor='left', yanchor='top', font=dict(size=10)),
-        margin=dict(l=60, r=20, t=45, b=45),
+        margin=dict(l=60, r=20, t=70, b=45),
         height=380
     )
 
@@ -1077,6 +1107,7 @@ def process_and_export_mc_results(all_records):
     os.makedirs(plot_dir, exist_ok=True)
 
     print("[PLOTTING] Generating fresh time-series plots for each nitrogen flow...")
+    population = load_population()
 
     for flow in summary_df['flow_name'].unique():
         df_flow = summary_df[summary_df['flow_name'] == flow].sort_values('year')
@@ -1130,7 +1161,7 @@ def process_and_export_mc_results(all_records):
         plt.savefig(os.path.join(plot_dir, safe_filename), dpi=150, bbox_inches='tight')
         plt.close()
 
-        plot_flow_timeseries_interactive(df_flow, flow, output_dir=plot_dir)
+        plot_flow_timeseries_interactive(df_flow, flow, population, output_dir=plot_dir)
 
     # ========================================================
     # INTEGRASJON: GENERERING AV BALANSEPLOTT FOR POOLER
