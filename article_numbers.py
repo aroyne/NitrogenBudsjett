@@ -9,9 +9,10 @@ Each row gives the mean of the median series over a start and an end period,
 the 2.5-97.5 % interval of the same mean across MC iterations (variant (i):
 each iteration is one consistent time series), and the Mann-Kendall p-value
 of the median series. Series that depend on Fodder crops (how N is split
-between AG.MM and AG.SM) use Fodder crops scaled down from 2021 on so 2021
-matches 2020 (cfa.fodder_crops_level_adjusted), because SSB changed the
-method for eng til slått in 2021 and the model does not correct the step.
+between AG.MM and AG.SM) use Fodder crops scaled from 2021 on so that the
+change from 2020 to 2021 equals that in Eurostat's Gross Nutrient Balance
+(cfa.fodder_crops_level_adjusted), because SSB changed the method for eng til
+slått in 2021 and the model does not correct the step.
 
 Series definitions are taken from calculations_for_article.py so the two
 scripts cannot disagree; that script's method note
@@ -381,7 +382,7 @@ def write_word_table(pool_rows_, nue_rows_):
         balances.to_excel(writer, index=False, sheet_name='Balanser')
         nue.to_excel(writer, index=False, sheet_name='NUE')
         note = pd.DataFrame({'Merknad': [
-            "† Fodder crops fra 2021 nedskalert med forholdet 2020/2021 i hver MC-iterasjon (SSBs metodeskifte for eng til slått i 2021).",
+            "† Fodder crops fra 2021 skalert slik at endringen 2020–2021 er lik Eurostats (GNB), i hver MC-iterasjon (SSBs metodeskifte for eng til slått i 2021).",
             "Verdi: median av periodesnittet over MC-iterasjonene (variant (i)). Intervall: 2,5-97,5 % av samme snitt.",
             "MK p: Mann-Kendall på medianserien. Balanser i kt N/år, NUE i %, avrundet til hele tall.",
         ]})
@@ -426,7 +427,7 @@ def main():
 - Modellkjøring: `{cfa.STATS_FILE}` skrevet {stats_time}, {len(sims)} MC-iterasjoner
 - Git HEAD ved generering: `{head}`
 
-**Lesing av tabellene.** Hver MC-iterasjon gir ett snitt over perioden (variant (i), feil fullt korrelert i tid). Verdien er medianen av disse snittene, og intervallet er 2,5- og 97,5-persentilen. Rader uten MC viser snittet av medianserien. MK p er Mann-Kendall-testen på medianserien. Forholdstall mot 2005 for NOx og NH3 har nesten ingen MC-spredning, fordi usikkerheten i disse er en faktor som er lik for alle år og faller bort i forholdet. Rader merket † avhenger av hvordan Fodder crops fordeler N mellom AG.MM og AG.SM. SSB endret metoden for eng til slått i 2021, og modellen korrigerer ikke spranget. For disse radene er Fodder crops fra 2021 derfor nedskalert med forholdet mellom 2020 og 2021, regnet i hver MC-iterasjon for seg (`fodder_crops_level_adjusted`). Forholdet fjerner også en eventuell reell endring fra 2020 til 2021. Kolonnen «Beregning» viser funksjonen i `calculations_for_article.py` (eller i dette skriptet), dokumentert i `claude_tekst/2026-09-25_calculations_for_article_metodenotat.md`. Alle balanser er tilførsel minus fraførsel (kt N/år), uten interne strømmer mellom delpooler i samme pool.
+**Lesing av tabellene.** Hver MC-iterasjon gir ett snitt over perioden (variant (i), feil fullt korrelert i tid). Verdien er medianen av disse snittene, og intervallet er 2,5- og 97,5-persentilen. Rader uten MC viser snittet av medianserien. MK p er Mann-Kendall-testen på medianserien. Forholdstall mot 2005 for NOx og NH3 har nesten ingen MC-spredning, fordi usikkerheten i disse er en faktor som er lik for alle år og faller bort i forholdet. Rader merket † avhenger av hvordan Fodder crops fordeler N mellom AG.MM og AG.SM. SSB endret metoden for eng til slått i 2021, og modellen korrigerer ikke spranget. For disse radene er Fodder crops fra 2021 derfor skalert slik at endringen fra 2020 til 2021 er lik endringen i Eurostats nitrogenbalanse (Gross Nutrient Balance, grovfôr), regnet i hver MC-iterasjon for seg (`fodder_crops_level_adjusted`). Eurostat beregner den norske balansen selv fra 2020 og har et mye mindre sprang i 2021. Kolonnen «Beregning» viser funksjonen i `calculations_for_article.py` (eller i dette skriptet), dokumentert i `claude_tekst/2026-09-25_calculations_for_article_metodenotat.md`. Alle balanser er tilførsel minus fraførsel (kt N/år), uten interne strømmer mellom delpooler i samme pool.
 
 ## 1. Balanser for pooler og delpooler (kt N/år)
 

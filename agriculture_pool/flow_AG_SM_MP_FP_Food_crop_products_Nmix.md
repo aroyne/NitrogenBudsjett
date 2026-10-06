@@ -11,7 +11,11 @@ nav_order: 7
 
 ### Flow Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-Food crop products are taken from EUROSTAT Gross nutrient balance as advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->: «Nutrient removal by harvest of crops» minus «Industrial crops». «Ornamenal crops», which should also be removed, are negligible in Norway. For the 2017-2019 gap in the source data, we linearly interpolate between the 2016 and 2020 values. Eurostat GNB has not yet published a 2024 figure at the time of writing; since 2023 itself looks like an unusually low outlier, the 2024 value is a 3-year average of 2021-2023 rather than a flat carry-forward of 2023 alone, with additional uncertainty (±50%) applied to reflect that it is not a real, independently observed value. 
+Food crop products are taken from EUROSTAT Gross nutrient balance as advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->: «Nutrient removal by harvest of crops» minus «Industrial crops». «Ornamenal crops», which should also be removed, are negligible in Norway. Eurostat GNB has no values for 2017–2019 and has not yet published 2024. For these years we use SSB's cereal harvest ([table 07479](https://www.ssb.no/statbank/table/07479)), since cereals carry most of the N: the cereal N is the harvest times the N per tonne of cereal harvest in the balance (interpolated between 2016 and 2020, or the 2023 value for 2024), and the other crops are interpolated between 2016 and 2020 or held at the 2023 value. 
+
+**How the numbers are derived.** Eurostat's Gross Nutrient Balance ([aei_pr_gnb](https://ec.europa.eu/eurostat/databrowser/view/aei_pr_gnb/default/table)) calculates nutrient removal by harvest as crop production multiplied by an N content per crop, based on Norwegian crop statistics. The flow is "Nutrient removal by harvest of crops" minus "industrial crops"; fodder crops and grazing are reported separately in the balance and are not included.
+
+**Interpretation.** The flow is 19–32 kt N per year and follows the size of the cereal harvest, since cereals make up about 88% of the N. Most of the cereal is used for animal feed and returns to AG.MM via MP.FP-AG.MM-Farm animal feed-Nmix. The low values in 2018 (16 kt N) and 2023 (19 kt N) are the drought years with poor cereal harvests, and the high value in 1990 (32 kt N) a good harvest.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References

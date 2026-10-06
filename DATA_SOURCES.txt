@@ -70,6 +70,18 @@ downloaded 16.09.2026
 SSB table 11561: Energibalansen (energy balance). Supply and consumption by energy balance item, energy product, year and statistical variable
 downloaded 13.11.2025
 
+07479_kornavling.csv
+SSB table 07479: Kornavling (1 000 tonn), "Korn i alt", 1989 and 1995-2025
+downloaded 06.10.2026 from the SSB API (https://data.ssb.no/api/v0/no/table/07479), all values for ContentsCode=Korn
+columns: year, kornavling_1000t
+used to fill the years without Eurostat GNB values (2017-2019, 2024) in AG.SM-MP.FP-Food crop products-Nmix (ag_mc._add_food_crop_products_flow_mc)
+
+05982_jordbruksareal_i_drift.csv
+SSB table 05982: Jordbruksareal, etter bruken (dekar), "Jordbruksareal i drift", 1969, 1979, 1989 and 1999-2025
+downloaded 06.10.2026 from the SSB API (https://data.ssb.no/api/v0/no/table/05982), query: VekstarDekar=01; all years
+columns: year, jordbruksareal_i_drift_daa
+used for the agricultural area in AG.SM-AT.AT-Emissions-N2 (ag_mc._add_N2_emissions_soil_management_mc); 1990-1998 interpolated
+
 11561_faste_biobrensler_industri.csv
 SSB table 11561: Energibalansen (energy balance), item "12.1 Industri og bergverk" (EB12010), solid biofuels (EP051 Faste biobrensler), GWh, 1990-2025
 downloaded 06.10.2026 from the SSB API (https://data.ssb.no/api/v0/no/table/11561), query: Energibalanse=EB12010; EnergiProdukt=EP051; ContentsCode=EnergibalansenGWh; all years

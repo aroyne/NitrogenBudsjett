@@ -7,7 +7,6 @@ from calculations.utils import (
     read_year_value_row,
     report_missing_years,
     load_crltap_emissions_to_N,
-    add_multi_year_average_year,
 )
 from calculations.shared_flow_calculations import (
     find_industrial_crop_products,
@@ -17,21 +16,58 @@ from calculations.shared_flow_calculations import (
 # CRLTAP category codes for the two AG subsectors, used to select which rows of
 # the CRLTAP inventory (webdabData1868031.txt, loaded as 'ag_crltap_raw_lines')
 # to sum for each subsector's NH3/NOx emissions.
-# SM = Soil Management: direct/indirect emissions from synthetic fertilizer and
-# crop residue N applied to soil (CRLTAP 3D) plus agricultural residue burning
-# (CRLTAP 4B/4C).
+# SM = Soil Management: emissions from fertilizer, manure, sludge, grazing and
+# crop residue N applied to soil (CRLTAP 3D, Schäppi et al. 2025 Table 30),
+# plus field burning of agricultural residues (3F), which the text of the
+# guidance names as an NH3 source although Table 30 does not list it. The
+# LULUCF codes 4B1/4B2/4C1/4C2 in Table 30 are not reported in the CRLTAP
+# inventory and give zero.
 AG_SM_CRLTAP_SECTORS = [
     '3Da1','3Da2a','3Da2b','3Da2c','3Da3','3Da4',
-    '3Db','3Dc','3De','3Df','4B1','4B2','4C1','4C2',
+    '3Db','3Dc','3De','3Df','3F','4B1','4B2','4C1','4C2',
 ]
 
-# MM = Manure Management: emissions from livestock manure during storage and
-# handling, before it is applied to soil (CRLTAP 3B).
+# MM = Manure Management: emissions from livestock manure during housing and
+# storage, before it is applied to soil (CRLTAP 3B, Table 29), plus 3I
+# (other agriculture), which in Norway is NH3 from ammonia treatment of straw
+# for feed.
 AG_MM_CRLTAP_SECTORS = [
     '3B1a','3B1b','3B2','3B3',
     '3B4a','3B4d','3B4e','3B4f',
-    '3B4gi','3B4gii','3B4giii','3B4giv','3B4h',
+    '3B4gi','3B4gii','3B4giii','3B4giv','3B4h','3I',
 ]
+
+
+def _utmark_grazing_losses(preloaded_data, current_params):
+    """
+    Losses from manure deposited by grazing animals on utmark (unmanaged
+    land), per year, from the national inventory's own figures in CRT Table
+    3.D. The inventory counts all grazing manure (PRP) as input to managed
+    soils, so its leaching, N2O and NH3/NOx from grazing include the utmark
+    share. This model only counts the innmark share as input to AG.SM (see
+    _add_manure_application_flow_mc); losses from utmark are already part of
+    the measured runoff from upland areas (TEOTIL3, FS.OL), so they are
+    removed from the AG.SM flows.
+
+    Returns {year: {'utmark_frac', 'leaching', 'n2o'}}, with the utmark share
+    of PRP and the corresponding leaching and N2O (direct plus indirect via
+    deposition and leaching) in kt N.
+    """
+    prp_values = preloaded_data['ag_manure_prp_crt']
+    loss_params = preloaded_data['ag_prp_loss_params_crt']
+    utmark_frac = 1.0 - float(current_params.get("innmark_prp_fraction"))
+    N2O_to_N = float(current_params.get("N2O_to_N_factor"))
+
+    losses = {}
+    for year, prp_t in prp_values.items():
+        prm = loss_params[year]
+        prp_utmark_kt = prp_t * utmark_frac * 1.0e-3  # t N -> kt N
+        leaching = prp_utmark_kt * prm['frac_leach']
+        n2o_direct = prm['prp_n2o_kt'] * N2O_to_N * utmark_frac
+        n2o_indirect = (prp_utmark_kt * prm['frac_gas_prp'] * prm['ef_deposition']
+                        + leaching * prm['ef_leaching'])
+        losses[year] = {'utmark_frac': utmark_frac, 'leaching': leaching, 'n2o': n2o_direct + n2o_indirect}
+    return losses
 
 
 def execute_calculations_ag(preloaded_data, current_params, dataset_noise, current_trade_factors):
@@ -44,10 +80,11 @@ def execute_calculations_ag(preloaded_data, current_params, dataset_noise, curre
     _add_food_crop_products_flow_mc(results, preloaded_data, current_params, dataset_noise)
     _add_industrial_crop_products_flow_mc(results, preloaded_data, current_params, dataset_noise)
     _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_noise)
-    _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.SM-AT.AT-Emissions-NH3', AG_SM_CRLTAP_SECTORS, 'NH3')
-    _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.SM-AT.AT-Emissions-NOx', AG_SM_CRLTAP_SECTORS, 'NOx')
-    _add_ag_n2o_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.SM-AT.AT-Emissions-N2O', 2, 'UNFCCC_N2O_agri_soils')
-    _add_ag_leaching_mc(results, preloaded_data, dataset_noise, 'AG.SM-HY.SW-Leaching-Nmix', 'Nr_SM')
+    utmark_losses = _utmark_grazing_losses(preloaded_data, current_params)
+    _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.SM-AT.AT-Emissions-NH3', AG_SM_CRLTAP_SECTORS, 'NH3', utmark_losses)
+    _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.SM-AT.AT-Emissions-NOx', AG_SM_CRLTAP_SECTORS, 'NOx', utmark_losses)
+    _add_ag_n2o_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.SM-AT.AT-Emissions-N2O', 2, 'UNFCCC_N2O_agri_soils', utmark_losses)
+    _add_ag_leaching_mc(results, preloaded_data, dataset_noise, 'AG.SM-HY.SW-Leaching-Nmix', 'Nr_SM', utmark_losses)
     _add_ag_leaching_mc(results, preloaded_data, dataset_noise, 'AG.MM-HY.SW-Leaching-Nmix', 'Nr_MM')
     _add_animal_products_flow_mc(results, preloaded_data, current_params, dataset_noise)
     _add_non_edible_animal_products_flow_mc(results, preloaded_data, current_params, dataset_noise)
@@ -62,6 +99,15 @@ def execute_calculations_ag(preloaded_data, current_params, dataset_noise, curre
 
 
 def _add_food_crop_products_flow_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    Nutrient removal by harvest of crops minus industrial crops, from
+    Eurostat's Gross Nutrient Balance. Years missing in the balance (2017-2019
+    and 2024) are filled from SSB's cereal harvest: cereals carry most of the
+    N, so the cereal N is the SSB harvest times the N per tonne of harvest in
+    the balance (interpolated between the nearest years with data, or taken
+    from the last year), and the remaining crops are interpolated or held at
+    the last year's value.
+    """
     flow_code = 'AG.SM-MP.FP-Food crop products-Nmix'
     collected_years = set()
     data_sources = 'Eurostat Gross nutrient balance'
@@ -69,88 +115,58 @@ def _add_food_crop_products_flow_mc(results, preloaded_data, current_params, dat
 
     # 'ag_gnb_workbook' <- data_files/aei_pr_gnb__custom_18744910_spreadsheet.xlsx
     # (Eurostat Gross nutrient balance)
+    # 'ssb_cereal_harvest_07479' <- data_files/07479_kornavling.csv (SSB table
+    # 07479, cereal harvest, 1000 t)
     workbook = preloaded_data.get('ag_gnb_workbook')
-    dataset_key = 'Gross nutrient balance'
-    noise_val = dataset_noise[dataset_key]
-    key_interp = 'trend interpolation'
-    noise_interp_val = dataset_noise[key_interp]
+    cereal_harvest = preloaded_data['ssb_cereal_harvest_07479']['kornavling_1000t']
+    noise_val = dataset_noise['Gross nutrient balance']
+    noise_ssb = dataset_noise['07479']
 
-    # --- Sheet 26: total crops ---
-    sheet_26 = workbook['Sheet 26']  # nutrient removal by harvest of crops
-    year_values = read_year_value_row(
-        sheet_26,
-        year_values=None,
-        year_row=9,
-        value_row=11,
-        first_col=2,
-        unit_factor=1.0e-3,
-        op='+',
-    )
+    def read_sheet(name, factor):
+        return read_year_value_row(workbook[name], year_values=None, year_row=9, value_row=11,
+                                   first_col=2, unit_factor=factor, op='+')
 
-    # --- Sheet 30: industrial crops (subtract) ---
-    sheet_30 = workbook['Sheet 30']  # nutrient removal by harvest of industrial crops
-    year_values = read_year_value_row(
-        sheet_30,
-        year_values=year_values,
-        year_row=9,
-        value_row=11,
-        first_col=2,
-        unit_factor=-1.0e-3,  # subtract industrial crops
-        op='+',
-    )
+    crops = read_sheet('Sheet 26', 1.0e-3)       # nutrient removal by harvest of crops
+    industrial = read_sheet('Sheet 30', 1.0e-3)  # of which industrial crops (subtracted)
+    cereals = read_sheet('Sheet 27', 1.0e-3)     # of which cereals
+    food = {y: v - industrial.get(y, 0.0) for y, v in crops.items()}
 
-    # Un-noised base values, used as anchors for interpolation
-    value_2016 = year_values.get(2016)
-    value_2020 = year_values.get(2020)
-
-    for year, total_value in year_values.items():
+    for year, value in food.items():
         if year not in EXPECTED_YEARS:
             continue
         collected_years.add(year)
-        
-        value = total_value * noise_val
-        if value < 0: 
-            value = 0.0
+        results.append({
+            'flow_name': flow_code,
+            'year': year,
+            'value': float(value * noise_val),
+            'comment': comment,
+            'data_sources': data_sources,
+        })
 
+    # Years without a balance figure, but with an SSB cereal harvest.
+    gnb_years = sorted(y for y in food if y in cereals and y in cereal_harvest.index)
+    n_per_harvest = {y: cereals[y] / cereal_harvest[y] for y in gnb_years}
+    other_crops = {y: food[y] - cereals[y] for y in gnb_years}
+    for year in sorted(EXPECTED_YEARS - set(food)):
+        if year < gnb_years[0] or year not in cereal_harvest.index:
+            continue
+        before = max(y for y in gnb_years if y < year)
+        after = [y for y in gnb_years if y > year]
+        if after:
+            w = (year - before) / (after[0] - before)
+            n_per_t = n_per_harvest[before] + w * (n_per_harvest[after[0]] - n_per_harvest[before])
+            other = other_crops[before] + w * (other_crops[after[0]] - other_crops[before])
+        else:
+            n_per_t, other = n_per_harvest[before], other_crops[before]
+        value = (n_per_t * cereal_harvest[year] * noise_ssb + other) * noise_val
+        collected_years.add(year)
         results.append({
             'flow_name': flow_code,
             'year': year,
             'value': float(value),
             'comment': comment,
-            'data_sources': data_sources,
+            'data_sources': 'Eurostat GNB scaled by SSB cereal harvest (table 07479)',
         })
-
-    # Interpolation for the 2017-2019 data gap
-    for year in range(2017, 2020):
-        if year in EXPECTED_YEARS:
-            collected_years.add(year)
-
-            # Linear interpolation on the un-noised base values (1/4 weight per year from 2016)
-            base_interp_val = value_2016 + (value_2020 - value_2016) / 4.0 * (year - 2016)
-
-            # Apply the general GNB dataset noise first...
-            val_with_gnb = base_interp_val * noise_val
-
-            # ...then a separate interpolation noise on top, since interpolated
-            # years carry additional uncertainty beyond the source dataset's own.
-            value = val_with_gnb * noise_interp_val
-
-            results.append({
-                'flow_name': flow_code,
-                'year': year,
-                'value': float(value),
-                'comment': 'ok',
-                'data_sources': 'interpolated (Eurostat GNB gap)'
-            })
-
-    # Eurostat GNB has not published 2024 yet, and 2023 itself looks like an
-    # unusually low outlier (well below the 2016-2022 range), so a 3-year
-    # average (2021-2023) is used as a more representative anchor than a
-    # flat carry-forward of 2023 alone.
-    add_multi_year_average_year(
-        results, flow_code, collected_years, range(2021, 2024), 2024, dataset_noise,
-        data_sources='3-year average of 2021-2023 (Eurostat GNB not yet released for 2024)'
-    )
 
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
@@ -331,13 +347,14 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
 
-def _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, flow_code, sectors, pollutant):
+def _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, flow_code, sectors, pollutant, utmark_losses=None):
     """
     Shared implementation for CRLTAP-derived NH3/NOx emissions of an AG subsector
     (soil management or manure management). `sectors` is AG_SM_CRLTAP_SECTORS or
     AG_MM_CRLTAP_SECTORS above; `pollutant` is 'NH3' or 'NOx'. Reads
     preloaded_data['ag_crltap_raw_lines'] <- data_files/webdabData1868031.txt
-    (CRLTAP Inventory Submissions).
+    (CRLTAP Inventory Submissions). With utmark_losses (soil management only),
+    the utmark share of emissions from grazing animals (3Da3) is left out.
     """
     collected_years = set()
     comment = 'ok'
@@ -354,6 +371,13 @@ def _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset
         dataset_noise=dataset_noise,
         noise_key='CRLTAP'
     )
+    if utmark_losses is not None:
+        grazing = load_crltap_emissions_to_N(
+            raw_lines=raw_lines, categories=['3Da3'], pollutant=pollutant,
+            conv_to_N=conv, dataset_noise=dataset_noise, noise_key='CRLTAP'
+        )
+        for year in sums:
+            sums[year] -= grazing.get(year, 0.0) * utmark_losses[year]['utmark_frac']
 
     for year, value in sums.items():
         if year not in EXPECTED_YEARS:
@@ -371,7 +395,7 @@ def _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset
     report_missing_years(flow_code, missing_years, results)
 
 
-def _add_ag_n2o_emissions_mc(results, preloaded_data, current_params, dataset_noise, flow_code, value_col, dataset_key):
+def _add_ag_n2o_emissions_mc(results, preloaded_data, current_params, dataset_noise, flow_code, value_col, dataset_key, utmark_losses=None):
     """
     Shared implementation for AG subsector N2O emissions. Both subsectors are
     columns of the same series: preloaded_data['unfccc_ark1_raw'] <- UNFCCC
@@ -380,7 +404,8 @@ def _add_ag_n2o_emissions_mc(results, preloaded_data, current_params, dataset_no
     column 2 = "3.D. Agricultural soils" N2O. dataset_key differs by caller
     since Norway NID Annexes 2025, Annex 2 gives manure management (IPCC 3B,
     'UNFCCC_N2O_agri_manure') and soil emissions (IPCC 3D, 'UNFCCC_N2O_agri_soils')
-    different N2O uncertainty ("Fac2" vs "Fac3").
+    different N2O uncertainty ("Fac2" vs "Fac3"). With utmark_losses (soil
+    management only), N2O from grazing manure on utmark is left out.
     """
     collected_years = set()
     comment = 'ok'
@@ -401,6 +426,8 @@ def _add_ag_n2o_emissions_mc(results, preloaded_data, current_params, dataset_no
             collected_years.add(year)
 
             base_value = float(ton_val) * conv_N2O
+            if utmark_losses is not None:
+                base_value -= utmark_losses[year]['n2o']
             value = base_value * noise_val
 
             results.append({
@@ -415,12 +442,14 @@ def _add_ag_n2o_emissions_mc(results, preloaded_data, current_params, dataset_no
     report_missing_years(flow_code, missing_years, results)
 
 
-def _add_ag_leaching_mc(results, preloaded_data, dataset_noise, flow_code, value_col):
+def _add_ag_leaching_mc(results, preloaded_data, dataset_noise, flow_code, value_col, utmark_losses=None):
     """
     Shared implementation for AG subsector Nr leaching/runoff. Both subsectors
     are columns of the same series: preloaded_data['ag_leaching_csv'] <-
     UNFCCC CRT Tables 3.D/3.B(b) (data_loader.py's crt_nr_ag method, reading
     directly from the NOR-CRT-2026-... folder). value_col is 'Nr_SM' or 'Nr_MM'.
+    With utmark_losses (soil management only), leaching from grazing manure
+    on utmark is left out.
     """
     collected_years = set()
     data_sources = 'UNFCCC CRT'
@@ -440,6 +469,8 @@ def _add_ag_leaching_mc(results, preloaded_data, dataset_noise, flow_code, value
         collected_years.add(year)
 
         base_value = float(values[i])
+        if utmark_losses is not None:
+            base_value -= utmark_losses[year]['leaching']
         value = base_value * noise_val
 
         results.append({
@@ -663,22 +694,32 @@ def _add_live_animal_export_mc(results, preloaded_data, current_params, dataset_
 
 
 def _add_N2_emissions_soil_management_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    N2 from denitrification in agricultural soils: a default loss rate per ha
+    (Schäppi et al. 2025) times the agricultural area in use each year.
+    'ssb_agri_area_05982' <- data_files/05982_jordbruksareal_i_drift.csv: SSB
+    table 05982, agricultural area in use (daa); the table has no values for
+    1990-1998, which are interpolated linearly between 1989 and 1999.
+    """
     flow_code = 'AG.SM-AT.AT-Emissions-N2'
     collected_years = set()
     comment = 'ok'
-    data_sources = 'Schäppi2025Ann + NIBIO'
-    
-    val_param = current_params.get("denitrification_AG_N2")        
-    value = float(val_param)
+    data_sources = 'Schäppi2025Ann + SSB table 05982'
+
+    rate_kg_per_ha = float(current_params.get("denitrification_AG_N2_per_ha"))
+    area_daa = preloaded_data['ssb_agri_area_05982']['jordbruksareal_i_drift_daa']
+    area_daa = area_daa.reindex(range(area_daa.index.min(), area_daa.index.max() + 1)).interpolate()
+
     for year in sorted(EXPECTED_YEARS):
         collected_years.add(year)
+        area_ha = area_daa[year] / 10.0  # daa -> ha
         results.append({
             'flow_name': flow_code,
             'year': year,
-            'value': value,  
+            'value': rate_kg_per_ha * area_ha * 1.0e-6,  # kg N -> kt N
             'comment': comment,
             'data_sources': data_sources
         })
-        
+
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)

@@ -184,22 +184,38 @@ def sum_flows(df, flow_names, years=ANALYSIS_YEARS):
 # SSB changed the method for eng til slått in 2021 (dry matter percentages
 # from feed samples), giving a step in Fodder crops that the model does not
 # correct. For trends across the step, Fodder crops from 2021 on can be scaled
-# down so 2021 matches 2020 (see fodder_crops_level_adjusted).
+# so that the change from 2020 to 2021 equals the change in Eurostat's Gross
+# Nutrient Balance (see fodder_crops_level_adjusted).
 FODDER_METHOD_CHANGE_YEAR = 2021
+GNB_FILE = 'data_files/aei_pr_gnb__custom_18744910_spreadsheet.xlsx'
+
+
+@functools.lru_cache(maxsize=None)
+def _gnb_fodder_change():
+    """Ratio of Eurostat GNB "Nutrient removal by harvest and grazing of
+    fodder" in FODDER_METHOD_CHANGE_YEAR to the year before. Eurostat has
+    calculated the Norwegian balance itself from 2020, and its series has a
+    much smaller step at the change of SSB's method than the model's."""
+    import openpyxl
+    from calculations.utils import read_year_value_row
+    sheet = openpyxl.load_workbook(GNB_FILE)['Sheet 35']
+    fodder = read_year_value_row(sheet, year_values=None, year_row=9, value_row=11,
+                                 first_col=2, unit_factor=1.0e-3, op='+')
+    return fodder[FODDER_METHOD_CHANGE_YEAR] / fodder[FODDER_METHOD_CHANGE_YEAR - 1]
 
 
 def fodder_crops_level_adjusted(df):
     """Copy of df (the statistics table or one MC iteration) with Fodder crops
-    for FODDER_METHOD_CHANGE_YEAR and later multiplied by the ratio of the
-    year before to that year, so the series has no step at the method change.
-    Applied per MC iteration, the ratio is that iteration's own. The whole
-    flow is scaled, including innmark grazing, which has no step; grazing is
-    about 13 % of the flow, so this differs by under 1 % from scaling eng til
-    slått alone. The ratio also removes any real change from 2020 to 2021."""
+    for FODDER_METHOD_CHANGE_YEAR and later scaled so that the change from the
+    year before to that year equals the change in Eurostat's Gross Nutrient
+    Balance for fodder (_gnb_fodder_change), rather than the step in the
+    model's own series. Applied per MC iteration, the model's ratio is that
+    iteration's own. The whole flow is scaled, including innmark grazing,
+    which has no step; grazing is about 13 % of the flow."""
     flow = FODDER_CROPS[0]
     is_flow = df['flow_name'] == flow
     values = df.loc[is_flow].set_index('year')['median']
-    ratio = values[FODDER_METHOD_CHANGE_YEAR - 1] / values[FODDER_METHOD_CHANGE_YEAR]
+    ratio = values[FODDER_METHOD_CHANGE_YEAR - 1] / values[FODDER_METHOD_CHANGE_YEAR] * _gnb_fodder_change()
     out = df.copy()
     out.loc[is_flow & (out['year'] >= FODDER_METHOD_CHANGE_YEAR), 'median'] *= ratio
     return out

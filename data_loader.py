@@ -203,6 +203,11 @@ def load_all_data(selected_pools):
         'hy_fiske_old_raw': ({'hy'}, 'data_files/fiske_1990_2000.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Ark1'}),
         'avlop_sewage': ({'hy', 'pr'}, 'data_files/05280_20251113-113329.xlsx', 'openpyxl_sewage', {}),
         'ag_gnb': ({'ag','mp'}, 'data_files/aei_pr_gnb__custom_18744910_spreadsheet.xlsx', 'openpyxl_gnb', {}),
+        # SSB 05982, "Jordbruksareal i drift" (daa), 1969-2025 with 1990-1998 missing,
+        # downloaded from the SSB API
+        'ssb_agri_area_05982': ({'ag'}, 'data_files/05982_jordbruksareal_i_drift.csv', 'csv', {'index_col': 'year'}),
+        # SSB 07479, "Korn i alt" (1000 t), 1989 and 1995-2025, downloaded from the SSB API
+        'ssb_cereal_harvest_07479': ({'ag'}, 'data_files/07479_kornavling.csv', 'csv', {'index_col': 'year'}),
         'ag_manure_crt': ({'ag'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_manure_applied', {}),
         'ag_innmark_grazing_raw': ({'ag'}, 'data_files/NibioStatisticsNewTK.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Eng, beite'}),
         'ag_grovfor': ({'ag'}, 'grovfor_filer_samling', 'excel_grovfor', {}),  # filepath unused - method loads 3 fixed files directly
@@ -328,8 +333,15 @@ def load_all_data(selected_pools):
             # managed manure N net of storage/housing losses) and "Urine and
             # dung deposited by grazing animals" (PRP - manure deposited
             # directly on pasture, never routed through storage or spreading).
+            # The same table also gives what is needed to separate out the
+            # losses from grazing manure (see ag_mc.py's utmark adjustment):
+            # direct N2O from PRP (3.D.1.c, kt N2O), the implied emission
+            # factors for indirect N2O from atmospheric deposition (3.D.2.a)
+            # and leaching (3.D.2.b), and the fractions FracGASPRP and
+            # FracLEACH-(H) in the "Additional information" columns.
             fam_values = {}
             prp_values = {}
+            prp_loss_params = {}
             for fname in os.listdir(filepath):
                 if not fname.endswith('.xlsx'):
                     continue
@@ -339,14 +351,28 @@ def load_all_data(selected_pools):
                 year = int(match.group(1))
                 wb_crt = openpyxl.load_workbook(os.path.join(filepath, fname), data_only=True, read_only=True)
                 ws_crt = wb_crt['Table3.D']
-                for row in ws_crt.iter_rows(min_row=10, max_row=17, values_only=True):
-                    if row[1] and 'Animal manure applied' in str(row[1]):
+                params = {}
+                for row in ws_crt.iter_rows(min_row=8, max_row=23, values_only=True):
+                    label = str(row[1]) if row[1] else ''
+                    if 'Animal manure applied' in label:
                         fam_values[year] = row[3]
-                    if row[1] and 'Urine and dung deposited' in str(row[1]):
+                    if 'Urine and dung deposited' in label:
                         prp_values[year] = row[3]
+                        params['prp_n2o_kt'] = float(row[5])
+                    if label.startswith('3.D.2.a.'):
+                        params['ef_deposition'] = float(row[4])
+                    if label.startswith('3.D.2.b.'):
+                        params['ef_leaching'] = float(row[4])
+                    fraction = str(row[7]).strip() if row[7] else ''
+                    if fraction == 'FracGASPRP':
+                        params['frac_gas_prp'] = float(row[9])
+                    if fraction == 'FracLEACH-(H)':
+                        params['frac_leach'] = float(row[9])
+                prp_loss_params[year] = params
                 wb_crt.close()
             preloaded['ag_manure_applied_crt'] = fam_values
             preloaded['ag_manure_prp_crt'] = prp_values
+            preloaded['ag_prp_loss_params_crt'] = prp_loss_params
 
         elif method == 'crt_fuel_industry':
             # UNFCCC CRT Table1.A(a)s2, "1.A.2 Manufacturing industries and
@@ -585,6 +611,11 @@ def load_all_data(selected_pools):
 
         elif method == 'csv_live_animals':
             df_fao_raw = pd.read_csv(filepath)
+            # FAOSTAT reports poultry in thousands of animals ('1000 An') and
+            # other animals as single animals ('An').
+            in_thousands = df_fao_raw['Unit'] == '1000 An'
+            df_fao_raw.loc[in_thousands, 'Value'] = df_fao_raw.loc[in_thousands, 'Value'] * 1000
+            df_fao_raw.loc[in_thousands, 'Unit'] = 'An'
             preloaded['fao_live_animals'] = df_fao_raw[(df_fao_raw['Element'] == 'Import quantity') & (df_fao_raw['Value'] != 0)][['Item', 'Year', 'Unit', 'Value']].copy()
             preloaded['fao_live_animals_export'] = df_fao_raw[(df_fao_raw['Element'] == 'Export quantity') & (df_fao_raw['Value'] != 0)][['Item', 'Year', 'Unit', 'Value']].copy()
 

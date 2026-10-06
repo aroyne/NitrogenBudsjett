@@ -12,6 +12,10 @@ nav_order: 4
 ### Flow Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 We have used data from CLRTAP Inventory Submissions (EMEP, 2025)<!--cite:emep_officially_2025--> as advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, using the categories given in Table 29.
+
+**How the numbers are derived.** The emissions reported to CLRTAP are calculated in the national inventory with the same manure model as the greenhouse gas inventory: N in manure, mineral fertilizer and other N sources multiplied by NH3 and NOx emission factors for each animal category, storage system, spreading method and fertilizer type. The methods are documented in the [Informative Inventory Report 2026, Norway](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/informative-inventory-report-iir-2026-norway-air-pollutant-emissions-1990-2024/). Emissions in Gg NH3 or Gg NOx (as NO2) are converted to N with the factors 14/17 and 14/46. The flow sums the manure management categories 3B1a–3B4h (Table 29 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->) and 3I (other agriculture, ammonia treatment of straw), which reports no NOx.
+
+**Interpretation.** The flow is very small, about 0.03–0.04 kt N per year.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References

@@ -12,6 +12,10 @@ nav_order: 8
 ### Flow Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 Crop products for industrial use is taken from EUROSTAT Gross nutrient balance as advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->. For years with missing data, we have filled in the average of all other years. Eurostat GNB has not yet published a 2024 figure at the time of writing; the 2024 value is a 3-year average of 2021-2023 (this flow is small and volatile with no clear trend), with additional uncertainty (±50%) applied to reflect that it is not a real, independently observed value. 
+
+**How the numbers are derived.** Eurostat's Gross Nutrient Balance ([aei_pr_gnb](https://ec.europa.eu/eurostat/databrowser/view/aei_pr_gnb/default/table)) calculates nutrient removal by harvest as crop production multiplied by an N content per crop, based on Norwegian crop statistics. The flow is "Nutrient removal by harvest of industrial crops" (in Norway mainly oilseeds).
+
+**Interpretation.** The flow is small, 0.3–0.8 kt N per year, with large variation from year to year.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References
