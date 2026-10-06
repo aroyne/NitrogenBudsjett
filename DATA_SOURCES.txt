@@ -70,6 +70,12 @@ downloaded 16.09.2026
 SSB table 11561: Energibalansen (energy balance). Supply and consumption by energy balance item, energy product, year and statistical variable
 downloaded 13.11.2025
 
+11561_faste_biobrensler_industri.csv
+SSB table 11561: Energibalansen (energy balance), item "12.1 Industri og bergverk" (EB12010), solid biofuels (EP051 Faste biobrensler), GWh, 1990-2025
+downloaded 06.10.2026 from the SSB API (https://data.ssb.no/api/v0/no/table/11561), query: Energibalanse=EB12010; EnergiProdukt=EP051; ContentsCode=EnergibalansenGWh; all years
+columns: year, GWh
+used for 1990-2002 of MP.OP-EF.IC-Industrial waste fuels-Nmix (shared_flow_calculations.find_industrial_waste_fuels), scaled to SSB table 08205's self-produced bioenergy over 2003-2007
+
 11561_feedstock_oljeprodukter.csv
 SSB table 11561: Energibalansen (energy balance), item "11 Netto innenlands forbruk som råstoff" (EB11), split by oil product, GWh, 1990-2025
 downloaded 06.10.2026 from the SSB API (https://data.ssb.no/api/v0/no/table/11561), query: Energibalanse=EB11; EnergiProdukt=EP04IF (oil and oil products excl. bio), EP0462-0463 (LPG and ethane), EP0469 (oil products not elsewhere specified); ContentsCode=EnergibalansenGWh; all years
@@ -119,10 +125,6 @@ downloaded 11.11.2025
 atm_in_out.xlsx
 Compilation of source-receptor data for Norway
 downloaded from https://www.emep.int/mscw/mscw_srdata.html, november 2025
-
-egentilvirket_bioenergi_industri.xlsx
-Historical self-produced bioenergy in the pulp/paper industry, used to backfill SSB table 08205 before 1998
-data from Spilde, D. & Aasestad, K. (2004). Energibruk i norsk industri: 1991-2001. Statistisk Sentralbyrå
 
 FAOSTAT_data_en_9-24-2026-3.csv
 Crop and livestock products - import and export of live animals, 1961-2024

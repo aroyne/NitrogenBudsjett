@@ -253,6 +253,9 @@ AQUACULTURE_FEED = [
 # one level deeper to the konv codes (MC_Reporting_Statistics.xlsx only has
 # the already-summed flow, not this breakdown).
 FOOD_EXPORT_TYPES = {'korn/planter', 'kjøtt/fisk/meieri/egg', 'mat'}
+# Food import also includes fish by-products not fit for human consumption
+# (rw_mc.py); their konv is fish_fresh_frozen, so they count as fish.
+FOOD_IMPORT_TYPES = FOOD_EXPORT_TYPES | {'fiskebiprodukter'}
 FISH_EXPORT_KONV = 'fish_fresh_frozen'
 
 
@@ -271,7 +274,8 @@ def _food_trade_n_by_year(is_import, include_fish, years=ANALYSIS_YEARS):
 
     direction = ['1', '1.0'] if is_import else ['2', '2.0']
     is_direction = df_vol['impeks'].astype(str).str.strip().isin(direction)
-    is_food = df_vol['type'].astype(str).str.lower().str.strip().isin(FOOD_EXPORT_TYPES)
+    types = FOOD_IMPORT_TYPES if is_import else FOOD_EXPORT_TYPES
+    is_food = df_vol['type'].astype(str).str.lower().str.strip().isin(types)
     keep = is_direction & is_food
     if not include_fish:
         keep &= df_vol['konv'] != FISH_EXPORT_KONV

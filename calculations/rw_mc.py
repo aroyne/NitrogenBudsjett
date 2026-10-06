@@ -65,7 +65,9 @@ def _add_food_import(results, preloaded_data, current_params, current_trade_fact
     process_generic_trade_flow(
         results=results, preloaded_data=preloaded_data, current_params=current_params,
         current_trade_factors=current_trade_factors, flow_code='RW.RW-MP.FP-Food import-Nmix',
-        target_types=['korn/planter', 'kjøtt/fisk/meieri/egg', 'mat'],
+        # 'fiskebiprodukter': fish waste and by-products not fit for human
+        # consumption (HS 0511), processed in MP.FP like the feed-grade ones.
+        target_types=['korn/planter', 'kjøtt/fisk/meieri/egg', 'mat', 'fiskebiprodukter'],
         is_import=True, dataset_noise = dataset_noise
     )
     
@@ -75,7 +77,7 @@ def _add_other_goods_import(results, preloaded_data, current_params, current_tra
         current_trade_factors=current_trade_factors, flow_code='RW.RW-MP.OP-Other goods import -Nmix',
         target_types=['organisk materiale','blomster','frø','kjemikalier','såpe','industrielt protein',
                       'plastprodukter','gummi','skinn','lærprodukter','tre','silke','ull',
-                      'bomull','nylon','tekstil','møller','plast','leker','plastavfall','tekstil_brukt'],
+                      'bomull','nylon','tekstil','møbler','plast','leker','tekstil_brukt'],
         is_import=True, dataset_noise = dataset_noise
     )
     

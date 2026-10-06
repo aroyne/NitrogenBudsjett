@@ -324,10 +324,14 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
     """
     Computes N in food industry waste (used by mp_mc.py for
     MP.FP-PR.SO-Food industry waste-Nmix) from the "wet organic" waste
-    category (row 14 in 05282 / row 7 in 10514) for the mining, manufacturing
-    and other/unspecified-industry sectors - the same sector selection as
-    find_other_industry_waste, since 'wet organic' is assumed to be entirely
-    food-industry-related.
+    category (row 14 in 05282 / row 7 in 10514) for the source sectors
+    "Jord-, skogbruk og fiske", "Industri" and "Annen eller uspesifisert
+    næring". Wet organic waste from manufacturing is assumed to come entirely
+    from the food industry. The primary sector is included because fishing
+    and aquaculture (e.g. dead fish from fish farms, which reaches MP.FP via
+    HY.AC-MP.FP) are part of it; the waste accounts do not separate fishing
+    from agriculture. Wet organic waste from mining goes to
+    find_other_industry_waste.
 
     Table 05282 (1995-2011) does not report an equivalent 2012 baseline, so
     the older values are scaled by the ratio of the 2012 value (from 10514)
@@ -353,7 +357,8 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
             continue
         year = int(float(year_val))
 
-        # Wet organic waste (row 7 -> index 6), Bergverk/Industri/Annen-uspesifisert sectors
+        # Wet organic waste (row 7 -> index 6); p_col+1, +3 and +8 are the
+        # Jord-/skogbruk/fiske, Industri and Annen/uspesifisert sector columns
         v_base = 0.0
         v_base += float(df_10514.iloc[6, p_col+1]) * wet_org_N
         v_base += float(df_10514.iloc[6, p_col+3]) * wet_org_N
@@ -778,61 +783,50 @@ def find_industrial_round_wood(preloaded_data, current_params, dataset_noise):
 
     return year_values
 
-def find_industrial_waste_fuels(df_bio_08205, df_bio_hist, current_params, dataset_noise):
+def find_industrial_waste_fuels(df_bio_08205, df_bio_11561, current_params, dataset_noise):
     """
     Computes N in industrial waste fuels (used by mp_mc.py for
-    MP.OP-EF.IC-Industrial waste fuels-Nmix) from SSB table 08205 bioenergy
-    volumes (2003-2024) plus an older historical series (1998-2002), with
-    1990-1997 extrapolated from the average of all pre-2008 years.
+    MP.OP-EF.IC-Industrial waste fuels-Nmix) from self-produced bioenergy in
+    manufacturing and mining (SSB table 08205, own wood residues, black liquor
+    and other waste, 2003-2024). 1990-2002 come from the energy balance (SSB
+    table 11561, solid biofuels in "12.1 Industri og bergverk"), scaled to the
+    level of table 08205 over the first overlapping years, since the balance
+    also includes purchased biofuels.
     """
     year_values = {}
 
     noise_08205 = float(dataset_noise['08205'])
-    noise_trend = float(dataset_noise['trend interpolation'])
+    noise_11561 = float(dataset_noise['11561'])
 
     NCV              = float(current_params.get('firewood_NCV'))
     N_content        = float(current_params.get('firewood_N_frac'))
     GWh_per_TJ = float(current_params.get('GWh_per_TJ'))
 
     arr_08205 = df_bio_08205.values
-    arr_hist = df_bio_hist.values
 
-    raw_sum_pre_2008 = 0.0
-
-    # --- PART 1: SSB table 08205 (2003-2024) ---
+    # --- PART 1: SSB table 08205 (2003-2024), row 9 = "Egentilvirket bioenergi" (GWh) ---
+    gwh_08205 = {}
     for col in range(3, 25):
-        year_val = arr_08205[2, col]
-        value_val = arr_08205[9, col]
+        year = int(arr_08205[2, col])
+        gwh_08205[year] = float(arr_08205[9, col])
 
-        year = int(year_val)
+    def gwh_to_kt_N(gwh):
         # GWh -> TJ, divide by NCV for kt of fuel, multiply by N_content for kt N
-        value_raw = float(value_val) / GWh_per_TJ / NCV * N_content
+        return gwh / GWh_per_TJ / NCV * N_content
 
-        year_values[year] = value_raw * noise_08205
-        if year < 2008:
-            raw_sum_pre_2008 += value_raw
+    for year, gwh in gwh_08205.items():
+        year_values[year] = gwh_to_kt_N(gwh) * noise_08205
 
-    # --- PART 2: historical series, 1998-2002 (df_bio_hist) ---
-    # df_bio_hist predates table 08205 and has no uncertainty entry of its own;
-    # it is reused here since both are SSB bioenergy accounting series.
-    for r in range(1, 6):
-        year_val = arr_hist[r, 0]
-        val_col2 = arr_hist[r, 1]
-        val_col3 = arr_hist[r, 2]
+    # --- PART 2: 1990-2002 from the energy balance, scaled to table 08205 ---
+    # The scaling uses the first five years both series cover (2003-2007),
+    # the ones closest to the years being filled.
+    first_08205 = min(gwh_08205)
+    overlap = range(first_08205, first_08205 + 5)
+    gwh_11561 = df_bio_11561['GWh']
+    scale = sum(gwh_08205[y] for y in overlap) / sum(gwh_11561[y] for y in overlap)
 
-        year = int(year_val)
-        value_raw = (float(val_col2) + float(val_col3)) / GWh_per_TJ / NCV * N_content
-
-        year_values[year] = value_raw * noise_08205
-
-        if year < 2008:
-            raw_sum_pre_2008 += value_raw
-
-    # --- PART 3: 1990-1997, extrapolated as the mean of all pre-2008 years ---
-    mean_value_raw = raw_sum_pre_2008 / 10.0
-
-    for year in range(1990, 1998):
-        year_values[year] = mean_value_raw * noise_trend
+    for year in range(1990, first_08205):
+        year_values[year] = gwh_to_kt_N(gwh_11561[year] * scale) * noise_11561
 
     return year_values
 

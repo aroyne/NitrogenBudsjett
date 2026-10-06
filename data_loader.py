@@ -22,6 +22,12 @@ from calculations.utils import read_trade_data
 # Suppresses openpyxl's specific header/footer warning.
 warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl.worksheet.header_footer")
 
+# Single facility-year reports in Miljødirektoratet's emissions-to-water data
+# that are left out as reporting errors (AnleggNummer, year):
+# - Biomar fôrfabrikk, Myre, 2022: 574 t N to the municipal network, against
+#   0.065 t in 2023 and 3.9 t in 2024; most likely reported in kg as tonnes.
+REJECTED_EMISSION_REPORTS = {('1868.0003.01', 2022)}
+
 # SSB table 06913: population on 1 January, one row per year (1951-2025).
 POPULATION_FILE = 'data_files/06913_20251113-124117.xlsx'
 
@@ -245,7 +251,9 @@ def load_all_data(selected_pools):
         'ssb_waste_12359': ({'pr'}, 'data_files/12359_20251211-153434.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Mengde'}),
         'ssb_13695': ({'mp'}, 'data_files/13695_20260916-120402.xlsx', 'excel_ssb_generic', {'sheet': '13695'}),
         'ssb_bio_08205': ({'mp'}, 'data_files/08205_20251104-141305.xlsx', 'excel_ssb_generic', {'sheet': 'Energibruk'}),
-        'ssb_bio_hist': ({'mp'}, 'data_files/egentilvirket_bioenergi_industri.xlsx', 'excel_ssb_generic', {'sheet': 'Ark1'}),
+        # SSB 11561, "12.1 Industri og bergverk" x "Faste biobrensler" (GWh), 1990-2025,
+        # downloaded from the SSB API; extends table 08205's self-produced bioenergy back to 1990
+        'ssb_bio_11561': ({'mp'}, 'data_files/11561_faste_biobrensler_industri.csv', 'csv', {'index_col': 'year'}),
         'ssb_hist_industry_waste': ({'mp','pr'}, 'data_files/kommunalt_avfall_1985_1995.xlsx', 'excel_ssb_generic', {'sheet': 'avfallsmengder'}),
         'skoggjoedsling_foer_1995_raw': ({'mp'}, 'data_files/skoggjødsling_før_1995.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Ark1'}),
         'waste_historical_fractions': ({'pr', 'mp'}, 'data_files/kommunalt_avfall_1985_1995.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'forbrenning og gjenvinning'}),
@@ -666,7 +674,9 @@ def load_all_data(selected_pools):
             preloaded[key] = df
 
         elif method == 'excel_mildir_emissions':
-            preloaded[key] = pd.read_excel(filepath, header=0)
+            df = pd.read_excel(filepath, header=0)
+            rejected = df.set_index(['AnleggNummer', 'År']).index.isin(REJECTED_EMISSION_REPORTS)
+            preloaded[key] = df[~rejected]
 
         elif method == 'excel_industry_categories':
             preloaded[key] = pd.read_excel(filepath)

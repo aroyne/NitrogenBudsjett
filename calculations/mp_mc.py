@@ -70,6 +70,46 @@ def protein_per_group(current_params, mapping_sheet, group_index):
     return pd.Series(protein_fractions, index=group_index)
 
 
+def _industry_n_to_water(preloaded_data, category, connected, fertilizer_industry=None):
+    """
+    Total N (t) per year reported to Miljødirektoratet by the facilities in
+    `category` ('FP' or 'OP') that are (connected=True) or are not or may not
+    be (connected=False) connected to a municipal sewage network.
+    fertilizer_industry=True/False restricts the selection to facilities
+    flagged/not flagged as fertilizer industry. A year missing inside a
+    facility's reporting period is filled by linear interpolation between its
+    neighbouring reported years; years before a facility's first or after its
+    last report are not filled.
+
+    'mildir_emissions' <- Årlig utslipp til vann - Landbasert 02-02-2026.xlsx
+    (data_loader.py DATA_MAP): Miljødirektoratet emissions data for
+    land-based industry, including connection to municipal sewage network.
+    'industry_categories' <- industry_categories.xlsx (data_loader.py
+    DATA_MAP): industribedrifter fra norskeutslipp.no, manually categorized by
+    pool ('kategori': FP/OP/...), by connection to a municipal sewage network
+    ('kommunalt nett?': ja/nei/ukjent) and by whether the facility is part of
+    the fertilizer industry ('gjødselindustri': ja/nei). Facilities connected
+    to the network send their N to treated municipal wastewater (PR.WW);
+    unknown connection is counted as not connected.
+    """
+    emissions = preloaded_data['mildir_emissions']
+    categories = preloaded_data['industry_categories']
+
+    connection = categories['kommunalt nett?'].str.lower()
+    keep = categories['kategori'] == category
+    keep &= (connection == 'ja') if connected else connection.isin(['nei', 'ukjent'])
+    if fertilizer_industry is not None:
+        keep &= (categories['gjødselindustri'] == 'ja') == fertilizer_industry
+
+    selected = emissions[
+        (emissions['Komponent'] == 'nitrogen, totalt') &
+        emissions['AnleggNavn'].isin(categories.loc[keep, 'Virksomhet'])
+    ]
+    per_facility = selected.pivot_table(index='År', columns='AnleggNavn', values='Mengde', aggfunc='sum')
+    per_facility = per_facility.reindex(range(per_facility.index.min(), per_facility.index.max() + 1))
+    return per_facility.interpolate(limit_area='inside').sum(axis=1, min_count=1).dropna()
+
+
 def execute_calculations_mp(preloaded_data, current_params, dataset_noise, current_trade_factors=None):
     """
     Main function for the MP (materials and products) pool. Runs all
@@ -344,35 +384,15 @@ def _add_food_industry_wastewater_mc(results, preloaded_data, current_params, da
     data_sources = 'Miljødirektoratet'
     
     target_years = {y for y in EXPECTED_YEARS if 1989 <= y <= 2023}
-    # 'mildir_emissions' <- Årlig utslipp til vann - Landbasert 02-02-2026.xlsx
-    # (data_loader.py DATA_MAP): Miljødirektoratet emissions data for
-    # land-based industry, including connection to municipal sewage network
-    # 'industry_categories' <- industry_categories.xlsx (data_loader.py
-    # DATA_MAP): industribedrifter fra norskeutslipp.no, manually categorized
-    # by pool ('kategori': FP/OP/...) and by whether the plant is connected to
-    # a municipal sewage network ('kommunalt nett?': ja/nei/ukjent) - plants
-    # connected to the network route their N to treated municipal wastewater
-    # (counted elsewhere), so this flow (untreated/direct emissions) and its
-    # "untreated wastewater" counterpart below split on that flag.
-    df_emissions_raw = preloaded_data.get('mildir_emissions')
-    df_categories = preloaded_data.get('industry_categories')
     key_støy = 'norskeutslipp'
     noise_factor = float(dataset_noise[key_støy])
 
-    emissions = df_emissions_raw[df_emissions_raw['Komponent'] == 'nitrogen, totalt']
-    categories_keep = df_categories[
-        (df_categories['kategori'] == 'FP') &
-        (df_categories['kommunalt nett?'].str.lower() == 'ja')
-    ]
+    n_by_year = _industry_n_to_water(preloaded_data, 'FP', connected=True)
 
-    emissions_FP = emissions[emissions['AnleggNavn'].isin(categories_keep['Virksomhet'])]
-    sum_by_year = emissions_FP.groupby(['År'])['Mengde'].sum().reset_index()
-
-    for index, row in sum_by_year.iterrows():
-        year = int(row['År'])
+    for year, tonnes in n_by_year.items():
         if year in target_years:
             collected_years.add(year)
-            base_value = float(row['Mengde']) / 1000.0  # kg -> tonn
+            base_value = float(tonnes) / 1000.0  # t N -> kt N
             value_noisy = base_value * noise_factor
 
             results.append({
@@ -415,6 +435,7 @@ def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise
     noise_06376 = float(dataset_noise['06376'])
     noise_pop = float(dataset_noise['06913'])
     noise_trend = float(dataset_noise['trend interpolation'])
+    noise_food_waste = float(dataset_noise['Stensgard_2023'])
 
     # 'ssb_13695' <- 13695_20260916-120402.xlsx (data_loader.py DATA_MAP): SSB
     # table 13695, food/drink intake per person per day by nutrient content
@@ -461,7 +482,7 @@ def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise
             'data_sources': 'SSB'
         }
 
-    # 1999-2012 (table 10249) ---
+    # 1998-2008 and 2012 (table 10249) ---
     mengde_10249 = df_10249.set_index(0).iloc[4:, 0::2].dropna(how='all')
     mengde_10249 = mengde_10249.astype(str).map(lambda s: s.replace(',','.') if pd.notna(s) else s)
     mengde_10249 = mengde_10249.apply(pd.to_numeric, errors='coerce')
@@ -481,9 +502,18 @@ def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise
             continue
             
         year = int(float(year_val))
-        
+        # SSB pooled the household budget surveys of 1997-2009 three years at
+        # a time and labels each period with its last year (e.g. 2000 =
+        # 1998-2000), so the value is placed in the middle year. The first
+        # period (1997-1999) overlaps table 06376's 1996-1998 period and is
+        # left out.
+        if year <= 2009:
+            year -= 1
+            if year < 1999:
+                continue
+
         pop = float(df_pop.loc[year, 'Befolkning 1. januar']) * noise_pop
-        
+
         v_human_N = v_N_pers * pop
         total_N = (v_human_N * noise_10249) + pet_N_year(year)
         
@@ -552,68 +582,47 @@ def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise
             'data_sources': src
         }
         
-    # 2010-2011 is a genuine gap within table 10249's own range (the sheet
-    # jumps straight from 2009 to 2012), and 2013-2017 is the gap between
-    # 10249's end (2012) and 13695's start (2018). Both are bridged with a
-    # single linear trend fitted across all other available years.
-    valid_years = [y for y in sorted(year_values.keys()) if y not in [2010, 2011, 2013, 2014, 2015, 2016, 2017]]
+    # Years without survey data between 1984 and the last year (2009-2011
+    # within table 10249's range, and 2013-2017 between 10249 and 13695) are
+    # bridged with a single linear trend fitted across all available years.
+    gap_years = [y for y in range(min(year_values), max(year_values)) if y not in year_values]
+    valid_years = sorted(year_values)
     y_arr = np.array(valid_years)
     v_arr = np.array([year_values[k]['value'] for k in y_arr])
-    
+
     m, b = np.polyfit(y_arr, v_arr, 1)
-    
-    for year in list(range(2010, 2012)) + list(range(2013, 2018)):
+
+    for year in gap_years:
         v_trend = m * year + b
         year_values[year] = {
             'value': v_trend * noise_trend,
-            'comment': 'interpolated trendline',
-            'data_sources': 'interpolated'
+            'comment': 'ok',
+            'data_sources': 'interpolated trendline'
         }
 
-    # Downstream-of-industry food waste (Stensgård & Berntsen / NORSUS
-    # matsvinn mapping report). "Food products" above is calibrated from
-    # dietary intake surveys - i.e. only food actually eaten - so food that
-    # physically left MP.FP but is later discarded at wholesale, retail,
-    # food service, catering/institutions or in the household never enters
-    # this flow, even though it did leave FP's boundary. That same food
-    # waste is counted as N entering HS.HS-PR.SO-Household waste-Nmix,
-    # sourced independently from SSB's waste-by-material statistics - so
-    # without this addition, that waste N would have no traceable MP.FP
-    # inflow at all. Excludes upstream agriculture/seafood losses and
-    # food-industry-internal waste, both already covered by other flows.
-    #
-    # The report gives 2021 tonnage and the 2015-to-2021 change in
-    # kg/capita for each downstream sector (Norway's food waste reduction
-    # agreement, "Bransjeavtalen", uses 2015 as its baseline year). The
-    # 2015 per-capita rate is backed out from the 2021 rate and the
-    # reported change, then linearly interpolated between the two; outside
-    # 2015-2021 the nearest endpoint's per-capita rate is held constant, as
-    # no data exists beyond that range.
-    downstream_matsvinn_sectors = {
-        # sector: (tonnage 2021, fractional change in kg/capita 2015->2021)
-        'wholesale': (5_800, -0.32),
-        'retail': (62_400, -0.19),
-        'food_service': (15_500, -0.17),
-        'catering': (5_200, -0.24),
-        'education_care': (5_000, -0.12),
-        'household': (216_100, -0.06),
-    }
-    # Mean N content of Norway's total food supply basket, 2010-2023
-    # (FAOSTAT Food Balance Sheets 'Food' quantity by item, weighted by N
-    # content per Schäppi2025Ann Table 21).
-    downstream_matsvinn_avg_N_frac = 0.0128
+    # Food wasted downstream of the food industry, before it reaches
+    # households: wholesale, retail, food service, catering and institutions
+    # (Stensgård et al. 2023). The food statistics above count food bought by
+    # households (grocery sales and household purchases), so food that leaves
+    # MP.FP but is wasted before it is bought is not in them; food wasted in
+    # households after it is bought is already included and is not added.
+    # The report gives 2021 tonnage and the 2015-to-2021 change in kg per
+    # capita for each sector (2015 is the baseline year of Norway's food
+    # waste reduction agreement, "Bransjeavtalen"). The 2015 per-capita rate
+    # is backed out from the 2021 rate and the change, then linearly
+    # interpolated between the two years; outside 2015-2021 the nearest
+    # endpoint's rate is held constant.
+    food_waste_sectors = current_params.get_table('food_waste_sectors')
+    food_waste_N_frac = float(current_params.get('food_waste_N_frac'))
     pop_2021 = float(df_pop.loc[2021, 'Befolkning 1. januar'])
-    percap_2021 = {k: t / pop_2021 for k, (t, _chg) in downstream_matsvinn_sectors.items()}
-    percap_2015 = {k: percap_2021[k] / (1 + chg) for k, (_t, chg) in downstream_matsvinn_sectors.items()}
+    percap_2021 = food_waste_sectors['tonnes_2021'] / pop_2021
+    percap_2015 = percap_2021 / (1 + food_waste_sectors['change_2015_2021'])
 
     for year in year_values:
         pop = float(df_pop.loc[year, 'Befolkning 1. januar']) * noise_pop
         frac = min(1.0, max(0.0, (year - 2015) / (2021 - 2015)))
-        matsvinn_t_per_capita = sum(
-            percap_2015[k] + frac * (percap_2021[k] - percap_2015[k])
-            for k in downstream_matsvinn_sectors
-        )
-        year_values[year]['value'] += matsvinn_t_per_capita * pop * downstream_matsvinn_avg_N_frac / 1000.0 * noise_trend
+        food_waste_t_per_capita = (percap_2015 + frac * (percap_2021 - percap_2015)).sum()
+        year_values[year]['value'] += food_waste_t_per_capita * pop * food_waste_N_frac / 1000.0 * noise_food_waste
 
     for year in sorted(year_values.keys()):
         if year in EXPECTED_YEARS:
@@ -637,40 +646,26 @@ def _add_fp_untreated_wastewater_mc(results, preloaded_data, current_params, dat
     
     target_years = {y for y in EXPECTED_YEARS if 1990 <= y <= 2023}
 
-    # See _add_food_industry_wastewater_mc above for what 'mildir_emissions'
-    # and 'industry_categories' are and what 'kommunalt nett?' means; this
-    # flow takes the plants NOT connected to a municipal network (their N
-    # goes directly to surface water, untreated).
-    df_emissions_raw = preloaded_data.get('mildir_emissions')
-    df_categories = preloaded_data.get('industry_categories')
-
     key_støy = 'norskeutslipp'
     noise_factor = float(dataset_noise[key_støy])
 
-    emissions = df_emissions_raw[df_emissions_raw['Komponent'] == 'nitrogen, totalt']
-    categories_keep = df_categories[
-        (df_categories['kategori'] == 'FP') &
-        (df_categories['kommunalt nett?'].str.lower().isin(['nei', 'ukjent']))
-    ]
-
-    emissions_FP = emissions[emissions['AnleggNavn'].isin(categories_keep['Virksomhet'])]
-    sum_by_year = emissions_FP.groupby(['År'])['Mengde'].sum().reset_index()
+    n_by_year = _industry_n_to_water(preloaded_data, 'FP', connected=False)
 
     found_values_94_23 = {}
     mean_value_94_98 = 0.0
 
-    for index, row in sum_by_year.iterrows():
-        year = int(row['År'])
+    for year, tonnes in n_by_year.items():
         if 1994 <= year <= 2023:
-            base_value = float(row['Mengde']) / 1000.0  # kg -> tonn
+            base_value = float(tonnes) / 1000.0  # t N -> kt N
             value_noisy = base_value * noise_factor
             found_values_94_23[year] = value_noisy
 
             if 1994 <= year <= 1998:
                 mean_value_94_98 += value_noisy
 
-    # 1990-1993 has no data in mildir_emissions, so extrapolate backward using
-    # the mean of the first 5 available years (1994-1998).
+    # Only 3-4 FP facilities without municipal connection report before 1994,
+    # so 1990-1993 are set to the mean of the first 5 years with fuller
+    # coverage (1994-1998).
     calculated_mean = (mean_value_94_98 / 5.0) if mean_value_94_98 > 0 else 0.0
 
     for year in sorted(list(target_years)):
@@ -774,7 +769,9 @@ def _add_food_export_mc(results, preloaded_data, current_params, current_trade_f
     
 def _add_feed_export_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise):
     flow_code = 'MP.FP-RW.RW-Feed export-Nmix'
-    types_to_keep = ['for', 'fiskefor', 'kjæledyrfor']
+    # 'fiskebiprodukter' is fish waste and by-products not fit for human
+    # consumption (HS 0511), which leave MP.FP like the feed-grade ones.
+    types_to_keep = ['for', 'fiskefor', 'kjæledyrfor', 'fiskebiprodukter']
     
     process_generic_trade_flow(
         results=results,
@@ -844,15 +841,14 @@ def _add_industrial_waste_fuels_mc(results, preloaded_data, current_params, data
 
     # 'ssb_bio_08205' <- 08205_20251104-141305.xlsx (data_loader.py DATA_MAP):
     # SSB table 08205, energy use/costs/prices in industry
-    # 'ssb_bio_hist' <- egentilvirket_bioenergi_industri.xlsx (data_loader.py
-    # DATA_MAP): historical self-produced bioenergy in the pulp/paper
-    # industry, used to backfill table 08205 before 1998
+    # 'ssb_bio_11561' <- 11561_faste_biobrensler_industri.csv (data_loader.py
+    # DATA_MAP): SSB energy balance, solid biofuels in industry and mining,
+    # used for 1990-2002
     df_bio_08205 = preloaded_data['ssb_bio_08205']
-    df_bio_hist = preloaded_data['ssb_bio_hist']
-
+    df_bio_11561 = preloaded_data['ssb_bio_11561']
 
     year_values = find_industrial_waste_fuels(
-        df_bio_08205, df_bio_hist, current_params, dataset_noise
+        df_bio_08205, df_bio_11561, current_params, dataset_noise
     )
     
     for year, value in year_values.items():
@@ -887,14 +883,12 @@ def _add_other_industry_waste_mc(results, preloaded_data, current_params, datase
     for year, value in industry_waste.items():
         if year in EXPECTED_YEARS:
             collected_years.add(year)               
-            comment = 'extrapolated' if year < 1995 else 'ok'
-                                        
             results.append({
                 'flow_name': flow_code,
                 'year': int(year),
                 'value': value,
-                'comment': comment,
-                'data_sources': data_sources,
+                'comment': 'ok',
+                'data_sources': 'SSB, extrapolated' if year < 1995 else data_sources,
             })
             
     missing_years = EXPECTED_YEARS - collected_years
@@ -908,29 +902,15 @@ def _add_other_industry_wastewater_mc(results, preloaded_data, current_params, d
     
     target_years = {y for y in EXPECTED_YEARS if 1989 <= y <= 2023}
 
-    # See _add_food_industry_wastewater_mc above for what 'mildir_emissions'
-    # and 'industry_categories' are; this flow takes the OP-category plants
-    # connected to a municipal network.
-    df_emissions_raw = preloaded_data.get('mildir_emissions')
-    df_categories = preloaded_data.get('industry_categories')
-
     key_støy = 'norskeutslipp'
     noise_factor = float(dataset_noise[key_støy])
 
-    emissions = df_emissions_raw[df_emissions_raw['Komponent'] == 'nitrogen, totalt']
-    categories_keep = df_categories[
-        (df_categories['kategori'] == 'OP') &
-        (df_categories['kommunalt nett?'].str.lower() == 'ja')
-    ]
+    n_by_year = _industry_n_to_water(preloaded_data, 'OP', connected=True)
 
-    emissions_filtered = emissions[emissions['AnleggNavn'].isin(categories_keep['Virksomhet'])]
-    sum_by_year = emissions_filtered.groupby(['År'])['Mengde'].sum().reset_index()
-
-    for index, row in sum_by_year.iterrows():
-        year = int(row['År'])
+    for year, tonnes in n_by_year.items():
         if year in target_years:
             collected_years.add(year)
-            base_value = float(row['Mengde']) / 1000.0  # kg -> tonn
+            base_value = float(tonnes) / 1000.0  # t N -> kt N
             value_noisy = base_value * noise_factor
 
             results.append({
@@ -1078,8 +1058,8 @@ def _add_fo_mineral_fertilizer_mc(results, preloaded_data, current_params, datas
                     
                     final_yearly_values[gap_year] = {
                         'value': v_interp * noise_trend,
-                        'comment': f'interpolert trend mellom {y0} og {y1}',
-                        'data_sources': 'Interpolert'
+                        'comment': 'ok',
+                        'data_sources': f'Interpolert mellom {y0} og {y1}'
                     }
 
     for year in sorted(final_yearly_values.keys()):
@@ -1214,28 +1194,17 @@ def _add_op_untreated_wastewater_mc(results, preloaded_data, current_params, dat
     data_sources = 'Miljødirektoratet'
     
     target_years = {y for y in EXPECTED_YEARS if 1989 <= y <= 2023}
-    # See _add_food_industry_wastewater_mc above for what 'mildir_emissions'
-    # and 'industry_categories' are; this flow takes the OP-category plants
-    # NOT connected to a municipal network (direct to surface water, untreated).
-    df_emissions_raw = preloaded_data.get('mildir_emissions')
-    df_categories = preloaded_data.get('industry_categories')
+    # Includes the fertilizer industry's facilities; _add_consumer_goods_mc
+    # leaves their share out of the MP.OP mass balance.
     key_støy = 'norskeutslipp'
     noise_factor = float(dataset_noise[key_støy])
 
-    emissions = df_emissions_raw[df_emissions_raw['Komponent'] == 'nitrogen, totalt']
-    categories_keep = df_categories[
-        (df_categories['kategori'] == 'OP') &
-        (df_categories['kommunalt nett?'].str.lower().isin(['nei', 'ukjent']))
-    ]
-    
-    emissions_filtered = emissions[emissions['AnleggNavn'].isin(categories_keep['Virksomhet'])]
-    sum_by_year = emissions_filtered.groupby(['År'])['Mengde'].sum().reset_index()
-    
-    for index, row in sum_by_year.iterrows():
-        year = int(row['År'])
+    n_by_year = _industry_n_to_water(preloaded_data, 'OP', connected=False)
+
+    for year, tonnes in n_by_year.items():
         if year in target_years:
             collected_years.add(year)
-            base_value = float(row['Mengde']) / 1000.0  # tN -> ktN
+            base_value = float(tonnes) / 1000.0  # t N -> kt N
             value_noisy = base_value * noise_factor
 
             results.append({
@@ -1459,7 +1428,7 @@ def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trad
         target_types=[
             'organisk materiale','blomster','frø','kjemikalier','såpe','industrielt protein',
             'plastprodukter','gummi','skinn','lærprodukter','tre','silke','ull',
-            'bomull','nylon','tekstil','møller','plast','leker','plastavfall','tekstil_brukt'
+            'bomull','nylon','tekstil','møbler','plast','leker','tekstil_brukt'
         ],
         is_import=True, dataset_noise=dataset_noise
     )
@@ -1492,8 +1461,27 @@ def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trad
     # Fertilizer-production intermediates within 'kjemikalier' are excluded
     # from the Other goods export outflow below (see
     # _get_excluded_fertilizer_chemicals_by_year) before it's netted against
-    # inflows.
+    # inflows, and so is the export of ammonia (type 'NH3'), since ammonia
+    # imports and N2 fixation for ammonia are not inflows here either.
     excluded_export = _get_excluded_fertilizer_chemicals_by_year(preloaded_data, current_trade_factors, dataset_noise, is_import=False)
+    temp_ammonia_export = []
+    process_generic_trade_flow(
+        results=temp_ammonia_export, preloaded_data=preloaded_data, current_params=current_params,
+        current_trade_factors=current_trade_factors, flow_code='ammonia export',
+        target_types=['NH3'], is_import=False, dataset_noise=dataset_noise
+    )
+    for res in temp_ammonia_export:
+        # Years without any ammonia export come back as 'not done' rows with
+        # no value and are skipped.
+        if res['comment'] == 'ok':
+            excluded_export[res['year']] = excluded_export.get(res['year'], 0.0) + res['value']
+
+    # The fertilizer industry's own wastewater is likewise left out of the
+    # MP.OP-HY.SW-Untreated wastewater-Nmix outflow (2024 uses the 2023
+    # value, as the flow itself does).
+    fertilizer_wastewater = _industry_n_to_water(preloaded_data, 'OP', connected=False, fertilizer_industry=True)
+    fertilizer_wastewater = fertilizer_wastewater / 1000.0 * float(dataset_noise['norskeutslipp'])  # t N -> kt N
+    fertilizer_wastewater[2024] = fertilizer_wastewater[2023]
 
     # Each of these must already be in `results` - i.e. its _add_*_mc function
     # must run before this one in execute_calculations_mp - or the lookup
@@ -1502,6 +1490,8 @@ def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trad
         for year, val in existing_outflows[out_code].items():
             if out_code == 'MP.OP-RW.RW-Other goods export-Nmix':
                 val = val - excluded_export.get(year, 0.0)
+            if out_code == 'MP.OP-HY.SW-Untreated wastewater-Nmix':
+                val = val - fertilizer_wastewater.get(year, 0.0)
             add_flow(year, val, outflow_totals, outflow_count)
 
 
