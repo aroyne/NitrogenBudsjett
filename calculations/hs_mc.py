@@ -180,12 +180,13 @@ def _add_overland_flow_urban_mc(results, preloaded_data, current_params, dataset
     flow_code = 'HS.HS-HY.SW-Overland flow-Nmix'
     collected_years = set()
     dataset_key = 'TEOTIL'
-    ret = float(current_params.get("HS_urban_retention_fraction"))
     noise_data = dataset_noise[dataset_key]
     noise_interp = dataset_noise['trend interpolation']
 
     # 'hy_teotil3_by_source' <- teotil3_n_summary.xlsx (data_loader.py
-    # DATA_MAP): relevant N flows extracted from the TEOTIL model, 2013 onward
+    # DATA_MAP): relevant N flows extracted from the TEOTIL model, 2013 onward.
+    # The source columns are inputs to surface water before retention; the
+    # retention in lakes and rivers is counted in HY.SW-AT.AT (N2/N2O).
     df_t3 = preloaded_data.get('hy_teotil3_by_source')
 
     # 1990-2012: TEOTIL2 urban, bias-corrected to the TEOTIL3 urban level
@@ -196,7 +197,7 @@ def _add_overland_flow_urban_mc(results, preloaded_data, current_params, dataset
     for year, raw_val in teotil2['urban'].items():
         year = int(year)
         collected_years.add(year)
-        value = raw_val * noise_data * noise_interp * (1.0 - ret)
+        value = raw_val * noise_data * noise_interp
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
             'comment': 'ok', 'data_sources': 'NIVA TEOTIL2, bias-corrected to TEOTIL3'
@@ -220,7 +221,7 @@ def _add_overland_flow_urban_mc(results, preloaded_data, current_params, dataset
 
             collected_years.add(year)
             val_p = float(raw_val)*noise_data
-            value = (val_p / 1000.0) * (1.0 - ret)
+            value = val_p / 1000.0
 
             results.append({
                 'flow_name': flow_code, 'year': year, 'value': value,
