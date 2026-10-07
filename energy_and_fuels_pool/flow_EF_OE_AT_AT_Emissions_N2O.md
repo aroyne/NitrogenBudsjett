@@ -11,15 +11,16 @@ nav_order: 1
 
 ### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-EF.OE-AT.AT-Emissions-N2O is taken from UNFCCC Common Reporting Tables, Table 1 using the categories give in Table 14 by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
+#### Flow description
 
-**How the numbers are derived**
+- **EF.OE-AT.AT-Emissions-N2O** is N2O from fuel combustion in other sectors (1.A.4 and 1.A.5), using the categories given in Table 14 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
 
-- N2O from fuel combustion is not measured but calculated in the national greenhouse gas inventory as fuel consumption (TJ, by fuel type and source category, from the national energy statistics) multiplied by emission factors (kg N2O per TJ), following the IPCC 2006 Guidelines ([IPCC 2006, Vol. 2, Ch. 2](https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_2_Ch2_Stationary_Combustion.pdf), [IPCC 2006, Vol. 2, Ch. 3](https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_3_Ch3_Mobile_Combustion.pdf)); Norway uses a mix of IPCC default and country-specific emission factors, documented in the National Inventory Document ([Miljødirektoratet, NID 2026](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)).
-- Activity data and implied emission factors are reported in CRT Table 1.A(a).
-- The values (kt N2O) are converted to N with the factor 28/44.
+#### Data sources
 
-**Interpretation**
+- N2O from the UNFCCC Common Reporting Tables (CRT), Table 1, of the national greenhouse gas inventory.
+- N2O from fuel combustion is not measured but calculated in the inventory as fuel consumption (TJ, by fuel type and source category, from the national energy statistics) multiplied by emission factors (kg N2O per TJ), following the IPCC 2006 Guidelines ([IPCC 2006, Vol. 2, Ch. 2](https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_2_Ch2_Stationary_Combustion.pdf), [IPCC 2006, Vol. 2, Ch. 3](https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_3_Ch3_Mobile_Combustion.pdf)); Norway uses a mix of IPCC default and country-specific emission factors, documented in the National Inventory Document ([Miljødirektoratet, NID 2026](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)). Activity data and implied emission factors are reported in CRT Table 1.A(a).
+
+#### Interpretations and comparisons
 
 - Emissions from other sectors (1.A.4 and 1.A.5) are stable at 0.10–0.13 kt N2O.
 - In 2024 they come in roughly equal parts from commercial/institutional (1.A.4.a), residential (1.A.4.b, mainly wood stoves) and agriculture, forestry and fishing (1.A.4.c, including fishing vessels and tractors).
