@@ -23,12 +23,12 @@ nav_order: 6
 
 #### Assumptions
 
-- The utmark share (47%, range 38–56%) of the losses from grazing manure is therefore removed from this flow; these losses are part of the runoff from upland areas measured by TEOTIL3 (FS.OL).
-- The removed leaching is FracLEACH (from CRT Table 3.D) times the utmark share of the grazing manure, about 2.5 kt N per year.
+- The utmark share (35–39% of grazing manure, see AG.MM-AG.SM-Manure application-Nmix) of the losses from grazing manure is therefore removed from this flow; the leaching is part of the runoff from upland areas measured by TEOTIL3 (FS.OL-HY.SW-Leaching-Nmix).
+- The removed leaching is FracLEACH (from CRT Table 3.D) times the utmark share of the grazing manure, about 2 kt N per year.
 
 #### Interpretations and comparisons
 
-- The flow is 37–44 kt N per year and follows the N applied to soils, falling slowly from about 44 kt N in 1990 to 39 kt N in 2024.
+- The flow is 38–45 kt N per year and follows the N applied to soils, falling slowly from about 45 kt N in 1990 to 40 kt N in 2024.
 - The flow is the N leaving the root zone, not the N reaching the sea; TEOTIL3 gives 43–51 kt N from agriculture including the agricultural background in 2013–2023, before retention in lakes and rivers. The data agree within the error range with what is reported in TEOTIL3 (Sample, 2024<!--cite:sample_kildefordelte_2024-->).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

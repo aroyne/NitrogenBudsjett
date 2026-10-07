@@ -3,16 +3,17 @@
 """
 Forests and semi-natural vegetation (FS) pool: forest (FS.FO) N2O/N2 emissions,
 leaching, industrial round wood and fuel wood; other land (FS.OL) leaching and
-grazing on utmark. FS.OL has no atmospheric emissions flows here - NOx, N2 and
-N2O are deliberately neglected as negligible/unreported, see
-forests_and_semi_natural_pool/subpool_other_land.md for the reasoning and sources.
+grazing on utmark, and the NH3, NOx and N2O from manure deposited by grazing
+animals on utmark. Other FS.OL emissions (N2, and NOx/N2O from the soils
+themselves) are neglected, see forests_and_semi_natural_pool/subpool_other_land.md.
 """
 from calculations.utils import (
     EXPECTED_YEARS,
     report_missing_years,
-    add_flat_carryforward_year
+    add_flat_carryforward_year,
+    load_crltap_emissions_to_N
 )
-from calculations.shared_flow_calculations import find_industrial_round_wood, find_teotil2_bias_corrected
+from calculations.shared_flow_calculations import find_industrial_round_wood, find_teotil2_bias_corrected, utmark_grazing
 
 def execute_calculations_fs(preloaded_data, current_params, dataset_noise):
     """
@@ -28,8 +29,59 @@ def execute_calculations_fs(preloaded_data, current_params, dataset_noise):
     _add_fuel_wood_for_households_mc(results, preloaded_data, current_params, dataset_noise)
     _add_land_leaching_mc(results, preloaded_data, current_params, dataset_noise, 'FS.OL-HY.SW-Leaching-Nmix', 'OL_leaching_bg_fraction', 8)
     _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_utmark_grazing_emissions_mc(results, preloaded_data, current_params, dataset_noise)
 
     return results
+
+
+def _add_utmark_grazing_emissions_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    NH3, NOx and N2O from manure deposited by grazing animals on utmark
+    (AG.MM-FS.OL-Manure from grazing on unmanaged land-Nmix). The inventory
+    reports these as part of the emissions from grazing animals on managed
+    soils (NFR 3Da3, CRT 3.D); the utmark share is removed from the AG.SM
+    flows in ag_mc.py and counted here. NH3 and NOx are the utmark share of
+    3Da3 in the CLRTAP inventory, and N2O is calculated in utmark_grazing
+    (shared_flow_calculations.py). Leaching from this manure is part of
+    FS.OL-HY.SW-Leaching-Nmix (TEOTIL3 upland).
+    """
+    utmark = utmark_grazing(preloaded_data, current_params)
+    # 'ag_crltap_raw_lines' <- webdabData1868031.txt (data_loader.py DATA_MAP):
+    # CLRTAP inventory submissions
+    raw_lines = preloaded_data['ag_crltap_raw_lines']
+
+    for pollutant in ('NH3', 'NOx'):
+        flow_code = f'FS.OL-AT.AT-Emissions-{pollutant}'
+        collected_years = set()
+        grazing = load_crltap_emissions_to_N(
+            raw_lines=raw_lines, categories=['3Da3'], pollutant=pollutant,
+            conv_to_N=float(current_params.get(f"{pollutant}_to_N_factor")),
+            dataset_noise=dataset_noise, noise_key='CRLTAP'
+        )
+        for year, value in grazing.items():
+            if year not in EXPECTED_YEARS:
+                continue
+            collected_years.add(year)
+            results.append({
+                'flow_name': flow_code, 'year': year,
+                'value': float(value * utmark[year]['utmark_frac']),
+                'comment': 'ok', 'data_sources': 'CRLTAP Inventory Submissions (3Da3), utmark share'
+            })
+        report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
+
+    flow_code = 'FS.OL-AT.AT-Emissions-N2O'
+    collected_years = set()
+    noise_val = dataset_noise['UNFCCC_N2O_agri_soils']
+    for year in sorted(utmark):
+        if year not in EXPECTED_YEARS:
+            continue
+        collected_years.add(year)
+        results.append({
+            'flow_name': flow_code, 'year': year,
+            'value': float(utmark[year]['n2o'] * noise_val),
+            'comment': 'ok', 'data_sources': 'UNFCCC CRT Table3.D, utmark share'
+        })
+    report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
 
 
 def _add_fo_denitrification_emissions_mc(results, preloaded_data, current_params, dataset_noise, flow_code, data_sources, n2_n2o_ratio_key=None):

@@ -14,7 +14,7 @@ nav_order: 1
 #### Flow description
 
 - **AG.MM-AG.SM-Manure application-Nmix** is the manure N applied to agricultural soils: managed manure N net of losses during animal housing and manure storage (tracked separately as AG.MM's own NH3/N2O/NOx emission flows), plus the share of manure deposited directly by grazing animals that lands on agricultural grazing land (innmark) rather than unmanaged land (utmark).
-- The utmark share is not included as a flow in this study. The N lost from it by leaching and runoff is part of the runoff from upland areas in TEOTIL3 (FS.OL-HY.SW-Leaching-Nmix), while its NH3 and N2O emissions are not included anywhere (they are removed from the AG.SM emission flows); see the Other Land (FS.OL) subpool page.
+- The utmark share goes to FS.OL as AG.MM-FS.OL-Manure from grazing on unmanaged land-Nmix.
 
 #### Data sources
 
@@ -23,14 +23,14 @@ nav_order: 1
 
 #### Assumptions
 
-- The flow is the sum of FAM and 53% (range 44–62%) of PRP – the share we estimate lands on innmark, apportioned by animal category using typical Norwegian grazing practice (e.g. dairy cattle graze almost exclusively on innmark, while sheep spend a large share of the season on utmark).
+- The flow is the sum of FAM and the innmark share of PRP. The utmark share is the PRP per animal category (CRT Table 3.B(b)) weighted with the share of each category's grazing time spent on utmark in 2018 (SSB Rapporter 2020/9 (Bruk av gjødselressurser i jordbruket 2018), Table A79): dairy cows 16%, suckler cows 30%, other cattle 32%, sheep 51%, goats 54% and horses 16% (each ±20%), reindeer 100% and farmed deer 0%. This gives a utmark share of 35–39% of PRP, so 61–65% is applied to AG.SM. The shares are held at the 2018 survey values for all years; before 2009 the subsidy rules required a longer grazing period on utmark (eight instead of five weeks), so the utmark share may have been somewhat higher.
 
 #### Interpretations and comparisons
 
-- The flow is 61–63 kt N per year in the 1990s, rises to about 70 kt N in 2015–2018 and is about 66 kt N in 2024.
-- In 2024 managed manure accounts for about 54 kt N and manure deposited on innmark during grazing for about 12 kt N.
+- The flow is 64–67 kt N per year in the 1990s, rises to about 72 kt N in 2015–2018 and is about 68 kt N in 2024.
+- In 2024 managed manure accounts for about 54 kt N and manure deposited on innmark during grazing for about 14 kt N.
 - The changes follow the livestock numbers, with fewer dairy cows and more beef cattle, pigs and poultry over the period.
-- Manure deposited on utmark (about 11 kt N per year) is not included, and the losses from it are also removed from the AG.SM emission and leaching flows.
+- Manure deposited on utmark (about 9 kt N per year) goes to FS.OL, and the losses from it are removed from the AG.SM emission and leaching flows.
 - EUROSTAT's Gross Nutrient Balance reports a substantially larger figure for manure N (roughly 40–65% higher across the time series): its documentation states manure excretion coefficients are gross, with "no reductions... made for volatilisation from the moment of excretion till the application to the soil" (Eurostat (2025)<!--cite:eurostat_gnb_glossary_2025-->) – i.e. it measures total excretion rather than what actually reaches the field.
 - EUROSTAT's Norwegian series also has a reporting-methodology discontinuity around 2017–2020 (Norway supplied EUROSTAT with pre-calculated results up to 2017; EUROSTAT has calculated results itself from raw activity data since 2020, per personal correspondence with EUROSTAT), producing an artificial ~23% step between 2016 and 2020 that does not appear in the CRT-based series used here.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

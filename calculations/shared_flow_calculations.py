@@ -1106,3 +1106,61 @@ def find_teotil2_bias_corrected(preloaded_data):
         'urban': scaled['urban'],
         'diffuse_to_coast': sum(scaled.values()) * to_coast_share,
     })
+
+
+# CRT Table3.B(b) category -> parameter with the share of its grazing manure
+# (PRP) that lands on utmark. Farmed deer (3.B.4.c.) graze in enclosures on
+# agricultural land and have no utmark share.
+UTMARK_GRAZING_SHARE_PARAMS = {
+    '3.B.1.a.i.': 'utmark_grazing_share_dairy_cattle',
+    '3.B.1.a.ii.': 'utmark_grazing_share_other_mature_cattle',
+    '3.B.1.a.iii.': 'utmark_grazing_share_growing_cattle',
+    '3.B.2.': 'utmark_grazing_share_sheep',
+    '3.B.4.d.': 'utmark_grazing_share_goats',
+    '3.B.4.e.': 'utmark_grazing_share_horses',
+    '3.B.4.h.ii.': 'utmark_grazing_share_reindeer',
+    '3.B.4.c.': None,
+}
+
+
+def utmark_grazing(preloaded_data, current_params):
+    """
+    Manure deposited by grazing animals on utmark (unmanaged land) and the
+    losses from it, per year, in kt N. Used by ag_mc.py (innmark share of PRP
+    applied to AG.SM, the AG.MM-FS.OL flow, and the utmark losses removed
+    from the AG.SM emission and leaching flows) and fs_mc.py (the FS.OL
+    emission flows).
+
+    The utmark share of PRP is the PRP per animal category (CRT Table3.B(b))
+    weighted with the share of each category's grazing time spent on utmark
+    (SSB survey of manure use in 2018, see the utmark_grazing_share_*
+    parameters). Leaching and N2O (direct plus indirect via deposition and
+    leaching) use the inventory's own fractions and emission factors for
+    grazing manure in CRT Table3.D.
+
+    Returns {year: {'utmark_frac', 'manure', 'leaching', 'n2o'}}.
+    """
+    # 'ag_manure_prp_crt'/'ag_prp_loss_params_crt'/'ag_prp_by_category_crt'
+    # <- UNFCCC CRT submission, Table3.D and Table3.B(b) (data_loader.py
+    # 'crt_manure_applied')
+    prp_values = preloaded_data['ag_manure_prp_crt']
+    loss_params = preloaded_data['ag_prp_loss_params_crt']
+    by_category = preloaded_data['ag_prp_by_category_crt']
+    N2O_to_N = float(current_params.get("N2O_to_N_factor"))
+    shares = {cat: (float(current_params.get(key)) if key else 0.0)
+              for cat, key in UTMARK_GRAZING_SHARE_PARAMS.items()}
+
+    result = {}
+    for year, prp_t in prp_values.items():
+        cats = by_category[year]
+        utmark_frac = (sum(cats[c] * shares[c] for c in shares)
+                       / sum(cats[c] for c in shares))
+        prm = loss_params[year]
+        manure = prp_t * utmark_frac * 1.0e-3  # t N -> kt N
+        leaching = manure * prm['frac_leach']
+        n2o_direct = prm['prp_n2o_kt'] * N2O_to_N * utmark_frac
+        n2o_indirect = (manure * prm['frac_gas_prp'] * prm['ef_deposition']
+                        + leaching * prm['ef_leaching'])
+        result[year] = {'utmark_frac': utmark_frac, 'manure': manure,
+                        'leaching': leaching, 'n2o': n2o_direct + n2o_indirect}
+    return result

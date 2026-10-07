@@ -211,10 +211,10 @@ def load_all_data(selected_pools):
         'ssb_agri_area_05982': ({'ag'}, 'data_files/05982_jordbruksareal_i_drift.csv', 'csv', {'index_col': 'year'}),
         # SSB 07479, "Korn i alt" (1000 t), 1989 and 1995-2025, downloaded from the SSB API
         'ssb_cereal_harvest_07479': ({'ag'}, 'data_files/07479_kornavling.csv', 'csv', {'index_col': 'year'}),
-        'ag_manure_crt': ({'ag'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_manure_applied', {}),
+        'ag_manure_crt': ({'ag','fs'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_manure_applied', {}),
         'ag_innmark_grazing_raw': ({'ag'}, 'data_files/NibioStatisticsNewTK.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Eng, beite'}),
         'ag_grovfor': ({'ag'}, 'grovfor_filer_samling', 'excel_grovfor', {}),  # filepath unused - method loads 3 fixed files directly
-        'ag_crltap_raw_lines': ({'ag','ef','mp','pr'}, 'data_files/webdabData1868031.txt', 'text_lines', {}),
+        'ag_crltap_raw_lines': ({'ag','ef','mp','pr','fs'}, 'data_files/webdabData1868031.txt', 'text_lines', {}),
         'unfccc_ark1_raw': ({'ag'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_n2o_ag', {}),
         'ag_leaching_csv': ({'ag'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_nr_ag', {}),
         'ag_faostat_production_all': ({'ag','mp'}, 'data_files/FAOSTAT_data_en_9-24-2026.csv', 'csv_faostat_production', {}),
@@ -342,9 +342,13 @@ def load_all_data(selected_pools):
             # factors for indirect N2O from atmospheric deposition (3.D.2.a)
             # and leaching (3.D.2.b), and the fractions FracGASPRP and
             # FracLEACH-(H) in the "Additional information" columns.
+            # Table3.B(b) gives the N deposited during grazing (column "Pasture
+            # range and paddock", kg N/yr) per animal category, used to split
+            # PRP between innmark and utmark (shared_flow_calculations.utmark_grazing).
             fam_values = {}
             prp_values = {}
             prp_loss_params = {}
+            prp_by_category = {}
             for fname in os.listdir(filepath):
                 if not fname.endswith('.xlsx'):
                     continue
@@ -372,10 +376,18 @@ def load_all_data(selected_pools):
                     if fraction == 'FracLEACH-(H)':
                         params['frac_leach'] = float(row[9])
                 prp_loss_params[year] = params
+                ws_b = wb_crt['Table3.B(b)']
+                by_cat = {}
+                for row in ws_b.iter_rows(min_row=10, max_row=40, values_only=True):
+                    label = str(row[1]).strip() if row[1] else ''
+                    if re.match(r'3\.B\.(1\.a\.(i|ii|iii)\.|2\.|4\.[a-h](\.ii)?\.)\s', label + ' '):
+                        by_cat[label.split()[0]] = float(row[12]) if isinstance(row[12], (int, float)) else 0.0
+                prp_by_category[year] = by_cat
                 wb_crt.close()
             preloaded['ag_manure_applied_crt'] = fam_values
             preloaded['ag_manure_prp_crt'] = prp_values
             preloaded['ag_prp_loss_params_crt'] = prp_loss_params
+            preloaded['ag_prp_by_category_crt'] = prp_by_category
 
         elif method == 'crt_fuel_industry':
             # UNFCCC CRT Table1.A(a)s2, "1.A.2 Manufacturing industries and

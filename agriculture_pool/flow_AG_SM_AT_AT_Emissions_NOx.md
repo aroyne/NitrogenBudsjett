@@ -24,11 +24,11 @@ nav_order: 5
 
 #### Assumptions
 
-- The utmark share (47%, range 38–56%) of the emissions from grazing animals (3Da3) is therefore removed from this flow; these losses are part of the runoff from upland areas measured by TEOTIL3 (FS.OL).
+- The utmark share (35–39% of grazing manure, see AG.MM-AG.SM-Manure application-Nmix) of the emissions from grazing animals (3Da3) is therefore removed from this flow; it is counted in FS.OL-AT.AT-Emissions-NOx.
 
 #### Interpretations and comparisons
 
-- The flow is about 1.9–2.4 kt N per year.
+- The flow is about 2.0–2.5 kt N per year.
 - Field burning contributed 0.3 kt N in 1990 and less than 0.05 kt N in 2024.
 - Mineral fertilizer (1.1 kt N in 2024) and manure spreading (0.65 kt N) are the main sources.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

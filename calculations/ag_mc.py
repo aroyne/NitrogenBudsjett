@@ -10,7 +10,8 @@ from calculations.utils import (
 )
 from calculations.shared_flow_calculations import (
     find_industrial_crop_products,
-    find_non_edible_animal_products
+    find_non_edible_animal_products,
+    utmark_grazing
     )
 
 # CRLTAP category codes for the two AG subsectors, used to select which rows of
@@ -38,38 +39,6 @@ AG_MM_CRLTAP_SECTORS = [
 ]
 
 
-def _utmark_grazing_losses(preloaded_data, current_params):
-    """
-    Losses from manure deposited by grazing animals on utmark (unmanaged
-    land), per year, from the national inventory's own figures in CRT Table
-    3.D. The inventory counts all grazing manure (PRP) as input to managed
-    soils, so its leaching, N2O and NH3/NOx from grazing include the utmark
-    share. This model only counts the innmark share as input to AG.SM (see
-    _add_manure_application_flow_mc); losses from utmark are already part of
-    the measured runoff from upland areas (TEOTIL3, FS.OL), so they are
-    removed from the AG.SM flows.
-
-    Returns {year: {'utmark_frac', 'leaching', 'n2o'}}, with the utmark share
-    of PRP and the corresponding leaching and N2O (direct plus indirect via
-    deposition and leaching) in kt N.
-    """
-    prp_values = preloaded_data['ag_manure_prp_crt']
-    loss_params = preloaded_data['ag_prp_loss_params_crt']
-    utmark_frac = 1.0 - float(current_params.get("innmark_prp_fraction"))
-    N2O_to_N = float(current_params.get("N2O_to_N_factor"))
-
-    losses = {}
-    for year, prp_t in prp_values.items():
-        prm = loss_params[year]
-        prp_utmark_kt = prp_t * utmark_frac * 1.0e-3  # t N -> kt N
-        leaching = prp_utmark_kt * prm['frac_leach']
-        n2o_direct = prm['prp_n2o_kt'] * N2O_to_N * utmark_frac
-        n2o_indirect = (prp_utmark_kt * prm['frac_gas_prp'] * prm['ef_deposition']
-                        + leaching * prm['ef_leaching'])
-        losses[year] = {'utmark_frac': utmark_frac, 'leaching': leaching, 'n2o': n2o_direct + n2o_indirect}
-    return losses
-
-
 def execute_calculations_ag(preloaded_data, current_params, dataset_noise, current_trade_factors):
     """
     Main function for the AG (agriculture) pool. Runs all sub-calculations.
@@ -80,7 +49,10 @@ def execute_calculations_ag(preloaded_data, current_params, dataset_noise, curre
     _add_food_crop_products_flow_mc(results, preloaded_data, current_params, dataset_noise)
     _add_industrial_crop_products_flow_mc(results, preloaded_data, current_params, dataset_noise)
     _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_noise)
-    utmark_losses = _utmark_grazing_losses(preloaded_data, current_params)
+    # Grazing manure on utmark (unmanaged land) and its losses; the
+    # inventory counts all grazing manure as input to managed soils, so the
+    # utmark losses are removed from the AG.SM flows (see utmark_grazing).
+    utmark_losses = utmark_grazing(preloaded_data, current_params)
     _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.SM-AT.AT-Emissions-NH3', AG_SM_CRLTAP_SECTORS, 'NH3', utmark_losses)
     _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.SM-AT.AT-Emissions-NOx', AG_SM_CRLTAP_SECTORS, 'NOx', utmark_losses)
     _add_ag_n2o_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.SM-AT.AT-Emissions-N2O', 2, 'UNFCCC_N2O_agri_soils', utmark_losses)
@@ -88,7 +60,8 @@ def execute_calculations_ag(preloaded_data, current_params, dataset_noise, curre
     _add_ag_leaching_mc(results, preloaded_data, dataset_noise, 'AG.MM-HY.SW-Leaching-Nmix', 'Nr_MM')
     _add_animal_products_flow_mc(results, preloaded_data, current_params, dataset_noise)
     _add_non_edible_animal_products_flow_mc(results, preloaded_data, current_params, dataset_noise)
-    _add_manure_application_flow_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_manure_application_flow_mc(results, preloaded_data, current_params, dataset_noise, utmark_losses)
+    _add_utmark_manure_flow_mc(results, current_params, dataset_noise, utmark_losses)
     _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.MM-AT.AT-Emissions-NH3', AG_MM_CRLTAP_SECTORS, 'NH3')
     _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.MM-AT.AT-Emissions-NOx', AG_MM_CRLTAP_SECTORS, 'NOx')
     _add_ag_n2o_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.MM-AT.AT-Emissions-N2O', 1, 'UNFCCC_N2O_agri_manure')
@@ -573,15 +546,15 @@ def _add_non_edible_animal_products_flow_mc(results, preloaded_data, current_par
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
     
-def _add_manure_application_flow_mc(results, preloaded_data, current_params, dataset_noise):
+def _add_manure_application_flow_mc(results, preloaded_data, current_params, dataset_noise, utmark_losses):
     """
     N in managed manure applied to agricultural soil: the IPCC 2006 FAM term
     (Eq. 11.4, Volume 4 Chapter 11) - managed manure N net of losses during
     animal housing and manure storage (tracked separately as AG.MM's own
     emissions flows) - plus the share of manure deposited directly by
     grazing animals (PRP) that lands on agricultural grazing land (innmark)
-    rather than unmanaged land (utmark, not included here - see the FS.OL
-    subpool page for that portion and why it is excluded).
+    rather than unmanaged land (utmark, which goes to FS.OL in
+    _add_utmark_manure_flow_mc).
 
     EUROSTAT's Gross Nutrient Balance reports a substantially larger figure
     for this same quantity (roughly 40-65% higher across the time series):
@@ -609,20 +582,13 @@ def _add_manure_application_flow_mc(results, preloaded_data, current_params, dat
     prp_values = preloaded_data.get('ag_manure_prp_crt')
     noise_val = dataset_noise['UNFCCC_manure_applied']
 
-    # Share of manure deposited during grazing (PRP) that lands on
-    # agricultural grazing land (innmark) rather than unmanaged land
-    # (utmark). Not reported directly in any source found; estimated by
-    # apportioning national PRP by animal category (Miljødirektoratet 2020,
-    # Tables 2-3) using typical Norwegian grazing practice per species - see
-    # innmark_prp_fraction's own source note in N_parameters.xlsx.
-    innmark_prp_frac = float(current_params.get("innmark_prp_fraction"))
-
     for year in sorted(set(fam_values) & set(prp_values)):
         if year not in EXPECTED_YEARS:
             continue
         collected_years.add(year)
 
-        base_value_t = fam_values[year] + prp_values[year] * innmark_prp_frac
+        innmark_frac = 1.0 - utmark_losses[year]['utmark_frac']
+        base_value_t = fam_values[year] + prp_values[year] * innmark_frac
         value = (base_value_t * 1.0e-3) * noise_val  # t N -> kt N
 
         results.append({
@@ -636,6 +602,32 @@ def _add_manure_application_flow_mc(results, preloaded_data, current_params, dat
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
     
+def _add_utmark_manure_flow_mc(results, current_params, dataset_noise, utmark_losses):
+    """
+    Manure deposited by grazing animals on utmark (unmanaged land), the part
+    of the inventory's PRP (CRT Table3.D) that is not applied to AG.SM; see
+    utmark_grazing in shared_flow_calculations.py.
+    """
+    flow_code = 'AG.MM-FS.OL-Manure from grazing on unmanaged land-Nmix'
+    collected_years = set()
+    noise_val = dataset_noise['UNFCCC_manure_applied']
+
+    for year in sorted(utmark_losses):
+        if year not in EXPECTED_YEARS:
+            continue
+        collected_years.add(year)
+        results.append({
+            'flow_name': flow_code,
+            'year': year,
+            'value': float(utmark_losses[year]['manure'] * noise_val),
+            'comment': 'ok',
+            'data_sources': 'UNFCCC CRT Table3.D and 3.B(b), SSB'
+        })
+
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+
+
 def _add_live_animal_export_mc(results, preloaded_data, current_params, dataset_noise):
     """
     Weight-based N export from live animal exports (FAOSTAT). Only animal types

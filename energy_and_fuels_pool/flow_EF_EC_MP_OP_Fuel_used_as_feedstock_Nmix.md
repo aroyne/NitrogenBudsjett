@@ -24,13 +24,13 @@ nav_order: 6
 
 #### Assumptions
 
-- Feedstock use is converted to TJ (1 TJ = 0.278 GWh) and divided by a net calorific value of 20 TJ/kt for coal and 44 TJ/kt for oil products.
+- Feedstock use is converted to TJ (1 TJ = 0.278 GWh) and divided by a net calorific value from IPCC 2006 Table 1.2: 25.8 TJ/kt (range 19.9–30.5) for coal, the value for other bituminous coal, since the coal used as feedstock is "Kull og brunkull" used in "11.2 I annen produksjon" (mainly as a reducing agent in industry), and 44.5 TJ/kt (range 41.8–46.5) for oil products, the value for naphtha.
 - N content 1% for coal and 0.0375% for oil products (the Table 15 value for "other oil"), applied to the oil feedstock excluding LPG and ethane.
 - LPG and ethane make up 50–65% of the oil feedstock and are given zero N (Table 15: ethane 0, LPG not specified).
 
 #### Interpretations and comparisons
 
-- In 2024 the flow is about 0.9 kt N, of which about 0.7 kt comes from coal.
+- In 2024 the flow is about 0.8–0.9 kt N, of which about 0.55 kt comes from coal.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References
