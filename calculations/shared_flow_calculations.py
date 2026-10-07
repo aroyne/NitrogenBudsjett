@@ -507,16 +507,16 @@ def find_household_waste(preloaded_data, current_params, dataset_noise):
     # =========================================================================
     # EXTRAPOLATION, 1990-1994
     # =========================================================================
-    inhabitants_1990 = 4233116
-    inhabitants_1995 = 4348410
-    waste_kg_person_1990 = 200
-    waste_kg_person_1995 = 289
-    
-    waste_kt_1990 = waste_kg_person_1990 * inhabitants_1990 * 1e-6
-    waste_kt_1995 = waste_kg_person_1995 * inhabitants_1995 * 1e-6
-    
-    N_frac = value_1995 / waste_kt_1995
-    value_1990 = waste_kt_1990 * N_frac
+    # Household waste per inhabitant (SSB 1997) times population gives the
+    # total household waste in 1990 relative to 1995; the N in all three
+    # sectors is assumed to change in the same proportion.
+    # 'ssb_06913' <- 06913_20251113-124117.xlsx (data_loader.py DATA_MAP):
+    # SSB population on 1 January.
+    population = preloaded_data['ssb_06913']['Befolkning 1. januar']
+    waste_kg_person_1990 = float(current_params.get('household_waste_kg_per_person_1990'))
+    waste_kg_person_1995 = float(current_params.get('household_waste_kg_per_person_1995'))
+
+    value_1990 = value_1995 * (waste_kg_person_1990 * population[1990]) / (waste_kg_person_1995 * population[1995])
     change_per_year = (value_1995 - value_1990) / 5.0
     
     for idx, year in enumerate(range(1990, 1995)):

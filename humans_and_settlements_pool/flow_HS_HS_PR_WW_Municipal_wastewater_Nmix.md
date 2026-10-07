@@ -21,7 +21,7 @@ nav_order: 5
 **Interpretation**
 
 - The flow rises from about 19 kt N in 1990 to 25 kt N in 2024, in proportion to the population.
-- It is about 95% of the N entering PR.WW. Since 2000 the outputs from PR.WW (discharges, N2 removal, N2O and sewage sludge) are 3–4 kt N per year, or about 15%, larger than the inputs, which suggests that the N in wastewater per person is somewhat underestimated or that the N content of sewage sludge is overestimated.
+- It is about 95% of the N entering PR.WW. The outputs from PR.WW (discharges, N2 removal, N2O and sewage sludge) are within ±6% of the inputs up to 2012 and 4–15% larger since, with the largest difference in 2014–2017 when N2 removal at the treatment plants was highest.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References
