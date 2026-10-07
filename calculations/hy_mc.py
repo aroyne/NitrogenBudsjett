@@ -18,7 +18,8 @@ from calculations.shared_flow_calculations import (
     find_recovered_lost_fish_N,
     find_treated_wastewater_discharge,
     find_teotil2_bias_corrected,
-    get_aquafeed_budget
+    get_aquafeed_budget,
+    teotil3_table
 )
 
 def execute_calculations_hy(preloaded_data, current_params, dataset_noise):
@@ -148,7 +149,6 @@ def _add_wild_shellfish_and_macroalgae(results, preloaded_data, current_params, 
     
     key_fisk = 'Fiskeridirektoratet'
     noise_fisk = dataset_noise[key_fisk]
-    noise_interp = dataset_noise['trend interpolation']
 
     # 'hy_art_raw' <- art.xlsx (data_loader.py DATA_MAP): Fiskeridirektoratet
     # catch statistics by species ("Fangst fordelt på art"), 2000-2024
@@ -160,23 +160,10 @@ def _add_wild_shellfish_and_macroalgae(results, preloaded_data, current_params, 
     df_fiske_old = preloaded_data.get('hy_fiske_old_raw')
 
     shellfish_total_row = 35  # 'Delsum' subtotal for shellfish/crustacean species
-    algae_total_row = 41      # 'Delsum' subtotal for macroalgae; NaN before 2011
-
-    # Anchor points to bridge the 2001-2010 gap in hy_art_raw's macroalgae
-    # data: the last historical seaweed figure (2000) and the first modern
-    # one (2011).
-    year_to_col = {}
-    for col in range(2, df_art.shape[1]):
-        val_at_cell = str(df_art.iloc[0, col]).strip()
-        if val_at_cell.lower() not in ['year', 'år', 'årstall', 'nan', '']:
-            year_to_col[int(float(val_at_cell))] = col
-    seaweed_2011_kt = float(df_art.iloc[algae_total_row, year_to_col[2011]]) / 1000.0
-
-    seaweed_2000_kt = None
-    for r in range(1, 12):
-        if int(float(str(df_fiske_old.iloc[r, 0]).strip())) == 2000:
-            seaweed_2000_kt = float(df_fiske_old.iloc[r, 4])
-            break
+    # Macroalgae rows: 'Brunalger' (kelp, all years) and 'Andre makroalger'
+    # (from 2018). The 'Delsum' row for macroalgae is empty before 2011, so
+    # the two rows are read directly. Quantities are wet weight.
+    algae_rows = [39, 40]
 
     for col in range(2, df_art.shape[1]):
         val_at_cell = str(df_art.iloc[0, col]).strip()
@@ -184,43 +171,22 @@ def _add_wild_shellfish_and_macroalgae(results, preloaded_data, current_params, 
             continue
 
         year = int(float(val_at_cell))
-        # Year 2000 is left to hy_fiske_old_raw below: this sheet's macroalgae
-        # subtotal (row 41) is NaN before 2011, so using it for 2000 would
-        # silently drop the seaweed component that the historical source has.
-        if year in EXPECTED_YEARS and year > 2000:
+        if year in EXPECTED_YEARS:
             collected_years.add(year)
-            val = 0.0
-            data_source = 'Fiskeridirektoratet'
-
-            if not pd.isna(df_art.iloc[shellfish_total_row, col]):
-                val += (float(df_art.iloc[shellfish_total_row, col]) / 1000.0) * fish_N_frac
-
-            algae_cell = df_art.iloc[algae_total_row, col]
-            if not pd.isna(algae_cell):
-                val += (float(algae_cell) / 1000.0) * seaweed_N_frac
-            elif 2001 <= year <= 2010:
-                # No macroalgae figure in this sheet before 2011; linearly
-                # interpolate between the 2000 (historical) and 2011 (modern)
-                # anchors, with interpolation noise on top of the regular
-                # dataset noise applied below.
-                frac = (year - 2000) / (2011 - 2000)
-                interp_seaweed_kt = seaweed_2000_kt + frac * (seaweed_2011_kt - seaweed_2000_kt)
-                val += interp_seaweed_kt * seaweed_N_frac * noise_interp
-                data_source = 'interpolated (Fiskeridirektoratet macroalgae gap)'
+            shellfish_kt = float(df_art.iloc[shellfish_total_row, col]) / 1000.0
+            algae_kt = sum(float(df_art.iloc[r, col]) for r in algae_rows
+                           if not pd.isna(df_art.iloc[r, col])) / 1000.0
+            val = shellfish_kt * fish_N_frac + algae_kt * seaweed_N_frac
 
             results.append({
                 'flow_name': flow_code, 'year': year, 'value': val * noise_fisk,
-                'comment': 'ok', 'data_sources': data_source
+                'comment': 'ok', 'data_sources': 'Fiskeridirektoratet'
             })
 
-    # Historical data (1990-2000): the only source with a seaweed component
-    # covering years before 2011.
-    for r in range(1, 12):
-        val_at_col0 = str(df_fiske_old.iloc[r, 0]).strip()
-        if val_at_col0.lower() in ['year', 'år', 'årstall', 'nan', '', 'none']:
-            continue
-
-        year = int(float(val_at_col0))
+    # Historical data (1990-1999): hy_art_raw covers 2000 onward, so this
+    # loop stops at 1999.
+    for r in range(1, 11):
+        year = int(float(str(df_fiske_old.iloc[r, 0]).strip()))
         if year in EXPECTED_YEARS:
             collected_years.add(year)
             # Column 3: crustaceans (1000 tons); column 4: seaweed (1000 tons)
@@ -239,10 +205,13 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
     """
     Freshwater N retention and the associated atmospheric N2/N2O emissions.
       - 2013+ uses TEOTIL3's retention matrix directly.
-      - 1990-2012 back-calculates retention from coastal outflow (populated by
-        _add_inflow_to_coastal_waters, which must run first) using a typical
-        retention fraction: Retention = Outflow * ret_frac / (1 - ret_frac),
-        derived from Outflow = Inflow * (1 - ret_frac).
+      - 1990-2012 back-calculates retention from the diffuse coastal outflow
+        (populated by _add_inflow_to_coastal_waters, which must run first) as
+        Retention = Outflow * R, where R is TEOTIL3's mean ratio of retention
+        to the diffuse inputs to the coast (total to coast minus aquaculture
+        and wastewater) over the TEOTIL3 years. Retention is set relative to
+        the diffuse part only, since aquaculture and most wastewater are
+        discharged directly to the sea and do not pass lakes and rivers.
       - Years before 1990 are ignored (no outflow data to back-calculate from).
     """
     flow_n2 = 'HY.SW-AT.AT-Emissions-N2'
@@ -250,7 +219,6 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
     collected_years = set()
 
     fraction_N2O = float(current_params.get("surface_water_fraction_to_N2O"))
-    ret_frac = float(current_params.get("surface_water_retention_fraction"))
 
     key_teotil = 'TEOTIL'
     key_interp = 'trend interpolation'
@@ -278,6 +246,13 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
                             'comment': 'ok', 'data_sources': 'NIVA TEOTIL3'})
 
     # 1990-2012: back-calculate retention from outflow_tracker (see docstring).
+    # 'hy_teotil3_to_coast'/'hy_teotil3_by_source' <- teotil3_n_summary.xlsx
+    t3_ret = teotil3_table(df_t3_ret)['totn_retained_tonnes']
+    t3_src = teotil3_table(preloaded_data['hy_teotil3_by_source'])
+    t3_coast = teotil3_table(preloaded_data['hy_teotil3_to_coast'])['totn_to-coast_tonnes']
+    t3_diffuse_to_coast = (t3_coast - t3_src['aquaculture_totn_tonnes']
+                           - t3_src['large-wastewater_totn_tonnes'] - t3_src['spredt_totn_tonnes'])
+    ret_ratio = t3_ret.mean() / t3_diffuse_to_coast.loc[t3_ret.index].mean()
     noise_interp = dataset_noise[key_interp]
 
     missing_years = {y for y in EXPECTED_YEARS if y >= 1990} - collected_years
@@ -286,7 +261,7 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
         if year in outflow_tracker.index and outflow_tracker.loc[year, 'entries'] == 1:
             collected_years.add(year)
 
-            hist_ret_val = outflow_tracker.loc[year, 'value'] * ret_frac / (1.0 - ret_frac)
+            hist_ret_val = outflow_tracker.loc[year, 'value'] * ret_ratio
             hist_ret_val *= noise_interp
 
             results.append({'flow_name': flow_n2, 'year': year, 'value': hist_ret_val * (1.0 - fraction_N2O),

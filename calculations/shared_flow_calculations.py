@@ -1011,7 +1011,7 @@ def find_treated_wastewater_discharge(df_05280, df_utslipp, dataset_noise):
 
 
 
-def _teotil3_table(df_raw):
+def teotil3_table(df_raw):
     """
     Turns one raw sheet of teotil3_n_summary.xlsx (as loaded by
     data_loader.py's 'openpyxl_teotil' method, header in row 0) into a
@@ -1069,8 +1069,8 @@ def find_teotil2_bias_corrected(preloaded_data):
     t2 = preloaded_data['teotil2_national'].set_index('year')
     # 'hy_teotil3_by_source'/'hy_teotil3_to_coast' <- teotil3_n_summary.xlsx
     # (data_loader.py DATA_MAP): N flows extracted from TEOTIL3 by NIVA, tonnes N
-    t3 = _teotil3_table(preloaded_data['hy_teotil3_by_source']) / 1000.0
-    t3_to_coast = _teotil3_table(preloaded_data['hy_teotil3_to_coast'])['totn_to-coast_tonnes'] / 1000.0
+    t3 = teotil3_table(preloaded_data['hy_teotil3_by_source']) / 1000.0
+    t3_to_coast = teotil3_table(preloaded_data['hy_teotil3_to_coast'])['totn_to-coast_tonnes'] / 1000.0
 
     overlap = t2.index.intersection(t3.index)
     years_before_t3 = t2.index[t2.index < t3.index.min()]

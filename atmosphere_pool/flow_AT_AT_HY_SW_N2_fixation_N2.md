@@ -13,15 +13,15 @@ nav_order: 14
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 **AT.AT-HY.SW-N2 fixation-N2**
 
-According to NIBIO (NIBIO, 2026)<!--cite:nibio_arealbarometer_2026-->, the surface water area is 20 457 km2 https://arealbarometer.nibio.no/nb/norge/. Table 62 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> (after Reddy and DeLaune, 2008) gives biological fixation rates of 0–18 (mean 9) kg N/ha in oligotrophic lakes, 0–1 (mean 1) kg N/ha in mesotrophic lakes and 2–91 (mean 47) kg N/ha in eutrophic lakes. Most Norwegian lakes are oligotrophic, but N fixation in nutrient-poor boreal lakes is generally low, and we use 0.1 tN/km2 (1 kg N/ha, the mesotrophic mean), with lowest and highest values of 0 and 2 tN/km2.
+According to NIBIO (NIBIO, 2026)<!--cite:nibio_arealbarometer_2026-->, the surface water area is 20 457 km2 https://arealbarometer.nibio.no/nb/norge/. Table 62 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> (after Reddy and DeLaune, 2008) gives biological fixation rates of 0–18 (mean 9) kg N/ha in oligotrophic lakes, 0–1 (mean 1) kg N/ha in mesotrophic lakes and 2–91 (mean 47) kg N/ha in eutrophic lakes. Most Norwegian lakes are oligotrophic, but N fixation in nutrient-poor boreal lakes is generally low, and we use 0.1 tN/km2 (1 kg N/ha, the mesotrophic mean) as the median of a lognormal distribution with 2 tN/km2 as the upper end of the 95 % interval.
 
 **How the numbers are derived**
 
-- The surface water area of 20 457 km² ([NIBIO Arealbarometer](https://arealbarometer.nibio.no/nb/norge/)) is multiplied by 0.1 t N/km² (range 0–2 t N/km²).
+- The surface water area of 20 457 km² ([NIBIO Arealbarometer](https://arealbarometer.nibio.no/nb/norge/)) is multiplied by 0.1 t N/km² (lognormal, 95% interval 0.005–2 t N/km²).
 
 **Interpretation**
 
-- The flow is 2.0 kt N per year with the most likely rate; the Monte Carlo median is higher, about 7 kt N, because the range for the rate (0–2 t N/km²) is very skewed above the most likely value.
+- The flow is constant at about 2 kt N per year, with a large uncertainty (95% interval about 0.1–40 kt N).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References
