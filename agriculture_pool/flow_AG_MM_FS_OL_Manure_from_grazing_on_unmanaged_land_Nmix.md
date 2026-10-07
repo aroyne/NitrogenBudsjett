@@ -22,11 +22,15 @@ nav_order: 9
 
 #### Assumptions
 
-- The utmark share is the grazing manure per animal category (CRT Table 3.B(b)) weighted with the share of each category's grazing time spent on utmark in 2018 (SSB Rapporter 2020/9 (Bruk av gjødselressurser i jordbruket 2018), Table A79): dairy cows 16%, suckler cows 30%, other cattle 32%, sheep 51%, goats 54% and horses 16% (each ±20%), reindeer 100% and farmed deer 0%. This gives 35–39% of the grazing manure. The shares are held at the 2018 survey values for all years; before 2009 the subsidy rules required a longer grazing period on utmark (eight instead of five weeks), so the share may have been somewhat higher.
+- The utmark share is the grazing manure per animal category (CRT Table 3.B(b)) weighted with the share of each category's grazing time spent on utmark in 2018 (SSB Rapporter 2020/9 (Bruk av gjødselressurser i jordbruket 2018), Table A79): sheep 51%, goats 54% and horses 16% (each ±20%), reindeer 100% and farmed deer 0%. For cattle the survey shares (dairy cows 16%, suckler cows 30%, other cattle 32%) would give more manure on utmark than the feed taken up on utmark (FS.OL-AG.MM-Grazing-Nmix) allows. The cattle manure on utmark is therefore the number of cattle on utmark (SSB table 12660, which counts animals with at least 5 weeks on utmark; the 1995 level before 1995) times the average N excretion of cattle other than dairy cows (CRT Table 3.B(b); most cattle on utmark are beef cows and young stock) times 8 weeks on utmark (range 5–12, PERT) out of 52, at most the grazing manure of cattle. This is 8–17% of the cattle grazing manure. In total this gives 26–33% of the grazing manure. The shares are held at the 2018 survey values for all years; before 2009 the subsidy rules required a longer grazing period on utmark (eight instead of five weeks), so the share may have been somewhat higher.
 
 #### Interpretations and comparisons
 
-- The flow is about 9–9.7 kt N per year, slowly declining with fewer sheep and cattle on pasture.
-- Sheep account for about 40% and reindeer, which graze only on utmark, for about 13%.
-- The manure deposited on utmark is larger than the feed taken up on utmark (FS.OL-AG.MM-Grazing-Nmix, about 6.5 kt N), which it cannot be in reality; at least one of the two is uncertain. The feed uptake builds on a single estimate for 1996 (Hegrenes & Asheim, 2006), and reindeer grazing is not included in it.
+- The flow is about 7–8 kt N per year, slightly higher after 2005 as more cattle (mainly beef cattle) graze on utmark.
+- Sheep account for 52–62%, cattle for 19–29% and reindeer, which graze only on utmark, for 14–18%.
+- The manure deposited on utmark is slightly smaller than the feed taken up on utmark (FS.OL-AG.MM-Grazing-Nmix, 7.5–8.6 kt N including reindeer), as it should be since part of the N in the feed is retained in growth, milk and wool. The difference is small, and both flows are uncertain: the feed uptake builds on a single estimate for 1996 (Hegrenes & Asheim, 2006), and the manure on the survey of grazing time in 2018.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
+
+### References
+
+* Norwegian Environment Agency (2020). *Calculation of atmospheric nitrogen emissions from manure in Norwegian agriculture: Technical description of the revised model*. [https://www.miljodirektoratet.no/globalassets/publikasjoner/m1848/m1848.pdf](https://www.miljodirektoratet.no/globalassets/publikasjoner/m1848/m1848.pdf)

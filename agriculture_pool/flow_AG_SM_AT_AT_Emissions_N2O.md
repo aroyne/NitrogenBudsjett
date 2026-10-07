@@ -22,7 +22,7 @@ nav_order: 3
 
 #### Assumptions
 
-- The utmark share (35–39% of grazing manure, see AG.MM-AG.SM-Manure application-Nmix) of the losses from grazing manure is therefore removed from this flow; it is counted in FS.OL-AT.AT-Emissions-N2O.
+- The utmark share (26–33% of grazing manure, see AG.MM-AG.SM-Manure application-Nmix) of the losses from grazing manure is therefore removed from this flow; it is counted in FS.OL-AT.AT-Emissions-N2O.
 - The removed N2O is the utmark share of the direct N2O from grazing manure (3.D.1.c) plus the indirect N2O from its volatilisation and leaching, calculated with the fractions and implied emission factors in CRT Table 3.D (about 0.1 kt N per year).
 
 #### Interpretations and comparisons

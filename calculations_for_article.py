@@ -329,7 +329,8 @@ MM_IN_FULL = FODDER_CROPS + GRAZING_UTMARK + FARM_ANIMAL_FEED + FEED_IMPORT + [
 MM_OUT_FULL = MANURE_APPLICATION + [
     'AG.MM-AT.AT-Emissions-N2O', 'AG.MM-AT.AT-Emissions-NH3', 'AG.MM-AT.AT-Emissions-NOx',
     'AG.MM-HY.SW-Leaching-Nmix',
-] + ANIMAL_PRODUCTS + NON_EDIBLE_ANIMAL_PRODUCTS + ['AG.MM-RW.RW-Live animal export-Nmix']
+] + ANIMAL_PRODUCTS + NON_EDIBLE_ANIMAL_PRODUCTS + ['AG.MM-RW.RW-Live animal export-Nmix',
+                                                   'AG.MM-FS.OL-Manure from grazing on unmanaged land-Nmix']
 SM_IN_FULL = MANURE_APPLICATION + BNF_SM + DEPOSITION_SM + [
     'MP.FP-AG.SM-Seeds and planting material -Nmix',
 ] + FERTILIZER_SM + [

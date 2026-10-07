@@ -279,9 +279,9 @@ def find_feedstock_fuel(preloaded_data, current_params, dataset_noise):
     noise_energy = float(dataset_noise['11561'])
 
     GWh_per_TJ = float(current_params.get('GWh_per_TJ'))
-    coal_NCV         = float(current_params.get('coal_feedstock_NCV'))
+    coal_NCV         = float(current_params.get('coal_NCV'))
     oil_NCV          = float(current_params.get('oil_feedstock_NCV'))
-    coal_N_frac      = float(current_params.get('coal_feedstock_N_frac'))
+    coal_N_frac      = float(current_params.get('coal_N_frac'))
     oil_N_frac       = float(current_params.get('oil_feedstock_N_frac'))
 
     df_energy = preloaded_data.get('ssb_energy_balance_11561')
@@ -1110,11 +1110,10 @@ def find_teotil2_bias_corrected(preloaded_data):
 
 # CRT Table3.B(b) category -> parameter with the share of its grazing manure
 # (PRP) that lands on utmark. Farmed deer (3.B.4.c.) graze in enclosures on
-# agricultural land and have no utmark share.
+# agricultural land and have no utmark share. Cattle are handled separately
+# in utmark_grazing.
+CATTLE_PRP_CATEGORIES = ['3.B.1.a.i.', '3.B.1.a.ii.', '3.B.1.a.iii.']
 UTMARK_GRAZING_SHARE_PARAMS = {
-    '3.B.1.a.i.': 'utmark_grazing_share_dairy_cattle',
-    '3.B.1.a.ii.': 'utmark_grazing_share_other_mature_cattle',
-    '3.B.1.a.iii.': 'utmark_grazing_share_growing_cattle',
     '3.B.2.': 'utmark_grazing_share_sheep',
     '3.B.4.d.': 'utmark_grazing_share_goats',
     '3.B.4.e.': 'utmark_grazing_share_horses',
@@ -1131,10 +1130,17 @@ def utmark_grazing(preloaded_data, current_params):
     from the AG.SM emission and leaching flows) and fs_mc.py (the FS.OL
     emission flows).
 
-    The utmark share of PRP is the PRP per animal category (CRT Table3.B(b))
-    weighted with the share of each category's grazing time spent on utmark
-    (SSB survey of manure use in 2018, see the utmark_grazing_share_*
-    parameters). Leaching and N2O (direct plus indirect via deposition and
+    For sheep, goats, horses and reindeer, the utmark manure is the PRP per
+    animal category (CRT Table3.B(b)) times the share of each category's
+    grazing time spent on utmark (SSB survey of manure use in 2018, see the
+    utmark_grazing_share_* parameters). For cattle it is the number of cattle
+    on utmark (SSB table 12660; 1995 level before 1995) times the average N
+    excretion of cattle other than dairy cows (most cattle on utmark are beef
+    cows and young stock) times the weeks on utmark
+    (utmark_grazing_weeks_cattle), at most the cattle PRP. The survey shares
+    give more cattle manure on utmark than the feed uptake estimated in
+    FS.OL-AG.MM-Grazing-Nmix allows, since only a minority of cattle go to
+    utmark. Leaching and N2O (direct plus indirect via deposition and
     leaching) use the inventory's own fractions and emission factors for
     grazing manure in CRT Table3.D.
 
@@ -1149,12 +1155,25 @@ def utmark_grazing(preloaded_data, current_params):
     N2O_to_N = float(current_params.get("N2O_to_N_factor"))
     shares = {cat: (float(current_params.get(key)) if key else 0.0)
               for cat, key in UTMARK_GRAZING_SHARE_PARAMS.items()}
+    # 'ag_cattle_excretion_crt' <- CRT Table3.B(b), population and N excretion
+    # of other mature and growing cattle; 'ssb_utmark_animals_12660' <-
+    # data_files/12660_husdyr_utmarksbeite.csv (SSB table 12660)
+    cattle_excretion = preloaded_data['ag_cattle_excretion_crt']
+    utmark_animals = preloaded_data['ssb_utmark_animals_12660']
+    weeks_cattle = float(current_params.get("utmark_grazing_weeks_cattle"))
+    first_count_year = int(utmark_animals.index.min())
 
     result = {}
     for year, prp_t in prp_values.items():
         cats = by_category[year]
-        utmark_frac = (sum(cats[c] * shares[c] for c in shares)
-                       / sum(cats[c] for c in shares))
+        excr = cattle_excretion[year]
+        nex_per_head = (sum(pop * nex for pop, nex in excr.values())
+                        / sum(pop for pop, _ in excr.values()))  # kg N/head/yr
+        n_cattle = utmark_animals.loc[max(year, first_count_year), 'storfe']
+        cattle_prp = sum(cats[c] for c in CATTLE_PRP_CATEGORIES)
+        cattle_utmark = min(n_cattle * nex_per_head * weeks_cattle / 52.0, cattle_prp)  # kg N
+        utmark_kg = sum(cats[c] * shares[c] for c in shares) + cattle_utmark
+        utmark_frac = utmark_kg / (sum(cats[c] for c in shares) + cattle_prp)
         prm = loss_params[year]
         manure = prp_t * utmark_frac * 1.0e-3  # t N -> kt N
         leaching = manure * prm['frac_leach']

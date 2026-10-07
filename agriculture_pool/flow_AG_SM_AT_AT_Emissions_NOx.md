@@ -24,7 +24,7 @@ nav_order: 5
 
 #### Assumptions
 
-- The utmark share (35–39% of grazing manure, see AG.MM-AG.SM-Manure application-Nmix) of the emissions from grazing animals (3Da3) is therefore removed from this flow; it is counted in FS.OL-AT.AT-Emissions-NOx.
+- The utmark share (26–33% of grazing manure, see AG.MM-AG.SM-Manure application-Nmix) of the emissions from grazing animals (3Da3) is therefore removed from this flow; it is counted in FS.OL-AT.AT-Emissions-NOx.
 
 #### Interpretations and comparisons
 

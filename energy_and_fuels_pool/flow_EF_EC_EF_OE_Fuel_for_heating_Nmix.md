@@ -26,8 +26,9 @@ nav_order: 4
 
 - The fuel consumption (TJ) is divided by the net calorific value and multiplied by the nitrogen content, by fuel class.
 - Liquid fuels: NCV 44 TJ/kt; N content weighted by year from the mix of oil products in SSB table 11561, with Table 15 values (gas/diesel oil and light fuel oil 0.0133%, heavy fuel oil 0.45%, kerosene 0.1%, heavy distillates 0.0375%, LPG and gasoline 0). The weighted N content falls from 0.035% in 1990 to 0.016% in 2024.
-- Solid fuels: 25 TJ/kt, 1.4% N.
+- Solid fuels: 25.8 TJ/kt (IPCC 2006 Table 1.2, other bituminous coal) and 1.5% N (Schäppi et al. 2025, Table 15, bituminous coal), the same values as for coal used as feedstock.
 - Other fossil fuels, i.e. waste fuels such as waste oil, tyres and plastics: assumed 25 TJ/kt and 0.4% N, between the values for waste oil, tyres and mixed waste (uncertain).
+- In the Monte Carlo simulation the NCVs vary within the IPCC 2006 Table 1.2 ranges (liquid fuels 41.4–44.8 TJ/kt, from gas/diesel oil to gasoline; coal 19.9–30.5 TJ/kt; other fossil fuels 10–40 TJ/kt, an assumption between municipal waste and waste oil), and the N contents within the Table 15 ranges where given (heavy fuel oil 0.1–0.8%, coal 0.5–2.5%); N contents for which Table 15 gives only an average (kerosene, gas/diesel oil, heavy distillates, and the assumed 0.4% for other fossil fuels) vary by ±50%.
 - Biomass is not included: firewood burned in households enters EF.OE via FS.FO-EF.OE-Fuel wood for households (SSB table 09702), which matches the biomass reported in the CRT, so including it here as well would count it twice. Gaseous fuels are not included.
 
 #### Interpretations and comparisons

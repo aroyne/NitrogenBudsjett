@@ -14,7 +14,7 @@ nav_order: 1
 #### Flow description
 
 - **RW.RW-AG.MM-Animal feed import-Nmix** is the N in imported raw materials for concentrate feed for farm animals.
-- Soy meal produced in Norway from imported soybeans is listed as a domestic raw material in Landbruksdirektoratet's statistics, but is counted here as imported feed, since the soybeans are imported (6–10 kt N/year). The same amount is subtracted from MP.FP-AG.MM-Farm animal feed-Nmix.
+- Soy meal produced in Norway from imported soybeans is counted here as imported feed, since the soybeans are imported. Landbruksdirektoratet's statistics (from 2000) list it among the imported raw materials, and so does Table 6.10 in Bruholt & Longva (1994) (all soybean meal imported, 42 600 t in 1994).
 
 #### Data sources
 
@@ -26,11 +26,11 @@ nav_order: 1
 
 - N contents are calculated from the composition of the feed, protein contents from FAO and specific Jones factors, and applied separately by raw-material type: 0.0197 kg N/kg for carbohydrate raw materials and 0.0648 kg N/kg for protein raw materials (including soy meal).
 - For 1985–1999, total purchased concentrate feed (NIBIO Totalkalkylen) is multiplied by the imported share (1 − the domestic share in Table 6.10 for 1985–1994, and the 1985–1994 mean for 1995–1999) and by the mean N content of the imported raw materials from 2000 onward.
-- Before 2000, domestic soy meal is taken as 9.3% (range 7.5–10.2%, PERT) of total concentrate feed, its share in 2000–2004.
+- The domestic shares in Table 6.10 include concentrate feed for fish farming (92 900 t in 1985, 331 200 t in 1994, 17% of the total in 1994), which cannot be separated out. Fish feed was largely herring meal, mostly domestic, so the domestic share for farm animals alone was probably somewhat lower, and the imported share somewhat higher, than the share used.
 
 #### Interpretations and comparisons
 
-- The flow is about 30–34 kt N per year in 1990–1999 and rises from 22 kt N in 2000 to about 40 kt N since 2010, as more of the concentrate feed is based on imported protein raw materials.
+- The flow is about 16–25 kt N per year in 1990–1999 and rises from 14 kt N in 2000 to 33–37 kt N since 2012, as more of the concentrate feed is based on imported protein raw materials.
 - 2000 is a low year in the concentrate feed statistics (24% imported raw materials, compared with 25–40% in the following years), not a break between the two sources.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

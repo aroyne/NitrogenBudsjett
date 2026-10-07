@@ -18,6 +18,7 @@ import pandas as pd
 import openpyxl
 import warnings
 from calculations.utils import read_trade_data
+from calculations.n_params import NParameters
 
 # Suppresses openpyxl's specific header/footer warning.
 warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl.worksheet.header_footer")
@@ -101,83 +102,57 @@ def _crt_cell(sheet, label_path, column):
 def _read_crt_fuel_series(crt_folder, sheet_name, row_specs):
     """
     Reads TJ fuel consumption (column C, "Consumption, TJ") from a UNFCCC CRT
-    submission folder (one workbook per inventory year) and converts to N.
-    row_specs is a list of (label_path, ncv_divisor, n_content_frac) tuples,
-    where n_content_frac is either a constant or a dict {year: fraction};
-    each label_path is resolved to a row via _find_crt_row for every year's
-    workbook independently, so a row shift in one year's template can't
-    silently misalign a different year's reading.
+    submission folder (one workbook per inventory year). row_specs is a list
+    of (label_path, ncv_param, n_param) tuples; the NCV and N content are
+    applied in ef_mc.py (_add_fuel_for_ec_subsector_mc) with the MC-perturbed
+    parameters. n_param is either a global parameter name or
+    'liquid_mix:<SSB 11561 sector>' for the product-mix weighted N content of
+    liquid fuels. Each label_path is resolved to a row via _find_crt_row for
+    every year's workbook independently, so a row shift in one year's template
+    can't silently misalign a different year's reading. CRT's non-numeric
+    flags (IE/NA/NE/NO) mark combinations with no estimate and are skipped.
+    Returns a long DataFrame with columns year, ncv_param, n_param, TJ.
     """
-    values = {}
-    for fname in os.listdir(crt_folder):
-        if not fname.endswith('.xlsx'):
-            continue
-        match = re.search(r'-(\d{4})-\d{8}', fname)
-        if not match:
-            continue
-        year = int(match.group(1))
-        wb = openpyxl.load_workbook(os.path.join(crt_folder, fname), data_only=True, read_only=True)
+    rows = []
+    for year, wb in _crt_iter_workbooks(crt_folder):
         sheet = wb[sheet_name]
-        value = 0.0
-        for label_path, ncv, n_frac in row_specs:
-            row = _find_crt_row(sheet, label_path)
-            cell_value = sheet.cell(row=row, column=3).value
-            frac = n_frac[year] if isinstance(n_frac, dict) else n_frac
-            try:
-                value += float(cell_value) / ncv * frac
-            except (TypeError, ValueError):
-                # CRT reports non-numeric flags (IE/NA/NE/NO) for combinations
-                # with no estimate; treated as zero, matching the original
-                # compilation notebooks' handling of the same flags.
-                pass
-        values[year] = value
+        for label_path, ncv_param, n_param in row_specs:
+            tj = _crt_cell(sheet, label_path, 3)
+            if tj is not None:
+                rows.append({'year': year, 'ncv_param': ncv_param, 'n_param': n_param, 'TJ': tj})
         wb.close()
-    return values
+    return pd.DataFrame(rows)
 
 
-# N content (mass fraction) of oil products in SSB table 11561, from Schäppi et al.
-# (2025) Annexes Table 15. Used to weight the N content of CRT "Liquid fuels" by
-# the actual product mix of each sector and year.
-OIL_PRODUCT_N = {
-    'EP0462-0463': 0.0,       # LPG and ethane (Table 15: ethane 0, LPG not specified)
-    'EP0465IF': 0.0,          # gasoline
-    'EP04661': 0.001,         # jet kerosene
-    'EP04669': 0.001,         # other kerosene (as jet kerosene)
-    'EP0467111': 0.000133,    # diesel for off-road machinery (gas/diesel oil)
-    'EP0467112IF': 0.000133,  # road diesel
-    'EP046712': 0.000133,     # marine gas oil
-    'EP046713': 0.000133,     # light fuel oil (gas/diesel oil)
-    'EP04672': 0.000375,      # heavy distillates ("other oil")
-    'EP0468': 0.0045,         # heavy fuel oil (residual fuel oil)
+# N content parameter (Schäppi et al. 2025 Annexes Table 15) for each oil
+# product in SSB table 11561, used to weight the N content of CRT "Liquid
+# fuels" by the actual product mix of each sector and year. LPG and ethane
+# (Table 15: ethane 0, LPG not specified) and gasoline (0) carry no N.
+OIL_PRODUCT_N_PARAM = {
+    'EP0462-0463': None,                         # LPG and ethane
+    'EP0465IF': None,                            # gasoline
+    'EP04661': 'jet_kerosene_N_frac',            # jet kerosene
+    'EP04669': 'jet_kerosene_N_frac',            # other kerosene (as jet kerosene)
+    'EP0467111': 'gas_diesel_oil_N_frac',        # diesel for off-road machinery
+    'EP0467112IF': 'gas_diesel_oil_N_frac',      # road diesel
+    'EP046712': 'gas_diesel_oil_N_frac',         # marine gas oil
+    'EP046713': 'gas_diesel_oil_N_frac',         # light fuel oil
+    'EP04672': 'other_oil_N_frac',               # heavy distillates ("other oil")
+    'EP0468': 'residual_fuel_oil_N_frac',        # heavy fuel oil
 }
 # EP0469 "oil products not elsewhere specified" is mainly fuel gas from the chemical
 # industry, which the CRT does not report under 1.A.2 "Liquid fuels" (SSB volumes
 # excluding EP0469 match CRT 1.A.2 liquid fuels within ~10%), so it is left out.
 
 
-def _liquid_fuel_N_by_year(sector, path='data_files/11561_oljeprodukter_sektor.csv'):
-    """Energy-weighted N content of liquid fuels per year for an SSB 11561 sector
-    (EB1201 industry ~ CRT 1.A.2, EB1203 other consumer groups ~ CRT 1.A.4+1.A.5)."""
+def _liquid_fuel_mix(path='data_files/11561_oljeprodukter_sektor.csv'):
+    """Energy use (GWh) per year, SSB 11561 sector and N content parameter
+    (OIL_PRODUCT_N_PARAM; '' for products without N). EB1201 industry
+    corresponds to CRT 1.A.2, EB1203 other consumer groups to CRT 1.A.4+1.A.5."""
     d = pd.read_csv(path)
-    d = d[(d.sektor == sector) & d.produkt.isin(OIL_PRODUCT_N)]
-    d = d.assign(N=d.GWh * d.produkt.map(OIL_PRODUCT_N))
-    g = d.groupby('year')[['N', 'GWh']].sum()
-    return (g.N / g.GWh).to_dict()
-
-
-def _read_domestic_soy_meal(filepath, years):
-    """Tonnes of 'Norsk' soy meal per year from the 'Protein' sheet of
-    Årlig råvareforbruk.xlsx, aligned to years. The kraftfôr statistics count
-    soy meal crushed in Norway (Denofa) from imported soybeans as a domestic
-    raw material; the feed flows move it to imported feed. Each raw material
-    has Totalt/Import/Norsk columns under its name in row 3; some cells hold
-    numbers as text with thousand separators."""
-    df = pd.read_excel(filepath, sheet_name='Protein', header=None)
-    col = df.iloc[2].tolist().index('Soyamel') + 2
-    data = df.iloc[4:].dropna(subset=[0])
-    soy = data[col].astype(str).str.replace(' ', '').astype(float)
-    soy.index = data[0].astype(int)
-    return soy.reindex(years).values
+    d = d[d.produkt.isin(OIL_PRODUCT_N_PARAM)]
+    d = d.assign(n_param=d.produkt.map(lambda c: OIL_PRODUCT_N_PARAM[c] or ''))
+    return d.groupby(['sektor', 'year', 'n_param'], as_index=False)['GWh'].sum()
 
 
 def load_all_data(selected_pools):
@@ -205,7 +180,7 @@ def load_all_data(selected_pools):
         'ag_gnb': ({'ag','mp'}, 'data_files/aei_pr_gnb__custom_18744910_spreadsheet.xlsx', 'openpyxl_gnb', {}),
         # SSB 12660, livestock on utmarksbeite (all animals with production subsidy for
         # utmark grazing), national totals 1995-2025, downloaded from the SSB API
-        'ssb_utmark_animals_12660': ({'fs'}, 'data_files/12660_husdyr_utmarksbeite.csv', 'csv', {'index_col': 'year'}),
+        'ssb_utmark_animals_12660': ({'fs','ag'}, 'data_files/12660_husdyr_utmarksbeite.csv', 'csv', {'index_col': 'year'}),
         # SSB 05982, "Jordbruksareal i drift" (daa), 1969-2025 with 1990-1998 missing,
         # downloaded from the SSB API
         'ssb_agri_area_05982': ({'ag'}, 'data_files/05982_jordbruksareal_i_drift.csv', 'csv', {'index_col': 'year'}),
@@ -283,7 +258,6 @@ def load_all_data(selected_pools):
     if not trade_needing_pools.isdisjoint(selected_pools):
         print("[I/O] Pre-loader komplett varehandelsstatistikk...")
         df_trade_raw = read_trade_data('data_files/Tab_08801_1988_2024.csv')
-        from calculations.n_params import NParameters
         df_mapping = NParameters("parameters/N_parameters.xlsx").get_trade_mapping()
         if 'konv' not in df_mapping.columns:
             df_mapping = df_mapping.reset_index()
@@ -349,6 +323,7 @@ def load_all_data(selected_pools):
             prp_values = {}
             prp_loss_params = {}
             prp_by_category = {}
+            cattle_excretion = {}
             for fname in os.listdir(filepath):
                 if not fname.endswith('.xlsx'):
                     continue
@@ -382,12 +357,17 @@ def load_all_data(selected_pools):
                     label = str(row[1]).strip() if row[1] else ''
                     if re.match(r'3\.B\.(1\.a\.(i|ii|iii)\.|2\.|4\.[a-h](\.ii)?\.)\s', label + ' '):
                         by_cat[label.split()[0]] = float(row[12]) if isinstance(row[12], (int, float)) else 0.0
+                    # Population (1000 head) and N excretion (kg N/head/yr) of
+                    # cattle other than dairy cows, for the cattle on utmark.
+                    if label.startswith(('3.B.1.a.ii.', '3.B.1.a.iii.')):
+                        cattle_excretion.setdefault(year, {})[label.split()[0]] = (float(row[2]), float(row[3]))
                 prp_by_category[year] = by_cat
                 wb_crt.close()
             preloaded['ag_manure_applied_crt'] = fam_values
             preloaded['ag_manure_prp_crt'] = prp_values
             preloaded['ag_prp_loss_params_crt'] = prp_loss_params
             preloaded['ag_prp_by_category_crt'] = prp_by_category
+            preloaded['ag_cattle_excretion_crt'] = cattle_excretion
 
         elif method == 'crt_fuel_industry':
             # UNFCCC CRT Table1.A(a)s2, "1.A.2 Manufacturing industries and
@@ -400,15 +380,17 @@ def load_all_data(selected_pools):
             # and household firewood enters EF.OE via FS.FO-EF.OE-Fuel wood for
             # households (SSB 09702, which matches CRT 1.A.4.b biomass); reading it
             # here as well double-counted it. Other fossil fuels (industrial waste
-            # fuels such as waste oil, tyres and plastics): assumed NCV 25 TJ/kt and
-            # N 0.4% (between waste oil, tyres and mixed waste; uncertain).
+            # fuels such as waste oil, tyres and plastics): assumed NCV and N
+            # content between waste oil, tyres and mixed waste (uncertain).
             row_specs = [
-                (['1.A.2 Manufacturing industries and construction', 'Liquid fuels'], 44, _liquid_fuel_N_by_year('EB1201')),
-                (['1.A.2 Manufacturing industries and construction', 'Solid fuels'], 25, 0.014),
-                (['1.A.2 Manufacturing industries and construction', 'Other fossil fuels'], 25, 0.004),
+                (['1.A.2 Manufacturing industries and construction', 'Liquid fuels'], 'liquid_fuels_NCV', 'liquid_mix:EB1201'),
+                (['1.A.2 Manufacturing industries and construction', 'Solid fuels'], 'coal_NCV', 'coal_N_frac'),
+                (['1.A.2 Manufacturing industries and construction', 'Other fossil fuels'], 'other_fossil_fuels_NCV', 'other_fossil_fuels_N_frac'),
             ]
-            values = _read_crt_fuel_series(filepath, 'Table1.A(a)s2', row_specs)
-            preloaded[key] = pd.DataFrame(sorted(values.items()), columns=['year', 'value'])
+            preloaded[key] = _read_crt_fuel_series(filepath, 'Table1.A(a)s2', row_specs)
+            # Oil product mix per SSB 11561 sector, for the 'liquid_mix:' N contents
+            # (also used by crt_fuel_heating, which is always loaded with it).
+            preloaded['liquid_fuel_mix'] = _liquid_fuel_mix()
 
         elif method == 'crt_fuel_heating':
             # UNFCCC CRT Table1.A(a)s4, "1.A.4 Other sectors" top-level
@@ -419,32 +401,30 @@ def load_all_data(selected_pools):
             # (Schäppi et al. 2025, Table 14). Biomass and other fossil fuels:
             # see the comment under crt_fuel_industry.
             row_specs = [
-                (['1.A.4  Other sectors', 'Liquid fuels'], 44, _liquid_fuel_N_by_year('EB1203')),
-                (['1.A.4  Other sectors', 'Solid fuels'], 25, 0.014),
-                (['1.A.4  Other sectors', 'Other fossil fuels'], 25, 0.004),
-                (['1.A.5  Other', 'Liquid fuels'], 44, _liquid_fuel_N_by_year('EB1203')),
-                (['1.A.5  Other', 'Solid fuels'], 25, 0.014),
-                (['1.A.5  Other', 'Other fossil fuels'], 25, 0.004),
+                (['1.A.4  Other sectors', 'Liquid fuels'], 'liquid_fuels_NCV', 'liquid_mix:EB1203'),
+                (['1.A.4  Other sectors', 'Solid fuels'], 'coal_NCV', 'coal_N_frac'),
+                (['1.A.4  Other sectors', 'Other fossil fuels'], 'other_fossil_fuels_NCV', 'other_fossil_fuels_N_frac'),
+                (['1.A.5  Other', 'Liquid fuels'], 'liquid_fuels_NCV', 'liquid_mix:EB1203'),
+                (['1.A.5  Other', 'Solid fuels'], 'coal_NCV', 'coal_N_frac'),
+                (['1.A.5  Other', 'Other fossil fuels'], 'other_fossil_fuels_NCV', 'other_fossil_fuels_N_frac'),
             ]
-            values = _read_crt_fuel_series(filepath, 'Table1.A(a)s4', row_specs)
-            preloaded[key] = pd.DataFrame(sorted(values.items()), columns=['year', 'value'])
+            preloaded[key] = _read_crt_fuel_series(filepath, 'Table1.A(a)s4', row_specs)
 
         elif method == 'crt_fuel_transport':
             # UNFCCC CRT Table1.A(a)s3. Domestic aviation's value sits
             # directly on its own header row (already a pre-aggregated
             # total), so that entry's label path is a single element.
             row_specs = [
-                (['1.A.3.a.  Domestic aviation'], 44.1, 0.001),
-                (['1.A.3.b.  Road transportation', 'Diesel oil'], 43, 0.000133),
-                (['1.A.3.b.  Road transportation', 'Biomass'], 27, 0.000133),  # biofuels: N content of gas/diesel
+                (['1.A.3.a.  Domestic aviation'], 'jet_kerosene_NCV', 'jet_kerosene_N_frac'),
+                (['1.A.3.b.  Road transportation', 'Diesel oil'], 'gas_diesel_oil_NCV', 'gas_diesel_oil_N_frac'),
+                (['1.A.3.b.  Road transportation', 'Biomass'], 'biodiesel_NCV', 'gas_diesel_oil_N_frac'),  # biofuels: N content of gas/diesel
                 # oil (Schäppi 2025 Table 15) used as proxy; Table 15's 1% for liquid biomass refers to sewage sludge
-                (['1.A.3.c.  Railways', 'Liquid fuels'], 44, 0.000133),  # diesel only (SSB 11561)
-                (['1.A.3.c.  Railways', 'Solid fuels'], 25, 0.014),
-                (['1.A.3.d.  Domestic Navigation', 'Residual fuel oil'], 40.4, 0.0045),
-                (['1.A.3.d.  Domestic Navigation', 'Gas/diesel oil'], 43, 0.000133),
+                (['1.A.3.c.  Railways', 'Liquid fuels'], 'liquid_fuels_NCV', 'gas_diesel_oil_N_frac'),  # diesel only (SSB 11561)
+                (['1.A.3.c.  Railways', 'Solid fuels'], 'coal_NCV', 'coal_N_frac'),
+                (['1.A.3.d.  Domestic Navigation', 'Residual fuel oil'], 'residual_fuel_oil_NCV', 'residual_fuel_oil_N_frac'),
+                (['1.A.3.d.  Domestic Navigation', 'Gas/diesel oil'], 'gas_diesel_oil_NCV', 'gas_diesel_oil_N_frac'),
             ]
-            values = _read_crt_fuel_series(filepath, 'Table1.A(a)s3', row_specs)
-            preloaded[key] = pd.DataFrame(sorted(values.items()), columns=['year', 'value'])
+            preloaded[key] = _read_crt_fuel_series(filepath, 'Table1.A(a)s3', row_specs)
 
         elif method == 'crt_n2o_ec':
             # UNFCCC CRT Table1, column E (N2O, kt), converted to N via the
@@ -595,7 +575,6 @@ def load_all_data(selected_pools):
                 'year': df.iloc[3:28, 0].astype(int),
                 'value_carb': df.iloc[3:28, 1].astype(float),  # column B (index 1) = domestic carbohydrate raw materials
                 'value_prot': df.iloc[3:28, 7].astype(float),  # column H (index 7) = domestic protein raw materials
-                'value_soy': _read_domestic_soy_meal(filepath, df.iloc[3:28, 0].astype(int)),
             }).reset_index(drop=True)
 
         elif method == 'excel_feed_raavarer_import':
@@ -604,7 +583,6 @@ def load_all_data(selected_pools):
                 'year': df.iloc[3:28, 0].astype(int),
                 'value_carb': df.iloc[3:28, 2].astype(float),  # column C (index 2) = imported carbohydrate raw materials
                 'value_prot': df.iloc[3:28, 8].astype(float),  # column I (index 8) = imported protein raw materials
-                'value_soy': _read_domestic_soy_meal(filepath, df.iloc[3:28, 0].astype(int)),
             }).reset_index(drop=True)
 
         elif method == 'excel_feed_totalkalkyle':

@@ -23,7 +23,7 @@ nav_order: 6
 
 #### Assumptions
 
-- The utmark share (35–39% of grazing manure, see AG.MM-AG.SM-Manure application-Nmix) of the losses from grazing manure is therefore removed from this flow; the leaching is part of the runoff from upland areas measured by TEOTIL3 (FS.OL-HY.SW-Leaching-Nmix).
+- The utmark share (26–33% of grazing manure, see AG.MM-AG.SM-Manure application-Nmix) of the losses from grazing manure is therefore removed from this flow; the leaching is part of the runoff from upland areas measured by TEOTIL3 (FS.OL-HY.SW-Leaching-Nmix).
 - The removed leaching is FracLEACH (from CRT Table 3.D) times the utmark share of the grazing manure, about 2 kt N per year.
 
 #### Interpretations and comparisons

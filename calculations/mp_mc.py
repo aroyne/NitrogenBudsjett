@@ -235,22 +235,20 @@ def _add_farm_animal_feed_mc(results, preloaded_data, current_params, dataset_no
     
     N_content_carb = float(current_params.get("feed_carb_N_frac"))
     N_content_prot = float(current_params.get("feed_prot_N_frac"))
-    # Soy meal crushed in Norway from imported soybeans is listed as a domestic
-    # raw material in the kraftfôr statistics; it is moved to
-    # RW.RW-AG.MM-Animal feed import-Nmix (rw_mc.py) and subtracted here.
-    # Before 2000 it is taken as a fixed share of total concentrate feed.
-    soy_share = float(current_params.get("soy_meal_share_of_concentrates"))
+    # Soy meal crushed in Norway from imported soybeans is counted as imported
+    # feed in both sources: the 'Varegrupper' sheet of the kraftfôr statistics
+    # (2000 onward) and the domestic share from Jordbruksstatistikk 1994
+    # Table 6.10 (1985-1994), which lists all soybean meal as imported.
     
     noise_kraftfor = dataset_noise['Kraftforstatistikk']
     noise_totalkalkylen = dataset_noise['Totalkalkylen']
-    noise_trend_interpolation = dataset_noise['trend interpolation']
     
     final_yearly_values = {}
 
     # 'feed_raavarer_norsk' <- Årlig råvareforbruk.xlsx (data_loader.py
     # DATA_MAP): Landbruksdirektoratets kraftfôrstatistikk, domestic and
     # imported consumption of carbohydrate/protein/fat/mineral raw materials
-    # in concentrate feed. Covers 2004 onward.
+    # in concentrate feed. Covers 2000 onward.
     df_raw = preloaded_data.get('feed_raavarer_norsk')
 
     N_cont_accumulator = 0.0
@@ -265,10 +263,8 @@ def _add_farm_animal_feed_mc(results, preloaded_data, current_params, dataset_no
         val_carb = float(df_raw.iloc[r, 1])
         val_prot = float(df_raw.iloc[r, 2])
         
-        val_soy = float(df_raw.iloc[r, 3])
-        
         value_kt_N = (val_carb * N_content_carb + val_prot * N_content_prot) / 1000.0
-        value_kt_N_noisy = (value_kt_N - val_soy * N_content_prot / 1000.0) * noise_kraftfor
+        value_kt_N_noisy = value_kt_N * noise_kraftfor
         
         if year in EXPECTED_YEARS:
             final_yearly_values[year] = {
@@ -283,7 +279,7 @@ def _add_farm_animal_feed_mc(results, preloaded_data, current_params, dataset_no
             valid_count += 1
 
     # Average N content per tonne of raw feed material across the years with
-    # direct Kraftfôrstatistikk data (2004+), used below as a stand-in N
+    # direct Kraftfôrstatistikk data (2000+), used below as a stand-in N
     # content for the earlier Totalkalkylen-era tonnage, which isn't broken
     # down by carbohydrate/protein content.
     N_cont_before_2000 = (N_cont_accumulator / valid_count) * 1e3
@@ -311,7 +307,7 @@ def _add_farm_animal_feed_mc(results, preloaded_data, current_params, dataset_no
             param_key_dom_frac = "feed_historical_dom_frac"
             dom_frac = float(current_params.get(param_key_dom_frac))
 
-        value_kt_N_hist = value_tonn * 1e-3 * (N_cont_before_2000 * dom_frac - N_content_prot * soy_share)
+        value_kt_N_hist = value_tonn * 1e-3 * N_cont_before_2000 * dom_frac
         value_kt_N_hist_noisy = value_kt_N_hist * noise_totalkalkylen
 
         if year in EXPECTED_YEARS and year not in final_yearly_values:
@@ -319,24 +315,6 @@ def _add_farm_animal_feed_mc(results, preloaded_data, current_params, dataset_no
                 'value': value_kt_N_hist_noisy,
                 'comment': 'ok',
                 'data_sources': 'Totalkalkylen'
-            }
-
-    # Totalkalkylen ends in 1999 and Kraftfôrstatistikk only starts in 2004,
-    # so the 2000-2003 gap is bridged with a linear interpolation between them.
-    val_1999 = final_yearly_values[1999]['value']
-    val_2004 = final_yearly_values[2004]['value']
-    slope = (val_2004 - val_1999) / 5.0
-    
-    for gap_year in [2000, 2001, 2002, 2003]:
-        if gap_year in EXPECTED_YEARS:
-            steps = gap_year - 1999
-            interpolated_base = val_1999 + (slope * steps)
-            final_interpolated_value = interpolated_base * noise_trend_interpolation
-
-            final_yearly_values[gap_year] = {
-                'value': final_interpolated_value,
-                'comment': 'ok',
-                'data_sources': 'Interpolert'
             }
 
     for year in sorted(final_yearly_values.keys()):

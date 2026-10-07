@@ -43,9 +43,9 @@ def execute_calculations_ef(preloaded_data, current_params, dataset_noise, curre
     """
     results = []
 
-    _add_fuel_for_ec_subsector_mc(results, preloaded_data, dataset_noise, 'EF.EC-EF.IC-Fuel for industry-Nmix', 'fuel_for_industry')
-    _add_fuel_for_ec_subsector_mc(results, preloaded_data, dataset_noise, 'EF.EC-EF.TR-Fuel for transport-Nmix', 'fuel_for_transport')
-    _add_fuel_for_ec_subsector_mc(results, preloaded_data, dataset_noise, 'EF.EC-EF.OE-Fuel for heating-Nmix', 'fuel_for_heating')
+    _add_fuel_for_ec_subsector_mc(results, preloaded_data, current_params, dataset_noise, 'EF.EC-EF.IC-Fuel for industry-Nmix', 'fuel_for_industry')
+    _add_fuel_for_ec_subsector_mc(results, preloaded_data, current_params, dataset_noise, 'EF.EC-EF.TR-Fuel for transport-Nmix', 'fuel_for_transport')
+    _add_fuel_for_ec_subsector_mc(results, preloaded_data, current_params, dataset_noise, 'EF.EC-EF.OE-Fuel for heating-Nmix', 'fuel_for_heating')
     _add_fuel_used_as_feedstock_mc(results, preloaded_data, current_params, dataset_noise)
 
     # EC has no NH3 variant: no NH3 combustion emissions are modeled for energy
@@ -71,29 +71,41 @@ def execute_calculations_ef(preloaded_data, current_params, dataset_noise, curre
     return results
 
 
-def _add_fuel_for_ec_subsector_mc(results, preloaded_data, dataset_noise, flow_code, preload_key):
+def _add_fuel_for_ec_subsector_mc(results, preloaded_data, current_params, dataset_noise, flow_code, preload_key):
     """
     Shared implementation for N in fuel combusted by an EF.EC subsector (industry,
     transport, heating). preload_key selects the source series - 'fuel_for_industry',
     'fuel_for_transport', 'fuel_for_heating' - each read directly from the UNFCCC
     CRT submission folder by data_loader.py's crt_fuel_industry/crt_fuel_heating/
     crt_fuel_transport methods (Table1.A(a)s2/s4/s3 respectively, "Consumption, TJ"
-    column), converted to N via IPCC (2006) NCVs and Schäppi (2025) Annexes Table 15
-    N contents (see DATA_SOURCES.txt). Row positions are resolved by column-B label
-    text (data_loader.py's _find_crt_row) rather than hardcoded row numbers, since
-    UNFCCC has moved rows between CRT submission years.
+    column) as TJ per fuel row and year. Each row is converted to N with its NCV
+    (IPCC 2006 Table 1.2) and N content (Schäppi 2025 Annexes Table 15) from the
+    global parameters. For mixed liquid fuels ('liquid_mix:<sector>') the N
+    content is the average over the oil products of that SSB 11561 sector,
+    weighted by their energy use in the year.
     """
     collected_years = set()
     dataset_key = 'UNFCCC_fuel'
 
-    df = preloaded_data.get(preload_key)
+    df = preloaded_data[preload_key]
+    # 'liquid_fuel_mix' <- data_files/11561_oljeprodukter_sektor.csv (SSB
+    # table 11561, energy use of oil products by sector)
+    mix = preloaded_data['liquid_fuel_mix']
 
-    for _, row in df.iterrows():
-        year = int(row['year'])
+    def n_content(n_param, year):
+        if not n_param.startswith('liquid_mix:'):
+            return float(current_params.get(n_param))
+        m = mix[(mix.sektor == n_param.split(':')[1]) & (mix.year == year)]
+        n = sum(gwh * (float(current_params.get(p)) if p else 0.0)
+                for p, gwh in zip(m.n_param, m.GWh))
+        return n / m.GWh.sum()
+
+    for year, group in df.groupby('year'):
+        year = int(year)
         collected_years.add(year)
-        raw_val = float(row['value'])
-        noise_val = dataset_noise[dataset_key]
-        value = raw_val * noise_val
+        value = sum(tj / float(current_params.get(ncv)) * n_content(n_par, year)
+                    for tj, ncv, n_par in zip(group.TJ, group.ncv_param, group.n_param))
+        value *= dataset_noise[dataset_key]
 
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,

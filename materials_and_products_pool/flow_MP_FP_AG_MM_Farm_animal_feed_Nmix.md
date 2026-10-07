@@ -14,7 +14,7 @@ nav_order: 1
 #### Flow description
 
 - **MP.FP-AG.MM-Farm animal feed-Nmix** is domestically produced concentrate feed to farm animals.
-- Soy meal produced in Norway from imported soybeans is listed as a domestic raw material in the statistics, but is counted as imported feed in RW.RW-AG.MM-Animal feed import-Nmix and subtracted here (see that flow).
+- Soy meal produced in Norway from imported soybeans is not included; it is counted as imported feed in RW.RW-AG.MM-Animal feed import-Nmix (see that flow).
 
 #### Data sources
 
@@ -26,16 +26,16 @@ nav_order: 1
 #### Assumptions
 
 - N content is applied separately by raw-material type, derived from the feed composition, protein content and Jones factor sources above: 1.97% (0.0197 kg N/kg) for carbohydrate raw materials (mainly cereals) and 6.48% (0.0648 kg N/kg) for protein raw materials; fat and mineral raw materials are not included.
-- From 2004 the Norwegian raw materials in Landbruksdirektoratet's statistics are used.
+- From 2000 the Norwegian raw materials in Landbruksdirektoratet's statistics are used. In these statistics, soy meal crushed in Norway from imported soybeans is already listed among the imported raw materials.
 - For 1985–1999 the total amount of purchased concentrate feed from Totalkalkylen is multiplied by the domestically produced share (Bruholt & Longva (1994) for 1985–1994, the average of 69.4% for 1995–1999) and by the average N content per tonne of Norwegian raw materials in 2004–2024.
-- The 2000–2003 gap between the two source series is bridged with a linear interpolation.
-- Norwegian-crushed soy meal is subtracted in all years: from the statistics from 2004, and as 9.3% of the concentrate feed before 2000.
+- Soy meal crushed in Norway is counted as imported in both sources: in Landbruksdirektoratet's statistics from 2000, and in Table 6.10 in Bruholt & Longva (1994), which lists all soybean meal as imported (42 600 t in 1994).
+- The domestic shares in Table 6.10 include concentrate feed for fish farming (92 900 t in 1985, 331 200 t in 1994, 17% of the total in 1994), which cannot be separated out. Fish feed was largely herring meal, mostly domestic, so the domestic share for farm animals alone was probably somewhat lower than the share used.
 
 #### Interpretations and comparisons
 
-- The flow varies between 9 and 18 kt N without a clear trend.
-- Much of the year-to-year variation is consistent with the size of the Norwegian cereal harvest, which determines how much of the carbohydrate raw material can be sourced domestically: the flow is low in 2019 (10.4 kt N), after the drought in 2018, and in 2024 (13.7 kt N), after the poor harvest in 2023, and high in 2023 (17.6 kt N).
-- In 2024 the total N in concentrate feed (this flow plus RW.RW-AG.MM-Animal feed import-Nmix) is about 54 kt N, of which about a quarter is domestic.
+- The flow varies between 19 and 26 kt N without a clear trend.
+- Much of the year-to-year variation is consistent with the size of the Norwegian cereal harvest, which determines how much of the carbohydrate raw material can be sourced domestically: the flow is low in 2019 (18.6 kt N), after the drought in 2018, and in 2024 (20.4 kt N), after the poor harvest in 2023, and high in 2023 (23.8 kt N).
+- In 2024 the total N in concentrate feed (this flow plus RW.RW-AG.MM-Animal feed import-Nmix) is about 54 kt N, of which almost 40% is domestic.
 - Hohmann-Marriott (2025)<!--cite:hohmann-marriott_nitrogen_2025--> found the domestic supply of animal feed in 2010 to be around 35 kt N, based on FAO statistics of production, export and import of seed cake, which is a dominant ingredient in farm animal feed. This is less than we found when combining domestic and imported animal feed. *(Note: This estimate might be too low, as it leads to a surplus here and a deficit in the AG.MM pool).*
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

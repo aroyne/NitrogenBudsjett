@@ -260,6 +260,11 @@ def _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise):
     For 1990-1994 sheep are extrapolated back from 1995 with the change in
     the number of winter-fed sheep (SSB table 03710); cattle, goats and
     horses are held at the 1995 level.
+
+    Reindeer graze on utmark all year but are not covered by the estimate
+    above; their uptake is set equal to their N excretion in the national
+    inventory (CRT Table3.B(b), all deposited during grazing), since only a
+    small part of the N is retained in the animals.
     """
     flow_code = 'FS.OL-AG.MM-Grazing-Nmix'
     collected_years = set()
@@ -287,6 +292,12 @@ def _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise):
     df_sheep = preloaded_data['ssb_sheep_numbers'].dropna(subset=['År'])
     sheep_index = dict(zip(df_sheep['År'].astype(int), df_sheep['Husdyr (sau)'].astype(float)))
 
+    # 'ag_prp_by_category_crt' <- UNFCCC CRT submission, Table3.B(b), N
+    # deposited during grazing per animal category (kg N/yr)
+    reindeer_kt = {year: cats['3.B.4.h.ii.'] * 1e-6
+                   for year, cats in preloaded_data['ag_prp_by_category_crt'].items()}
+    noise_crt = dataset_noise['UNFCCC_manure_applied']
+
     first_year = int(animals.index.min())
     for year in range(1990, 2026):
         if year >= first_year:
@@ -299,7 +310,8 @@ def _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise):
         fem = sum(n[group] * fem_per_animal[group] for group in fem_1996)
         collected_years.add(year)
         results.append({
-            'flow_name': flow_code, 'year': year, 'value': fem * protein_cont / Jones,
+            'flow_name': flow_code, 'year': year,
+            'value': fem * protein_cont / Jones + reindeer_kt.get(year, 0.0) * noise_crt,
             'comment': 'ok', 'data_sources': src
         })
 
