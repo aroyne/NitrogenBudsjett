@@ -15,7 +15,7 @@ Food crop products are taken from EUROSTAT Gross nutrient balance as advised by 
 
 **How the numbers are derived.** Eurostat's Gross Nutrient Balance ([aei_pr_gnb](https://ec.europa.eu/eurostat/databrowser/view/aei_pr_gnb/default/table)) calculates nutrient removal by harvest as crop production multiplied by an N content per crop, based on Norwegian crop statistics. The flow is "Nutrient removal by harvest of crops" minus "industrial crops"; fodder crops and grazing are reported separately in the balance and are not included.
 
-**Interpretation.** The flow is 19–32 kt N per year and follows the size of the cereal harvest, since cereals make up about 88% of the N. Most of the cereal is used for animal feed and returns to AG.MM via MP.FP-AG.MM-Farm animal feed-Nmix. The low values in 2018 (16 kt N) and 2023 (19 kt N) are the drought years with poor cereal harvests, and the high value in 1990 (32 kt N) a good harvest.
+**Interpretation.** The flow is 16–32 kt N per year and follows the size of the cereal harvest, since cereals make up about 88% of the N. Most of the cereal is used for animal feed and returns to AG.MM via MP.FP-AG.MM-Farm animal feed-Nmix. The low values in 2018 (16 kt N) and 2023 (19 kt N) are the drought years with poor cereal harvests, and the high value in 1990 (32 kt N) a good harvest.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References
