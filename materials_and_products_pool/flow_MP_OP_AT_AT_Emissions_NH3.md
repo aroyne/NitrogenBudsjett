@@ -11,16 +11,16 @@ nav_order: 3
 
 ### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-We have used data from CLRTAP Inventory Submissions (EMEP, 2025)<!--cite:emep_officially_2025--> as advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, using the categories given in Table 20.
+#### Flow description
 
-**How the numbers are derived**
+- **MP.OP-AT.AT-Emissions-NH3** is ammonia from industrial processes. The flow sums the NFR categories in Table 20 of Schäppi et al. (2025): 2A Mineral industry, 2B Chemical industry, 2C Metal production, 2D Non-energy products from fuels and solvent use, 2G Other product use and 2H Other, which Norway reports at sub-category level (e.g. 2B2, 2C2).
 
-- The emissions reported to CLRTAP are calculated in the national inventory; for industrial processes they are largely based on emissions reported by the individual plants to Miljødirektoratet, supplemented by production data multiplied by emission factors from the [EMEP/EEA Guidebook 2023](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023).
-- The methods are documented in the [Informative Inventory Report 2026, Norway](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/informative-inventory-report-iir-2026-norway-air-pollutant-emissions-1990-2024/).
-- The flow sums the NFR categories 2A Mineral industry, 2B Chemical industry, 2C Metal production, 2D Non-energy products from fuels and solvent use, 2G Other product use and 2H Other (Table 20 in Schäppi et al. 2025), which Norway reports at sub-category level (e.g. 2B2, 2C2).
-- Emissions in Gg NOx (as NO2) or Gg NH3 are converted to N with the factors 14/46 and 14/17.
+#### Data sources
 
-**Interpretation**
+- Emissions reported by Norway to CLRTAP (CLRTAP inventory submissions, EMEP 2025<!--cite:emep_officially_2025-->), as advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
+- For industrial processes the inventory emissions are largely based on emissions reported by the individual plants to Miljødirektoratet, supplemented by production data multiplied by emission factors from the [EMEP/EEA Guidebook 2023](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023). The methods are documented in the [Informative Inventory Report 2026, Norway](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/informative-inventory-report-iir-2026-norway-air-pollutant-emissions-1990-2024/).
+
+#### Interpretations and comparisons
 
 - The flow is about 0.4–0.6 kt N per year without a clear trend.
 - Nitric acid production (2B2) accounts for about 0.4 kt N, and the rest comes mainly from glass production (2A3) and other mineral products (2A6).

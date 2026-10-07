@@ -11,17 +11,17 @@ nav_order: 2
 
 ### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-**MP.OP-AT.AT-Emissions-N2O** are taken from UNFCCC common reporting tables, Table 2 as advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->. Emissions are substantial, at least before 2009, and the main source of emissions is from nitric acid production.
+#### Flow description
 
-**How the numbers are derived**
+- **MP.OP-AT.AT-Emissions-N2O** is N2O from industrial processes, as advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->: the sum of 2.B Chemical industry, 2.C Metal industry, 2.G Other product manufacture and use and 2.H Other (2.A Mineral industry and 2.D Non-energy products from fuels report no N2O). The main source is nitric acid production.
 
-- The flow is the N2O from industrial processes in the national greenhouse gas inventory, CRT Table 2(I): the sum of 2.B Chemical industry, 2.C Metal industry, 2.G Other product manufacture and use and 2.H Other (2.A Mineral industry and 2.D Non-energy products from fuels report no N2O).
-- N2O from nitric acid production is reported by the plants; the methods are documented in the [Miljødirektoratet, NID 2026](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/).
-- N2O is converted to N with the factor 28/44.
+#### Data sources
 
-**Interpretation**
+- N2O from industrial processes in the UNFCCC Common Reporting Tables (CRT), Table 2(I), of the national greenhouse gas inventory. N2O from nitric acid production is reported by the plants; the methods are documented in the [National Inventory Document (Miljødirektoratet, NID 2026)](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/).
 
-- Chemical industry (2.B, nitric acid production) accounts for over 90% of the flow.
+#### Interpretations and comparisons
+
+- Chemical industry (2.B, nitric acid production) accounts for over 90% of the flow. Emissions are substantial, at least before 2009.
 - Emissions were about 4.4 kt N (6.9 kt N2O) in 1990, fell from 4.3 kt N in 2005 to about 1.1 kt N in 2010 after N2O-reducing catalysts were installed in the nitric acid plants, and have been 0.5–0.8 kt N since.
 - Category 2.G (mainly N2O used as anaesthetic and propellant) contributes about 0.1 kt N2O per year.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

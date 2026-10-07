@@ -11,14 +11,20 @@ nav_order: 8
 
 ### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-**MP.OP-HS.HS-Mineral fertilizer-Nmix**: as advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, we assume a default value of 2% of total mineral fertilizer for non-agricultural use. Data for fertilizer use in agriculture are taken from FAOSTAT Fertilizer by nutrient (FAO, 2025)<!--cite:fao_fertilizer_2025-->.
+#### Flow description
 
-**How the numbers are derived**
+- **MP.OP-HS.HS-Mineral fertilizer-Nmix** is mineral fertilizer used outside agriculture, in gardens, parks and sports grounds.
 
-- Agricultural use of N fertilizer is taken from FAOSTAT's [Fertilizers by Nutrient](https://www.fao.org/faostat/en/#data/RFN) and multiplied by 0.02/0.98, so that non-agricultural use is 2% of total use (range 1–3% in the uncertainty analysis).
+#### Data sources
+
+- FAOSTAT's [Fertilizers by Nutrient](https://www.fao.org/faostat/en/#data/RFN) (FAO, 2025<!--cite:fao_fertilizer_2025-->) gives agricultural use, production, import and export of nitrogen fertilizers in tonnes N.
 - No Norwegian data on fertilizer use in gardens, parks and sports grounds are used.
 
-**Interpretation**
+#### Assumptions
+
+- As advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, we assume a default value of 2% of total mineral fertilizer for non-agricultural use (range 1–3%): agricultural use is multiplied by 0.02/0.98.
+
+#### Interpretations and comparisons
 
 - The flow is about 2 kt N per year and follows agricultural use.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
