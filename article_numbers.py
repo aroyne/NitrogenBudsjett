@@ -78,7 +78,7 @@ def national_balance(df, years=cfa.ANALYSIS_YEARS, exclude=()):
     HY.CW and RW.RW), as in article_figures/make_total_balance.py: a flow
     counts when exactly one end is a boundary subpool."""
     inflows, outflows = [], []
-    for f in df['flow_name'].unique():
+    for f in cfa.flow_names(df):
         if f in exclude:
             continue
         source, target = f.split('-')[0], f.split('-')[1]
@@ -92,7 +92,7 @@ def emissions_total(df, species, years=cfa.ANALYSIS_YEARS):
     """National emissions of one species (kt N/yr): every flow named
     '<pool>-AT.AT-Emissions-<species>', as in
     article_figures/make_emissions_timeseries.py."""
-    flows = [f for f in df['flow_name'].unique() if f.endswith(f'-AT.AT-Emissions-{species}')]
+    flows = [f for f in cfa.flow_names(df) if f.endswith(f'-AT.AT-Emissions-{species}')]
     return cfa.sum_flows(df, flows, years)
 
 

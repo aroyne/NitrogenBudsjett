@@ -105,6 +105,18 @@ def theil_sen(years, values):
     return slope, intercept
 
 
+def theil_sen_rows(years, matrix):
+    """theil_sen for every row of matrix at once (one time series per row)."""
+    years = np.asarray(years, dtype=float)
+    matrix = np.asarray(matrix, dtype=float)
+    i, j = np.array([(i, j) for i, j in itertools.combinations(range(len(years)), 2)
+                     if years[j] != years[i]]).T
+    slopes = (matrix[:, j] - matrix[:, i]) / (years[j] - years[i])
+    slope = np.median(slopes, axis=1)
+    intercept = np.median(matrix - slope[:, None] * years, axis=1)
+    return slope, intercept
+
+
 def theil_sen_ci(years, values, z=Z_95):
     """Non-parametric confidence interval for the Theil-Sen slope (Hollander
     & Wolfe 1973, as given in Gilbert 1987, section 16.5): with N ordered
@@ -162,23 +174,71 @@ def load_stats():
     return df
 
 
-def flow_series(df, flow_name, years=ANALYSIS_YEARS):
-    """Median value of one flow_name for each year in `years` (0.0 if a year
-    is genuinely absent - only used for flows confirmed present in all
+@functools.lru_cache(maxsize=None)
+def _model_data(pool):
+    """data_loader.load_all_data for one pool, loaded once per run. The
+    returned tables are read-only here."""
+    from data_loader import load_all_data
+    return load_all_data({pool})
+
+
+# Every series is computed once per MC iteration (1000 small DataFrames), so
+# looking flows up by boolean filtering of the DataFrame dominates the run
+# time. _flow_index builds a flow x year array once per DataFrame instead.
+# DataFrames are treated as read-only once looked up.
+_FLOW_INDEX = {}
+
+
+def _flow_index(df):
+    """Flow names (in order of first appearance), flow and year positions,
+    and the flow x year array of 'median' values with a mask of the
+    (flow, year) pairs present in df. Built once per DataFrame."""
+    entry = _FLOW_INDEX.get(id(df))
+    if entry is not None and entry[0] is df:
+        return entry[1]
+    flow_codes, names = pd.factorize(df['flow_name'])
+    year_codes, year_values = pd.factorize(df['year'])
+    values = np.full((len(names), len(year_values)), np.nan)
+    present = np.zeros(values.shape, dtype=bool)
+    values[flow_codes, year_codes] = df['median'].to_numpy(dtype=float)
+    present[flow_codes, year_codes] = True
+    index = {'names': list(names), 'row': {n: i for i, n in enumerate(names)},
+             'col': {y: j for j, y in enumerate(year_values)}, 'values': values, 'present': present}
+    _FLOW_INDEX[id(df)] = (df, index)
+    return index
+
+
+def flow_names(df):
+    """The flow names in df, in order of first appearance (as
+    df['flow_name'].unique())."""
+    return _flow_index(df)['names']
+
+
+def _flow_values(df, flow_name, years):
+    """Values of one flow for each year in `years` as an array. Raises if a
+    year is absent - only used for flows confirmed present in all
     ANALYSIS_YEARS; a silent 0.0 for a missing year would otherwise corrupt a
-    sum without warning)."""
-    sub = df[df['flow_name'] == flow_name].set_index('year')['median']
-    missing = set(years) - set(sub.index)
+    sum without warning."""
+    index = _flow_index(df)
+    row = index['row'].get(flow_name)
+    cols = [index['col'].get(y) for y in years]
+    missing = [y for y, c in zip(years, cols)
+               if row is None or c is None or not index['present'][row, c]]
     if missing:
         raise KeyError(f"'{flow_name}' is missing values for years: {sorted(missing)}")
-    return sub.reindex(years)
+    return index['values'][row, cols]
+
+
+def flow_series(df, flow_name, years=ANALYSIS_YEARS):
+    """Median value of one flow_name for each year in `years`."""
+    return pd.Series(_flow_values(df, flow_name, years), index=pd.Index(list(years), name='year'), name='median')
 
 
 def sum_flows(df, flow_names, years=ANALYSIS_YEARS):
-    total = pd.Series(0.0, index=list(years))
+    total = np.zeros(len(years))
     for name in flow_names:
-        total = total.add(flow_series(df, name, years), fill_value=0.0)
-    return total
+        total = total + np.nan_to_num(_flow_values(df, name, years), nan=0.0)
+    return pd.Series(total, index=list(years))
 
 
 # SSB changed the method for eng til slått in 2021 (dry matter percentages
@@ -282,8 +342,7 @@ def _food_trade_n_by_year(is_import, include_fish, years=ANALYSIS_YEARS):
     trade_parameters median value (not MC-perturbed) for a single,
     reproducible point estimate, since this breakdown isn't carried in
     MC_Reporting_Statistics.xlsx."""
-    from data_loader import load_all_data
-    preloaded = load_all_data({'mp'})
+    preloaded = _model_data('mp')
     df_vol = preloaded['compressed_trade_volume']
     trade_params = pd.read_excel('parameters/N_parameters.xlsx', sheet_name='trade_parameters')
     factors = dict(zip(trade_params['param_id'], trade_params['value']))
@@ -444,8 +503,7 @@ def poultry_pork_share_of_animal_products(years=ANALYSIS_YEARS):
     kept in the aggregated MC_Reporting_Statistics.xlsx flow), using the
     table's median N_content_percent (not MC-perturbed) for a single,
     reproducible point estimate."""
-    from data_loader import load_all_data
-    preloaded = load_all_data({'ag'})
+    preloaded = _model_data('ag')
     df_fao = preloaded['fao_animal_production_clean']
 
     n_content = pd.read_excel('parameters/N_parameters.xlsx', sheet_name='animal_products')
@@ -588,8 +646,7 @@ NOX_FLOWS_ALL_POOLS = [
 @functools.lru_cache(maxsize=None)
 def _population():
     """SSB table 06913, population on 1 January (loaded once per run)."""
-    from data_loader import load_all_data
-    preloaded = load_all_data({'mp'})
+    preloaded = _model_data('mp')
     return preloaded['ssb_06913']['Befolkning 1. januar']
 
 
@@ -797,7 +854,7 @@ def _at_flows(df, species=None, direction=None):
     """Flow names with AT.AT at one end, optionally filtered by species
     (key of AT_SPECIES) and direction ('in' = into AT, 'out' = out of AT)."""
     names = []
-    for f in df['flow_name'].unique():
+    for f in flow_names(df):
         source, target = f.split('-')[0], f.split('-')[1]
         if 'AT.AT' not in (source, target):
             continue
@@ -871,8 +928,13 @@ def excreta_share_of_aquafeed(df, years=ANALYSIS_YEARS):
 def _pool_flows(df, prefix, direction):
     """Flow names into ('in') or out of ('out') the pool or subpool whose
     code starts with prefix, excluding flows internal to it."""
+    return _pool_flows_from_names(tuple(flow_names(df)), prefix, direction)
+
+
+@functools.lru_cache(maxsize=None)
+def _pool_flows_from_names(all_names, prefix, direction):
     names = []
-    for f in df['flow_name'].unique():
+    for f in all_names:
         source, target = f.split('-')[0], f.split('-')[1]
         inside_s, inside_t = source.startswith(prefix), target.startswith(prefix)
         if inside_s and inside_t:
@@ -960,8 +1022,7 @@ HOUSEHOLD_WASTE_SECTORS = {
 @functools.lru_cache(maxsize=None)
 def _waste_tables():
     """SSB tables 05282 and 10514 (loaded once per run)."""
-    from data_loader import load_all_data
-    preloaded = load_all_data({'hs'})
+    preloaded = _model_data('hs')
     return preloaded['ssb_05282'], preloaded['ssb_10514']
 
 
@@ -1114,18 +1175,15 @@ def _trend_percentiles(matrix, years):
     end-period averages, the slope and the percent change, plus the share of
     rows whose slope has the same sign as the median slope."""
     years = list(years)
-    rows = []
-    for values in matrix:
-        slope, intercept = theil_sen(years, values)
-        fit_start = intercept + slope * years[0]
-        fit_end = intercept + slope * years[-1]
-        rows.append({
-            'avg_start': values[:3].mean(),
-            'avg_end': values[-3:].mean(),
-            'slope': slope,
-            'pct_change': 100 * (fit_end - fit_start) / abs(fit_start),
-        })
-    res = pd.DataFrame(rows)
+    slope, intercept = theil_sen_rows(years, matrix)
+    fit_start = intercept + slope * years[0]
+    fit_end = intercept + slope * years[-1]
+    res = pd.DataFrame({
+        'avg_start': matrix[:, :3].mean(axis=1),
+        'avg_end': matrix[:, -3:].mean(axis=1),
+        'slope': slope,
+        'pct_change': 100 * (fit_end - fit_start) / np.abs(fit_start),
+    })
     q = res.quantile([0.025, 0.5, 0.975])
     same_sign = (np.sign(res['slope']) == np.sign(q.loc[0.5, 'slope'])).mean()
     return q, same_sign, len(res)
