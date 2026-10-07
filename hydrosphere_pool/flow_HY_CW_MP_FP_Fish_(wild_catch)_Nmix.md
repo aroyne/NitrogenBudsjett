@@ -11,15 +11,23 @@ nav_order: 1
 
 ### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-found using data from Fiskeridirektoratet (2025)<!--cite:fiskeridirektoratet_fangst_2025--> on total wild fish catch. According to Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, p254: N content in fish and shellfish: 2.8% according to UNECE Guidance, Annex 6 Table 12. For 1990-1999, this is extended backward using a historical compilation of pelagic and bottom fish catch from the same source. The flow sums all "true fish" catch categories (pelagic, cod-family, other bottom/deep-water fish, skates and sharks) and explicitly excludes shellfish and seaweed, which are reported separately (see below). Our results are very close to those of Hohmann-Marriott (2025)<!--cite:hohmann-marriott_nitrogen_2025--> (also when looking at shellfish and aquaculture). 
+#### Flow description
 
-**How the numbers are derived**
+- **HY.CW-MP.FP-Fish (wild catch)-Nmix** is the N in wild fish catch. The flow sums all "true fish" catch categories (pelagic, cod-family, other bottom/deep-water fish, skates and sharks) and explicitly excludes shellfish and seaweed, which are reported in HY.CW-MP.FP-Shellfish-Nmix.
 
-- Landed catch (live weight) of pelagic fish, cod-family fish, other bottom and deep-water fish, and skates and sharks from Fiskeridirektoratet's catch statistics by species (2000 onward) and a historical compilation of pelagic and bottom fish (1990–1999), multiplied by 2.8% N (range ±10%).
+#### Data sources
 
-**Interpretation**
+- Landed catch (live weight) from Fiskeridirektoratet's catch statistics by species (Fiskeridirektoratet, 2025<!--cite:fiskeridirektoratet_fangst_2025-->), 2000 onward.
+- For 1990–1999, a historical compilation of pelagic and bottom fish catch from the same source.
+
+#### Assumptions
+
+- N content in fish 2.8% (range ±10%), according to Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, p. 254, and UNECE Guidance, Annex 6 Table 12.
+
+#### Interpretations and comparisons
 
 - The flow rises from about 43 kt N in 1990 to about 70 kt N around 2000 and falls to 50 kt N in 2024, following the catch of pelagic fish such as herring, mackerel and blue whiting, which varies with stock sizes and quotas.
+- Our results are very close to those of Hohmann-Marriott (2025)<!--cite:hohmann-marriott_nitrogen_2025--> (also when looking at shellfish and aquaculture).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References

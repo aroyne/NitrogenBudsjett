@@ -11,15 +11,21 @@ nav_order: 2
 
 ### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-Calculated using data from Fiskeridirektoratet (2025)<!--cite:fiskeridirektoratet_06002_2025--> on sold farmed fish, using a feed-waste fraction estimated to fall from ~29% in 1990 to the measured 3% (Wang et al., 2013)<!--cite:wang_chemical_2013--> by 2010 (see the [methodological note](subpool_aquaculture.html) on the Aquaculture (HY.AC) subpool page for how this is derived from the apparent whole-fish retention trend) and 2.8 % nitrogen content in fish and shellfish (Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, p. 254).
+#### Flow description
 
-**How the numbers are derived**
+- **HY.AC-HY.CW-Waste feed-Nmix** is the N in feed that is not eaten by the farmed fish and is lost to coastal water.
 
-- Sold farmed salmon and trout by year (Fiskeridirektoratet, table A.06.002, 1994 onward; historical compilation for 1984–1993) are multiplied by 2.8% N.
-- Feed N is the harvested N divided by an apparent whole-system retention that rises linearly from 26% in 1990 (Ytrestøyl et al., 2015) to 35.75% in 2010 (Aas et al., 2022) and is constant after. The rise is attributed to less feed waste, so the biological retention of eaten feed is held constant and the feed waste falls from about 29% of the feed in 1990 to 3% (Wang et al., 2013) in 2010; see the [methodological note](subpool_aquaculture.html).
-- This flow is the feed waste: feed N times the feed waste fraction.
+#### Data sources
 
-**Interpretation**
+- Sold farmed salmon and trout by year from Fiskeridirektoratet (2025)<!--cite:fiskeridirektoratet_06002_2025--> (table A.06.002, 1994 onward; historical compilation for 1984–1993).
+
+#### Assumptions
+
+- Harvested fish are multiplied by 2.8% N (Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, p. 254).
+- Feed N is the harvested N divided by an apparent whole-system retention that rises linearly from 26% in 1990 (Ytrestøyl et al., 2015<!--cite:ytrestoyl_utilisation_2015-->) to 35.75% in 2010 (Aas et al., 2022<!--cite:aas_utilization_2022-->) and is constant after. The rise is attributed to less feed waste, so the biological retention of eaten feed is held constant and the feed waste falls from about 29% of the feed in 1990 to the measured 3% (Wang et al., 2013<!--cite:wang_chemical_2013-->) in 2010; see the [methodological note](subpool_aquaculture.html) on the Aquaculture (HY.AC) subpool page.
+- This flow is the feed N times the feed-waste fraction (see the [methodological note](subpool_aquaculture.html) for how the fraction is derived from the apparent whole-fish retention trend).
+
+#### Interpretations and comparisons
 
 - The flow rises to about 7.4 kt N around 2000, falls to 2.5 kt N in 2010 as the feed waste fraction falls, and then rises with production to about 4 kt N in 2024.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
