@@ -9,7 +9,7 @@ nav_order: 1
 
 <iframe src="../output_files/plots/FS_OL_AG_MM_Grazing_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
-### Flow Description
+### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 Calculated from the number of livestock on utmark grazing and the feed taken up per animal, calibrated against the estimate of total feed uptake on utmark in 1996 in Table 1.2 of Hegrenes & Asheim (2006)<!--cite:hegrenes_verdi_2006-->, with 150 g protein per FEm and the standard Jones factor.
 

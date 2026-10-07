@@ -9,7 +9,7 @@ nav_order: 4
 
 <iframe src="../output_files/plots/HS_HS_PR_SO_Household_waste_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
-### Flow Description
+### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 **HS.HS-PR.SO-Household waste-Nmix** includes all types of solid waste from settlements which are processed in the sub-pool “solid waste” through incineration, landfilling, biofuel production or composting. We use data from SSB table 05282 “Avfallsregnskap for Norge (1 000 tonn), etter materialtype, statistikkvariabel, år og kilde” (1995-2011) and 10514 «Avfallsregnskap for Norge, etter kilde og materialtype (1 000 tonn) 2012 – 2023» with N contents taken from Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> and typical, assumed values are chosen if none are given. We include households, services (tjenesteytende næringer) and construction (Bygge- og anleggsvirksomhet). Power and water supply and the waste management sector are not included, since much of the waste from waste management is residues from treating waste that has already been counted.
 

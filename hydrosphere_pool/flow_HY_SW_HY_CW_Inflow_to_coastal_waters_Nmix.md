@@ -9,7 +9,7 @@ nav_order: 3
 
 <iframe src="../output_files/plots/HY_SW_HY_CW_Inflow_to_coastal_waters_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
-### Flow Description
+### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 From 2013 onward, found from data supplied by NIVA, produced in the TEOTIL3 model Sample et al. (2024)<!--cite:sample_teotil3_2024-->. TEOTIL3's total N-to-coast figure includes both aquaculture and treated wastewater discharge, so to avoid double counting with the dedicated aquaculture and wastewater flows, we subtract TEOTIL3's aquaculture component and the flow *PR.WW-HY.CW-Treated wastewater discharge-Nmix* (which already assigns all treated wastewater discharge to CW).
 

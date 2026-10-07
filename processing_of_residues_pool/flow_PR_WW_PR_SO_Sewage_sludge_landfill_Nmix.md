@@ -9,7 +9,7 @@ nav_order: 6
 
 <iframe src="../output_files/plots/PR_WW_PR_SO_Sewage_sludge_landfill_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
-### Flow Description
+### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 Taken from SSB table 05279 *Avløpsslam, etter slamdisponering, statistikkvariabel, år og region*, including both sludge that is landfilled and sludge used for top cover on landfills Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->. For years 1993-2001 we use data from the SSB Naturressurser og miljø series. For years 1990-1992 we use the average value of the 1993-1995. We use an N content of 3 % of dry matter based on NIBIO.
 

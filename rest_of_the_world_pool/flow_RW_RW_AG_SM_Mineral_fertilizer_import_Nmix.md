@@ -9,7 +9,7 @@ nav_order: 3
 
 <iframe src="../output_files/plots/RW_RW_AG_SM_Mineral_fertilizer_import_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
-### Flow Description
+### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 Is taken from FAOSTAT Fertilizer by nutrient FAO (2025)<!--cite:fao_fertilizer_2025-->. Because anhydrous ammonia is not used directly as fertilizer in Norway, it is not counted as a fertilizer in this particular FAO statistic. We therefore account for NH3 import in the flow **RW.RW-MP.OP-Ammonia import-Nmix**.
 

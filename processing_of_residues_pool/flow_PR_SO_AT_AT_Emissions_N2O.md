@@ -9,7 +9,7 @@ nav_order: 2
 
 <iframe src="../output_files/plots/PR_SO_AT_AT_Emissions_N2O.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
-### Flow Description
+### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 **PR.SO-AT.AT-Emissions-N2O** is taken from UNFCCC Common reporting tables, Table 5, where we have included emissions from biological treatment of waste (composting and biogas production) and waste incineration; landfills report no N2O. 
 

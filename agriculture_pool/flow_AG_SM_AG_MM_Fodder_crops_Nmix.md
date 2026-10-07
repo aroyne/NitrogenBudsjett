@@ -9,7 +9,7 @@ nav_order: 1
 
 <iframe src="../output_files/plots/AG_SM_AG_MM_Fodder_crops_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
-### Flow Description
+### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 We have used data for grass and fodder production from SSB table 13648 «Avling i jordbruket (1000 tonn) og avling per dekar (kg), etter ymse jordbruksvekstar (F) 2021 – 2024» and 05772 «Avling i jordbruket, etter ymse jordbruksvekstar (1 000 tonn) (F) (avslutta serie) 2000 – 2020». Values prior to 2000 are found in the SSB Jordbruksstatistikk (Table 2.1/Table 20), with the revised 1995 and 1996 figures from Jordbruksstatistikk 1997, Table 2.2 ([SSB, 1998](https://www.ssb.no/a/histstat/nos/nos_c493.pdf)). The protein content of grass and fodder is known to be highly variable. We have assumed a protein content of 15 % based on 2025 analyses of 13 000 grass samples from all over Norway by Tine/NorFor (Bakken et al., 2026)<!--cite:bakken_nitrogen_2026-->, and a standard Jones factor for N in protein. As shown in Figure 3 in Volden & Schei (2025)<!--cite:volden_bedre_2025-->, there has been a slight decrease in the measured protein content of the second harvest of grass silage during 1990-2024, but not the first harvest. Due to the variability we choose to use a constant value. 
 

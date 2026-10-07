@@ -9,7 +9,7 @@ nav_order: 1
 
 <iframe src="../output_files/plots/MP_FP_AG_MM_Farm_animal_feed_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
-### Flow Description
+### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 **MP.FP-AG.MM-Farm animal feed-Nmix** is feed to farm animals. We have used data on domestic feed supply from Landbruksdirektoratet (Landbruksdirektoratet, 2025)<!--cite:landbruksdirektoratet_kraftforstatistikk_2025--> and used the detailed composition of animal feed given in Eidem & Ruud (2022)<!--cite:eidem_for-_2022--> together with protein contents from FAO (2021)<!--cite:fao_annex_2021--> and specific Jones factors from FAO (2023)<!--cite:fao_chapter_2023--> to get nitrogen contents.
 

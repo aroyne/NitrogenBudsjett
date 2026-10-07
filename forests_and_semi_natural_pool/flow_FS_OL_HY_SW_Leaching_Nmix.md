@@ -9,7 +9,7 @@ nav_order: 2
 
 <iframe src="../output_files/plots/FS_OL_HY_SW_Leaching_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
-### Flow Description
+### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 From 2013 onward, found in data supplied by NIVA, produced in the TEOTIL3 model (Sample et al., 2024)<!--cite:sample_teotil3_2024-->, using TEOTIL3's «upland» category (mountain, heath and wetland areas, i.e. other land including WL).
 

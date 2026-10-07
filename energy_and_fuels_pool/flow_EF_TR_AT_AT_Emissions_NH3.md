@@ -9,7 +9,7 @@ nav_order: 2
 
 <iframe src="../output_files/plots/EF_TR_AT_AT_Emissions_NH3.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
-### Flow Description
+### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 EF.TR-AT.AT-Emissions-NH3 denotes ammonia emissions from fuel combustion. We have used data from CLRTAP Inventory Submissions EMEP (2025)<!--cite:emep_officially_2025--> as advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, using the categories given in Table 13, with the addition of domestic aviation cruise (1A3aii(ii)), included for consistency with the EF.TR fuel input and N2O flows. 
 

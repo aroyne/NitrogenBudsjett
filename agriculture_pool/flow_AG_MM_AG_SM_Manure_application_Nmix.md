@@ -9,7 +9,7 @@ nav_order: 1
 
 <iframe src="../output_files/plots/AG_MM_AG_SM_Manure_application_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
-### Flow Description
+### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 Taken from the UNFCCC Common Reporting Table (CRT), Table 3.D. The main component is row "Animal manure applied to soils" - the IPCC 2006 Guidelines' FAM term (Volume 4, Chapter 11, Equation 11.4; De Klein et al. (2006)<!--cite:deklein_chapter11_2006-->), i.e. managed manure N net of losses during animal housing and manure storage (tracked separately as AG.MM's own NH3/N2O/NOx emissions flows). We add to this the share of manure deposited directly by grazing animals (row "Urine and dung deposited by grazing animals", PRP) that we estimate lands on agricultural grazing land (innmark) rather than unmanaged land (utmark) - approximately 44-62 % of the national PRP total, apportioned by animal category using typical Norwegian grazing practice (e.g. dairy cattle graze almost exclusively on innmark, while sheep spend a large share of the season on utmark). The utmark share is not included in any flow in this study; see the Other Land (FS.OL) subpool page for that portion and why it is excluded. Norway's calculation methodology for both terms is documented in Norwegian Environment Agency (2020)<!--cite:miljodirektoratet_manure_2020-->. 
 

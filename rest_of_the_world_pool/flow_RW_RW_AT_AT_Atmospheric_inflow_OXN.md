@@ -9,7 +9,7 @@ nav_order: 4
 
 <iframe src="../output_files/plots/RW_RW_AT_AT_Atmospheric_inflow_OXN.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
-### Flow Description
+### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 Is the nitrogen emitted outside Norway and deposited in Norway, found from source-receptor data from EMEP, as advised by (Schäppi et al., 2025)<!--cite:schappi_annexes_2025-->.
 

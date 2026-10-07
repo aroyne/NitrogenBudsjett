@@ -9,7 +9,7 @@ nav_order: 8
 
 <iframe src="../output_files/plots/MP_FP_RW_RW_Feed_export_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
-### Flow Description
+### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 Using trade data from SSB, table 08801.
 

@@ -9,7 +9,7 @@ nav_order: 7
 
 <iframe src="../output_files/plots/MP_FP_PR_WW_Food_industry_wastewater_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
-### Flow Description
+### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 **MP.FP-PR.WW-Food industry wastewater-Nmix** is found using data from Miljødirektoratet (personal communication, 2026) on emissions to water from individual industries, where industries are categorized as belonging to OP or FP, and their connection status to the municipal wastewater, based on the information given in the statistic. This flow counts the FP facilities that are connected to the municipal sewage network; facilities with unknown connection status are counted in MP.FP-HY.SW-Untreated wastewater-Nmix. Miljødirektoratet's data has not been updated for 2024 at the time of writing; the 2024 value is a flat carry-forward of 2023, with additional uncertainty (±50%) applied to reflect that it is not a real, independently observed value.
 

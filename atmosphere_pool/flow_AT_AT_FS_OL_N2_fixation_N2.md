@@ -9,7 +9,7 @@ nav_order: 9
 
 <iframe src="../output_files/plots/AT_AT_FS_OL_N2_fixation_N2.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
-### Flow Description
+### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 We use N2 fixation rates from Table 62 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> together with land type areas calculated from the CORINE land cover inventory European Environment Agency (2019)<!--cite:european_environment_agency_corine_2019-->. In the Swedish NNB (Moldan et al., 2025)<!--cite:moldan_where_2025-->, N2 fixation in the OL compartment was considered negligible. Note that in our model, OL includes what Moldan et al. (2025)<!--cite:moldan_where_2025--> treat as a separate wetland (WL) compartment. Almost all of our OL fixation comes from peat bogs (CORINE-derived area of 2.1 million ha); intertidal flats and freshwater marshes contribute less than 0.1 ktN. This total (23 ktN) is therefore not directly comparable to Moldan et al. (2025)<!--cite:moldan_where_2025-->'s "negligible" OL estimate, but instead corresponds closely to their separate WL estimate of about 30 ktN (Jutterström et al., 2020)<!--cite:jutterstrom_swedish_2020-->.
 

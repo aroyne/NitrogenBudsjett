@@ -9,7 +9,7 @@ nav_order: 1
 
 <iframe src="../output_files/plots/EF_IC_AT_AT_Emissions_N2O.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
-### Flow Description
+### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 EF.IC-AT.AT-Emissions-N2O is taken from UNFCCC Common Reporting Tables, Table 1 using the categories give in Table 12 by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->. 
 

@@ -9,7 +9,7 @@ nav_order: 3
 
 <iframe src="../output_files/plots/FS_FO_EF_OE_Fuel_wood_for_households_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
-### Flow Description
+### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 Taken from SSB table 09702 'Energibalansen. Vedforbruk i boliger og fritidsboliger 1990 – 2024' and an N content of 1.4 kg/t for stem wood with bark.
 

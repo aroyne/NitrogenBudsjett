@@ -9,7 +9,7 @@ nav_order: 6
 
 <iframe src="../output_files/plots/PR_SO_HS_HS_Biologically_treated_organic_waste_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
-### Flow Description
+### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 **PR.SO-HS.HS-Biologically treated organic waste-Nmix** is the N in compost and digestate from biological treatment of organic waste (composting and biogas production) used on green areas or delivered to soil producers. Sewage sludge that is treated biologically is counted in the PR.WW sludge flows and left out here.
 

@@ -9,7 +9,7 @@ nav_order: 3
 
 <iframe src="../output_files/plots/EF_TR_AT_AT_Emissions_NOx.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
-### Flow Description
+### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 EF.TR-AT.AT-Emissions-NOx denotes NOx emissions from fuel combustion. We have used data from CLRTAP Inventory Submissions EMEP (2025)<!--cite:emep_officially_2025--> as advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, using the categories given in Table 13, with the addition of domestic aviation cruise (1A3aii(ii)), which is a memo item in the CLRTAP reporting but a domestic emission, and is included so that the NOx flow covers the same activities as the EF.TR fuel input and N2O flows (about 3.6 Gg NOx in 2024). 
 

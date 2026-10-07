@@ -9,7 +9,7 @@ nav_order: 7
 
 <iframe src="../output_files/plots/MP_OP_HS_HS_Consumer_goods_Nmix.html" width="100%" height="400px" frameborder="0" scrolling="no"></iframe>
 
-### Flow Description
+### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 **MP.OP-HS.HS-Consumer goods-Nmix** is calculated by mass balance, assuming that all incoming flows to OP that are not accounted for in outgoing flows end up in domestic consumer goods. The fertilizer industry is kept out of the balance: we have excluded N2 fixation for ammonia synthesis, ammonia import and export, mineral fertilizer flows, and the wastewater from fertilizer plants (Yara Porsgrunn, Yara Glomfjord, Herøya industrial park and Hydro Rjukan). We also exclude emissions to air from the balance because they result mainly from fertilizer production.
 
