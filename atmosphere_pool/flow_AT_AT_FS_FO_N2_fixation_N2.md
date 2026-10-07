@@ -12,6 +12,14 @@ nav_order: 6
 ### Flow Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 Following the Swedish NBB Moldan et al. (2025)<!--cite:moldan_where_2025-->, we use an N-fixation rate of 1.5 kg/ha/year and a forested area of 12.0 mill ha as given by SSB for 2019-2023 (table 14368); we assume this value is constant for our entire time period. This gives an annual N-fixation rate of 18.0 ktN. For comparison, the value for Sweden in 2015 was found to be 39.5 ktN Moldan et al. (2025)<!--cite:moldan_where_2025-->.
+
+**How the numbers are derived**
+
+- 1.5 kg N/ha per year (range ±50%), as in the Swedish NNB (Moldan et al., 2025), times 12.0 million ha forest ([SSB table 14368](https://www.ssb.no/statbank/table/14368), 2019–2023), constant over the period.
+
+**Interpretation**
+
+- The flow is constant at about 18 kt N per year; for comparison, Sweden has 39.5 kt N in 2015 (Moldan et al., 2025).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References

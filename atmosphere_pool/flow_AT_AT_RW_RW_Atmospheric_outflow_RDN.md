@@ -13,7 +13,18 @@ nav_order: 17
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 **AT.AT-RW.RW-Atmospheric outflow-RDN**
 
-is found using source-receptor data from (EMEP, 2024)<!--cite:emep_sr_2024-->, as advised by (Schäppi et al., 2025)<!--cite:schappi_annexes_2025-->. The EMEP source-receptor tables are not published for every year: 1984-1996 use the average of 1997-2001 (the earliest available years); the single missing years 2011, 2015 and 2022 use the average of the surrounding years; and 2019-2020 are linearly interpolated between 2018 and 2021. The EMEP source-receptor tables have not been updated for 2024 at the time of writing; since this flow shows a smooth, consistent decline over 2019-2023, the 2024 value is extrapolated from a linear fit to that period rather than a flat carry-forward, with additional uncertainty (±50%) applied to reflect that it is not a real, independently observed value.
+is the nitrogen emitted in Norway and deposited elsewhere in the EMEP domain, found using source-receptor data from (EMEP, 2024)<!--cite:emep_sr_2024-->, as advised by (Schäppi et al., 2025)<!--cite:schappi_annexes_2025-->.
+
+**How the numbers are derived**
+
+- From the [EMEP source-receptor tables](https://emep.int/mscw/mscw_srdata.html): deposition in the EMEP domain from Norwegian emissions of ammonia, minus the part deposited in Norway, which is included in the national deposition flows (AT.AT-*-Deposition-RDN).
+- 1997–2006 are from EMEP's recalculation of these years with one model version (2009); from 2007 each year is from the annual EMEP Status Report, calculated with the model version and meteorology of that year. The tables for 2019, 2020 and 2022–2024 are taken from Appendix C of the Status Reports, and the table files are compiled by data_files/emep_sr_norway.py.
+- 2015 has no tables and is the mean of 2014 and 2016; 1984–1996 are the mean of 1997–2001.
+- The change of EMEP model domain and version in 2007 gives a break in the deposition in Norway from foreign emitters (see RW.RW-AT.AT-Atmospheric inflow), but not in the deposition of Norwegian emissions abroad, so this flow is not corrected.
+
+**Interpretation**
+
+- The flow is about 10–12 kt N per year up to 2016 and 13–14 kt N since, much less than for oxidised N since ammonia is mainly deposited close to the source.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References

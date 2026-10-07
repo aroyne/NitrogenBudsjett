@@ -8,8 +8,7 @@ import pandas as pd
 from calculations.utils import (
     EXPECTED_YEARS,
     report_missing_years,
-    process_generic_trade_flow,
-    add_trend_extrapolated_year
+    process_generic_trade_flow
 )
 
 def execute_calculations_at(preloaded_data, current_params, dataset_noise, current_trade_factors):
@@ -20,8 +19,9 @@ def execute_calculations_at(preloaded_data, current_params, dataset_noise, curre
     """
     results = []
 
-    # 'atm_in_out' <- data_files/atm_in_out.xlsx: EMEP source-receptor data for Norway
-    # (https://www.emep.int/mscw/mscw_srdata.html, downloaded Nov 2025)
+    # 'atm_in_out' <- data_files/atm_in_out.xlsx (built by data_files/emep_sr_norway.py):
+    # transboundary N deposition into and out of Norway from the EMEP
+    # source-receptor tables, excluding Norwegian emissions deposited in Norway.
     df_atm = preloaded_data.get('atm_in_out')
 
     _add_atmospheric_outflow_mc(results, 'AT.AT-RW.RW-Atmospheric outflow-OXN', 2, df_atm, current_params, dataset_noise)
@@ -120,17 +120,14 @@ def _deposition_flow_mc(results, flow_code, class4, poll, preloaded_data, curren
             # No new NILU period map exists yet for 2017-2021, so we keep the 2016
             # per-class distribution and scale it by the national trend reported for
             # observed (kriging-method) deposition since 2015 in Blake et al. (2023,
-            # Table 3): NOx -10%, Nred/NHx -17%, giving factors 61440/68166 and
-            # 61175/73494. The kriging method is used here rather than the newer
+            # Table 3): NOx -10%, Nred/NHx -17%. The kriging method is used here rather than the newer
             # NILU model-assimilation totals for 2017-2021 because NILU themselves
             # advise using the kriging method specifically for trend assessment
             # (personal correspondence, 2026): it is the only method applied
             # consistently across all periods, whereas the assimilation methodology
             # for the two most recent periods differs somewhat between them.
-            if poll == 'NOx':
-                value = value_2016 * 61440 / 68166
-            else:
-                value = value_2016 * 61175 / 73494
+            scale_key = 'deposition_scale_2017_OXN' if poll == 'NOx' else 'deposition_scale_2017_RDN'
+            value = value_2016 * float(current_params.get(scale_key))
             value_last = value
             data_sources = 'NILU and geodata.no'
             
@@ -249,7 +246,7 @@ def _add_OP_N2_fixation_mc(results, preloaded_data, current_params, ammonia_impo
 def _add_AG_N2_fixation_mc(results, current_params):
     flow_code = 'AT.AT-AG.SM-Biological N2 fixation-N2'
     comment = 'ok'
-    data_sources = 'Bleken & Bakken'
+    data_sources = 'Bechmann et al. (2023)'
     collected_years = set()
 
     val_param = current_params.get("AG_biological_fixation_N2")
@@ -297,17 +294,20 @@ def _add_FO_N2_fixation_mc(results, current_params):
 def _add_OL_N2_fixation_mc(results, current_params):
     flow_code = 'AT.AT-FS.OL-N2 fixation-N2'
     comment = 'ok'
-    data_sources = 'CORINE land cover inventory and REddy & DeLaune (2008)'
+    data_sources = 'CORINE land cover inventory and Reddy & DeLaune (2008)'
     collected_years = set()
 
     fixation_marshes = float(current_params.get("N2_fixation_freshwater_marshes"))
     fixation_peat = float(current_params.get("N2_fixation_peat_bog"))
-    fixation_wetl = float(current_params.get("N2_fixation_coastal_wetlands"))
+    fixation_mud_flats = float(current_params.get("N2_fixation_mud_flats"))
     marshes_area = float(current_params.get("inland_marshes_area"))
     peat_area = float(current_params.get("peat_bog_area"))
     intertidal_area = float(current_params.get("intertidal_flats_area"))
 
-    value = (fixation_marshes*marshes_area + fixation_peat*peat_area + fixation_wetl*intertidal_area)*1e-6 # kg -> kt
+    # CORINE 'intertidal flats' are unvegetated mud and sand flats, so they
+    # get the mud-flat rate in Schäppi et al. (2025) Table 62, not the rate
+    # for (vegetated) coastal wetlands.
+    value = (fixation_marshes*marshes_area + fixation_peat*peat_area + fixation_mud_flats*intertidal_area)*1e-6 # kg -> kt
 
     for year in EXPECTED_YEARS:
         collected_years.add(year)
@@ -358,10 +358,7 @@ def _add_atmospheric_outflow_mc(results, flow_code, value_col, df_atm, current_p
     collected_years = set()
     comment = 'ok'
 
-    for r in range(5, 45):
-        if r >= len(df_atm):
-            break
-
+    for r in range(5, len(df_atm)):
         year_val = df_atm.iloc[r, 0]
         if pd.isna(year_val):
             continue
@@ -388,16 +385,6 @@ def _add_atmospheric_outflow_mc(results, flow_code, value_col, df_atm, current_p
             'comment': comment,
             'data_sources': data_sources
         })
-
-    # EMEP's source-receptor tables have not been updated for 2024. This
-    # flow (N leaving Norway) shows a smooth, consistent multi-year decline
-    # driven substantially by Norway's own declining emissions, so a linear
-    # trend fit to 2019-2023 is extended to 2024 rather than a flat
-    # carry-forward.
-    add_trend_extrapolated_year(
-        results, flow_code, collected_years, range(2019, 2024), 2024, dataset_noise,
-        data_sources='trend-extrapolated from 2019-2023 (EMEP source-receptor tables not updated for 2024)'
-    )
 
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)

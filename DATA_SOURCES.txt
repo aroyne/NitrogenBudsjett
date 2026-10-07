@@ -141,8 +141,11 @@ https://www.fiskeridir.no/statistikk-tall-og-analyse/data-og-statistikk-om-yrkes
 downloaded 11.11.2025
 
 atm_in_out.xlsx
-Compilation of source-receptor data for Norway
-downloaded from https://www.emep.int/mscw/mscw_srdata.html, november 2025
+Transboundary deposition of oxidised and reduced N into and out of Norway, 1984-2024 (100 t N), built by data_files/emep_sr_norway.py
+from the EMEP MSC-W source-receptor tables (https://emep.int/mscw/mscw_srdata.html and Appendix C of EMEP Status Reports 1/2021, 1/2022, 1/2024, 1/2025, 1/2026).
+in = deposition in Norway from foreign emitters, out = deposition elsewhere from Norwegian emissions; Norway's own deposition is excluded from both.
+1997-2006 from the 2009 recalculation; 2015 = mean of 2014 and 2016; 1984-1996 = mean of 1997-2001. Downloaded October 2026.
+Inflow (in) for 1997-2006 is scaled for the break when EMEP changed model domain and version in 2007 (factor 0.593 for OXN, 0.511 for RDN = mean 2007-2009 / mean 2004-2006); uncorrected values are kept in separate columns.
 
 FAOSTAT_data_en_9-24-2026-3.csv
 Crop and livestock products - import and export of live animals, 1961-2024

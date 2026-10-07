@@ -10,8 +10,7 @@ import pandas as pd
 from calculations.utils import (
     EXPECTED_YEARS,
     report_missing_years,
-    process_generic_trade_flow,
-    add_flat_carryforward_year
+    process_generic_trade_flow
 )
 from calculations.shared_flow_calculations import find_aquaculture_production, get_aquafeed_budget, get_aquafeed_import_fraction
 
@@ -30,8 +29,9 @@ def execute_calculations_rw(preloaded_data, current_params, dataset_noise, curre
     _add_live_animal_import_mc(results, preloaded_data, current_params, dataset_noise)
     _add_mineral_fertilizer_import_mc(results, preloaded_data, current_params, dataset_noise)
 
-    # 'atm_in_out' <- atm_in_out.xlsx (data_loader.py DATA_MAP): EMEP
-    # source-receptor data for Norway
+    # 'atm_in_out' <- atm_in_out.xlsx (built by data_files/emep_sr_norway.py):
+    # transboundary N deposition into and out of Norway from the EMEP
+    # source-receptor tables, excluding Norwegian emissions deposited in Norway.
     df_atm = preloaded_data.get('atm_in_out')
     _add_atmospheric_inflow_mc(results, 'RW.RW-AT.AT-Atmospheric inflow-OXN', 1, df_atm, current_params, dataset_noise)
     _add_atmospheric_inflow_mc(results, 'RW.RW-AT.AT-Atmospheric inflow-RDN', 3, df_atm, current_params, dataset_noise)
@@ -314,7 +314,7 @@ def _add_atmospheric_inflow_mc(results, flow_code, value_col, df_rw, current_par
     collected_years = set()
     comment = 'ok'
 
-    for r in range(5, 45):
+    for r in range(5, len(df_rw)):
         year_val = df_rw.iloc[r, 0]
         if pd.isna(year_val):
             continue
@@ -341,15 +341,6 @@ def _add_atmospheric_inflow_mc(results, flow_code, value_col, df_rw, current_par
             'comment': comment,
             'data_sources': data_sources
         })
-
-    # EMEP's source-receptor tables have not been updated for 2024. Unlike
-    # the outflow direction, this flow (N arriving from other countries) is
-    # noisier without a clean multi-year trend, so a flat carry-forward of
-    # 2023 is used rather than a fitted trend.
-    add_flat_carryforward_year(
-        results, flow_code, collected_years, 2023, 2024, dataset_noise,
-        data_sources='flat carry-forward from 2023 (EMEP source-receptor tables not updated for 2024)'
-    )
 
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
