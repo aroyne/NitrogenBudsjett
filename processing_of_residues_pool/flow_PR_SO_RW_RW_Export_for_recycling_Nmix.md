@@ -11,13 +11,19 @@ nav_order: 10
 
 ### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-**PR.SO-RW.RW-Export for recycling-Nmix** is plastic, paper and textile waste which has been collected for recycling and exported to recycling facilities outside of Norway. Data taken from trade data, SSB table 08801.
+#### Flow description
 
-**How the numbers are derived**
+- **PR.SO-RW.RW-Export for recycling-Nmix** is plastic, paper and textile waste which has been collected for recycling and exported to recycling facilities outside of Norway.
 
-- Export quantities (kg) by commodity code are taken from SSB's external trade statistics ([table 08801](https://www.ssb.no/statbank/table/08801)), which are compiled from customs declarations, and multiplied by an N content per commodity type from the trade mapping sheet of N_parameters.xlsx.
+#### Data sources
 
-**Interpretation**
+- Export quantities (kg) by commodity code from SSB's external trade statistics ([SSB table 08801](https://www.ssb.no/statbank/table/08801)), which are compiled from customs declarations.
+
+#### Assumptions
+
+- The quantities are multiplied by an N content per commodity type from the trade mapping sheet of N_parameters.xlsx.
+
+#### Interpretations and comparisons
 
 - The flow rises from about 0.3 kt N in 1990 to about 3 kt N per year since 2018, mainly plastic waste for recycling.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

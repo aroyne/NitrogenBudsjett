@@ -11,18 +11,24 @@ nav_order: 4
 
 ### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-Taken from SSB table 05279 *Avløpsslam, etter slamdisponering, statistikkvariabel, år og region*, including all sludge used for green areas and for soil production Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->. For years 1993-2001 we use data from the SSB *Naturressurser og miljø series*. For years 1990-1992 we use the average value of the 1993-1995. We use an N content of 3 % of dry matter based on NIBIO.
+#### Flow description
 
-**How the numbers are derived**
+- **PR.WW-HS.HS-Sewage sludge fertilizer-Nmix** is the N in sewage sludge used on green areas and delivered to soil producers (Schäppi et al., 2025<!--cite:schappi_annexes_2025-->).
 
-- SSB's statistics on sewage sludge ([table 05279](https://www.ssb.no/statbank/table/05279)) give the amount of sludge (tonnes dry matter) from municipal wastewater treatment plants by disposal, based on the plants' reporting through KOSTRA. For 1993–2001 the amounts and shares by disposal are taken from SSB's Naturressurser og miljø, and 1990–1992 are the mean of 1993–1995.
-- The dry matter is multiplied by an N content of 3% (range 2–4%), the middle of the 20–40 kg total N per tonne dry matter that [NIBIO](https://www.nibio.no/tema/jord/organisk-avfall-som-gjodsel/avlopsslam) gives for Norwegian sewage sludge. There are no public Norwegian data on N in sludge from different treatment processes (Frøseth et al., 2025, NIBIO Rapport 11(124)).
-- For comparison, Tables 54 and 55 in Schäppi et al. (2025) give 2.6–3.7% N in dry matter for dewatered, digested and composted sludge in the JRC models (Huygens et al., 2022) and a median of 4.9% in German analyses (Sichler et al., 2022).
-- This flow is the sludge used on green areas and delivered to soil producers.
+#### Data sources
 
-**Interpretation**
+- SSB's statistics on sewage sludge ([table 05279](https://www.ssb.no/statbank/table/05279) “Avløpsslam, etter slamdisponering, statistikkvariabel, år og region”) give the amount of sludge (tonnes dry matter) from municipal wastewater treatment plants by disposal, based on the plants' reporting through KOSTRA. For 1993–2001 the amounts and shares by disposal are taken from SSB's Naturressurser og miljø series.
+- [NIBIO](https://www.nibio.no/tema/jord/organisk-avfall-som-gjodsel/avlopsslam) gives 20–40 kg total N per tonne dry matter for Norwegian sewage sludge. There are no public Norwegian data on N in sludge from different treatment processes (Frøseth et al., 2025, NIBIO Rapport 11(124)).
+
+#### Assumptions
+
+- 1990–1992 are the mean of 1993–1995.
+- The dry matter is multiplied by an N content of 3% (range 2–4%), the middle of the NIBIO range.
+
+#### Interpretations and comparisons
 
 - The flow is about 0.1–1.3 kt N per year and has increased as more sludge is delivered to soil producers.
+- For comparison, Tables 54 and 55 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> give 2.6–3.7% N in dry matter for dewatered, digested and composted sludge in the JRC models (Huygens et al., 2022) and a median of 4.9% in German analyses (Sichler et al., 2022).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References

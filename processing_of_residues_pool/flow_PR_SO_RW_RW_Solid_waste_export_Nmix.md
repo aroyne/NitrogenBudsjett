@@ -11,15 +11,24 @@ nav_order: 12
 
 ### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-Taken from trade data, SSB table 08801 with N contents taken from Table 50 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> for municipal waste, sewage sludge, hazardous and other waste. No export in these categories is reported before 2002, so we set all previous years to zero. The increase seen from 2022 to 2023 is in the category municipal waste.
+#### Flow description
 
-**How the numbers are derived**
+- **PR.SO-RW.RW-Solid waste export-Nmix** is exported municipal waste, sewage sludge, hazardous and other waste.
 
-- Export quantities (kg) by commodity code are taken from SSB's external trade statistics ([table 08801](https://www.ssb.no/statbank/table/08801)), which are compiled from customs declarations, and multiplied by an N content per commodity type from the trade mapping sheet of N_parameters.xlsx.
+#### Data sources
 
-**Interpretation**
+- Export quantities (kg) by commodity code from SSB's external trade statistics ([SSB table 08801](https://www.ssb.no/statbank/table/08801)), which are compiled from customs declarations.
+- N contents from Table 50 in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)<!--cite:schappi_annexes_2025-->.
+
+#### Assumptions
+
+- The quantities are multiplied by an N content per commodity type from the trade mapping sheet of N_parameters.xlsx.
+- No export in these categories is reported before 2002, so all previous years are set to zero.
+
+#### Interpretations and comparisons
 
 - The flow is below 1 kt N per year, with the highest value in 2012 (0.9 kt N).
+- The increase seen from 2022 to 2023 is in the category municipal waste.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References
