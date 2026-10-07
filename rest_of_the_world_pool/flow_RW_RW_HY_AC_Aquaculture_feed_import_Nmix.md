@@ -11,14 +11,21 @@ nav_order: 8
 
 ### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-The import fraction of aquafeed varies by year, rising from about 11% in the mid-1980s to the 92% reported for 2020 (Aas et al., 2022)<!--cite:aas_utilization_2022--> (see the [methodological note](../hydrosphere_pool/subpool_aquaculture.html) on the Aquaculture (HY.AC) subpool page for how this is derived). The amount of feed used is based on the amount of fish produced, calculated using data from Fiskeridirektoratet (2025)<!--cite:fiskeridirektoratet_06002_2025--> on sold farmed fish, using a feed-waste fraction estimated to fall from ~29% in 1990 to the measured 3% (Wang et al., 2013)<!--cite:wang_chemical_2013--> by 2010 (see the same methodological note for how this is derived from the apparent whole-fish retention trend) and 2.8 % nitrogen content in fish and shellfish (Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, p. 254).
+#### Flow description
 
-**How the numbers are derived**
+- **RW.RW-HY.AC-Aquaculture feed import-Nmix** is the imported part of the feed N used in coastal aquaculture.
 
-- Total feed N for aquaculture from the aquafeed budget (harvested fish N divided by the apparent whole-system retention; see the [methodological note](../hydrosphere_pool/subpool_aquaculture.html)).
-- Times the imported share, which combines the share of marine ingredients (89% in 1990, 22% in 2020; Aas et al., 2022), the imported part of the marine ingredients (rising from almost none before 1985), and plant-based ingredients counted as fully imported.
+#### Data sources
 
-**Interpretation**
+- Sold farmed fish from Fiskeridirektoratet (2025)<!--cite:fiskeridirektoratet_06002_2025-->, with 2.8% nitrogen content in fish and shellfish (Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, p. 254).
+- The composition of Norwegian salmon feed (share of marine ingredients 89% in 1990 and 22% in 2020) and the import share of 92% in 2020 from Aas et al. (2022)<!--cite:aas_utilization_2022-->.
+
+#### Assumptions
+
+- Total feed N for aquaculture is the harvested fish N divided by the apparent whole-system retention, with a feed-waste fraction estimated to fall from ~29% in 1990 to the measured 3% (Wang et al., 2013)<!--cite:wang_chemical_2013--> by 2010; see the [methodological note](../hydrosphere_pool/subpool_aquaculture.html) on the Aquaculture (HY.AC) subpool page for how this is derived from the apparent whole-fish retention trend.
+- The imported share combines the share of marine ingredients, the imported part of the marine ingredients (rising from almost none before 1985), and plant-based ingredients counted as fully imported. It rises from about 11% in the mid-1980s to 92% in 2020 (see the [methodological note](../hydrosphere_pool/subpool_aquaculture.html)).
+
+#### Interpretations and comparisons
 
 - The flow rises from 0.4 kt N in 1985 to about 119 kt N in 2024, following the growth of aquaculture and the shift from domestic fish meal to imported plant-based ingredients.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

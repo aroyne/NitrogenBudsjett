@@ -11,18 +11,24 @@ nav_order: 1
 
 ### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-Data on imported animal feed is taken from Landbruksdirektoratet and we have used the detailed composition of animal feed together with protein contents from FAO and specific Jones factors to get nitrogen contents.
+#### Flow description
 
- N content is applied separately by raw-material type: 0.0197 kgN/kg for carbohydrate raw materials and 0.0648 kgN/kg for protein raw materials. NIBIO Totalkalkylen gives statistics for total amount of feed to Norwegian farm animals between 1959 and 2026. Table 6.10 in (Bruholt & Longva, 1994)<!--cite:bruholt_jordbruksstatistikk_1994--> gives the domestically produced fraction of farm animal feed between 1985 and 1994. We combine these data to find values before 2000, using an average import fraction for 1995-1999.
+- **RW.RW-AG.MM-Animal feed import-Nmix** is the N in imported raw materials for concentrate feed for farm animals.
+- Soy meal produced in Norway from imported soybeans is listed as a domestic raw material in Landbruksdirektoratet's statistics, but is counted here as imported feed, since the soybeans are imported (6–10 kt N/year). The same amount is subtracted from MP.FP-AG.MM-Farm animal feed-Nmix.
 
-Soy meal produced in Norway from imported soybeans is listed as a domestic raw material in Landbruksdirektoratet's statistics, but is counted here as imported feed, since the soybeans are imported (6–10 ktN/year). Before 2000, domestic soy meal is taken as 9.3 % (range 7.5–10.2 %, PERT) of total concentrate feed, its share in 2000–2004. The same amount is subtracted from MP.FP-AG.MM-Farm animal feed-Nmix.
+#### Data sources
 
-**How the numbers are derived**
+- From 2000, imported raw materials for concentrate feed from Landbruksdirektoratet's statistics (Årlig råvareforbruk), with the detailed composition of the feed.
+- NIBIO Totalkalkylen gives the total amount of purchased concentrate feed to Norwegian farm animals between 1959 and 2026.
+- Table 6.10 in Bruholt & Longva (1994)<!--cite:bruholt_jordbruksstatistikk_1994--> gives the domestically produced fraction of farm animal feed between 1985 and 1994.
 
-- From 2000, the imported raw materials for concentrate feed from Landbruksdirektoratet's statistics (Årlig råvareforbruk), with 1.97% N in carbohydrate and 6.48% N in protein raw materials, plus soy meal crushed in Norway from imported soybeans.
-- For 1985–1999, total purchased concentrate feed (NIBIO Totalkalkylen) times the imported share (1 − the domestic share in Table 6.10 of Bruholt & Longva (1994) for 1985–1994, and the 1985–1994 mean for 1995–1999), times the mean N content of the imported raw materials from 2000 onward, plus soy meal at 9.3% of the total concentrate feed.
+#### Assumptions
 
-**Interpretation**
+- N contents are calculated from the composition of the feed, protein contents from FAO and specific Jones factors, and applied separately by raw-material type: 0.0197 kg N/kg for carbohydrate raw materials and 0.0648 kg N/kg for protein raw materials (including soy meal).
+- For 1985–1999, total purchased concentrate feed (NIBIO Totalkalkylen) is multiplied by the imported share (1 − the domestic share in Table 6.10 for 1985–1994, and the 1985–1994 mean for 1995–1999) and by the mean N content of the imported raw materials from 2000 onward.
+- Before 2000, domestic soy meal is taken as 9.3% (range 7.5–10.2%, PERT) of total concentrate feed, its share in 2000–2004.
+
+#### Interpretations and comparisons
 
 - The flow is about 30–34 kt N per year in 1990–1999 and rises from 22 kt N in 2000 to about 40 kt N since 2010, as more of the concentrate feed is based on imported protein raw materials.
 - 2000 is a low year in the concentrate feed statistics (24% imported raw materials, compared with 25–40% in the following years), not a break between the two sources.

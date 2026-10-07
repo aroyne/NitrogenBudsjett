@@ -11,13 +11,20 @@ nav_order: 3
 
 ### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-Is taken from FAOSTAT Fertilizer by nutrient FAO (2025)<!--cite:fao_fertilizer_2025-->. Because anhydrous ammonia is not used directly as fertilizer in Norway, it is not counted as a fertilizer in this particular FAO statistic. We therefore account for NH3 import in the flow **RW.RW-MP.OP-Ammonia import-Nmix**.
+#### Flow description
 
-**How the numbers are derived**
+- **RW.RW-AG.SM-Mineral fertilizer import-Nmix** is imported mineral fertilizer N.
+- Because anhydrous ammonia is not used directly as fertilizer in Norway, it is not counted as a fertilizer in the FAO statistic; NH3 import is accounted for in the flow RW.RW-MP.OP-Ammonia import-Nmix.
 
-- The import quantity of fertilizer N from FAOSTAT Fertilizers by Nutrient; imported fertilizer is counted as used in agriculture, and MP.OP-AG.SM-Mineral fertilizer-Nmix is FAOSTAT's agricultural use minus this import.
+#### Data sources
 
-**Interpretation**
+- The import quantity of fertilizer N from FAOSTAT Fertilizers by Nutrient (FAO, 2025<!--cite:fao_fertilizer_2025-->).
+
+#### Assumptions
+
+- Imported fertilizer is counted as used in agriculture, and MP.OP-AG.SM-Mineral fertilizer-Nmix is FAOSTAT's agricultural use minus this import.
+
+#### Interpretations and comparisons
 
 - The flow varies between about 6 and 51 kt N per year and has been 39–51 kt N since 2018, so a growing share of the fertilizer used in Norwegian agriculture is imported.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

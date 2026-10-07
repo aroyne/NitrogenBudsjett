@@ -11,14 +11,24 @@ nav_order: 11
 
 ### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-Is taken from trade data, SSB table 08801. Import of N2 is a large contributor but not included here because it does not contribute to the reactive nitrogen cycle. Within the plastics and synthetic-textile trade categories, N content is assigned by base polymer rather than a single blended factor: nitrogen-containing polymers (polyamide/nylon, polyurethane, melamine and urea formaldehyde resins, polyacrylonitrile) use the N contents given in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, Table 23, while ordinary commodity plastics and fibres with no nitrogen in their polymer backbone (polyethylene, polypropylene, PVC, polystyrene, polyester, viscose/rayon, cotton) are assigned ~0. The same principle applies to clothing, footwear and other finished textile articles: items explicitly of wool use the protein-fibre N content from Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, Table 24 (as for silk), items with a leather component use the same N content as hides and skins, and items of cotton or unspecified synthetic/artificial fibre (predominantly polyester, which - like cotton - has no nitrogen in its polymer backbone) default to ~0. Roundwood, fuel wood, chips, sawdust and wood residues (HS 4401 and 4403) are given the N content of stem wood (1.2 g/kg for conifers and 1.4 g/kg for broadleaves, Table 45 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->), the same as domestic industrial round wood, while processed wood products use 0.2% (Table 22). Plastic waste is counted in RW.RW-PR.SO-Solid waste import-Nmix, and fish waste and by-products (HS 0511) in RW.RW-MP.FP-Food import-Nmix.
+#### Flow description
 
-**How the numbers are derived**
+- **RW.RW-MP.OP-Other goods import-Nmix** is the N in imported chemicals, plastics, rubber, leather, textiles, wood, furniture, toys and other goods.
+- Import of N2 is a large contributor but not included here because it does not contribute to the reactive nitrogen cycle.
+- Plastic waste is counted in RW.RW-PR.SO-Solid waste import-Nmix, and fish waste and by-products (HS 0511) in RW.RW-MP.FP-Food import-Nmix.
 
-- Import quantities (kg) by commodity code are taken from SSB's external trade statistics ([table 08801](https://www.ssb.no/statbank/table/08801)), which are compiled from customs declarations, and multiplied by an N content per commodity type from the trade mapping sheet of N_parameters.xlsx.
-- Chemicals, plastics, rubber, leather, textiles, wood, furniture, toys and other goods, with the N content assigned by material as described above.
+#### Data sources
 
-**Interpretation**
+- Import quantities (kg) by commodity code from SSB's external trade statistics ([SSB table 08801](https://www.ssb.no/statbank/table/08801)), which are compiled from customs declarations.
+
+#### Assumptions
+
+- The quantities are multiplied by an N content per commodity type from the trade mapping sheet of N_parameters.xlsx.
+- Within the plastics and synthetic-textile trade categories, N content is assigned by base polymer rather than a single blended factor: nitrogen-containing polymers (polyamide/nylon, polyurethane, melamine and urea formaldehyde resins, polyacrylonitrile) use the N contents given in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, Table 23, while ordinary commodity plastics and fibres with no nitrogen in their polymer backbone (polyethylene, polypropylene, PVC, polystyrene, polyester, viscose/rayon, cotton) are assigned ~0.
+- The same principle applies to clothing, footwear and other finished textile articles: items explicitly of wool use the protein-fibre N content from Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, Table 24 (as for silk), items with a leather component use the same N content as hides and skins, and items of cotton or unspecified synthetic/artificial fibre (predominantly polyester, which – like cotton – has no nitrogen in its polymer backbone) default to ~0.
+- Roundwood, fuel wood, chips, sawdust and wood residues (HS 4401 and 4403) are given the N content of stem wood (1.2 g/kg for conifers and 1.4 g/kg for broadleaves, Table 45 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->), the same as domestic industrial round wood, while processed wood products use 0.2% (Table 22).
+
+#### Interpretations and comparisons
 
 - The flow is about 24–32 kt N per year since 1995, with peaks such as 45 kt N in 2015 that come from imports of nitric acid (1.6–20.5 kt N per year), a raw material for the fertilizer industry.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

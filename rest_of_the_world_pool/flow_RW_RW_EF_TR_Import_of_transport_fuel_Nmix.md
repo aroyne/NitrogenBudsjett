@@ -11,14 +11,20 @@ nav_order: 7
 
 ### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-Is taken from trade data, SSB table 08801 for all fuel items for transport.
+#### Flow description
 
-**How the numbers are derived**
+- **RW.RW-EF.TR-Import of transport fuel-Nmix** is the N in imported fuels for transport.
 
-- Import quantities (kg) by commodity code are taken from SSB's external trade statistics ([table 08801](https://www.ssb.no/statbank/table/08801)), which are compiled from customs declarations, and multiplied by an N content per commodity type from the trade mapping sheet of N_parameters.xlsx.
+#### Data sources
+
+- Import quantities (kg) by commodity code from SSB's external trade statistics ([SSB table 08801](https://www.ssb.no/statbank/table/08801)), which are compiled from customs declarations.
+
+#### Assumptions
+
+- The quantities are multiplied by an N content per commodity type from the trade mapping sheet of N_parameters.xlsx.
 - Only the commodity codes for transport fuels are included.
 
-**Interpretation**
+#### Interpretations and comparisons
 
 - The flow is small, below 0.5 kt N per year, since transport fuels contain little N.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
