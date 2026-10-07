@@ -14,7 +14,6 @@ nav_order: 3
 #### Flow description
 
 - **PR.SO-AT.AT-Emissions-NH3** is ammonia from waste treatment, using the categories given in Tables 48 and 31 of Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->: 1A1a (public electricity and heat production, in Norway mainly waste incineration and district heating), 5A (solid waste disposal), 5B1 composting, 5B2 anaerobic digestion, 5C (incineration) and 5E (other waste). Category 1A1a is counted here and not in EF.EC-AT.AT, as recommended in chapter 1.4.1.2 of Schäppi et al. (2025), to avoid double counting.
-- Emissions from category 1A1 Energy industries are all assigned to the EF pool.
 
 #### Data sources
 

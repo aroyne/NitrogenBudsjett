@@ -14,6 +14,7 @@ nav_order: 2
 #### Flow description
 
 - **HY.CW-MP.FP-Shellfish-Nmix** combines the catch of shellfish and crustaceans and wild-harvested macroalgae (seaweed). The macroalgae harvest is almost all kelp (Laminaria hyperborea).
+- **The flow includes Antarctic krill, which is part of the Norwegian catch statistics but is caught in the Southern Ocean, not in Norwegian coastal waters. Krill accounts for most of the growth in the flow after 2005 (about 9 kt N in 2024).**
 
 #### Data sources
 

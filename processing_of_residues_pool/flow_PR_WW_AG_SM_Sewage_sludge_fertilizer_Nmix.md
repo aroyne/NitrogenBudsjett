@@ -30,3 +30,7 @@ nav_order: 1
 - The flow is about 1.0–2.5 kt N per year; about 40–60% of the sewage sludge in Norway is used on agricultural land.
 - For comparison, Tables 54 and 55 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> give 2.6–3.7% N in dry matter for dewatered, digested and composted sludge in the JRC models (Huygens et al., 2022) and a median of 4.9% in German analyses (Sichler et al., 2022).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
+
+### References
+
+* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)

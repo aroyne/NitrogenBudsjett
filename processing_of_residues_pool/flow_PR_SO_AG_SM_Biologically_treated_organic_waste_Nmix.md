@@ -36,3 +36,7 @@ nav_order: 1
 - The flow is about 0.7–1.3 kt N per year; about a third of the compost and digestate goes to agricultural land.
 - It rises from 2012 with more biogas production, and digestate from biogas plants is mostly used in agriculture.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
+
+### References
+
+* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)

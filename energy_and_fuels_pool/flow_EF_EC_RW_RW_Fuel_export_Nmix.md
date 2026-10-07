@@ -23,12 +23,12 @@ nav_order: 7
 
 #### Assumptions
 
-- N contents: crude oil (HS 2709) 0.25% (range 0.02–1.5%), residual fuel oil 0.45%, gas/diesel oil 0.0133%, kerosene 0.1%, other oils 0.0375%, bitumen 0.7%, coal and coke 1.0–1.85% and peat 0.2%; gasoline, naphtha and natural gas condensate are included with zero N (Table 15: gasoline 0, naphtha and NGL not specified).
+- N contents: crude oil (HS 2709) 0.25% (lognormal with this median and 1.5% as the upper end of the 95% interval), residual fuel oil 0.45%, gas/diesel oil 0.0133%, kerosene 0.1%, other oils 0.0375%, bitumen 0.7%, coal and coke 1.0–1.85% and peat 0.2%; gasoline, naphtha and natural gas condensate are included with zero N (Table 15: gasoline 0, naphtha and NGL not specified).
 - The selection of HS codes and fuel types is defined in the trade mapping sheet of N_parameters.xlsx.
 
 #### Interpretations and comparisons
 
-- Crude oil dominates the flow, accounting for over 99% of its N content, giving a total on the order of 150–210 kt N per year (2013–2023).
+- Crude oil dominates the flow, accounting for over 99% of its N content, giving a total on the order of 160–220 kt N per year (2013–2023).
 - The uncertainty of the flow lies mainly in the N content of crude oil, which varies between fields (0.02–1.5%).
 - The flow is broadly consistent with the Norway-specific crude oil N content and export estimate of Hohmann-Marriott (2025)<!--cite:hohmann-marriott_nitrogen_2025-->.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

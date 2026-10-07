@@ -13,7 +13,7 @@ nav_order: 11
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 #### Flow description
 
-- **MP.OP-PR.WW-Other industry wastewater-Nmix** is N discharged from other producing industry facilities to the municipal sewage network, found by counting those that are not reported to be connected to municipal wastewater treatment.
+- **MP.OP-PR.WW-Other industry wastewater-Nmix** is N discharged from other producing industry facilities to the municipal sewage network, found by counting those that are reported to be connected to municipal wastewater treatment.
 
 #### Data sources
 

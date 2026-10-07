@@ -27,7 +27,7 @@ nav_order: 1
 #### Interpretations and comparisons
 
 - The flow rises from about 43 kt N in 1990 to about 70 kt N around 2000 and falls to 50 kt N in 2024, following the catch of pelagic fish such as herring, mackerel and blue whiting, which varies with stock sizes and quotas.
-- Our results are very close to those of Hohmann-Marriott (2025)<!--cite:hohmann-marriott_nitrogen_2025--> (also when looking at shellfish and aquaculture).
+- Hohmann-Marriott (2025)<!--cite:hohmann-marriott_nitrogen_2025--> found 107 kt N from fisheries in 2018, mainly fish, against about 70 kt N here (63 kt N wild fish and 7 kt N shellfish). Their values for crustaceans (8 kt N) and aquaculture (38 kt N in 2018 and 41 kt N in 2020) are close to ours (HY.CW-MP.FP-Shellfish-Nmix and HY.AC-MP.FP-Coastal fish and seafood-Nmix).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References

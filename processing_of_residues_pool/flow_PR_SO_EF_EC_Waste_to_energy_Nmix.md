@@ -29,7 +29,7 @@ nav_order: 5
 - Sludge incinerated is mainly industrial sludge, so the N content of industrial effluent sludges (1.4%, Table 50) is used.
 - Table 10513 reports most incinerated residual waste as mixed waste (0.9% N), while table 05281 split the same waste into materials with lower N contents; from 2011 to 2012 the incinerated tonnage rises about 12% but the N per tonne about 30%. The 1995–2011 values are therefore scaled by the ratio of the N per tonne in 2012 to that in 2011, so the series is continuous in N content.
 - Before 1995 the flow is the total waste (household and industry) multiplied by the share incinerated in historical SSB records, with the overall N content of the waste equal to the 1995 value, calibrated so that the same calculation gives the 1995 value.
-- For years with missing data, we interpolate.
+- The historical records give the share incinerated for 1985 and 1992–1995; for 1990–1991 it is interpolated linearly between 1985 and 1992.
 
 #### Interpretations and comparisons
 

@@ -27,6 +27,6 @@ nav_order: 3
 
 #### Interpretations and comparisons
 
-- The flow is about 3.9–4.5 kt N per year, with a slight decrease since 1990.
+- The flow is about 3.3–3.8 kt N per year, with a slight decrease since 1990.
 - The uncertainty is large (CV about 40%), mainly from the emission factors.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

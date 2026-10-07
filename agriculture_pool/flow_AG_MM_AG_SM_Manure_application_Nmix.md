@@ -14,7 +14,7 @@ nav_order: 1
 #### Flow description
 
 - **AG.MM-AG.SM-Manure application-Nmix** is the manure N applied to agricultural soils: managed manure N net of losses during animal housing and manure storage (tracked separately as AG.MM's own NH3/N2O/NOx emission flows), plus the share of manure deposited directly by grazing animals that lands on agricultural grazing land (innmark) rather than unmanaged land (utmark).
-- The utmark share is not included in any flow in this study; see the Other Land (FS.OL) subpool page for that portion and why it is excluded.
+- The utmark share is not included as a flow in this study. The N lost from it by leaching and runoff is part of the runoff from upland areas in TEOTIL3 (FS.OL-HY.SW-Leaching-Nmix), while its NH3 and N2O emissions are not included anywhere (they are removed from the AG.SM emission flows); see the Other Land (FS.OL) subpool page.
 
 #### Data sources
 

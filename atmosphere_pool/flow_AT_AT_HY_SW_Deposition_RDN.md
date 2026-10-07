@@ -30,3 +30,7 @@ nav_order: 13
 - The steps follow the five-year periods of the NILU data; the decline reflects lower emissions in Europe, more for oxidised than for reduced N.
 - For comparison, the data used in the TEOTIL model give 3.5 kt N in 2013 and 3.0 kt N in 2023 – a similar declining trend to our combined OXN+RDN values (about 9.4 and 8.1 kt N for the same years), but substantially lower in magnitude, likely reflecting different datasets and different data treatment.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
+
+### References
+
+* Blake, L. R., Aas, W., Denby, B., Hjellbrekke, A., Mu, Q., Simpson, D., & Fagerli, H. (2023). *Deposition of sulfur and nitrogen in Norway 2017-2021*.

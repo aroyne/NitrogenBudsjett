@@ -23,7 +23,6 @@ nav_order: 7
 #### Assumptions
 
 - Each landfill is classified as connected or not connected to a municipal sewage network from publicly available information; where this was not possible, half of the emissions are assigned to each of PR.SO-HY.SW-Leaching-Nmix and PR.SO-PR.WW-Wastewater from landfills-Nmix.
-- For years before 2011 we have extrapolated using the average value from 2011 onward. This probably underestimates the real value because landfilling was more prevalent in previous years.
 - 1990–2010 are the mean of 2011 onward scaled with methane from landfills.
 
 #### Interpretations and comparisons

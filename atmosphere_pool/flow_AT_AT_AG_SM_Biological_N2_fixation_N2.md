@@ -31,7 +31,7 @@ nav_order: 1
 
 - The flow is constant at 12 kt N per year, since there are no annual data on clover in Norwegian grassland.
 - The rate of 80 kg N/ha used by Bleken & Bakken (1997) agrees relatively well with the later Norwegian studies.
-- In Sweden (Moldan et al., 2025)<!--cite:moldan_where_2025-->, with about three times the agricultural area of Norway, the value was found to be 34 kt N in 2015, which is more in line with the values found before 2000.
+- In Sweden the value was 34 kt N in 2015 (Moldan et al., 2025<!--cite:moldan_where_2025-->, from the Eurostat Gross Nutrient Balance), about 11 kg N per ha on about 3 million ha of agricultural land; our value gives about 12 kg N per ha on about 1 million ha.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References

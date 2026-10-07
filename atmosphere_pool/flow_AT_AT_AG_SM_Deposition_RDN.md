@@ -29,3 +29,7 @@ nav_order: 3
 - The flow falls from about 4.4 kt N in 1984–1987 to about 3 kt N in 1997–2016 and 2.4–2.5 kt N from 2017.
 - The steps follow the five-year periods of the NILU data; the decline reflects lower emissions in Europe, more for oxidised than for reduced N.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
+
+### References
+
+* Blake, L. R., Aas, W., Denby, B., Hjellbrekke, A., Mu, Q., Simpson, D., & Fagerli, H. (2023). *Deposition of sulfur and nitrogen in Norway 2017-2021*.
