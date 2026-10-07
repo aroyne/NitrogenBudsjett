@@ -11,15 +11,20 @@ nav_order: 14
 
 ### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-**AT.AT-HY.SW-N2 fixation-N2**
+#### Flow description
 
-According to NIBIO (NIBIO, 2026)<!--cite:nibio_arealbarometer_2026-->, the surface water area is 20 457 km2 https://arealbarometer.nibio.no/nb/norge/. Table 62 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> (after Reddy and DeLaune, 2008) gives biological fixation rates of 0–18 (mean 9) kg N/ha in oligotrophic lakes, 0–1 (mean 1) kg N/ha in mesotrophic lakes and 2–91 (mean 47) kg N/ha in eutrophic lakes. Most Norwegian lakes are oligotrophic, but N fixation in nutrient-poor boreal lakes is generally low, and we use 0.1 tN/km2 (1 kg N/ha, the mesotrophic mean) as the median of a lognormal distribution with 2 tN/km2 as the upper end of the 95 % interval.
+- **AT.AT-HY.SW-N2 fixation-N2** is biological N2 fixation in lakes and rivers.
 
-**How the numbers are derived**
+#### Data sources
 
-- The surface water area of 20 457 km² ([NIBIO Arealbarometer](https://arealbarometer.nibio.no/nb/norge/)) is multiplied by 0.1 t N/km² (lognormal, 95% interval 0.005–2 t N/km²).
+- Surface water area of 20 457 km² from NIBIO ([Arealbarometer](https://arealbarometer.nibio.no/nb/norge/); NIBIO, 2026<!--cite:nibio_arealbarometer_2026-->).
+- Table 62 in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)<!--cite:schappi_annexes_2025--> (after Reddy and DeLaune, 2008) gives biological fixation rates of 0–18 (mean 9) kg N/ha in oligotrophic lakes, 0–1 (mean 1) kg N/ha in mesotrophic lakes and 2–91 (mean 47) kg N/ha in eutrophic lakes.
 
-**Interpretation**
+#### Assumptions
+
+- Most Norwegian lakes are oligotrophic, but N fixation in nutrient-poor boreal lakes is generally low, and we use 0.1 t N/km² (1 kg N/ha, the mesotrophic mean) as the median of a lognormal distribution with 2 t N/km² as the upper end of the 95% interval (95% interval 0.005–2 t N/km²).
+
+#### Interpretations and comparisons
 
 - The flow is constant at about 2 kt N per year, with a large uncertainty (95% interval about 0.1–40 kt N).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

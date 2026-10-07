@@ -11,18 +11,21 @@ nav_order: 16
 
 ### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-**AT.AT-RW.RW-Atmospheric outflow-OXN**
+#### Flow description
 
-is the nitrogen emitted in Norway and deposited elsewhere in the EMEP domain, found using source-receptor data from (EMEP, 2024)<!--cite:emep_sr_2024-->, as advised by (Schäppi et al., 2025)<!--cite:schappi_annexes_2025-->.
+- **AT.AT-RW.RW-Atmospheric outflow-OXN** is the nitrogen emitted in Norway and deposited elsewhere in the EMEP domain.
 
-**How the numbers are derived**
+#### Data sources
 
-- From the [EMEP source-receptor tables](https://emep.int/mscw/mscw_srdata.html): deposition in the EMEP domain from Norwegian emissions of nitrogen oxides, minus the part deposited in Norway, which is included in the national deposition flows (AT.AT-*-Deposition-OXN).
+- The [EMEP source-receptor tables](https://emep.int/mscw/mscw_srdata.html) (EMEP, 2024<!--cite:emep_sr_2024-->), as advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->: deposition in the EMEP domain from Norwegian emissions of nitrogen oxides, minus the part deposited in Norway, which is included in the national deposition flows (AT.AT-*-Deposition-OXN).
 - 1997–2006 are from EMEP's recalculation of these years with one model version (2009); from 2007 each year is from the annual EMEP Status Report, calculated with the model version and meteorology of that year. The tables for 2019, 2020 and 2022–2024 are taken from Appendix C of the Status Reports, and the table files are compiled by data_files/emep_sr_norway.py.
+
+#### Assumptions
+
 - 2015 has no tables and is the mean of 2014 and 2016; 1984–1996 are the mean of 1997–2001.
 - The change of EMEP model domain and version in 2007 gives a break in the deposition in Norway from foreign emitters (see RW.RW-AT.AT-Atmospheric inflow), but not in the deposition of Norwegian emissions abroad, so this flow is not corrected.
 
-**Interpretation**
+#### Interpretations and comparisons
 
 - The flow is about 35–42 kt N per year up to 2021 and falls to 25 kt N in 2024, following lower Norwegian NOx emissions.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

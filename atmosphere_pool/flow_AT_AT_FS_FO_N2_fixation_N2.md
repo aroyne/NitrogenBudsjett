@@ -11,15 +11,22 @@ nav_order: 6
 
 ### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-Following the Swedish NBB Moldan et al. (2025)<!--cite:moldan_where_2025-->, we use an N-fixation rate of 1.5 kg/ha/year and a forested area of 12.0 mill ha as given by SSB for 2019-2023 (table 14368); we assume this value is constant for our entire time period. This gives an annual N-fixation rate of 18.0 ktN. For comparison, the value for Sweden in 2015 was found to be 39.5 ktN Moldan et al. (2025)<!--cite:moldan_where_2025-->.
+#### Flow description
 
-**How the numbers are derived**
+- **AT.AT-FS.FO-N2 fixation-N2** is biological N2 fixation in forests.
 
-- 1.5 kg N/ha per year (range ±50%), as in the Swedish NNB (Moldan et al., 2025), times 12.0 million ha forest ([SSB table 14368](https://www.ssb.no/statbank/table/14368), 2019–2023), constant over the period.
+#### Data sources
 
-**Interpretation**
+- Forested area of 12.0 million ha from SSB ([table 14368](https://www.ssb.no/statbank/table/14368), 2019–2023).
+- N-fixation rate of 1.5 kg N/ha per year from the Swedish NNB (Moldan et al., 2025)<!--cite:moldan_where_2025-->.
 
-- The flow is constant at about 18 kt N per year; for comparison, Sweden has 39.5 kt N in 2015 (Moldan et al., 2025).
+#### Assumptions
+
+- 1.5 kg N/ha per year (range ±50%) times the forested area, assumed constant for the entire time period.
+
+#### Interpretations and comparisons
+
+- The flow is constant at about 18 kt N per year; for comparison, the value for Sweden in 2015 was 39.5 kt N (Moldan et al., 2025)<!--cite:moldan_where_2025-->.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References
