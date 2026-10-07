@@ -11,5 +11,14 @@ nav_order: 2
 
 ### Flow Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-**PR.SO-AT.AT-Emissions-N2O** is taken from UNFCCC Common reporting tables, Table 4, where we have included emissions from landfills, waste incineration and biofuel production. 
+**PR.SO-AT.AT-Emissions-N2O** is taken from UNFCCC Common reporting tables, Table 5, where we have included emissions from biological treatment of waste (composting and biogas production) and waste incineration; landfills report no N2O. 
+
+**How the numbers are derived**
+
+- The flow is the N2O from "5.B. Biological treatment of solid waste" and "5.C. Incineration and open burning of waste" in CRT Table 5 of the national greenhouse gas inventory ([Miljødirektoratet, NID 2026](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)), calculated from the amounts of waste composted, digested and incinerated and emission factors.
+- N2O is converted to N with the factor 28/44.
+
+**Interpretation**
+
+- The flow is small, below 0.005 kt N in 1990 and 0.02–0.04 kt N per year since 2000; biological treatment accounts for most of it.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

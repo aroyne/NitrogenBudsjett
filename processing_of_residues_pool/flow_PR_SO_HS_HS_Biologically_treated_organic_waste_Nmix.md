@@ -11,13 +11,17 @@ nav_order: 6
 
 ### Flow Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-**PR.SO-HS.HS-Biologically treated organic waste-Nmix** includes all forms of organic waste except sewage sludge that is organically treated and used in agricultural soils. Biological treatment of organic waste includes both composting and biogas production, but in Norway, most of the waste composted in the municipal waste sector is used on the private sector, not in agriculture.
+**PR.SO-HS.HS-Biologically treated organic waste-Nmix** is the N in compost and digestate from biological treatment of organic waste (composting and biogas production) used on green areas or delivered to soil producers. Sewage sludge that is treated biologically is counted in the PR.WW sludge flows and left out here.
 
-SSB statistics on composted organic waste also includes some composted wastewater sludge, but there is no exact statistics on the amount.
+**How the numbers are derived**
 
-From 2018, we use data on the disposal of biologically produced waste from SSB table 12818 assuming a typical N content of compost, although a smaller fraction is also biogas digestate.
+- N in: SSB's waste accounts ([table 10513](https://www.ssb.no/statbank/table/10513)) give the wet organic waste, park and garden waste and wood waste delivered to biogas production and to composting, multiplied by an N content per waste type (wet organic 0.9%, park and garden and wood 0.25%; Table 50 in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)).
+- N out: part of the N is lost as NH3, N2O and N2 during treatment; we assume a loss of 10% in biogas production (digestate_loss_fraction) and 30% in composting (compost_N_loss).
+- Use: SSB's statistics on biological treatment ([table 12818](https://www.ssb.no/statbank/table/12818)) give how much compost and digestate is delivered to each use from 2018; this flow gets the share delivered to green areas and soil producers. Before 2018 the 2018 shares are used.
+- The N is calculated from the N delivered to treatment, not from the mass of the products, since most of the mass lost during treatment is water and carbon (in 2018, 515 kt of waste was delivered and 286 kt of products were disposed of).
+- Table 10513 starts in 2012; 1990–2011 are held at the 2012 value, although biological treatment was smaller in the 1990s.
 
-For 2012-2017, we use data on composted organic waste from SSB table 10513 “Avfallsregnskap for Norge (1 000 tonn) and scale the nitrogen value in 2018 for consistency.
+**Interpretation**
 
-There are no official data prior to 2012, but we know that there was organic waste composted and used in the private sector. In lack of other data we extrapolate the 2012 value back to 1990.
+- The flow is about 0.6–1.2 kt N per year; about a third of the compost and digestate goes to green areas and soil producers.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

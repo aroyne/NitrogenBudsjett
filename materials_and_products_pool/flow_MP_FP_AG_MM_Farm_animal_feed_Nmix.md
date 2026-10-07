@@ -17,9 +17,18 @@ N content is applied separately by raw-material type, derived from the feed comp
 
 Hohmann-Marriott (2025)<!--cite:hohmann-marriott_nitrogen_2025--> found the domestic supply of animal feed in 2010 to be around 35 ktN, based on FAO statistics of production, export and import of seed cake, which is a dominant ingredient in farm animal feed. This is less than we found when combining domestic and imported animal feed. *(Note: This estimate might be too low, as it leads to a surplus here and a deficit in the AG.MM pool).*
 
-**How the numbers are derived.** From 2004 the flow is based on Landbruksdirektoratet's concentrate feed statistics (Landbruksdirektoratet, 2025)<!--cite:landbruksdirektoratet_kraftforstatistikk_2025-->, which give the annual use of raw materials in compound feed from Norwegian feed mills, as reported by the feed producers, split into Norwegian and imported raw materials and by raw material group. The Norwegian carbohydrate raw materials (mainly cereals) are multiplied by 1.97% N and the Norwegian protein raw materials by 6.48% N; fat and mineral raw materials are not included. For 1985–1999 the total amount of purchased concentrate feed is taken from Totalkalkylen for jordbruket (Budsjettnemnda for jordbruket, 2025)<!--cite:bfj_totalkalkylen_2025-->, the sector account for Norwegian agriculture compiled by NIBIO, and multiplied by the domestically produced share (Bruholt & Longva (1994)<!--cite:bruholt_jordbruksstatistikk_1994--> for 1985–1994, 69.4% for 1995–1999) and by the average N content per tonne of Norwegian raw materials in 2004–2024. Norwegian-crushed soy meal is subtracted in all years: from the statistics from 2004, and as 9.3% of the concentrate feed before 2000.
+**How the numbers are derived**
 
-**Interpretation.** The flow varies between 9 and 18 kt N without a clear trend. Much of the year-to-year variation is consistent with the size of the Norwegian cereal harvest, which determines how much of the carbohydrate raw material can be sourced domestically: the flow is low in 2019 (10.4 kt N), after the drought in 2018, and in 2024 (13.7 kt N), after the poor harvest in 2023, and high in 2023 (17.6 kt N). In 2024 the total N in concentrate feed (this flow plus RW.RW-AG.MM-Animal feed import-Nmix) is about 54 kt N, of which about a quarter is domestic.
+- From 2004 the flow is based on Landbruksdirektoratet's concentrate feed statistics (Landbruksdirektoratet, 2025)<!--cite:landbruksdirektoratet_kraftforstatistikk_2025-->, which give the annual use of raw materials in compound feed from Norwegian feed mills, as reported by the feed producers, split into Norwegian and imported raw materials and by raw material group.
+- The Norwegian carbohydrate raw materials (mainly cereals) are multiplied by 1.97% N and the Norwegian protein raw materials by 6.48% N; fat and mineral raw materials are not included.
+- For 1985–1999 the total amount of purchased concentrate feed is taken from Totalkalkylen for jordbruket (Budsjettnemnda for jordbruket, 2025)<!--cite:bfj_totalkalkylen_2025-->, the sector account for Norwegian agriculture compiled by NIBIO, and multiplied by the domestically produced share (Bruholt & Longva (1994)<!--cite:bruholt_jordbruksstatistikk_1994--> for 1985–1994, 69.4% for 1995–1999) and by the average N content per tonne of Norwegian raw materials in 2004–2024.
+- Norwegian-crushed soy meal is subtracted in all years: from the statistics from 2004, and as 9.3% of the concentrate feed before 2000.
+
+**Interpretation**
+
+- The flow varies between 9 and 18 kt N without a clear trend.
+- Much of the year-to-year variation is consistent with the size of the Norwegian cereal harvest, which determines how much of the carbohydrate raw material can be sourced domestically: the flow is low in 2019 (10.4 kt N), after the drought in 2018, and in 2024 (13.7 kt N), after the poor harvest in 2023, and high in 2023 (17.6 kt N).
+- In 2024 the total N in concentrate feed (this flow plus RW.RW-AG.MM-Animal feed import-Nmix) is about 54 kt N, of which about a quarter is domestic.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References

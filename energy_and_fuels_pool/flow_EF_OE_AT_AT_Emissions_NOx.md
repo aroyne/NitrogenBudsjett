@@ -13,9 +13,17 @@ nav_order: 3
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 EF.OE-AT.AT-Emissions-NOx is NOx emissions from fuel combustion in residential, commercial and other sectors that are not already covered. We have used data from CLRTAP Inventory Submissions EMEP (2025)<!--cite:emep_officially_2025--> as advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, using the categories given in Table 14. 
 
-**How the numbers are derived.** The emissions reported to CLRTAP are not measured but calculated in the national inventory, mainly as activity data (fuel consumption by fuel type and source category, from the national energy statistics) multiplied by emission factors, following the [EMEP/EEA Guidebook 2023](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023); for some large point sources, plant-specific reported emissions are used. The methods are documented in the [Informative Inventory Report 2026, Norway](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/informative-inventory-report-iir-2026-norway-air-pollutant-emissions-1990-2024/). The values are reported in Gg NOx (as NO2) or Gg NH3 and converted to N with the factors 14/46 and 14/17, respectively.
+**How the numbers are derived**
 
-**Interpretation.** NOx emissions declined from about 30 Gg in the 1990s to about 18 Gg in 2024. The largest source is national fishing (1A4ciii), with 12–17 Gg until 2000 and 5.6 Gg in 2024, reflecting a smaller and more modern fishing fleet and NOx-reducing measures. Other important sources are commercial and household mobile machinery (1A4aii, 1A4bii), agricultural and forestry machinery (1A4cii) and other mobile sources including military and recreational boats (1A5b).
+- The emissions reported to CLRTAP are not measured but calculated in the national inventory, mainly as activity data (fuel consumption by fuel type and source category, from the national energy statistics) multiplied by emission factors, following the [EMEP/EEA Guidebook 2023](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023); for some large point sources, plant-specific reported emissions are used.
+- The methods are documented in the [Informative Inventory Report 2026, Norway](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/informative-inventory-report-iir-2026-norway-air-pollutant-emissions-1990-2024/).
+- The values are reported in Gg NOx (as NO2) or Gg NH3 and converted to N with the factors 14/46 and 14/17, respectively.
+
+**Interpretation**
+
+- NOx emissions declined from about 30 Gg in the 1990s to about 18 Gg in 2024.
+- The largest source is national fishing (1A4ciii), with 12–17 Gg until 2000 and 5.6 Gg in 2024, reflecting a smaller and more modern fishing fleet and NOx-reducing measures.
+- Other important sources are commercial and household mobile machinery (1A4aii, 1A4bii), agricultural and forestry machinery (1A4cii) and other mobile sources including military and recreational boats (1A5b).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References

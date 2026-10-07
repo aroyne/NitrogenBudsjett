@@ -17,9 +17,16 @@ The net caloric value of 15.6 for conversion is taken from table 1.2 in Garg et 
 
 Table 08205 starts in 2003. For 1990–2002 we use solid biofuels used in industry and mining from the energy balance ([SSB table 11561](https://www.ssb.no/statbank/table/11561), "12.1 Industri og bergverk"), scaled to the level of table 08205 by the ratio of the two series over 2003–2007 (about 1.06), since the energy balance also includes purchased biofuels.
 
-**How the numbers are derived.** SSB's statistics on energy use in manufacturing and mining ([Energibruk i industrien](https://www.ssb.no/energi-og-industri/energi/statistikk/energibruk-i-industrien), [table 08205](https://www.ssb.no/statbank/table/08205)) are based on a survey of about 2,300 establishments, including the largest establishments in each industry, which together cover about 95% of the energy use; energy use in the remaining establishments is estimated from their energy costs. "Egentilvirket bioenergi" (self-produced bioenergy, GWh) covers own wood residues, black liquor and other waste used for energy. The values are converted to TJ, divided by a net calorific value of 15.6 TJ/kt and multiplied by 0.4% N.
+**How the numbers are derived**
 
-**Interpretation.** The flow is about 3.4–4.1 kt N per year until 2011, falls to about 1.7 kt N in 2014–2015 and has been 2.3–2.7 kt N since. The decline coincides with the closure of several pulp and paper mills, among them Norske Skog Follum (2012) and Södra Cell Tofte (2013).
+- SSB's statistics on energy use in manufacturing and mining ([Energibruk i industrien](https://www.ssb.no/energi-og-industri/energi/statistikk/energibruk-i-industrien), [table 08205](https://www.ssb.no/statbank/table/08205)) are based on a survey of about 2,300 establishments, including the largest establishments in each industry, which together cover about 95% of the energy use; energy use in the remaining establishments is estimated from their energy costs.
+- "Egentilvirket bioenergi" (self-produced bioenergy, GWh) covers own wood residues, black liquor and other waste used for energy.
+- The values are converted to TJ, divided by a net calorific value of 15.6 TJ/kt and multiplied by 0.4% N.
+
+**Interpretation**
+
+- The flow is about 3.4–4.1 kt N per year until 2011, falls to about 1.7 kt N in 2014–2015 and has been 2.3–2.7 kt N since.
+- The decline coincides with the closure of several pulp and paper mills, among them Norske Skog Follum (2012) and Södra Cell Tofte (2013).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References

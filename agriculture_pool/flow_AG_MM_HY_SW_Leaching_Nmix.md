@@ -13,7 +13,12 @@ nav_order: 5
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 Taken from UNFCCC Common reporting tables, Table 3.
 
-**How the numbers are derived.** The flow is the N lost through leaching and runoff from manure management in CRT Table 3.B(b), reported as the basis for indirect N2O emissions (3.B.5). It is calculated in the inventory as a fraction of the N in managed manure, using the manure model described under AG.MM-AG.SM-Manure application-Nmix ([Miljødirektoratet, NID 2026](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)).
+**How the numbers are derived**
 
-**Interpretation.** The flow is about 3 kt N per year with little change since 1990.
+- The flow is the N lost through leaching and runoff from manure management in CRT Table 3.B(b), reported as the basis for indirect N2O emissions (3.B.5).
+- It is calculated in the inventory as a fraction of the N in managed manure, using the manure model described under AG.MM-AG.SM-Manure application-Nmix ([Miljødirektoratet, NID 2026](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)).
+
+**Interpretation**
+
+- The flow is about 3 kt N per year with little change since 1990.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

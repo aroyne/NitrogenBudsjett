@@ -423,8 +423,34 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
 
 
 def find_household_waste(preloaded_data, current_params, dataset_noise):
+    """
+    N in waste from private households, services and construction (used for
+    HS.HS-PR.SO-Household waste-Nmix and in the 1990-1994 estimates of other
+    PR flows), from SSB table 05282 (1995-2011) and 10514 (2012-2024), with
+    1990-1994 extrapolated from waste per inhabitant.
+
+    SSB revised the waste accounts from 2012, which gives a break between the
+    two tables:
+    - Private households: the total amount is about the same in 2011 and
+      2012, but table 10514 reports most residual waste as mixed waste, which
+      05282 split into materials. This changes the N only slightly and is not
+      adjusted.
+    - Services and construction: table 10514 reports much more waste than
+      05282 (most likely because the new method builds on the waste received
+      by treatment plants rather than on estimates per employee). The 05282
+      years for these sectors are scaled by the ratio of their N in 2012 to
+      that in 2011.
+    - The sectors "Elektrisitets-, gass-, damp- og varmtvannsforsyning" and
+      "Vannforsyning, avløps- og renovasjonsvirksomhet" in table 10514 are
+      not included: they have no counterpart in 05282, and waste from the
+      waste management sector is largely residues from treating waste that
+      has already been counted.
+    Table 05282 also shows a real dip in 2009 in construction and services
+    (financial crisis and/or the change from SN2002 to SN2007 in 2008); it is
+    not corrected.
+    """
     household_waste = {y: 0.0 for y in range(1990, 2024)}
-    
+
     noise_05282 = float(dataset_noise['05282'])
     noise_10514 = float(dataset_noise['10514'])
     noise_interp = float(dataset_noise['trend interpolation'])
@@ -440,118 +466,43 @@ def find_household_waste(preloaded_data, current_params, dataset_noise):
     park_N    = float(current_params.waste_N_frac('park_garden'))
     mixed_N   = float(current_params.waste_N_frac('mixed_waste'))
 
-    # =========================================================================
-    # TABLE 05281 / 05282 (1995-2011)
-    # =========================================================================
-    # Sectors summed here: Bygge- og anleggsvirksomhet (construction),
-    # Tjenesteytende næringer (services), Private husholdninger (households).
-    # Unlike the 2012+ block below, this period does NOT include the
-    # power/water supply or water/sewage/waste-management sectors - 05282
-    # doesn't group them the same way 10514 does, and no attempt is made to
-    # reconstruct an equivalent. This is a real (small) source of
-    # under-coverage for 1995-2011 relative to 2012+.
-    #
-    # 'Blandet avfall' (mixed waste) has no equivalent row in this table at
-    # all. Verified this isn't hidden elsewhere: 05282's own row totals for
-    # these sectors are fully reconciled by metal + glass + concrete + sludge
-    # (the rows deliberately excluded here) - there's no unaccounted tonnage.
-    # 'Blandet avfall' is a new SSB reporting category that starts with table
-    # 10514 in 2012, persistently large (~2300-2400 kt/year in these sectors,
-    # not a one-off), not a reclassification of tonnage that existed before
-    # under another name. This means 1995-2011 household waste is likely a
-    # real undercount of the true total relative to 2012 onward, not a
-    # double-counting or calibration artifact in this function - visible as a
-    # ~40% jump in the computed flow between 2011 and 2012.
-    #
-    # Separately, 2009 shows a real dip (should not be corrected): this
-    # table's own footnote states industries are classified under SN2007 from
-    # 2008 (SN2002 before), and the dip is entirely in the construction and
-    # services sectors specifically - private households alone shows no dip
-    # and grows smoothly throughout. Consistent with the 2008-2009 financial
-    # crisis, the classification change, or both.
+    # Table 05282 (1995-2011): rows by material; sector column offsets from
+    # each year's first column: 5 = Bygge- og anleggsvirksomhet,
+    # 6 = Tjenesteytende næringer, 9 = Private husholdninger.
+    rows_05282 = {6: paper_N, 8: plastic_N, 11: wood_N, 12: textile_N, 13: wet_N,
+                  16: other_N, 17: haz_N, 18: contam_N}
+    # Table 10514 (2012-2024): offsets 6 = Bygge- og anleggsvirksomhet,
+    # 7 = Tjenesteytende næringer, 9 = Private husholdninger.
+    rows_10514 = {6: wet_N, 7: park_N, 8: wood_N, 10: paper_N, 16: plastic_N, 18: textile_N,
+                  21: haz_N, 22: mixed_N, 23: other_N, 24: contam_N}
+
+    def year_columns(df, first, last):
+        cols = {}
+        for col_idx in range(1, df.shape[1]):
+            val = str(df.iloc[3, col_idx]).strip()
+            if val.replace('.0', '').isdigit() and first <= int(float(val)) <= last:
+                cols[int(float(val))] = col_idx
+        return cols
+
+    def sector_N(df, rows, col_idx, offsets):
+        return sum(float(df.iloc[r, col_idx + c]) * n for r, n in rows.items() for c in offsets)
+
     df_05282 = preloaded_data['ssb_05282']
-    value_1995 = 0.0
-    width_05282 = df_05282.shape[1]
-
-    col_to_year = {}
-    for col_idx in range(1, width_05282):
-        val = str(df_05282.iloc[3, col_idx]).strip()
-        if val.replace('.0', '').isdigit():
-            y = int(float(val))
-            if 1995 <= y <= 2011:
-                col_to_year[col_idx] = y
-
-    for col_idx, year in col_to_year.items():
-        val_year = 0.0
-        
-        # Paper (row 7 -> index 6)
-        for c in [5, 6, 9]:
-            if col_idx + c < width_05282: val_year += float(df_05282.iloc[6, col_idx + c]) * paper_N
-        # Plastic (row 9 -> index 8)
-        for c in [5, 6, 9]:
-            if col_idx + c < width_05282: val_year += float(df_05282.iloc[8, col_idx + c]) * plastic_N
-        # Wood waste (row 12 -> index 11)
-        for c in [5, 6, 9]:
-            if col_idx + c < width_05282: val_year += float(df_05282.iloc[11, col_idx + c]) * wood_N
-        # Textiles (row 13 -> index 12)
-        for c in [5, 6, 9]:
-            if col_idx + c < width_05282: val_year += float(df_05282.iloc[12, col_idx + c]) * textile_N
-        # Wet organic (row 14 -> index 13)
-        for c in [5, 6, 9]:
-            if col_idx + c < width_05282: val_year += float(df_05282.iloc[13, col_idx + c]) * wet_N
-        # Other materials (row 17 -> index 16)
-        for c in [5, 6, 9]:
-            if col_idx + c < width_05282: val_year += float(df_05282.iloc[16, col_idx + c]) * other_N
-        # Hazardous waste (row 18 -> index 17)
-        for c in [5, 6, 9]:
-            if col_idx + c < width_05282: val_year += float(df_05282.iloc[17, col_idx + c]) * haz_N
-        # Contaminated masses (row 19 -> index 18)
-        for c in [5, 6, 9]:
-            if col_idx + c < width_05282: val_year += float(df_05282.iloc[18, col_idx + c]) * contam_N
-
-        household_waste[year] = val_year * noise_05282
-        if year == 1995:
-            value_1995 = household_waste[year]
-
-    # =========================================================================
-    # TABLE 10513 / 10514 (2012-2024)
-    # =========================================================================
     df_10514 = preloaded_data['ssb_10514']
-    width_10514 = df_10514.shape[1]
+    cols_05282 = year_columns(df_05282, 1995, 2011)
+    cols_10514 = year_columns(df_10514, 2012, 2024)
 
-    col_to_year_10514 = {}
-    for col_idx in range(1, width_10514):
-        val = str(df_10514.iloc[3, col_idx]).strip()
-        if val.replace('.0', '').isdigit():
-            y = int(float(val))
-            if 2012 <= y <= 2024:
-                col_to_year_10514[col_idx] = y
+    services_construction_scale = (sector_N(df_10514, rows_10514, cols_10514[2012], [6, 7])
+                                   / sector_N(df_05282, rows_05282, cols_05282[2011], [5, 6]))
 
-    for col_idx, year in col_to_year_10514.items():
-        val_year = 0.0
-        
-        for c in [4, 5, 6, 7, 9]:
-            if col_idx + c < width_10514: val_year += float(df_10514.iloc[6, col_idx + c]) * wet_N
-        for c in [4, 5, 6, 7, 9]:
-            if col_idx + c < width_10514: val_year += float(df_10514.iloc[7, col_idx + c]) * park_N
-        for c in [4, 5, 6, 7, 9]:
-            if col_idx + c < width_10514: val_year += float(df_10514.iloc[8, col_idx + c]) * wood_N
-        for c in [4, 5, 6, 7, 9]:
-            if col_idx + c < width_10514: val_year += float(df_10514.iloc[10, col_idx + c]) * paper_N
-        for c in [4, 5, 6, 7, 9]:
-            if col_idx + c < width_10514: val_year += float(df_10514.iloc[16, col_idx + c]) * plastic_N
-        for c in [4, 5, 6, 7, 9]:
-            if col_idx + c < width_10514: val_year += float(df_10514.iloc[18, col_idx + c]) * textile_N
-        for c in [4, 5, 6, 7, 9]:
-            if col_idx + c < width_10514: val_year += float(df_10514.iloc[21, col_idx + c]) * haz_N
-        for c in [4, 5, 6, 7, 9]:
-            if col_idx + c < width_10514: val_year += float(df_10514.iloc[22, col_idx + c]) * mixed_N
-        for c in [4, 5, 6, 7, 9]:
-            if col_idx + c < width_10514: val_year += float(df_10514.iloc[23, col_idx + c]) * other_N
-        for c in [4, 5, 6, 7, 9]:
-            if col_idx + c < width_10514: val_year += float(df_10514.iloc[24, col_idx + c]) * contam_N
+    for year, col_idx in cols_05282.items():
+        value = (sector_N(df_05282, rows_05282, col_idx, [9])
+                 + sector_N(df_05282, rows_05282, col_idx, [5, 6]) * services_construction_scale)
+        household_waste[year] = value * noise_05282
+    value_1995 = household_waste[1995]
 
-        household_waste[year] = val_year * noise_10514
+    for year, col_idx in cols_10514.items():
+        household_waste[year] = sector_N(df_10514, rows_10514, col_idx, [6, 7, 9]) * noise_10514
 
     # =========================================================================
     # EXTRAPOLATION, 1990-1994
@@ -908,13 +859,12 @@ def find_recycling(preloaded_data, current_params, current_trade_factors, datase
     rubber_N  = float(current_params.waste_N_frac('rubber'))
     contam_N  = float(current_params.waste_N_frac('contaminated_masses'))
 
-    # 'Blandet avfall' (mixed waste) has no matching row text in table 05281 below -
-    # it is a new SSB reporting category introduced with table 10513 in 2012, not a
-    # reclassification of tonnage recorded under another name before (see the fuller
-    # reconciliation in find_household_waste's comment above, which covers the same
-    # table transition). Recycling captures two of the largest 'Blandet avfall'
-    # contributions, so this flow's 2011-to-2012 jump is even larger than household
-    # waste's: roughly 3.45 kt N in 2011 to 5.6 kt N in 2012, about +62%.
+    # Table 10513 (2012 onward) has new material categories, including mixed
+    # waste (blandet avfall), and reports more 'other materials' and less wood
+    # delivered to recycling than table 05281. The resulting step from about
+    # 3.5 kt N in 2011 to 5.6 kt N in 2012 is not adjusted: part of it is a
+    # real increase (more plastic recycled), and the category changes pull in
+    # both directions (see find_household_waste for the 2012 revision).
     df_05281 = preloaded_data.get('ssb_waste_05281')
     value_1995 = 0.0
 

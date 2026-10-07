@@ -19,7 +19,12 @@ Hohmann-Marriott (2025)<!--cite:hohmann-marriott_nitrogen_2025--> used similar d
 
 In addition to harvested (slått) forage above, this flow includes grazing on agricultural land (innmark), which the harvest statistics do not cover. This is taken from Budsjettnemnda for jordbruket's Totalkalkylen "Eng, beite" series (Budsjettnemnda for jordbruket (2025)<!--cite:bfj_totalkalkylen_2025-->), 1000 FEm/year, calculated by BFJ as 200 FEm/daa on innmarksbeite plus 18 FEm/daa aftermath grazing on eng til slått, both scaled by the actual-vs-normal-year harvest ratio (Landbruksdirektoratet (2021)<!--cite:landbruksdirektoratet_forressurser_2021-->). Converted to N using the same 150 g protein/FEm assumption as the corresponding utmark-grazing flow (FS.OL-AG.MM-Grazing-Nmix).
 
-**Interpretation.** The flow varies between about 53 and 101 kt N per year. The low value in 2018 (53 kt N) is the drought year. The step from 79 kt N in 2020 to 101 kt N in 2021 follows SSB's change of method for eng til slått in 2021 and is not corrected. Eurostat's Gross Nutrient Balance, which estimates N removed by harvest and grazing of fodder for Norway from the same SSB statistics, gives a similar level (63–85 kt N per year) but a smaller increase from 2020 to 2022.
+**Interpretation**
+
+- The flow varies between about 53 and 101 kt N per year.
+- The low value in 2018 (53 kt N) is the drought year.
+- The step from 79 kt N in 2020 to 101 kt N in 2021 follows SSB's change of method for eng til slått in 2021 and is not corrected.
+- Eurostat's Gross Nutrient Balance, which estimates N removed by harvest and grazing of fodder for Norway from the same SSB statistics, gives a similar level (63–85 kt N per year) but a smaller increase from 2020 to 2022.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References

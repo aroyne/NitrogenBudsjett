@@ -71,7 +71,11 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
     wood_N    = float(current_params.waste_N_frac('wood'))
     textile_N = float(current_params.waste_N_frac('textiles'))
     wet_N     = float(current_params.waste_N_frac('wet_organic'))
-    sludge_N  = float(current_params.waste_N_frac('sludge'))
+    # Sludge incinerated in the waste accounts is mainly industrial sludge
+    # (sewage sludge delivered to incineration is about 1 kt dry matter per
+    # year, SSB table 05279), so the N content of industrial effluent sludges
+    # is used.
+    sludge_N  = float(current_params.waste_N_frac('industrial_sludge'))
     other_N   = float(current_params.waste_N_frac('other_materials'))
     haz_N     = float(current_params.waste_N_frac('hazardous'))
     contam_N  = float(current_params.waste_N_frac('contaminated_masses'))
@@ -79,82 +83,63 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
     rubber_N  = float(current_params.waste_N_frac('rubber'))
     park_N    = float(current_params.waste_N_frac('park_garden'))
 
+    # Table 10513 (2012-2024) reports most incinerated residual waste as
+    # mixed waste, with a higher N content than the materials table 05281
+    # (1995-2011) splits the same waste into; the incinerated tonnage rises
+    # about 12% from 2011 to 2012 but the N per tonne about 30%. The 05281
+    # years are therefore scaled by the ratio of the N per tonne in 2012 to
+    # that in 2011, so the series is continuous in N content.
+    rows_05281 = {60: paper_N, 88: paper_N, 62: plastic_N, 90: plastic_N, 65: wood_N, 93: wood_N,
+                  66: textile_N, 94: textile_N, 67: wet_N, 95: wet_N, 69: sludge_N, 97: sludge_N,
+                  70: other_N, 98: other_N, 71: haz_N, 99: haz_N, 72: contam_N, 100: contam_N}
+    rows_10513 = {6: wet_N, 7: park_N, 8: wood_N, 9: sludge_N, 10: paper_N, 16: plastic_N,
+                  17: rubber_N, 18: textile_N, 21: haz_N, 22: mixed_N, 23: other_N, 24: contam_N}
+
     # =========================================================================
     # 1. PERIOD 1995-2011: SSB table 05281
     # =========================================================================
-    dataset_key_05281 = '05281'
     # 'ssb_waste_05281' <- 05281_20260121-140338.xlsx (data_loader.py
     # DATA_MAP): SSB table 05281, waste accounts by statistical variable,
-    # treatment method, material type and year
+    # treatment method, material type and year; rows 59-72 are energy
+    # recovery and rows 87-100 incineration without energy recovery.
     df_05281 = preloaded_data.get('ssb_waste_05281')
-    noise_05281 = dataset_noise[dataset_key_05281]
-
-    for col in range(3, 20):  
+    noise_05281 = dataset_noise['05281']
+    N_05281, tonnes_05281 = {}, {}
+    for col in range(3, 20):
         year = int(float(df_05281.iloc[2, col]))
-        collected_years.add(year)
-        
-        raw_tonnage = 0.0
-        raw_tonnage += float(df_05281.iloc[60, col]) * paper_N    
-        raw_tonnage += float(df_05281.iloc[88, col]) * paper_N    
-        raw_tonnage += float(df_05281.iloc[62, col]) * plastic_N  
-        raw_tonnage += float(df_05281.iloc[90, col]) * plastic_N  
-        raw_tonnage += float(df_05281.iloc[65, col]) * wood_N     
-        raw_tonnage += float(df_05281.iloc[93, col]) * wood_N     
-        raw_tonnage += float(df_05281.iloc[66, col]) * textile_N  
-        raw_tonnage += float(df_05281.iloc[94, col]) * textile_N  
-        raw_tonnage += float(df_05281.iloc[67, col]) * wet_N      
-        raw_tonnage += float(df_05281.iloc[95, col]) * wet_N      
-        raw_tonnage += float(df_05281.iloc[69, col]) * sludge_N   
-        raw_tonnage += float(df_05281.iloc[97, col]) * sludge_N   
-        raw_tonnage += float(df_05281.iloc[70, col]) * other_N    
-        raw_tonnage += float(df_05281.iloc[98, col]) * other_N    
-        raw_tonnage += float(df_05281.iloc[71, col]) * haz_N      
-        raw_tonnage += float(df_05281.iloc[99, col]) * haz_N      
-        raw_tonnage += float(df_05281.iloc[72, col]) * contam_N   
-        raw_tonnage += float(df_05281.iloc[100, col]) * contam_N  
-
-        value = raw_tonnage*noise_05281
-
-        results.append({
-            'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok', 'data_sources': data_sources
-        })
+        N_05281[year] = sum(float(df_05281.iloc[r, col]) * nf for r, nf in rows_05281.items())
+        tonnes_05281[year] = sum(float(df_05281.iloc[r, col]) for r in rows_05281)
 
     # =========================================================================
     # 2. PERIOD 2012-2024: SSB table 10513
     # =========================================================================
-    dataset_key_10513 = '10513'
     # 'ssb_waste_10513' <- 10513_20260916-120243.xlsx (data_loader.py
     # DATA_MAP): SSB table 10513, waste accounts by material type,
-    # statistical variable, year and treatment method (2012-2024)
+    # statistical variable, year and treatment method (2012-2024); col+5 is
+    # "Levert til forbrenning".
     df_10513 = preloaded_data.get('ssb_waste_10513')
-    noise_10513 = dataset_noise[dataset_key_10513]
-
+    noise_10513 = dataset_noise['10513']
+    N_10513, tonnes_10513 = {}, {}
     for col in range(1, 110, 9):
         year = int(float(df_10513.iloc[3, col]))
+        N_10513[year] = sum(float(df_10513.iloc[r, col + 5]) * nf for r, nf in rows_10513.items())
+        tonnes_10513[year] = sum(float(df_10513.iloc[r, col + 5]) for r in rows_10513)
+
+    scale_05281 = (N_10513[2012] / tonnes_10513[2012]) / (N_05281[2011] / tonnes_05281[2011])
+
+    for year, value in N_05281.items():
         collected_years.add(year)
-        
-        raw_tonnage = 0.0
-        raw_tonnage += float(df_10513.iloc[6, col+5]) * wet_N       
-        raw_tonnage += float(df_10513.iloc[7, col+5]) * park_N      
-        raw_tonnage += float(df_10513.iloc[8, col+5]) * wood_N       
-        raw_tonnage += float(df_10513.iloc[9, col+5]) * sludge_N     
-        raw_tonnage += float(df_10513.iloc[10, col+5]) * paper_N     
-        raw_tonnage += float(df_10513.iloc[16, col+5]) * plastic_N   
-        raw_tonnage += float(df_10513.iloc[17, col+5]) * rubber_N    
-        raw_tonnage += float(df_10513.iloc[18, col+5]) * textile_N   
-        raw_tonnage += float(df_10513.iloc[21, col+5]) * haz_N       
-        raw_tonnage += float(df_10513.iloc[22, col+5]) * mixed_N     
-        raw_tonnage += float(df_10513.iloc[23, col+5]) * other_N     
-        raw_tonnage += float(df_10513.iloc[24, col+5]) * contam_N    
-
-        value = raw_tonnage*noise_10513
-
         results.append({
-            'flow_name': flow_code, 'year': year, 'value': value,
+            'flow_name': flow_code, 'year': year, 'value': value * scale_05281 * noise_05281,
+            'comment': 'ok', 'data_sources': 'SSB table 05281, scaled to the N content of table 10513'
+        })
+    for year, value in N_10513.items():
+        collected_years.add(year)
+        results.append({
+            'flow_name': flow_code, 'year': year, 'value': value * noise_10513,
             'comment': 'ok', 'data_sources': data_sources
         })
-        
+
     # =========================================================================
     # 3. PERIOD 1990-1994: historical extrapolation
     # =========================================================================
@@ -175,11 +160,19 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
         dataset_noise
     )
 
-    inc_frac_1985 = float(df_hist.iloc[1, 1]) / 100  
-    inc_frac_1992 = float(df_hist.iloc[2, 1]) / 100  
+    inc_frac_1985 = float(df_hist.iloc[1, 1]) / 100
+    inc_frac_1992 = float(df_hist.iloc[2, 1]) / 100
+    inc_frac_1995 = float(df_hist.iloc[5, 1]) / 100
     change_per_year = (inc_frac_1992 - inc_frac_1985) / 7
-    
-    r_iloc = 2  
+
+    # Total waste times the share incinerated gives the trend; it is
+    # calibrated so that the same calculation for 1995 matches the 1995 value
+    # above (the N in total generated waste is not the same as the N in the
+    # waste actually incinerated).
+    calibration = (N_05281[1995] * scale_05281
+                   / ((household_waste[1995] + industry_waste[1995]) * inc_frac_1995))
+
+    r_iloc = 2
     for year in range(1990, 1995):
         collected_years.add(year)
         
@@ -193,7 +186,7 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
             comment_str = 'ok'
             r_iloc += 1
             
-        raw_val = waste * inc_frac        
+        raw_val = waste * inc_frac * calibration
         value = raw_val*noise_hist*noise_trend
 
         results.append({
@@ -234,180 +227,108 @@ def _add_recycling_mc(results, preloaded_data, current_params, dataset_noise, cu
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
     
+def _biologically_treated_N(preloaded_data, current_params, dataset_noise):
+    """
+    N in compost and digestate from biological treatment of organic waste,
+    and the share of the products going to each use.
+
+    1. N in: wet organic, park and garden and wood waste delivered to biogas
+       production and to composting (SSB table 10513), times the N content of
+       each waste type. Sewage sludge delivered to biological treatment is
+       left out; its N is counted in the PR.WW sludge flows.
+    2. N out: N in to biogas times (1 - digestate_loss_fraction) plus N in to
+       composting times (1 - compost_N_loss); the losses are NH3, N2O and N2
+       during treatment.
+    3. Use: the products (compost and digestate) delivered to each use, as a
+       share of all products disposed of (SSB table 12818, from 2018); before
+       2018 the 2018 shares are used.
+
+    'ssb_waste_10513' <- 10513_20260916-120243.xlsx (data_loader.py
+    DATA_MAP): SSB table 10513, waste accounts by material and treatment
+    (2012-2024, 1000 t); col+2 = biogas production, col+3 = composting.
+    'ssb_waste_12818' <- 12818_20260526-110921.xlsx (data_loader.py
+    DATA_MAP): SSB table 12818, biological waste by disposal (2018-2024,
+    1000 t); row 4 = all disposed of, 5 = agricultural land, 6 = green areas,
+    7 = delivered to soil producers.
+
+    Returns (N_out, shares): N_out {year: kt N} for 1990-2024 (1990-2011 held
+    at the 2012 value) and shares {year: {'agriculture', 'green_and_soil'}}.
+    """
+    wet_N = float(current_params.waste_N_frac('wet_organic'))
+    park_N = float(current_params.waste_N_frac('park_garden'))
+    wood_N = float(current_params.waste_N_frac('wood'))
+    biogas_loss = float(current_params.get('digestate_loss_fraction'))
+    compost_loss = float(current_params.waste_N_frac('compost_N_loss'))
+    noise_10513 = dataset_noise['10513']
+    noise_12818 = dataset_noise['12818']
+
+    df_10513 = preloaded_data['ssb_waste_10513']
+    N_out = {}
+    for col in range(1, df_10513.shape[1], 9):
+        cell_year = str(df_10513.iloc[3, col]).strip()
+        if not cell_year.replace('.0', '').isdigit():
+            continue
+        year = int(float(cell_year))
+
+        def n_in(offset):
+            return (float(df_10513.iloc[6, col + offset]) * wet_N      # wet organic
+                    + float(df_10513.iloc[7, col + offset]) * park_N   # park and garden
+                    + float(df_10513.iloc[8, col + offset]) * wood_N)  # wood waste
+
+        N_out[year] = (n_in(2) * (1 - biogas_loss) + n_in(3) * (1 - compost_loss)) * noise_10513
+
+    for year in range(1990, 2012):
+        N_out[year] = N_out[2012] * dataset_noise['trend interpolation']
+
+    df_12818 = preloaded_data['ssb_waste_12818']
+    shares = {}
+    for col_idx in range(1, 8):
+        year = int(float(str(df_12818.iloc[3, col_idx]).strip()))
+        total = float(df_12818.iloc[4, col_idx])
+        shares[year] = {
+            'agriculture': float(df_12818.iloc[5, col_idx]) / total * noise_12818,
+            'green_and_soil': (float(df_12818.iloc[6, col_idx]) + float(df_12818.iloc[7, col_idx])) / total * noise_12818,
+        }
+    first_share_year = min(shares)
+    for year in N_out:
+        if year not in shares:
+            shares[year] = shares[first_share_year]
+
+    return N_out, shares
+
+
+def _add_biologically_treated_flow_mc(results, preloaded_data, current_params, dataset_noise, flow_code, use):
+    collected_years = set()
+    N_out, shares = _biologically_treated_N(preloaded_data, current_params, dataset_noise)
+
+    for year in range(1990, 2025):
+        collected_years.add(year)
+        if year < 2012:
+            source = 'extrapolated'
+        elif year < 2018:
+            source = 'SSB table 10513, use shares from table 12818 (2018)'
+        else:
+            source = 'SSB tables 10513 and 12818'
+        results.append({
+            'flow_name': flow_code,
+            'year': year,
+            'value': N_out[year] * shares[year][use],
+            'comment': 'ok',
+            'data_sources': source
+        })
+
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+
+
 def _add_ag_biologically_treated_organic_waste_mc(results, preloaded_data, current_params, dataset_noise):
-    flow_code = 'PR.SO-AG.SM-Biologically treated organic waste-Nmix'
-    collected_years = set()
-    
-    # 1) find the fraction of N in input waste (excluding sewage sludge) for biological treatment from SSB 10513 (2012-2024)
-    # as well as the fraction of sewage sludge in input
-    wet_N         = float(current_params.waste_N_frac('wet_organic'))
-    park_N        = float(current_params.waste_N_frac('park_garden'))
-    wood_N        = float(current_params.waste_N_frac('wood'))
-    
-    noise_trend = dataset_noise['trend interpolation']
-    noise_10513 = dataset_noise['10513']
-    noise_12818 = dataset_noise['12818']
-    df_10513 = preloaded_data.get('ssb_waste_10513') # given in kt
-    total_10513 = {}
-    frac_N_10513 = {}
-    frac_sludge_10513 = {}
-    for col in range(1, df_10513.shape[1], 9):
-        cell_year = str(df_10513.iloc[3, col]).strip()
-        if cell_year.replace('.0', '').isdigit():
-            year = int(float(cell_year))
-        total = ( # delivered to biogas production (+2) and composting (+3)
-            float(df_10513.iloc[6, col + 2]) + float(df_10513.iloc[6, col + 3]) +  # wet organic
-            float(df_10513.iloc[7, col + 2]) +  float(df_10513.iloc[7, col + 3]) + # park and garden
-            float(df_10513.iloc[8, col + 2]) + float(df_10513.iloc[8, col + 3])  # wood waste
-        )
-        frac_sludge_10513[year] = (float(df_10513.iloc[9, col + 2])+float(df_10513.iloc[9, col + 3]))/(total+float(df_10513.iloc[9, col + 2])+float(df_10513.iloc[9, col + 3]))
-        total_10513[year] = total
-        total_N = (
-            float(df_10513.iloc[6, col + 2]) * wet_N +  # wet organic
-            float(df_10513.iloc[7, col + 2]) * park_N +  # park and garden
-            float(df_10513.iloc[8, col + 2]) * wood_N   # wood waste
-        )
-        frac_N_10513[year] = total_N/total
+    _add_biologically_treated_flow_mc(results, preloaded_data, current_params, dataset_noise,
+                                      'PR.SO-AG.SM-Biologically treated organic waste-Nmix', 'agriculture')
 
-    # 2) find the amount of disposed waste allocated to agriculture from SSB 12818 (2018-2024)
-    # removing sewage sludge fraction from previous step
-    # 'ssb_waste_12818' <- 12818_20260526-110921.xlsx (data_loader.py
-    # DATA_MAP): SSB table 12818, biological waste by disposal method and
-    # year (given in kt)
-    df_12818 = preloaded_data.get('ssb_waste_12818')
-    waste_ag = {}
-    for col_idx in range(1, 8):
-        year = int(float(str(df_12818.iloc[3, col_idx]).strip()))
-        kt_ag = float(df_12818.iloc[5, col_idx])
-        waste_ag[year] = kt_ag*(1-frac_sludge_10513[year])
 
-    # 3) find the N content of that waste by using fraction N from 1)
-    N_ag = {}
-    for year in range(2018,2025):
-        N_ag[year] = waste_ag[year]*frac_N_10513[year]
-
-    # 3b) for 2012-2017, scale 2018 input amount and ag fraction using totals from 10513
-    for year in range(2012,2018):
-        N_ag[year] = N_ag[2018]/total_10513[2018]*total_10513[year]
-
-    # 4) extrapolate constant 2012 value back to 1990
-    for year in range(1990,2012):
-        N_ag[year] = N_ag[2012]
-
-    for year in range(1990,2025):
-        collected_years.add(year)
-        val = N_ag[year]*noise_10513*noise_12818
-        
-        if year < 2012:
-            val *= noise_trend
-            comment_str = 'ok'
-            source_str  = 'extrapolated'
-        elif year < 2018:
-            comment_str = 'ok'
-            source_str  = 'extrapolated/SSB'
-            
-        else:
-            comment_str = 'ok'
-            source_str  = 'SSB'
-
-        results.append({
-            'flow_name': flow_code,
-            'year': year,
-            'value': val,
-            'comment': comment_str,
-            'data_sources': source_str
-        })
-
-    missing_years = EXPECTED_YEARS - collected_years
-    report_missing_years(flow_code, missing_years, results)
-    
-    
 def _add_hs_biologically_treated_organic_waste_mc(results, preloaded_data, current_params, dataset_noise):
-    flow_code = 'PR.SO-HS.HS-Biologically treated organic waste-Nmix'
-    collected_years = set()
-    
-    # 1) find the fraction of N in input waste (excluding sewage sludge) for biological treatment from SSB 10513 (2012-2024)
-    # as well as the fraction of sewage sludge in input
-    wet_N         = float(current_params.waste_N_frac('wet_organic'))
-    park_N        = float(current_params.waste_N_frac('park_garden'))
-    wood_N        = float(current_params.waste_N_frac('wood'))
-    
-    noise_trend = dataset_noise['trend interpolation']
-    noise_10513 = dataset_noise['10513']
-    noise_12818 = dataset_noise['12818']
-    df_10513 = preloaded_data.get('ssb_waste_10513') # given in kt
-    total_10513 = {}
-    frac_N_10513 = {}
-    frac_sludge_10513 = {}
-    for col in range(1, df_10513.shape[1], 9):
-        cell_year = str(df_10513.iloc[3, col]).strip()
-        if cell_year.replace('.0', '').isdigit():
-            year = int(float(cell_year))
-        total = ( # delivered to biogas production (+2) and composting (+3)
-            float(df_10513.iloc[6, col + 2]) + float(df_10513.iloc[6, col + 3]) +  # wet organic
-            float(df_10513.iloc[7, col + 2]) +  float(df_10513.iloc[7, col + 3]) + # park and garden
-            float(df_10513.iloc[8, col + 2]) + float(df_10513.iloc[8, col + 3])  # wood waste
-        )
-        frac_sludge_10513[year] = (float(df_10513.iloc[9, col + 2])+float(df_10513.iloc[9, col + 3]))/(total+float(df_10513.iloc[9, col + 2])+float(df_10513.iloc[9, col + 3]))
-        total_10513[year] = total
-        total_N = (
-            float(df_10513.iloc[6, col + 2]) * wet_N +  # wet organic
-            float(df_10513.iloc[7, col + 2]) * park_N +  # park and garden
-            float(df_10513.iloc[8, col + 2]) * wood_N   # wood waste
-        )
-        frac_N_10513[year] = total_N/total
-
-    # 2) find the amount of disposed waste allocated to HS ("grøntareal" + "levert jordprodusent") from SSB 12818 (2018-2024)
-    # removing sewage sludge fraction from previous step
-    # 'ssb_waste_12818' <- 12818_20260526-110921.xlsx (data_loader.py
-    # DATA_MAP): SSB table 12818, biological waste by disposal method and
-    # year (given in kt)
-    df_12818 = preloaded_data.get('ssb_waste_12818')
-    waste_hs = {}
-    for col_idx in range(1, 8):
-        year = int(float(str(df_12818.iloc[3, col_idx]).strip()))
-        kt_hs = float(df_12818.iloc[6, col_idx]) + float(df_12818.iloc[7, col_idx])
-        waste_hs[year] = kt_hs*(1-frac_sludge_10513[year])
-
-    # 3) find the N content of that waste by using fraction N from 1)
-    N_hs = {}
-    for year in range(2018,2025):
-        N_hs[year] = waste_hs[year]*frac_N_10513[year]
-
-    # 3b) for 2012-2017, scale 2018 input amount and ag fraction using totals from 10513
-    for year in range(2012,2018):
-        N_hs[year] = N_hs[2018]/total_10513[2018]*total_10513[year]
-
-    # 4) extrapolate constant 2012 value back to 1990
-    for year in range(1990,2012):
-        N_hs[year] = N_hs[2012]
-
-    for year in range(1990,2025):
-        collected_years.add(year)
-        val = N_hs[year]*noise_10513*noise_12818
-        
-        if year < 2012:
-            val *= noise_trend
-            comment_str = 'ok'
-            source_str  = 'extrapolated'
-        elif year < 2018:
-            comment_str = 'ok'
-            source_str  = 'extrapolated/SSB'
-            
-        else:
-            comment_str = 'ok'
-            source_str  = 'SSB'
-
-        results.append({
-            'flow_name': flow_code,
-            'year': year,
-            'value': val,
-            'comment': comment_str,
-            'data_sources': source_str
-        })
-
-    missing_years = EXPECTED_YEARS - collected_years
-    report_missing_years(flow_code, missing_years, results)
+    _add_biologically_treated_flow_mc(results, preloaded_data, current_params, dataset_noise,
+                                      'PR.SO-HS.HS-Biologically treated organic waste-Nmix', 'green_and_soil')
 
 
 def _add_wastewater_from_landfills_mc(results, preloaded_data, current_params, dataset_noise):
@@ -475,14 +396,20 @@ def _add_wastewater_from_landfills_mc(results, preloaded_data, current_params, d
         except (ValueError, TypeError, IndexError):
             continue
 
-    # Extrapolate backward to 1990 using the mean of the reported years.
+    # Reported data only cover a single landfill before 2011. 1990-2010 are
+    # the mean of the reported years scaled with methane from landfills in the
+    # national inventory (CRT 5.A, 'landfill_ch4_crt'), which is calculated
+    # with a first-order decay model of earlier landfilled waste and so
+    # follows the decomposition that also produces the leachate.
+    landfill_ch4 = preloaded_data['landfill_ch4_crt']
     valid_years = [y for y in real_years_data.keys() if 2011 <= y <= 2025]
+    ch4_ref = landfill_ch4.loc[[y for y in valid_years if y in landfill_ch4.index]].mean()
     mean_connected_kt = sum(real_years_data[y] for y in valid_years) / len(valid_years)
 
     final_values = {}
     
     for year in range(1990, 2011):
-        final_values[year] = mean_connected_kt
+        final_values[year] = mean_connected_kt * landfill_ch4[year] / ch4_ref
 
     for year in range(2011, 2026):
         final_values[year] = real_years_data.get(year)
@@ -496,7 +423,7 @@ def _add_wastewater_from_landfills_mc(results, preloaded_data, current_params, d
             'year': year,
             'value': val,
             'comment': 'ok',
-            'data_sources': 'Utslipp_deponi.xlsx (Mildir)' if year >= 2011 else 'extrapolated'
+            'data_sources': 'Utslipp_deponi.xlsx (Mildir)' if year >= 2011 else 'extrapolated with CRT 5.A landfill CH4'
         })
 
     missing_years = EXPECTED_YEARS - collected_years
@@ -562,21 +489,24 @@ def _add_so_leaching_mc(results, preloaded_data, current_params, dataset_noise):
         except (ValueError, TypeError, IndexError):
             continue
 
-    # Extrapolate backward to 1990 using the mean of the reported years.
+    # Reported data only cover a single landfill before 2011. 1990-2010 are
+    # the mean of the reported years scaled with methane from landfills in the
+    # national inventory (CRT 5.A, 'landfill_ch4_crt'), which is calculated
+    # with a first-order decay model of earlier landfilled waste and so
+    # follows the decomposition that also produces the leachate.
+    landfill_ch4 = preloaded_data['landfill_ch4_crt']
     valid_years = [y for y in real_years_data.keys() if 2011 <= y <= 2025]
+    ch4_ref = landfill_ch4.loc[[y for y in valid_years if y in landfill_ch4.index]].mean()
 
     mean_unconnected_kt = sum(real_years_data[y] for y in valid_years) / len(valid_years)
 
     final_values = {}
     
     for year in range(1990, 2011):
-        final_values[year] = mean_unconnected_kt
+        final_values[year] = mean_unconnected_kt * landfill_ch4[year] / ch4_ref
 
     for year in range(2011, 2026):
         final_values[year] = real_years_data.get(year, 0.0)
-
-    for year in range(1984, 1990):
-        final_values[year] = 0.0
 
     for year in sorted(final_values.keys()):
         collected_years.add(year)
@@ -587,7 +517,7 @@ def _add_so_leaching_mc(results, preloaded_data, current_params, dataset_noise):
             'year': year,
             'value': val,
             'comment': comment,
-            'data_sources': 'Utslipp_deponi.xlsx (Mildir)' if year >= 2011 else 'extrapolated'
+            'data_sources': 'Utslipp_deponi.xlsx (Mildir)' if year >= 2011 else 'extrapolated with CRT 5.A landfill CH4'
         })
 
     missing_years = EXPECTED_YEARS - collected_years
@@ -785,7 +715,7 @@ def _add_so_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
 
     # 'n2o_so_raw' <- UNFCCC CRT Table5 (data_loader.py's crt_n2o_so method,
     # reading directly from the NOR-CRT-2026-... folder): N2O emissions from
-    # incineration and open burning of waste
+    # biological treatment and incineration of solid waste (5.B + 5.C)
     df_so_emissions = preloaded_data.get('n2o_so_raw')
     for index, row in df_so_emissions.iterrows():
         year_val = row['year']
@@ -1107,40 +1037,27 @@ def _add_solid_waste_export_mc(results, preloaded_data, current_params, current_
         current_trade_factors=current_trade_factors, 
         flow_code=flow_code,
         target_types=['kommunalt_avfall', 'farlig_avfall', 'annet_avfall'],
-        is_import=False,  # Eksport (tilsvarer impeks = 2)
+        is_import=False,
         dataset_noise=dataset_noise
     )
 
-    trade_years_dict = {row['year']: row['value'] for row in trade_results}
+    # The trade statistics start in 1988 and report no exports in these
+    # categories before 2002; years without exports come back from
+    # process_generic_trade_flow as 'not done' rows and are set to zero here.
+    trade_years_dict = {row['year']: row['value'] for row in trade_results if row['comment'] == 'ok'}
 
     for year in sorted(EXPECTED_YEARS):
-        # Vi forholder oss til tidslinjen fra opprinnelig funksjon (f.eks. fra 1988 og utover)
         if year < 1988:
             continue
-            
         collected_years.add(year)
-
-        if 1988 <= year <= 2001:
-            value = 0.0
-            current_comment = comment
-        else:
-            # Hent den beregnede MC-verdien fra handelsfunksjonen (default til 0.0 hvis år mangler)
-            value = float(trade_years_dict.get(year, 0.0))
-            current_comment = comment
-
-        # Sikre mot eventuelle NaN-verdier eller negative avvik fra støyen
-        if value < 0 or pd.isna(value):
-            value = 0.0
-
         results.append({
             'flow_name': flow_code,
             'year': year,
-            'value': value,
-            'comment': current_comment,
+            'value': float(trade_years_dict.get(year, 0.0)),
+            'comment': comment,
             'data_sources': data_sources
         })
 
-    # 4. Sjekk om alle forventede år ble samlet inn
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
     
@@ -1377,10 +1294,9 @@ def _add_ww_N2_emissions_mc(results, preloaded_data, current_params, dataset_noi
         else:
             value = sum(_contribution(plant, year, mode, rensegrad_col) for plant, mode, rensegrad_col in spec)
             if year == 2003:
-                # NRVA's first reporting year: uses the sector-wide mean
-                # multiplied directly by removal_default, not run through
-                # _factor() like every other plant/year here.
-                value += plant_means["NRVA"] * removal_default
+                # NRVA's first reporting year has no figure of its own; its
+                # long-run mean is used with the default removal rate.
+                value += plant_means["NRVA"] * _factor(removal_default)
 
         value *= noise_val
 

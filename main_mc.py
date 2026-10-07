@@ -84,7 +84,8 @@ def _draw_perturbed_value(val, low_b, upp_b, unc_type, dist_type):
 
     For unc_type == 'perc', low_b/upp_b are +/- percentages of val. For any
     other unc_type ('abs'), low_b/upp_b are literal absolute bounds on the
-    drawn value, not offsets from val.
+    drawn value, not offsets from val. For PERT the bounds are the minimum and
+    maximum; for normal and lognormal distributions they are a 95% interval.
     """
     if pd.isna(low_b) or pd.isna(upp_b) or (low_b == 0 and upp_b == 0):
         return val
@@ -97,20 +98,22 @@ def _draw_perturbed_value(val, low_b, upp_b, unc_type, dist_type):
     if unc_type == 'perc':
         abs_min = val * (1 - low_b / 100.0)
         abs_max = val * (1 + upp_b / 100.0)
-        std_dev = ((low_b + upp_b) / 2.0 / 100.0) * val
     else:
         abs_min = low_b
         abs_max = upp_b
-        std_dev = (low_b + upp_b) / 2.0 / 1.96
 
+    # For normal and lognormal distributions the bounds are read as a 95%
+    # interval, as the uncertainties in the inventories are given. The
+    # lognormal distribution has its median at val (the reported value) and
+    # the upper bound at its 97.5th percentile, as for IPCC uncertainty
+    # factors ("Fac2", "Fac3").
     if 'pert' in dist_type:
         chosen_val = draw_from_pert(abs_min, val, abs_max)
     elif 'log' in dist_type:
-        cv = std_dev / val if val > 0 else 0.1
-        sigma_log = np.sqrt(np.log(1 + cv**2))
-        mu_log = np.log(val) - (sigma_log ** 2) / 2
-        chosen_val = np.random.lognormal(mu_log, sigma_log)
+        sigma_log = np.log(abs_max / val) / 1.96 if val > 0 else 0.0
+        chosen_val = np.random.lognormal(np.log(val), sigma_log) if val > 0 else val
     else:
+        std_dev = (abs_max - abs_min) / 2.0 / 1.96
         chosen_val = np.random.normal(val, std_dev)
 
     if val >= 0 and chosen_val < 0:

@@ -13,9 +13,20 @@ nav_order: 5
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 We have used data from CLRTAP Inventory Submissions EMEP (2025)<!--cite:emep_officially_2025--> as advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, using the categories given in Table 30. 
 
-**How the numbers are derived.** The emissions reported to CLRTAP are calculated in the national inventory with the same manure model as the greenhouse gas inventory: N in manure, mineral fertilizer and other N sources multiplied by NH3 and NOx emission factors for each animal category, storage system, spreading method and fertilizer type. The methods are documented in the [Informative Inventory Report 2026, Norway](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/informative-inventory-report-iir-2026-norway-air-pollutant-emissions-1990-2024/). Emissions in Gg NH3 or Gg NOx (as NO2) are converted to N with the factors 14/17 and 14/46. The flow sums the soil categories 3Da1–3Df in Table 30 of Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> and field burning of agricultural residues (3F); the LULUCF codes 4B1, 4B2, 4C1 and 4C2 in Table 30 are not reported in the CLRTAP inventory. The inventory counts all manure deposited by grazing animals as input to managed soils, including the share deposited on utmark (unmanaged land), which this model does not count as input to AG.SM (see AG.MM-AG.SM-Manure application-Nmix). The utmark share (47%, range 38–56%) of the emissions from grazing animals (3Da3) is therefore removed from this flow; these losses are part of the runoff from upland areas measured by TEOTIL3 (FS.OL).
+**How the numbers are derived**
 
-**Interpretation.** The flow is about 1.9–2.4 kt N per year. Field burning contributed 0.3 kt N in 1990 and less than 0.05 kt N in 2024. Mineral fertilizer (1.1 kt N in 2024) and manure spreading (0.65 kt N) are the main sources.
+- The emissions reported to CLRTAP are calculated in the national inventory with the same manure model as the greenhouse gas inventory: N in manure, mineral fertilizer and other N sources multiplied by NH3 and NOx emission factors for each animal category, storage system, spreading method and fertilizer type.
+- The methods are documented in the [Informative Inventory Report 2026, Norway](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/informative-inventory-report-iir-2026-norway-air-pollutant-emissions-1990-2024/).
+- Emissions in Gg NH3 or Gg NOx (as NO2) are converted to N with the factors 14/17 and 14/46.
+- The flow sums the soil categories 3Da1–3Df in Table 30 of Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> and field burning of agricultural residues (3F); the LULUCF codes 4B1, 4B2, 4C1 and 4C2 in Table 30 are not reported in the CLRTAP inventory.
+- The inventory counts all manure deposited by grazing animals as input to managed soils, including the share deposited on utmark (unmanaged land), which this model does not count as input to AG.SM (see AG.MM-AG.SM-Manure application-Nmix).
+- The utmark share (47%, range 38–56%) of the emissions from grazing animals (3Da3) is therefore removed from this flow; these losses are part of the runoff from upland areas measured by TEOTIL3 (FS.OL).
+
+**Interpretation**
+
+- The flow is about 1.9–2.4 kt N per year.
+- Field burning contributed 0.3 kt N in 1990 and less than 0.05 kt N in 2024.
+- Mineral fertilizer (1.1 kt N in 2024) and manure spreading (0.65 kt N) are the main sources.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References

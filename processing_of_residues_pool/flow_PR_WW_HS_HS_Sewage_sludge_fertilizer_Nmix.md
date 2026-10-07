@@ -11,7 +11,17 @@ nav_order: 4
 
 ### Flow Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-Taken from SSB table 05279 *Avløpsslam, etter slamdisponering, statistikkvariabel, år og region*, including all sludge used for green areas and for soil production Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->. For years 1993-2001 we use data from the SSB *Naturressurser og miljø series*. For years 1990-1992 we use the average value of the 1993-1995. We use a N content of 0.26 % as given in Table 54 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
+Taken from SSB table 05279 *Avløpsslam, etter slamdisponering, statistikkvariabel, år og region*, including all sludge used for green areas and for soil production Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->. For years 1993-2001 we use data from the SSB *Naturressurser og miljø series*. For years 1990-1992 we use the average value of the 1993-1995. We use an N content of 5 % of dry matter based on Tables 54 and 55 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
+
+**How the numbers are derived**
+
+- SSB's statistics on sewage sludge ([table 05279](https://www.ssb.no/statbank/table/05279)) give the amount of sludge (tonnes dry matter) from municipal wastewater treatment plants by disposal, based on the plants' reporting through KOSTRA. For 1993–2001 the amounts and shares by disposal are taken from SSB's Naturressurser og miljø, and 1990–1992 are the mean of 1993–1995.
+- The dry matter is multiplied by an N content of 5% (range 3–6%), based on Tables 54 and 55 in Schäppi et al. (2025): 2.6–3.7% N in dry matter for dewatered, digested and composted sludge in the JRC models (Huygens et al., 2022) and a median of 4.9% in German analyses (Sichler et al., 2022).
+- This flow is the sludge used on green areas and delivered to soil producers.
+
+**Interpretation**
+
+- The flow is about 0.2–2.1 kt N per year and has increased as more sludge is delivered to soil producers.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References

@@ -30,7 +30,16 @@ The trade-based inflow and outflow below (Other goods import/export) are further
 * MP.OP-RW.RW-Other goods export-Nmix (excluding nitric acid, dicyandiamide and ammonia, for the same reason as the import flow above - MP.OP-RW.RW-Other goods export-Nmix itself still reports the full total including them)
 * MP.OP-EF.IC-Industrial waste fuels-Nmix
 
-**How the numbers are derived.** The flow is not measured but calculated as the residual of the six inflows minus the five outflows listed above, each documented on its own page. All errors in these flows therefore end up in this flow: a 10% error in Other goods import alone corresponds to about 3 kt N, or about 20% of the flow. Negative residuals in individual MC iterations are set to zero.
+**How the numbers are derived**
 
-**Interpretation.** The flow rises from about 4–5 kt N per year in 1990–1994 to 8–11 kt N around 2000, 13–16 kt N in 2004–2011 and 17–20 kt N in 2012–2022, and falls to about 14 kt N in 2023–2024 (about 2.6 kg N per person). The low level in the early 1990s is mainly due to lower imports of other goods (15–22 kt N against 24–28 kt N from 1995). The drop in 2023–2024 comes mainly from lower recycling and higher imports of nitric acid, which are excluded from the balance. The 95% interval is wide (8–21 kt N in 2024), since the flow is the difference between much larger flows.
+- The flow is not measured but calculated as the residual of the six inflows minus the five outflows listed above, each documented on its own page.
+- All errors in these flows therefore end up in this flow: a 10% error in Other goods import alone corresponds to about 3 kt N, or about 20% of the flow.
+- Negative residuals in individual MC iterations are set to zero.
+
+**Interpretation**
+
+- The flow rises from about 4–5 kt N per year in 1990–1994 to 8–11 kt N around 2000, 13–16 kt N in 2004–2011 and 17–20 kt N in 2012–2022, and falls to about 14 kt N in 2023–2024 (about 2.6 kg N per person).
+- The low level in the early 1990s is mainly due to lower imports of other goods (15–22 kt N against 24–28 kt N from 1995).
+- The drop in 2023–2024 comes mainly from lower recycling and higher imports of nitric acid, which are excluded from the balance.
+- The 95% interval is wide (8–21 kt N in 2024), since the flow is the difference between much larger flows.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

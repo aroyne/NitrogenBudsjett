@@ -70,6 +70,12 @@ downloaded 16.09.2026
 SSB table 11561: Energibalansen (energy balance). Supply and consumption by energy balance item, energy product, year and statistical variable
 downloaded 13.11.2025
 
+12660_husdyr_utmarksbeite.csv
+SSB table 12660: Husdyr på utmarksbeite, region "0N Heile landet", 1995-2025: husdyr i alt, storfe, sauer (incl. lambs); geit_og_hest = husdyr i alt - storfe - sauer
+downloaded 07.10.2026 from the SSB API (https://data.ssb.no/api/v0/no/table/12660), query: Region=0N; ContentsCode=HusdyrUtmark, StorfeUtmark, SauerUtmark
+animals with at least 8 weeks on utmark up to 2008 and at least 5 weeks from 2009 (production subsidy applications)
+used for FS.OL-AG.MM-Grazing-Nmix (fs_mc._add_ol_grazing_mc). The municipality extracts 12660_20261007-*.xlsx in data_files/ lack the old municipality codes and do not sum to the national totals before 2025.
+
 07479_kornavling.csv
 SSB table 07479: Kornavling (1 000 tonn), "Korn i alt", 1989 and 1995-2025
 downloaded 06.10.2026 from the SSB API (https://data.ssb.no/api/v0/no/table/07479), all values for ContentsCode=Korn
@@ -260,6 +266,7 @@ downloaded 13.11.2025
 OBB_Fylke_1970-2025.xlsx
 Landbruksdirektoratet, Organisert beitebruk (organised grazing): sheep, lambs, cattle and goats released/lost on outfield pasture, per county, 1970-2025
 downloaded from Landbruksdirektoratet's statistics
+no longer read by the model - FS.OL-AG.MM-Grazing-Nmix uses SSB table 12660 (all animals on utmark) instead
 
 skoggjødsling_før_1995.xlsx
 Historical forest fertilization area, pre-1995

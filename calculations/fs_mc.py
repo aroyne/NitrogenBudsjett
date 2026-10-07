@@ -3,12 +3,10 @@
 """
 Forests and semi-natural vegetation (FS) pool: forest (FS.FO) N2O/N2 emissions,
 leaching, industrial round wood and fuel wood; other land (FS.OL) leaching and
-organised grazing. FS.OL has no atmospheric emissions flows here - NOx, N2 and
+grazing on utmark. FS.OL has no atmospheric emissions flows here - NOx, N2 and
 N2O are deliberately neglected as negligible/unreported, see
 forests_and_semi_natural_pool/subpool_other_land.md for the reasoning and sources.
 """
-import numpy as np
-
 from calculations.utils import (
     EXPECTED_YEARS,
     report_missing_years,
@@ -169,7 +167,9 @@ def _add_fuel_wood_for_households_mc(results, preloaded_data, current_params, da
     # 'fs_firewood_raw' <- data_files/09702_20251120-133716.xlsx: SSB table 09702,
     # firewood consumption in residences and holiday homes (1000 tonnes/year)
     df_ved = preloaded_data.get('fs_firewood_raw')
-    N_content = float(current_params.get("firewood_N_frac"))
+    # Fuel wood is mainly stem wood with bark, so the stem N content is used,
+    # not the whole-tree value (which includes foliage and branches).
+    N_content = float(current_params.get("household_fuelwood_N_frac"))
 
     # rows 3-37 = years 1990-2024
     for r in range(3, 38):
@@ -194,98 +194,61 @@ def _add_fuel_wood_for_households_mc(results, preloaded_data, current_params, da
     
 def _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise):
     """
-    Organised grazing (NIBIO beitestatistikk) combined with estimated fodder
-    intake per animal group from Table 1.2 in Hegrenes & Asheim (2006).
-    Feed units (FEm) per animal are calibrated once, using 1996 national FEm
-    totals (fu_<animal>_1996, from Hegrenes & Asheim) divided by the 1996
-    released-animal counts read from the OBB grazing statistics below. That
-    per-animal FEm rate is then applied to every year's animal counts to get
-    total feed units grazed, converted to N via an average protein content of
-    150 g per FEm (protein_cont_grazing) and the Jones factor.
+    Feed taken up by livestock grazing on utmark. Hegrenes & Asheim (2006,
+    Table 1.2, after Garmo & Skurdal 1998) estimate 303 mill. FEm taken up on
+    utmark in 1996 by all grazing animals, 70% by sheep, 27% by cattle, 2% by
+    goats and 1% by horses (fu_<animal>_1996). Dividing each group's share by
+    the number of animals on utmark in 1996 gives FEm per animal, which is
+    applied to every year's number of animals and converted to N via 150 g
+    protein per FEm (protein_cont_grazing) and the Jones factor.
+
+    Animal numbers are from SSB table 12660 (all animals with production
+    subsidy for at least 8 weeks on utmark up to 2008 and 5 weeks from 2009;
+    sheep include lambs; goats and horses are reported together), 1995-2025.
+    For 1990-1994 sheep are extrapolated back from 1995 with the change in
+    the number of winter-fed sheep (SSB table 03710); cattle, goats and
+    horses are held at the 1995 level.
     """
     flow_code = 'FS.OL-AG.MM-Grazing-Nmix'
     collected_years = set()
-    data_sources = 'NIBIO'
-    dataset_key = 'beitestatistikk'
-    noise_val = dataset_noise[dataset_key]
+    data_sources = 'SSB table 12660'
+    noise_ssb = dataset_noise['12660']
     Jones = float(current_params.get("Jones_factor"))
-    
-    fu_sheep_1996 = float(current_params.get("fu_sheep_1996")) * 1e6
-    fu_cattle_1996 = float(current_params.get("fu_cattle_1996")) * 1e6
-    fu_goat_1996 = float(current_params.get("fu_goat_1996")) * 1e6   
+    protein_cont = float(current_params.get("protein_cont_grazing")) * 1e-9  # g protein/FEm -> kt protein/FEm
 
-    protein_cont = float(current_params.get("protein_cont_grazing")) * 1e-9
+    fem_1996 = {
+        'sauer': float(current_params.get("fu_sheep_1996")) * 1e6,
+        'storfe': float(current_params.get("fu_cattle_1996")) * 1e6,
+        'geit_og_hest': (float(current_params.get("fu_goat_1996")) + float(current_params.get("fu_horse_1996"))) * 1e6,
+    }
 
-    sau, lam, storfe, geit = {}, {}, {}, {}
+    # 'ssb_utmark_animals_12660' <- data_files/12660_husdyr_utmarksbeite.csv
+    animals = preloaded_data['ssb_utmark_animals_12660']
+    fem_per_animal = {group: fem_1996[group] / animals.loc[1996, group] for group in fem_1996}
 
-    # preloaded_data['obb_<sheet>_raw'] <- data_files/OBB_Fylke_1970-2025.xlsx
-    # (Landbruksdirektoratet, Organisert beitebruk), one sheet per animal group
-    # and decade. Column layout differs by decade, hence the varying row_idx and
-    # column strides below; row_idx selects the national-total row (summed
-    # across counties) for released ("sleppt") sheep/lamb counts that year.
-    def extract_sau_lam(df, cols, row_idx):
-        for col in cols:
-            year = int(df.iloc[0, col])
-            r_sau = float(df.iloc[row_idx, col-3])
-            r_lam = float(df.iloc[row_idx, col-2])
-            sau[year] = r_sau * noise_val
-            lam[year] = r_lam * noise_val
+    # Sheep in 1990-1994 follow the number of winter-fed sheep:
+    # 'ssb_sheep_numbers' <- data_files/03710_20260128-152225.xlsx (SSB table
+    # 03710). Cattle, goats and horses are held at the 1995 level, since no
+    # national series for them on utmark exists before 1995 (the organised
+    # grazing statistics grew in the early 1990s as more farmers joined
+    # grazing associations, so they do not show the number of animals).
+    df_sheep = preloaded_data['ssb_sheep_numbers'].dropna(subset=['År'])
+    sheep_index = dict(zip(df_sheep['År'].astype(int), df_sheep['Husdyr (sau)'].astype(float)))
 
-    extract_sau_lam(preloaded_data['obb_Sau1990-99_raw'], range(6, 100, 10), 21)
-    extract_sau_lam(preloaded_data['obb_Sau2000-09_raw'], range(6, 100, 10), 22)
-    extract_sau_lam(preloaded_data['obb_Sau2010-19_raw'], range(6, 100, 10), 22)
-    extract_sau_lam(preloaded_data['obb_Sau2020-29_raw'], range(6, 60, 10), 13)
-
-    # Cattle (storfe) and goat (geit) counts come from separate sheets in the
-    # same workbook, again with the national-total row selected per decade.
-    df_sg_old = preloaded_data.get('obb_Storfe og geit1993-2019_raw')
-
-    for col in range(4, 59, 6):
-        year = int(df_sg_old.iloc[0, col])
-        r_st = float(df_sg_old.iloc[23, col-2])
-        r_gt = float(df_sg_old.iloc[23, col-1])
-        storfe[year] = r_st * noise_val
-        geit[year] = r_gt * noise_val
-        
-    for col in range(66, 200, 8):
-        year = int(df_sg_old.iloc[0, col])
-        r_st = float(df_sg_old.iloc[23, col-2])
-        r_gt = float(df_sg_old.iloc[23, col-1])
-        storfe[year] = r_st * noise_val
-        geit[year] = r_gt * noise_val
-
-    df_sg_new = preloaded_data.get('obb_Storfe og geit2020-29_raw')
-        
-    for col in range(6, 49, 8):
-        year = int(df_sg_new.iloc[0, col])
-        r_st = float(df_sg_new.iloc[13, col-2])
-        r_gt = float(df_sg_new.iloc[13, col-1])
-        storfe[year] = r_st * noise_val
-        geit[year] = r_gt * noise_val
-
-    # Linear backward extrapolation for the missing years (1990-1992)
-    for animal_dict in [storfe, geit]:
-        years = np.array(list(animal_dict.keys()), dtype=float)
-        y = np.array(list(animal_dict.values()), dtype=float)    
-        a, b = np.polyfit(years, y, 1)    
-        for y_back in [1990, 1991, 1992]:
-            animal_dict[y_back] = a * y_back + b
-
-    # Ewes are released to outfield pasture together with their lambs, and a
-    # lamb's feed unit is assumed equal in size to an adult sheep's, so both are
-    # calibrated from the same fu_sheep_1996 reference total against their
-    # respective 1996 counts and later summed as equivalent grazing animals.
-    fu_sheep = fu_sheep_1996 / sau[1996]
-    fu_lamb = fu_sheep_1996 / lam[1996]
-    fu_cattle = fu_cattle_1996 / storfe[1996]
-    fu_goat = fu_goat_1996 / geit[1996]
-
-    for year in range(1990, 2026):            
+    first_year = int(animals.index.min())
+    for year in range(1990, 2026):
+        if year >= first_year:
+            n = {group: animals.loc[year, group] * noise_ssb for group in fem_1996}
+            src = data_sources
+        else:
+            n = {group: animals.loc[first_year, group] * noise_ssb for group in fem_1996}
+            n['sauer'] *= sheep_index[year] / sheep_index[first_year]
+            src = 'SSB table 12660, 1995 level; sheep scaled with SSB table 03710'
+        fem = sum(n[group] * fem_per_animal[group] for group in fem_1996)
         collected_years.add(year)
-        value = (sau[year]*fu_sheep + lam[year]*fu_lamb + storfe[year]*fu_cattle + geit[year]*fu_goat) * protein_cont / Jones
         results.append({
-            'flow_name': flow_code, 'year': year, 'value': value, 
-            'comment': 'ok', 'data_sources': data_sources
+            'flow_name': flow_code, 'year': year, 'value': fem * protein_cont / Jones,
+            'comment': 'ok', 'data_sources': src
         })
 
     missing_years = EXPECTED_YEARS - collected_years

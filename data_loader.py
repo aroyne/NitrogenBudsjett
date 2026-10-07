@@ -6,7 +6,7 @@ pools are requested (selected_pools). Most entries in DATA_MAP go through the
 generic per-method loading loop below and end up under their own dict key,
 but a handful of methods load one workbook and split it into several output
 keys instead - for those, the DATA_MAP key itself (e.g. 'ag_gnb', 'ag_grovfor',
-'aqua_data', 'avlop_sewage', 'hy_teotil3', 'fs_obb_grazing',
+'aqua_data', 'avlop_sewage', 'hy_teotil3',
 'fao_live_animals_all', 'ag_faostat_production_all', 'fao_fertilizer_all',
 'ag_manure_crt') exists only to gate
 loading by pool membership and is never read back; the actual data lives
@@ -203,6 +203,9 @@ def load_all_data(selected_pools):
         'hy_fiske_old_raw': ({'hy'}, 'data_files/fiske_1990_2000.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Ark1'}),
         'avlop_sewage': ({'hy', 'pr'}, 'data_files/05280_20251113-113329.xlsx', 'openpyxl_sewage', {}),
         'ag_gnb': ({'ag','mp'}, 'data_files/aei_pr_gnb__custom_18744910_spreadsheet.xlsx', 'openpyxl_gnb', {}),
+        # SSB 12660, livestock on utmarksbeite (all animals with production subsidy for
+        # utmark grazing), national totals 1995-2025, downloaded from the SSB API
+        'ssb_utmark_animals_12660': ({'fs'}, 'data_files/12660_husdyr_utmarksbeite.csv', 'csv', {'index_col': 'year'}),
         # SSB 05982, "Jordbruksareal i drift" (daa), 1969-2025 with 1990-1998 missing,
         # downloaded from the SSB API
         'ssb_agri_area_05982': ({'ag'}, 'data_files/05982_jordbruksareal_i_drift.csv', 'csv', {'index_col': 'year'}),
@@ -216,10 +219,9 @@ def load_all_data(selected_pools):
         'ag_leaching_csv': ({'ag'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_nr_ag', {}),
         'ag_faostat_production_all': ({'ag','mp'}, 'data_files/FAOSTAT_data_en_9-24-2026.csv', 'csv_faostat_production', {}),
         'wool_production': ({'ag','mp'}, 'data_files/ull.xlsx', 'excel', {'skiprows': 3}),
-        'ssb_sheep_numbers': ({'ag','mp'}, 'data_files/03710_20260128-152225.xlsx', 'excel', {'skiprows': 2}),
+        'ssb_sheep_numbers': ({'ag','mp','fs'}, 'data_files/03710_20260128-152225.xlsx', 'excel', {'skiprows': 2}),
         'fs_unfccc_emissions_raw': ({'fs'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_n2o_hs_fs', {}),
         'fs_firewood_raw': ({'fs'}, 'data_files/09702_20251120-133716.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'VedTonn'}),
-        'fs_obb_grazing': ({'fs'}, 'data_files/OBB_Fylke_1970-2025.xlsx', 'openpyxl_obb_grazing', {}),
         'faostat_forestry': ({'fs'}, 'data_files/FAOSTAT_data_en_2-20-2026.csv', 'csv_forestry', {}),
         'fuel_for_industry': ({'ef'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_fuel_industry', {}),
         'fuel_for_transport': ({'ef'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_fuel_transport', {}),
@@ -264,6 +266,7 @@ def load_all_data(selected_pools):
         'waste_historical_fractions': ({'pr', 'mp'}, 'data_files/kommunalt_avfall_1985_1995.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'forbrenning og gjenvinning'}),
         'biogass_tall': ({'pr'}, 'data_files/biogass_tall.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'biorest'}),
         'ssb_waste_12818': ({'pr'}, 'data_files/12818_20260526-110921.xlsx', 'openpyxl_single_sheet', {'sheet_name': '12818'}),
+        'landfill_ch4_crt': ({'pr'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_landfill_ch4', {}),
         'deponi_utslipp': ({'pr'}, 'data_files/Utslipp_deponi.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Utslipp'}),
         'deponi_tilkobling': ({'pr'}, 'data_files/Utslipp_deponi.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'tilkobling'}),
         'biogass_manure': ({'pr'}, 'data_files/Biogass.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Tabell'}),
@@ -456,15 +459,29 @@ def load_all_data(selected_pools):
             preloaded[key] = pd.DataFrame(rows).sort_values('year').reset_index(drop=True)
 
         elif method == 'crt_n2o_so':
-            # UNFCCC CRT Table5, "5.C. Incineration and open burning of
-            # waste", column E (N2O, kt) - converted to N further downstream
-            # (pr_mc.py applies N2O_to_N_factor from N_parameters.xlsx).
+            # UNFCCC CRT Table5, "5.B. Biological treatment of solid waste"
+            # (composting and anaerobic digestion) plus "5.C. Incineration and
+            # open burning of waste", column E (N2O, kt) - converted to N
+            # further downstream (pr_mc.py applies N2O_to_N_factor from
+            # N_parameters.xlsx). Solid waste disposal (5.A) reports no N2O.
             rows = []
             for year, wb in _crt_iter_workbooks(filepath):
-                v = _crt_cell(wb['Table5'], ['5.C. Incineration and open burning of waste'], 5)
+                v = (_crt_cell(wb['Table5'], ['5.B. Biological treatment of solid waste'], 5)
+                     + _crt_cell(wb['Table5'], ['5.C. Incineration and open burning of waste'], 5))
                 rows.append({'year': year, 'value': v})
                 wb.close()
             preloaded[key] = pd.DataFrame(rows).sort_values('year').reset_index(drop=True)
+
+        elif method == 'crt_landfill_ch4':
+            # UNFCCC CRT Table5, "5.A. Solid waste disposal", column D (CH4,
+            # kt). The inventory calculates it with a first-order decay model
+            # of the organic waste landfilled in earlier years, so it follows
+            # the decomposition in Norwegian landfills over time.
+            rows = []
+            for year, wb in _crt_iter_workbooks(filepath):
+                rows.append({'year': year, 'ch4': _crt_cell(wb['Table5'], ['5.A. Solid waste disposal'], 4)})
+                wb.close()
+            preloaded[key] = pd.DataFrame(rows).set_index('year').sort_index()['ch4']
 
         elif method == 'crt_n2o_ww':
             # UNFCCC CRT Table5, "5.D. Wastewater treatment and discharge",
@@ -678,19 +695,6 @@ def load_all_data(selected_pools):
             df_fao = pd.read_csv(filepath)
             preloaded['fao_animal_production_clean'] = df_fao[(df_fao['Element'] == 'Production') & (df_fao['Value'] != 0) & (df_fao['Item'].isin(animal_product_items))][['Item', 'Year', 'Value']].copy()
             preloaded['fao_hides_clean'] = df_fao[(df_fao['Element'] == 'Production') & (df_fao['Value'] != 0) & (df_fao['Item'].str.contains('hides', case=False, na=False))][['Item', 'Year', 'Value']].copy()
-
-        elif method == 'openpyxl_obb_grazing':
-            # Converts every relevant sheet from the organised-grazing workbook to a
-            # DataFrame in one pass; fs_mc.py indexes each obb_<sheet>_raw key directly.
-            wb_obb = openpyxl.load_workbook(filepath, data_only=True)
-            preloaded['fs_obb_workbook'] = wb_obb
-
-            target_sheets = [
-                'Sau1990-99', 'Sau2000-09', 'Sau2010-19', 'Sau2020-29',
-                'Storfe og geit1993-2019', 'Storfe og geit2020-29'
-            ]
-            for sheet_name in target_sheets:
-                preloaded[f"obb_{sheet_name}_raw"] = pd.DataFrame(list(wb_obb[sheet_name].values))
 
         elif method == 'csv_forestry':
             df_raw = pd.read_csv(filepath)

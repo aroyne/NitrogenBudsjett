@@ -18,6 +18,11 @@ For 1990–2012, we use the natural diffuse loss from TEOTIL2 model results from
 We do not use the published series for 1990–2012 (Miljødirektoratet's TEOTIL figures and NIVA's annual reports), because for 1990–1995 it contains results from an older TEOTIL version, with 40–50 % higher background loading than the TEOTIL2 results used here, which gives an artificial drop in 1996. All years 1990–2012 used here come from the same TEOTIL2 model run. Results for 1990–1995 are less certain than for later years, because the input data for those years are incomplete (J. Sample, NIVA, pers. comm., September 2026); the gaps are mainly in point sources, which are not used here.
 
 TEOTIL3 has not been updated for 2024 at the time of writing; the 2024 value is a flat carry-forward of 2023, with additional uncertainty (±50%) applied to reflect that it is not a real, independently observed value.
+
+**Interpretation**
+
+- The flow is about 27–42 kt N per year without a clear trend.
+- TEOTIL calculates the diffuse loss from land as runoff times area-specific N concentrations, so the year-to-year variation mainly follows precipitation and runoff: low values in dry years (for example 2010) and high values in wet years (for example 2020).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References

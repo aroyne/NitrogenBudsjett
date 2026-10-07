@@ -15,9 +15,18 @@ Taken from the UNFCCC Common Reporting Table (CRT), Table 3.D. The main componen
 
 EUROSTAT's Gross Nutrient Balance reports a substantially larger figure for manure N (roughly 40-65 % higher across the time series): its documentation states manure excretion coefficients are gross, with "no reductions... made for volatilisation from the moment of excretion till the application to the soil" (Eurostat (2025)<!--cite:eurostat_gnb_glossary_2025-->) - i.e. it measures total excretion rather than what actually reaches the field. EUROSTAT's Norwegian series also has a reporting-methodology discontinuity around 2017-2020 (Norway supplied EUROSTAT with pre-calculated results up to 2017; EUROSTAT has calculated results itself from raw activity data since 2020, per personal correspondence with EUROSTAT), producing an artificial ~23 % step between 2016 and 2020 that does not appear in the CRT-based series used here.
 
-**How the numbers are derived.** Norway's inventory calculates the N excreted per animal category from animal numbers and national N excretion rates, distributes the manure between grazing and the different housing and storage systems using SSB's surveys of manure use in agriculture, and deducts the N lost as NH3, N2O, NOx and N2 during housing and storage. The method is documented in Miljødirektoratet (2020)<!--cite:miljodirektoratet_manure_2020--> and in the [Miljødirektoratet, NID 2026](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/). The flow is the sum of "Animal manure applied to soils" (FAM) and 53% (range 44–62%) of "Urine and dung deposited by grazing animals" (PRP) in CRT Table 3.D.
+**How the numbers are derived**
 
-**Interpretation.** The flow is 61–63 kt N per year in the 1990s, rises to about 70 kt N in 2015–2018 and is about 66 kt N in 2024. In 2024 managed manure accounts for about 54 kt N and manure deposited on innmark during grazing for about 12 kt N. The changes follow the livestock numbers, with fewer dairy cows and more beef cattle, pigs and poultry over the period. Manure deposited on utmark (about 11 kt N per year) is not included, and the losses from it are also removed from the AG.SM emission and leaching flows.
+- Norway's inventory calculates the N excreted per animal category from animal numbers and national N excretion rates, distributes the manure between grazing and the different housing and storage systems using SSB's surveys of manure use in agriculture, and deducts the N lost as NH3, N2O, NOx and N2 during housing and storage.
+- The method is documented in Miljødirektoratet (2020)<!--cite:miljodirektoratet_manure_2020--> and in the [Miljødirektoratet, NID 2026](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/).
+- The flow is the sum of "Animal manure applied to soils" (FAM) and 53% (range 44–62%) of "Urine and dung deposited by grazing animals" (PRP) in CRT Table 3.D.
+
+**Interpretation**
+
+- The flow is 61–63 kt N per year in the 1990s, rises to about 70 kt N in 2015–2018 and is about 66 kt N in 2024.
+- In 2024 managed manure accounts for about 54 kt N and manure deposited on innmark during grazing for about 12 kt N.
+- The changes follow the livestock numbers, with fewer dairy cows and more beef cattle, pigs and poultry over the period.
+- Manure deposited on utmark (about 11 kt N per year) is not included, and the losses from it are also removed from the AG.SM emission and leaching flows.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References
