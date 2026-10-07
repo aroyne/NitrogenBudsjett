@@ -11,15 +11,21 @@ nav_order: 8
 
 ### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-Taken from FAOSTAT Crop and livestock products, assuming typical weights of animals from various sources, average 16 % protein in whole animal based on typical values in Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> and Jones factor 6.25 for nitrogen to protein (standard).
+#### Flow description
 
-**How the numbers are derived**
+- **AG.MM-RW.RW-Live animal export-Nmix** is the N in exported live animals.
 
-- FAOSTAT's trade statistics for live animals ([TCL](https://www.fao.org/faostat/en/#data/TCL)) give the number of animals exported per year and animal category.
-- FAOSTAT reports poultry in thousands of animals, which is converted to animals.
-- The number is multiplied by an average live weight per category from the IPCC 2006 Guidelines (Vol. 4, Ch. 10, Annex 10A: e.g. other cattle 420 kg, breeding pigs 198 kg, sheep 48.5 kg, goats 38.5 kg, horses 377 kg, laying hens 1.8 kg; animal_weights in N_parameters.xlsx), a protein content of 16% and 1/6.25 to get N.
+#### Data sources
 
-**Interpretation**
+- FAOSTAT's trade statistics for live animals ([TCL](https://www.fao.org/faostat/en/#data/TCL), Crops and livestock products) give the number of animals exported per year and animal category. FAOSTAT reports poultry in thousands of animals.
+- Average live weights per category from the IPCC 2006 Guidelines (Vol. 4, Ch. 10, Annex 10A) and other sources.
+
+#### Assumptions
+
+- Poultry numbers are converted from thousands to animals.
+- The number is multiplied by an average live weight per category (e.g. other cattle 420 kg, breeding pigs 198 kg, sheep 48.5 kg, goats 38.5 kg, horses 377 kg, laying hens 1.8 kg; animal_weights in N_parameters.xlsx), an average of 16% protein in the whole animal based on typical values in Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> and the standard Jones factor 6.25 for nitrogen to protein.
+
+#### Interpretations and comparisons
 
 - The flow is very small, below 0.03 kt N per year.
 - Pigs and horses make up most of the exported animals.

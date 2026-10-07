@@ -11,15 +11,21 @@ nav_order: 6
 
 ### Description
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
-Taken from FAOSTAT Crops and livestock products, with N contents taken from Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
+#### Flow description
 
-**How the numbers are derived**
+- **AG.MM-MP.FP-Animal products-Nmix** is the N in meat, milk and eggs produced in Norway.
+
+#### Data sources
 
 - FAOSTAT's production statistics ([Crops and livestock products](https://www.fao.org/faostat/en/#data/QCL)) give the production of meat (carcass weight), milk and eggs in Norway, based on the official statistics Norway reports to FAO.
-- Each product is multiplied by an N content from Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> (for example 2.5% for beef, 2.56% for pork, 3.0% for chicken, 2.6% for mutton).
+- N contents from Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
+
+#### Assumptions
+
+- Each product is multiplied by its N content (for example 2.5% for beef, 2.56% for pork, 3.0% for chicken, 2.6% for mutton).
 - Only individual products are used, not FAOSTAT's aggregates.
 
-**Interpretation**
+#### Interpretations and comparisons
 
 - The flow rises from about 17 kt N in 1990 to 19 kt N in 2024.
 - Milk is the largest product but decreases from 10.6 to 7.9 kt N, while chicken meat increases from 0.6 to 3.3 kt N, pork from 2.1 to 3.3 kt N and eggs from 1.0 to 1.4 kt N.
