@@ -22,7 +22,7 @@ nav_order: 1
 
 #### Interpretations and comparisons
 
-- Emissions from other sectors (1.A.4 and 1.A.5) are stable at 0.10–0.13 kt N2O.
+- Emissions from other sectors (1.A.4 and 1.A.5) are stable at 0.064–0.083 kt N/year.
 - In 2024 they come in roughly equal parts from commercial/institutional (1.A.4.a), residential (1.A.4.b, mainly wood stoves) and agriculture, forestry and fishing (1.A.4.c, including fishing vessels and tractors).
 - The decline in residential emissions after 2010 reflects reduced use of heating oil and firewood, while commercial emissions increased.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
