@@ -22,8 +22,8 @@ nav_order: 2
 #### Interpretations and comparisons
 
 - Chemical industry (2.B, nitric acid production) accounts for over 90% of the flow. Emissions are substantial, at least before 2009.
-- Emissions were about 4.4 kt N (6.9 kt N2O) in 1990, fell from 4.3 kt N in 2005 to about 1.1 kt N in 2010 after N2O-reducing catalysts were installed in the nitric acid plants, and have been 0.5–0.8 kt N since.
-- Category 2.G (mainly N2O used as anaesthetic and propellant) contributes about 0.1 kt N2O per year.
+- Emissions were about 4.4 kt N/year in 1990, fell from 4.3 kt N in 2005 to about 1.1 kt N in 2010 after N2O-reducing catalysts were installed in the nitric acid plants, and have been 0.5–0.8 kt N since.
+- Category 2.G (mainly N2O used as anaesthetic and propellant) contributes about 0.06 kt N/year.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References
