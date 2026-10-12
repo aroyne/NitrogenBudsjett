@@ -23,9 +23,13 @@ nav_order: 1
 
 #### Interpretations and comparisons
 
-- Road transport (1.A.3.b) accounts for about three quarters of the flow.
-- N2O from road transport increased in the 1990s (0.12 kt N/year in 1990, 0.18 kt N in 2000) because early three-way catalytic converters produce N2O as a by-product, decreased in the early 2000s with improved catalysts, and has increased again to about 0.20 kt N/year since 2010, likely due to the growth in diesel vehicles with SCR and oxidation catalysts ([EMEP/EEA Guidebook 2023, ch. 1.A.3.b.i–iv](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023/part-b-sectoral-guidance-chapters/1-energy/1-a-combustion/1-a-3-b-i)).
-- Domestic navigation, aviation and railways contribute 0.013–0.03 kt N/year each.
+- Road transport (1.A.3.b) accounts for 66–79% of the flow throughout the period.
+- N2O from road transport increased from 0.12 kt N/year in 1990 to about 0.18 kt N in 1999–2004, mainly from petrol cars, because early three-way catalytic converters produce N2O as a by-product ([EMEP/EEA Guidebook 2023, ch. 1.A.3.b.i–iv](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023/part-b-sectoral-guidance-chapters/1-energy/1-a-combustion/1-a-3-b-i)).
+- In 2005 road transport N2O fell in one step to 0.13 kt N/year. The step comes from the implied N2O emission factor for petrol cars in the CRT, which falls from 3.3 to 2.0 kg N2O/TJ between 2004 and 2005, while petrol use falls by only 4%; the CRT tables do not give the reason.
+- After 2005 the flow has been driven by diesel: the implied emission factor for diesel in road transport rose from 0.9 kg N2O/TJ in 2000 to 1.5 in 2010 and 3.1 in 2024, likely due to oxidation catalysts and urea-based selective catalytic reduction (SCR) on newer diesel vehicles (EMEP/EEA Guidebook 2023). Road transport N2O rose from 0.14 kt N/year in 2010 to about 0.20 kt N in 2018–2024, of which diesel accounted for 0.16 kt N and biofuels 0.03 kt N in 2024, while petrol cars contribute almost nothing.
+- Railways contributed 0.024–0.033 kt N/year in 1990–1995 (13–16% of the flow), fell to about 0.016 kt N in 1996 and have been 0.009–0.014 kt N since 2010 (4–5%).
+- Domestic navigation increased from 0.020 kt N/year in 1990 to about 0.03 kt N and has been fairly stable since 2003 (11–16% of the flow).
+- Domestic aviation increased from 0.014 kt N/year in 1990 to 0.019–0.024 kt N in 1996–2019, with a dip to 0.016 kt N in 2020–2021 during the COVID-19 pandemic.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References
