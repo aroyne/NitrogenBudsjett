@@ -22,8 +22,8 @@ nav_order: 3
 
 #### Interpretations and comparisons
 
-- NOx emissions declined from about 30 Gg in the 1990s to about 18 Gg in 2024.
-- The largest source is national fishing (1A4ciii), with 12–17 Gg until 2000 and 5.6 Gg in 2024, reflecting a smaller and more modern fishing fleet and NOx-reducing measures.
+- NOx emissions declined from about 9.1 kt N/year in the 1990s to about 5.5 kt N in 2024.
+- The largest source is national fishing (1A4ciii), with 3.7–5.2 kt N/year until 2000 and 1.7 kt N in 2024, reflecting a smaller and more modern fishing fleet and NOx-reducing measures.
 - Other important sources are commercial and household mobile machinery (1A4aii, 1A4bii), agricultural and forestry machinery (1A4cii) and other mobile sources including military and recreational boats (1A5b).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

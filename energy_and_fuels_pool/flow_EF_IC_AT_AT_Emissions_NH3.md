@@ -22,7 +22,7 @@ nav_order: 2
 
 #### Interpretations and comparisons
 
-- NH3 emissions from fuel combustion in industry are very small (about 0.01 Gg NH3 per year), mainly from combustion of biomass and other fuels in 1A2d (pulp, paper and print) and 1A2gviii (other stationary combustion).
+- NH3 emissions from fuel combustion in industry are very small (about 0.008 kt N/year), mainly from combustion of biomass and other fuels in 1A2d (pulp, paper and print) and 1A2gviii (other stationary combustion).
 - NH3 is not a significant product of combustion except where biomass or catalytic NOx reduction is involved.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

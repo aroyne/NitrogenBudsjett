@@ -24,9 +24,9 @@ nav_order: 1
 #### Interpretations and comparisons
 
 - The emission factors differ strongly between fuels: in the 2024 CRT, the implied N2O factors for 1.A.1 are about 0.1 kg/TJ for natural gas, about 2 kg/TJ for the fossil part of waste (“other fossil fuels”) and about 3.7 kg/TJ for biomass (including the biogenic part of waste). The time series therefore follows the use of waste and biomass more than total energy use.
-- Emissions from energy industries (1.A.1) increased from 0.039 kt N2O in 1990 to about 0.10 kt in 2024, and almost all of the growth after 2008 comes from public electricity and heat production (1.A.1.a), mainly heat plants, where emissions rose from 0.026 kt in 2008 to 0.078 kt in 2023 as waste incineration and biomass-fired district heating expanded.
-- Emissions from oil and gas extraction (1.A.1.c), which use mainly natural gas in turbines, are larger in CO2 terms but contribute less N2O (0.024 kt in 2023), and emissions from petroleum refining (1.A.1.b) have been small since 2000.
-- N2O from fugitive emissions in the oil and gas sector (1.B.2, in practice only 1.B.2.c Venting and flaring) was 0.017 kt in 1990 (about 30% of the flow), varied mostly around 0.01–0.02 kt with a short peak of 0.022 kt in 2007–2008, and has since declined to 0.004 kt in 2024 (about 4% of the flow); the other 1.B.2 subcategories are reported as not applicable, not occurring or included elsewhere.
+- Emissions from energy industries (1.A.1) increased from 0.025 kt N/year in 1990 to about 0.064 kt N in 2024, and almost all of the growth after 2008 comes from public electricity and heat production (1.A.1.a), mainly heat plants, where emissions rose from 0.017 kt N/year in 2008 to 0.050 kt N in 2023 as waste incineration and biomass-fired district heating expanded.
+- Emissions from oil and gas extraction (1.A.1.c), which use mainly natural gas in turbines, are larger in CO2 terms but contribute less N2O (0.015 kt N/year in 2023), and emissions from petroleum refining (1.A.1.b) have been small since 2000.
+- N2O from fugitive emissions in the oil and gas sector (1.B.2, in practice only 1.B.2.c Venting and flaring) was 0.011 kt N/year in 1990 (about 30% of the flow), varied mostly around 0.006–0.013 kt N with a short peak of 0.014 kt N in 2007–2008, and has since declined to 0.003 kt N in 2024 (about 4% of the flow); the other 1.B.2 subcategories are reported as not applicable, not occurring or included elsewhere.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References

@@ -22,7 +22,7 @@ nav_order: 2
 
 #### Interpretations and comparisons
 
-- NH3 emissions in this sub-pool (0.06–0.10 Gg NH3 per year) come almost entirely from residential stationary combustion (1A4bi), i.e. wood burning in households, and follow the use of firewood.
+- NH3 emissions in this sub-pool (0.05–0.08 kt N/year) come almost entirely from residential stationary combustion (1A4bi), i.e. wood burning in households, and follow the use of firewood.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References

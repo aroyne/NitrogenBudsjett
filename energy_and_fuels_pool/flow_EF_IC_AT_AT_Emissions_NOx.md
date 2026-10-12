@@ -22,8 +22,8 @@ nav_order: 3
 
 #### Interpretations and comparisons
 
-- NOx emissions from industry and construction fell from about 18–21 Gg in the 1990s to about 8 Gg in 2024.
-- The largest source is mobile machinery in construction and industry (1A2gvii, 8–11 Gg in the 1990s, 3.8 Gg in 2024), where the decline follows the gradual replacement of machinery under the EU emission standards for non-road mobile machinery.
+- NOx emissions from industry and construction fell from about 5.5–6.4 kt N/year in the 1990s to about 2.4 kt N in 2024.
+- The largest source is mobile machinery in construction and industry (1A2gvii, 2.4–3.3 kt N/year in the 1990s, 1.2 kt N in 2024), where the decline follows the gradual replacement of machinery under the EU emission standards for non-road mobile machinery.
 - Emissions from non-metallic minerals (1A2f, e.g. cement kilns) and pulp and paper (1A2d) have also fallen substantially, while emissions from iron and steel (1A2a) increased after 2010.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

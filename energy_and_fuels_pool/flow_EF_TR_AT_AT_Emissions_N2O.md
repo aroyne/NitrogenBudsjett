@@ -24,8 +24,8 @@ nav_order: 1
 #### Interpretations and comparisons
 
 - Road transport (1.A.3.b) accounts for about three quarters of the flow.
-- N2O from road transport increased in the 1990s (0.19 kt in 1990, 0.28 kt in 2000) because early three-way catalytic converters produce N2O as a by-product, decreased in the early 2000s with improved catalysts, and has increased again to about 0.31 kt since 2010, likely due to the growth in diesel vehicles with SCR and oxidation catalysts ([EMEP/EEA Guidebook 2023, ch. 1.A.3.b.i–iv](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023/part-b-sectoral-guidance-chapters/1-energy/1-a-combustion/1-a-3-b-i)).
-- Domestic navigation, aviation and railways contribute 0.02–0.05 kt each.
+- N2O from road transport increased in the 1990s (0.12 kt N/year in 1990, 0.18 kt N in 2000) because early three-way catalytic converters produce N2O as a by-product, decreased in the early 2000s with improved catalysts, and has increased again to about 0.20 kt N/year since 2010, likely due to the growth in diesel vehicles with SCR and oxidation catalysts ([EMEP/EEA Guidebook 2023, ch. 1.A.3.b.i–iv](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023/part-b-sectoral-guidance-chapters/1-energy/1-a-combustion/1-a-3-b-i)).
+- Domestic navigation, aviation and railways contribute 0.013–0.03 kt N/year each.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References

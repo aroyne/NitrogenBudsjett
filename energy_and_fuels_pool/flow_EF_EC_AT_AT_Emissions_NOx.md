@@ -14,7 +14,7 @@ nav_order: 2
 #### Flow description
 
 - **EF.EC-AT.AT-Emissions-NOx** is NOx from energy industries and fugitive emissions in the oil and gas sector, using the categories given in Table 11 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
-- Public electricity and heat production (1A1a, about 1–2 Gg NOx, mainly waste incineration and district heating) is not included here but counted in the processing of residues pool (PR.SO-AT.AT), as recommended in chapter 1.4.1.2 of Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, to avoid double counting.
+- Public electricity and heat production (1A1a, about 0.3–0.6 kt N/year, mainly waste incineration and district heating) is not included here but counted in the processing of residues pool (PR.SO-AT.AT), as recommended in chapter 1.4.1.2 of Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, to avoid double counting.
 - NH3 emissions from these categories are reported as zero or not occurring, which is why there is no EF.EC NH3 flow.
 
 #### Data sources
@@ -24,8 +24,8 @@ nav_order: 2
 
 #### Interpretations and comparisons
 
-- Oil and gas extraction (1A1c, mainly gas turbines on offshore installations) dominates the flow: its NOx emissions rose from 25 Gg in 1990 to about 48 Gg in 2005–2015 with increasing petroleum production and have since fallen to 33 Gg in 2024, partly due to electrification of offshore installations with power from shore and NOx-reducing measures financed by the NOx Fund ([Næringslivets NOx-fond](https://www.nox-fondet.no/)).
-- Refineries (1A1b) and fugitive emissions including flaring (1B2) contribute up to 1–2 Gg each.
+- Oil and gas extraction (1A1c, mainly gas turbines on offshore installations) dominates the flow: its NOx emissions rose from 7.6 kt N/year in 1990 to about 14.6 kt N in 2005–2015 with increasing petroleum production and have since fallen to 10.0 kt N in 2024, partly due to electrification of offshore installations with power from shore and NOx-reducing measures financed by the NOx Fund ([Næringslivets NOx-fond](https://www.nox-fondet.no/)).
+- Refineries (1A1b) and fugitive emissions including flaring (1B2) contribute up to 0.3–0.6 kt N/year each.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### References
