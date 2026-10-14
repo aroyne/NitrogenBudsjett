@@ -477,26 +477,23 @@ def build_landing_page(output_filename, current_date_str, bib_filename, target_f
         
         if target_format == "html":
             f.write("### Interactive National Nitrogen Flow Map\n")
-            f.write("The diagram below illustrates the integrated nitrogen economy of Norway. "
-                    "Use the **slider at the bottom** or press **Play** to explore how the flow magnitudes "
-                    "have evolved over time. Flows are color-coded by chemical/functional type "
-                    "(e.g., gray for inert N₂, red for NOx, orange for NH₃/RDN, green for Nmix).\n\n")
-            
-            # Informasjon og bryter/lenke for å se diagrammet uten de dominerende strømmene ---
-            f.write("> 💡 **Tip:** The national budget is highly dominated by fertilizer production and trade, and by "
-                    "crude oil export. If you want to study the smaller, internal environmental and agricultural cycles "
-                    "more closely, you can view the "
-                    "**[Sankey Map with Dominant Trade Flows Hidden](output_files/plots/global_nitrogen_sankey_no_fertilizer.html)** "
-                    "(fertilizer/ammonia trade and crude oil export removed).\n\n")
-            
-            # Standard visning (Viser alle strømmer)
-            f.write('<iframe src="output_files/plots/global_nitrogen_sankey.html" '
-                    'width="100%" height="900px" frameborder="0" scrolling="no"></iframe>\n\n')
+            f.write("The diagram below shows the nitrogen flows between the pools of the Norwegian nitrogen budget. "
+                    "Use the **slider** or press **Play** to step through the years; the scale is the same for every year, "
+                    "so the widths can be compared over time. Hover a flow to see the individual flows it contains, with "
+                    "their 95 % uncertainty intervals. The budget is dominated by fertilizer production and trade and by "
+                    "crude oil export; use **Hide fertilizer, ammonia & crude-oil trade** to see the smaller internal "
+                    "flows more clearly.\n\n")
+            # The diagram page reports its own height (postMessage), so the iframe fits it without scrollbars or blank space.
+            f.write('<iframe id="nnb-sankey" src="output_files/plots/global_nitrogen_sankey.html" '
+                    'width="100%" height="1000" style="border:0;" scrolling="no"></iframe>\n'
+                    '<script>window.addEventListener("message", function (e) { '
+                    'if (e.data && e.data.sankeyHeight) { document.getElementById("nnb-sankey").style.height = e.data.sankeyHeight + "px"; } '
+                    '});</script>\n\n')
             f.write("---\n\n")
         else:
             # Fallback-tekst hvis man bygger en statisk PDF via Pandoc
             f.write("> **Note on Interactive Content:** Interactive, animated Sankey diagrams showing the "
-                    "evolution of national nitrogen flows (both complete and with fertilizer trade hidden) are available in the web-based "
+                    "evolution of national nitrogen flows are available in the web-based "
                     "version of this report.\n\n")
             f.write("---\n\n")
             

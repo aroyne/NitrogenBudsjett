@@ -21,11 +21,10 @@ Welcome to the interactive data and documentation portal for the Norwegian natio
 Use the navigation menu on the left side to explore the individual nitrogen pools (e.g., Forests and Semi-natural Vegetation, Agriculture, Atmosphere, Hydrosphere, Rest of the World) and access detailed statistical time-series graphs, methodological explanations, and parameterizations for each specific flow.
 
 ### Interactive National Nitrogen Flow Map
-The diagram below illustrates the integrated nitrogen economy of Norway. Use the **slider at the bottom** or press **Play** to explore how the flow magnitudes have evolved over time. Flows are color-coded by chemical/functional type (e.g., gray for inert N₂, red for NOx, orange for NH₃/RDN, green for Nmix).
+The diagram below shows the nitrogen flows between the pools of the Norwegian nitrogen budget. Use the **slider** or press **Play** to step through the years; the scale is the same for every year, so the widths can be compared over time. Hover a flow to see the individual flows it contains, with their 95 % uncertainty intervals. The budget is dominated by fertilizer production and trade and by crude oil export; use **Hide fertilizer, ammonia & crude-oil trade** to see the smaller internal flows more clearly.
 
-> 💡 **Tip:** The national budget is highly dominated by fertilizer production and trade, and by crude oil export. If you want to study the smaller, internal environmental and agricultural cycles more closely, you can view the **[Sankey Map with Dominant Trade Flows Hidden](output_files/plots/global_nitrogen_sankey_no_fertilizer.html)** (fertilizer/ammonia trade and crude oil export removed).
-
-<iframe src="output_files/plots/global_nitrogen_sankey.html" width="100%" height="900px" frameborder="0" scrolling="no"></iframe>
+<iframe id="nnb-sankey" src="output_files/plots/global_nitrogen_sankey.html" width="100%" height="1000" style="border:0;" scrolling="no"></iframe>
+<script>window.addEventListener("message", function (e) { if (e.data && e.data.sankeyHeight) { document.getElementById("nnb-sankey").style.height = e.data.sankeyHeight + "px"; } });</script>
 
 ---
 

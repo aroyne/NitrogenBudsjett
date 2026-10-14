@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nitrogen Flows Norway</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --text: #1f2933;
+    --muted: #616e7c;
+    --line: #d9dee3;
+    --panel: #f5f7f9;
+    --accent: #1a365d;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 8px 4px 12px; }
+  .bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-bottom: 6px; }
+  .year { font-size: 32px; font-weight: 700; font-variant-numeric: tabular-nums; min-width: 80px; color: var(--accent); }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  .seg button { border: 0; background: var(--bg); color: var(--muted); font: inherit; font-size: 13px;
+    padding: 6px 11px; cursor: pointer; }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button.on { background: var(--accent); color: #fff; }
+  .lbl { font-size: 12px; color: var(--muted); margin-right: 4px; }
+  .timeline { display: flex; align-items: center; gap: 10px; margin: 4px 0 2px; }
+  .timeline input[type=range] { flex: 1; accent-color: var(--accent); }
+  .play { border: 1px solid var(--line); background: var(--bg); border-radius: 50%; width: 34px; height: 34px;
+    cursor: pointer; font-size: 13px; color: var(--accent); flex: none; }
+  .ticks { position: relative; height: 16px; font-size: 11px; color: var(--muted); margin: 0 8px 4px 52px; }
+  .ticks span { position: absolute; transform: translateX(-50%); }
+  .scroll { overflow-x: auto; }
+  svg { width: 100%; min-width: 760px; height: auto; display: block; }
+  .node-label { font-size: 12px; fill: var(--text); paint-order: stroke; stroke: var(--bg); stroke-width: 3px;
+    stroke-linejoin: round; pointer-events: none; }
+  .node-label .v { fill: var(--muted); font-size: 11px; }
+  .scale { font-size: 11px; fill: var(--muted); }
+  .col-head { font-size: 11px; fill: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  path.link { fill: none; stroke-linecap: butt; transition: stroke-opacity .15s; }
+  .dim path.link { stroke-opacity: 0.08 !important; }
+  .dim path.link.hl { stroke-opacity: 1 !important; }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .legend span.sw { display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-right: 5px; vertical-align: -2px; }
+  .note { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+  #tip { position: fixed; pointer-events: none; background: rgba(255,255,255,.97); border: 1px solid #b8c0c8;
+    border-radius: 5px; padding: 7px 10px; font-size: 12px; line-height: 1.45; box-shadow: 0 2px 8px rgba(0,0,0,.12);
+    display: none; max-width: 360px; z-index: 10; }
+  #tip b { font-size: 13px; }
+  #tip table { border-collapse: collapse; margin-top: 3px; }
+  #tip td { padding: 0 6px 0 0; vertical-align: top; }
+  #tip td.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  #tip .ci { color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar">
+    <div class="year" id="yearLabel"></div>
+    <div><span class="lbl">Flows</span><span class="seg" id="segScope">
+      <button data-v="all" class="on">All flows</button>
+      <button data-v="hide">Hide fertilizer, ammonia &amp; crude-oil trade</button></span></div>
+    <div><span class="lbl">Colour by</span><span class="seg" id="segColor">
+      <button data-v="species" class="on">N species</button>
+      <button data-v="category">Category</button></span></div>
+  </div>
+  <div class="timeline">
+    <button class="play" id="play" title="Play / pause">&#9654;</button>
+    <input type="range" id="slider" min="0" step="1">
+  </div>
+  <div class="ticks" id="ticks"></div>
+  <div class="scroll"><svg id="chart" role="img" aria-label="Sankey diagram of nitrogen flows in Norway"></svg></div>
+  <div class="legend" id="legend"></div>
+  <div class="note" id="note"></div>
+</div>
+<div id="tip"></div>
+<script>
+const DATA = __DATA__;
+
+const W = 1160, M_L = 120, M_R = 130, TOP = 34, MAIN_H = 470, NODE_W = 14, PAD = 16;
+const LANE_GAP = 4, LOOP_TOP_GAP = 22, LEG_GAP = 4, ARC_R = 6;
+const COLS = [
+  ['AT_in', 'RW_in'],
+  ['FS', 'AG'],
+  ['MP'],
+  ['HS'],
+  ['PR'],
+  ['EF', 'HY'],
+  ['AT_out', 'RW_out'],
+];
+const COL_HEADS = ['Inputs', 'Primary production', 'Industry & trade', 'Households', 'Residues', '', 'Outputs'];
+const colX = c => M_L + c * (W - M_L - M_R - NODE_W) / (COLS.length - 1);
+const nodeCol = {}, nodeOrder = {};
+COLS.forEach((ids, c) => ids.forEach((id, i) => { nodeCol[id] = c; nodeOrder[id] = i; }));
+const NODE_IDS = COLS.flat();
+const poolOf = id => id.split('_')[0];
+const nodeRole = id => id.endsWith('_in') ? (poolOf(id) === 'RW' ? 'imports' : 'inputs')
+                     : id.endsWith('_out') ? (poolOf(id) === 'RW' ? 'exports' : 'emissions') : '';
+const nodeName = id => DATA.pools[poolOf(id)].name + (nodeRole(id) ? ' (' + nodeRole(id) + ')' : '');
+
+const state = { scope: 'all', color: 'species', yi: DATA.years.length - 1, playing: null };
+const fmt = v => v >= 100 ? v.toFixed(0) : v >= 10 ? v.toFixed(1) : v.toFixed(2);
+
+// One drawn link per (source node, target node, colour key) in a given scope/colour mode.
+function buildLinks(scope, color) {
+  const map = new Map();
+  DATA.flows.forEach(f => {
+    if (scope === 'hide' && f.hide) return;
+    const s = f.s === 'AT' || f.s === 'RW' ? f.s + '_in' : f.s;
+    const t = f.t === 'AT' || f.t === 'RW' ? f.t + '_out' : f.t;
+    const key = color === 'species' ? f.sp : f.cat;
+    const id = s + '|' + t + '|' + key;
+    if (!map.has(id)) map.set(id, { id, s, t, key, flows: [] });
+    map.get(id).flows.push(f);
+  });
+  const links = [...map.values()];
+  links.forEach(l => {
+    l.v = DATA.years.map((_, yi) => l.flows.reduce((a, f) => a + f.v[yi], 0));
+    l.loop = nodeCol[l.t] <= nodeCol[l.s];
+  });
+  return links;
+}
+
+function nodeTotals(links, yi) {
+  const tin = {}, tout = {};
+  NODE_IDS.forEach(n => { tin[n] = 0; tout[n] = 0; });
+  links.forEach(l => { tout[l.s] += l.v[yi]; tin[l.t] += l.v[yi]; });
+  return { tin, tout };
+}
+
+// Scale (px per kt N) is fixed across all years within a scope, chosen so the fullest column in any year fills MAIN_H.
+function scaleFor(links) {
+  let k = Infinity;
+  DATA.years.forEach((_, yi) => {
+    const { tin, tout } = nodeTotals(links, yi);
+    COLS.forEach(ids => {
+      const sum = ids.reduce((a, n) => a + Math.max(tin[n], tout[n]), 0);
+      if (sum > 0) k = Math.min(k, (MAIN_H - PAD * (ids.length - 1)) / sum);
+    });
+  });
+  return k;
+}
+
+// Backward links (to the same or an earlier column) run in fixed lanes below the diagram; each lane is as wide as
+// that link's largest value over all years, so the lanes never move when the year changes.
+function lanesFor(links, k) {
+  const loops = links.filter(l => l.loop);
+  loops.forEach(l => { l.wmax = Math.max(...l.v) * k; l.span = nodeCol[l.s] - nodeCol[l.t]; });
+  loops.sort((a, b) => a.span - b.span || nodeCol[b.s] - nodeCol[a.s] || b.wmax - a.wmax);
+  let y = TOP + MAIN_H + LOOP_TOP_GAP;
+  loops.forEach((l, i) => { l.lane = i; l.laneY = y + l.wmax / 2; y += l.wmax + LANE_GAP; });
+  // Vertical legs: the loop in the innermost lane leaves a node lowest and turns down closest to it, so loops
+  // sharing a node nest instead of crossing.
+  const legs = (end, sign) => {
+    const byNode = {};
+    loops.forEach(l => (byNode[l[end]] = byNode[l[end]] || []).push(l));
+    Object.values(byNode).forEach(ls => {
+      let off = LEG_GAP;
+      ls.sort((a, b) => a.lane - b.lane).forEach(l => {
+        const r = l.wmax / 2 + ARC_R;
+        off += r;
+        l[end + 'Leg'] = sign * off;
+        off += l.wmax / 2 + LANE_GAP;
+      });
+    });
+  };
+  legs('s', 1); legs('t', -1);
+  return y;
+}
+
+function layout(links, k, yi) {
+  const { tin, tout } = nodeTotals(links, yi);
+  const nodes = {};
+  COLS.forEach((ids, c) => {
+    const hs = ids.map(n => Math.max(tin[n], tout[n]) * k);
+    const total = hs.reduce((a, b) => a + b, 0) + PAD * (ids.length - 1);
+    let y = TOP + (MAIN_H - total) / 2;
+    ids.forEach((n, i) => {
+      nodes[n] = { id: n, x: colX(c), y, h: hs[i], tin: tin[n], tout: tout[n] };
+      y += hs[i] + PAD;
+    });
+  });
+  const geo = {};
+  NODE_IDS.forEach(n => {
+    const node = nodes[n];
+    const out = links.filter(l => l.s === n);
+    const inc = links.filter(l => l.t === n);
+    const byTarget = (a, b) => (a.loop - b.loop) || (a.loop ? b.lane - a.lane : (nodes[a.t].y - nodes[b.t].y) || nodeOrder[a.t] - nodeOrder[b.t]);
+    const bySource = (a, b) => (a.loop - b.loop) || (a.loop ? b.lane - a.lane : (nodes[a.s].y - nodes[b.s].y) || nodeOrder[a.s] - nodeOrder[b.s]);
+    let y = node.y;
+    out.sort(byTarget).forEach(l => { const w = l.v[yi] * k; const g = geo[l.id] || (geo[l.id] = {}); g.sy = y + w / 2; g.w = w; y += w; });
+    y = node.y;
+    inc.sort(bySource).forEach(l => { const w = l.v[yi] * k; const g = geo[l.id] || (geo[l.id] = {}); g.ty = y + w / 2; y += w; });
+  });
+  return { nodes, geo };
+}
+
+function linkPath(l, g) {
+  const x0 = colX(nodeCol[l.s]) + NODE_W, x1 = colX(nodeCol[l.t]);
+  if (!l.loop) {
+    const xm = (x0 + x1) / 2;
+    return `M${x0},${g.sy}C${xm},${g.sy} ${xm},${g.ty} ${x1},${g.ty}`;
+  }
+  // Racetrack loop: right from the source, down a vertical leg, left along its lane, up a leg, right into the target.
+  const r = g.w / 2 + ARC_R, ls = x0 + l.sLeg, lt = x1 + l.tLeg, y = l.laneY;
+  return `M${x0},${g.sy}H${ls - r}A${r},${r} 0 0 1 ${ls},${g.sy + r}V${y - r}A${r},${r} 0 0 1 ${ls - r},${y}` +
+         `H${lt + r}A${r},${r} 0 0 1 ${lt},${y - r}V${g.ty + r}A${r},${r} 0 0 1 ${lt + r},${g.ty}H${x1}`;
+}
+
+const svg = document.getElementById('chart');
+const NS = 'http://www.w3.org/2000/svg';
+const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const a in attrs) e.setAttribute(a, attrs[a]); parent && parent.appendChild(e); return e; };
+const tip = document.getElementById('tip');
+
+let cur = null;      // {links, k, bottom, lay}
+let drawn = null;    // element handles for the current scope/colour
+
+function colourOf(l) { return (state.color === 'species' ? DATA.species : DATA.categories)[l.key]; }
+
+function rebuild() {
+  const links = buildLinks(state.scope, state.color);
+  const k = scaleFor(links);
+  const bottom = lanesFor(links, k);
+  cur = { links, k, bottom };
+  svg.innerHTML = '';
+  const H = bottom + 40;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  COL_HEADS.forEach((t, c) => { if (t) el('text', { x: colX(c) + NODE_W / 2, y: 14, 'text-anchor': c === 0 ? 'start' : c === COLS.length - 1 ? 'end' : 'middle', class: 'col-head' }, svg).textContent = t; });
+  const gl = el('g', {}, svg), gn = el('g', {}, svg), gt = el('g', {}, svg);
+  drawn = { links: {}, nodes: {}, labels: {} };
+  links.sort((a, b) => Math.max(...b.v) - Math.max(...a.v)).forEach(l => {
+    const p = el('path', { class: 'link', stroke: colourOf(l), 'stroke-opacity': 1 }, gl);
+    p.addEventListener('mousemove', e => showLinkTip(e, l));
+    p.addEventListener('mouseleave', hideTip);
+    drawn.links[l.id] = p;
+  });
+  NODE_IDS.forEach(n => {
+    const r = el('rect', { width: NODE_W, fill: DATA.pools[poolOf(n)].color, rx: 1.5 }, gn);
+    r.addEventListener('mousemove', e => showNodeTip(e, n));
+    r.addEventListener('mouseleave', hideTip);
+    drawn.nodes[n] = r;
+    const c = nodeCol[n];
+    const anchor = c === 0 ? 'end' : 'start';
+    const t = el('text', { class: 'node-label', 'text-anchor': anchor, 'dominant-baseline': 'middle' }, gt);
+    const a = el('tspan', {}, t); a.textContent = DATA.pools[poolOf(n)].name;
+    const b = el('tspan', { class: 'v' }, t);
+    drawn.labels[n] = { t, b, anchor };
+  });
+  drawScaleBar(bottom);
+  drawLegend();
+  cur.lay = layout(links, k, state.yi);
+  apply(cur.lay);
+  postHeight();
+}
+
+function drawScaleBar(bottom) {
+  const steps = [1000, 500, 200, 100, 50, 20, 10, 5];
+  const kt = steps.find(s => s * cur.k <= 60) || 5;
+  const h = kt * cur.k, x = W - M_R + 30, y = bottom + 4;
+  const g = el('g', {}, svg);
+  el('rect', { x, y, width: NODE_W, height: h, fill: '#9aa5b1' }, g);
+  el('text', { x: x - 6, y: y + h / 2, 'text-anchor': 'end', 'dominant-baseline': 'middle', class: 'scale' }, g).textContent = kt + ' kt N';
+}
+
+function drawLegend() {
+  const map = state.color === 'species' ? DATA.species : DATA.categories;
+  const used = new Set(cur.links.map(l => l.key));
+  document.getElementById('legend').innerHTML = Object.entries(map).filter(([k]) => used.has(k))
+    .map(([k, c]) => `<span><span class="sw" style="background:${c}"></span>${k}</span>`).join('');
+  document.getElementById('note').innerHTML =
+    'Values are Monte Carlo medians in kt N per year; hover a flow for its components and 95% intervals. ' +
+    'The scale is the same for every year' + (state.scope === 'hide' ? ' within this view (it differs from the "All flows" view).' : '.') +
+    ' Flows that go back to an earlier column (e.g. feed and fertilizer to agriculture, fish catch to industry) are drawn as loops below the diagram.' +
+    (state.scope === 'hide' ? '<br>Hidden: ' + DATA.hiddenNames.join(', ') + '.' : '');
+}
+
+function apply(lay) {
+  const { nodes, geo } = lay;
+  cur.links.forEach(l => {
+    const g = geo[l.id], p = drawn.links[l.id];
+    if (!g || g.w <= 0) { p.setAttribute('d', ''); return; }
+    p.setAttribute('d', linkPath(l, g));
+    p.setAttribute('stroke-width', Math.max(g.w, 0.6));
+  });
+  NODE_IDS.forEach(n => {
+    const nd = nodes[n], r = drawn.nodes[n], lab = drawn.labels[n];
+    r.setAttribute('x', nd.x); r.setAttribute('y', nd.y); r.setAttribute('height', Math.max(nd.h, 0.5));
+    const lx = lab.anchor === 'end' ? nd.x - 6 : nd.x + NODE_W + 6;
+    lab.t.setAttribute('x', lx); lab.t.setAttribute('y', nd.y + nd.h / 2);
+    [...lab.t.childNodes].forEach(ts => ts.setAttribute('x', lx));
+    lab.t.childNodes[1].setAttribute('dy', '1.2em');
+    lab.t.childNodes[0].setAttribute('dy', '-0.45em');
+    lab.b.textContent = (nodeRole(n) ? nodeRole(n) + ' · ' : '') + fmt(Math.max(nd.tin, nd.tout)) + ' kt N';
+    lab.t.style.display = nd.h > 0 || nd.tin + nd.tout > 0 ? '' : 'none';
+  });
+}
+
+// Tween between two layouts so a year change reads as growth/shrinkage rather than a jump.
+let anim = null;
+function goToYear(yi, duration = 450) {
+  state.yi = yi;
+  document.getElementById('slider').value = yi;
+  document.getElementById('yearLabel').textContent = DATA.years[yi];
+  const from = cur.lay, to = layout(cur.links, cur.k, yi);
+  cur.lay = to;
+  if (anim) cancelAnimationFrame(anim);
+  if (!from || duration === 0) { apply(to); return; }
+  const t0 = performance.now();
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const step = now => {
+    let t = Math.min(1, (now - t0) / duration); t = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    const nodes = {}, geo = {};
+    for (const n in to.nodes) { const a = from.nodes[n], b = to.nodes[n];
+      nodes[n] = { ...b, y: lerp(a.y, b.y, t), h: lerp(a.h, b.h, t), tin: lerp(a.tin, b.tin, t), tout: lerp(a.tout, b.tout, t) }; }
+    for (const id in to.geo) { const a = from.geo[id] || to.geo[id], b = to.geo[id];
+      geo[id] = { sy: lerp(a.sy, b.sy, t), ty: lerp(a.ty, b.ty, t), w: lerp(a.w, b.w, t) }; }
+    apply({ nodes, geo });
+    if (t < 1) anim = requestAnimationFrame(step);
+  };
+  anim = requestAnimationFrame(step);
+  if (tip.style.display === 'block' && tip._refresh) tip._refresh();
+}
+
+function placeTip(e) {
+  const pad = 14, r = tip.getBoundingClientRect();
+  let x = e.clientX + pad, y = e.clientY + pad;
+  if (x + r.width > window.innerWidth - 4) x = e.clientX - r.width - pad;
+  if (y + r.height > window.innerHeight - 4) y = e.clientY - r.height - pad;
+  tip.style.left = Math.max(4, x) + 'px'; tip.style.top = Math.max(4, y) + 'px';
+}
+function highlight(ids) {
+  svg.classList.add('dim');
+  cur.links.forEach(l => drawn.links[l.id].classList.toggle('hl', ids.has(l.id)));
+}
+function hideTip() { tip.style.display = 'none'; tip._refresh = null; svg.classList.remove('dim'); }
+
+function showLinkTip(e, l) {
+  const yi = state.yi;
+  const rows = l.flows.filter(f => f.v[yi] > 0).sort((a, b) => b.v[yi] - a.v[yi])
+    .map(f => `<tr><td>${f.name}</td><td class="n">${fmt(f.v[yi])}</td><td class="n ci">[${fmt(f.lo[yi])}–${fmt(f.hi[yi])}]</td></tr>`).join('');
+  tip.innerHTML = `<b>${nodeName(l.s)} → ${nodeName(l.t)}</b><br>${l.key}: <b>${fmt(l.v[yi])} kt N</b> (${DATA.years[yi]})<table>${rows}</table>`;
+  tip.style.display = 'block'; placeTip(e);
+  highlight(new Set([l.id]));
+}
+function showNodeTip(e, n) {
+  const nd = cur.lay.nodes[n];
+  tip.innerHTML = `<b>${nodeName(n)}</b> (${DATA.years[state.yi]})<br>In: ${fmt(nd.tin)} kt N<br>Out: ${fmt(nd.tout)} kt N`;
+  tip.style.display = 'block'; placeTip(e);
+  highlight(new Set(cur.links.filter(l => l.s === n || l.t === n).map(l => l.id)));
+}
+
+function postHeight() {
+  if (window.parent !== window) window.parent.postMessage({ sankeyHeight: document.documentElement.scrollHeight }, '*');
+}
+window.addEventListener('resize', postHeight);
+window.addEventListener('load', postHeight);
+
+function seg(id, key) {
+  document.querySelectorAll('#' + id + ' button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('#' + id + ' button').forEach(x => x.classList.toggle('on', x === b));
+    state[key] = b.dataset.v; rebuild();
+  }));
+}
+seg('segScope', 'scope'); seg('segColor', 'color');
+
+const slider = document.getElementById('slider');
+slider.max = DATA.years.length - 1;
+slider.addEventListener('input', () => goToYear(+slider.value, 250));
+const ticks = document.getElementById('ticks');
+DATA.years.forEach((y, i) => {
+  if (y % 5 !== 0 && i !== 0 && i !== DATA.years.length - 1) return;
+  const s = document.createElement('span'); s.textContent = y;
+  s.style.left = (100 * i / (DATA.years.length - 1)) + '%';
+  ticks.appendChild(s);
+});
+
+const playBtn = document.getElementById('play');
+playBtn.addEventListener('click', () => {
+  if (state.playing) { clearInterval(state.playing); state.playing = null; playBtn.innerHTML = '&#9654;'; return; }
+  if (state.yi === DATA.years.length - 1) goToYear(0, 0);
+  playBtn.innerHTML = '&#10074;&#10074;';
+  state.playing = setInterval(() => {
+    if (state.yi >= DATA.years.length - 1) { clearInterval(state.playing); state.playing = null; playBtn.innerHTML = '&#9654;'; return; }
+    goToYear(state.yi + 1, 550);
+  }, 700);
+});
+
+// Optional start view from the URL hash, e.g. #hide, #category or #1995 (combinable: #hide,1995).
+location.hash.slice(1).split(/[,&]/).forEach(h => {
+  if (h === 'hide') state.scope = 'hide';
+  if (h === 'category') state.color = 'category';
+  const yi = DATA.years.indexOf(+h); if (yi >= 0) state.yi = yi;
+});
+document.querySelectorAll('#segScope button').forEach(b => b.classList.toggle('on', b.dataset.v === state.scope));
+document.querySelectorAll('#segColor button').forEach(b => b.classList.toggle('on', b.dataset.v === state.color));
+rebuild();
+goToYear(state.yi, 0);
+</script>
+</body>
+</html>
