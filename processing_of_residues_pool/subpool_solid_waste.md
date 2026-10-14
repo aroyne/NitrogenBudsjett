@@ -20,7 +20,7 @@ Hover over the chart to inspect specific streams, or click legend items to toggl
 <!-- MANUAL:POOL_TEXT:START -->
 We have added the flow *PR.SO-EF.EC-Waste to energy-Nmix* to better account for the Norwegian waste management system and statistics. This accounts for all waste incineration. Although the SSB data does separate between incineration with and without energy recovery for use, the fraction for energy reuse has consistently been around or above 80% since 1995, and we therefore for simplicity assign the entire waste incineration process to the EF.EC sector.
 
-It is expected that there should be a surplus for all years because landfilled waste stays in the PR sector and thus does not represent an outflow. The fraction of waste to landfill has been decreasing.
+It is expected that there should be a surplus for all years because landfilled waste stays in the PR sector and thus does not represent an outflow. The fraction of waste to landfill has been decreasing. Up to 2008 about 2 million tonnes of waste were landfilled each year (SSB table 05281), and the outflows were about 50–65% of the inflows. From 1 July 2009 landfilling of biodegradable waste was banned ([Avfallsforskriften § 9-4](https://lovdata.no/dokument/SF/forskrift/2004-06-01-930/%C2%A79-4), amended by regulation of 27 June 2008 no. 741). Landfilled waste fell to 0.8 million tonnes in 2011 (SSB table 05281; see also [SSB 2011](https://www.ssb.no/natur-og-miljo/statistikker/avfregno/aar/2011-12-14)), more waste went to incineration, and from 2012 the outflows are about 90–100% of the inflows.
 
 ### Flows that are zero or neglected:
 
