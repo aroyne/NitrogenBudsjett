@@ -443,7 +443,7 @@ SANKEY_HIDDEN_KEYWORDS = ["AMMONIA IMPORT", "AMMONIA EXPORT", "AMMONIA SYNTHESIS
 SANKEY_TEMPLATE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "plot", "sankey_template.html")
 
 # Pools whose page gets a Sankey diagram of its subpools (plot_pool_sankey_interactive).
-POOL_SANKEYS = ['EF']
+POOL_SANKEYS = ['EF', 'AG', 'MP', 'FS', 'PR', 'HY']
 
 # Columns of the national diagram, left to right; AT and RW appear twice, as
 # inputs/imports on the left and emissions/exports on the right.
