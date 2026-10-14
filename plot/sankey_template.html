@@ -342,8 +342,9 @@ function showNodeTip(e, n) {
   highlight(new Set(cur.links.filter(l => l.s === n || l.t === n).map(l => l.id)));
 }
 
+// Height of the content itself: documentElement.scrollHeight is never less than the iframe, so the iframe could not shrink.
 function postHeight() {
-  if (window.parent !== window) window.parent.postMessage({ sankeyHeight: document.documentElement.scrollHeight }, '*');
+  if (window.parent !== window) window.parent.postMessage({ sankeyHeight: Math.ceil(document.querySelector('.wrap').getBoundingClientRect().height) }, '*');
 }
 window.addEventListener('resize', postHeight);
 window.addEventListener('load', postHeight);
