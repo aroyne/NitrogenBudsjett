@@ -123,6 +123,25 @@ def _frontmatter(page):
     return "---\n" + "\n".join(lines) + "\n---\n\n"
 
 
+def get_sankey_markdown(pool_code, plot_files, plot_dir, relative_depth="", target_format='html'):
+    """Iframe with the pool's Sankey diagram (sankey_<pool>.html), if it exists; the page reports its own height."""
+    sankey_file = f"sankey_{pool_code}.html"
+    if target_format != "html" or sankey_file not in plot_files:
+        return ""
+    return (
+        f"\n---\n\n"
+        f"## Interactive Flow Diagram\n\n"
+        f"Flows between the subpools of {pool_code} and to and from the other pools. Use the slider or press "
+        f"**Play** to step through the years; the scale is the same for every year. Hover a flow to see the "
+        f"individual flows it contains, with their 95 % uncertainty intervals.\n\n"
+        f'<iframe id="nnb-sankey" src="{relative_depth}{plot_dir}/{sankey_file}" '
+        f'width="100%" height="800" style="border:0;" scrolling="no"></iframe>\n'
+        f'<script>window.addEventListener("message", function (e) {{ '
+        f'if (e.data && e.data.sankeyHeight) {{ document.getElementById("nnb-sankey").style.height = e.data.sankeyHeight + "px"; }} '
+        f'}});</script>\n'
+    )
+
+
 def _page_header(page, plot_files, plot_dir, target_format):
     """The regenerated top of a page, down to the MANUAL block."""
     if page['kind'] == 'flow':
@@ -132,7 +151,8 @@ def _page_header(page, plot_files, plot_dir, target_format):
                 + "\n\n### Description\n")
     body = page['intro']
     if page['balance']:
-        body = body.replace('{BALANCE}', get_balance_image_markdown(
+        sankey = get_sankey_markdown(page['balance'], plot_files, plot_dir, "../", target_format) if page['kind'] == 'pool' else ""
+        body = body.replace('{BALANCE}', sankey + get_balance_image_markdown(
             page['balance'], plot_files, plot_dir, relative_depth="../", target_format=target_format))
     return _frontmatter(page) + body
 

@@ -440,7 +440,15 @@ SANKEY_POOLS = {
 # Sankey diagram leaves out, so the smaller internal flows become legible.
 SANKEY_HIDDEN_KEYWORDS = ["AMMONIA IMPORT", "AMMONIA EXPORT", "AMMONIA SYNTHESIS", "FERTILIZER EXPORT", "FUEL EXPORT"]
 
-SANKEY_TEMPLATE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "plot", "national_sankey_template.html")
+SANKEY_TEMPLATE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "plot", "sankey_template.html")
+
+# Pools whose page gets a Sankey diagram of its subpools (plot_pool_sankey_interactive).
+POOL_SANKEYS = ['EF']
+
+# Columns of the national diagram, left to right; AT and RW appear twice, as
+# inputs/imports on the left and emissions/exports on the right.
+NATIONAL_SANKEY_COLS = [['AT_in', 'RW_in'], ['FS', 'AG'], ['MP'], ['HS'], ['PR'], ['EF', 'HY'], ['AT_out', 'RW_out']]
+NATIONAL_SANKEY_HEADS = ['Inputs', 'Primary production', 'Industry & trade', 'Households', 'Residues', '', 'Outputs']
 
 
 def _get_species_key(flow_name):
@@ -482,21 +490,77 @@ def _load_flow_categories(report_path='Report.xlsx', sheet_name='2a. Database N 
     return category_map
 
 
+def _sankey_years(df_flows):
+    """
+    Years shown in the Sankey diagrams: from 1990, and only years where at
+    least 90 % of the flows have a value, so a final year with only a handful
+    of flows calculated is left out.
+    """
+    df = df_flows[df_flows['year'] >= 1990]
+    counts = df[df['value'].notna()].groupby('year')['flow_name'].nunique()
+    years = sorted(counts[counts >= 0.9 * counts.max()].index.astype(int))
+    return list(range(years[0], years[-1] + 1))
+
+
+def _sankey_flow_records(df, years, node_of, name_of, hidden_regex=None):
+    """
+    One record per flow for the Sankey page: source/target node ids (from
+    node_of(source code, is_source)), tooltip name, species and overview
+    category, and the median and 2.5/97.5 percentiles for every year. Flows
+    that are zero in all years are left out.
+    """
+    category_map = _load_flow_categories()
+    flows = []
+    for flow_name, g in df.groupby('flow_name'):
+        g = g.set_index('year').reindex(years)
+        values = g['value'].fillna(0.0).clip(lower=0.0)
+        if values.max() <= 0:
+            continue
+        s_code, t_code = extract_source_target(flow_name)
+        flows.append({
+            's': node_of(s_code, True),
+            't': node_of(t_code, False),
+            'name': name_of(flow_name, s_code, t_code),
+            'sp': _get_species_key(flow_name),
+            'cat': category_map.get(flow_name, 'other/unclassified'),
+            'hide': bool(hidden_regex and re.search(hidden_regex, flow_name.upper())),
+            'v': values.round(4).tolist(),
+            'lo': g['p2_5'].fillna(0.0).clip(lower=0.0).round(4).tolist(),
+            'hi': g['p97_5'].fillna(0.0).clip(lower=0.0).round(4).tolist(),
+        })
+    return flows
+
+
+def _write_sankey_page(data, filename, output_dir):
+    """Fills plot/sankey_template.html with data and writes it to output_dir/filename."""
+    data = {
+        'species': SANKEY_SPECIES_COLORS,
+        'categories': SANKEY_CATEGORY_COLORS,
+        'hiddenNames': sorted({f['name'] for f in data['flows'] if f['hide']}),
+        **data,
+    }
+    with open(SANKEY_TEMPLATE, encoding='utf-8') as fh:
+        html = fh.read().replace('__DATA__', json.dumps(data, separators=(',', ':')))
+    out_path = os.path.join(output_dir, filename)
+    with open(out_path, 'w', encoding='utf-8') as fh:
+        fh.write(html)
+    print(f"[SUCCESS] Sankey-diagram generert -> {out_path}")
+    return filename
+
+
 def plot_global_sankey_interactive(df_flows, output_dir="output_files/plots"):
     """
     Writes the national pool-level Sankey diagram shown on the report's home
     page (global_nitrogen_sankey.html): one self-contained page, drawn by the
-    JavaScript in plot/national_sankey_template.html, with a year slider, a
-    toggle that hides the dominant trade flows (SANKEY_HIDDEN_KEYWORDS), and
-    link colouring by N species or by Report.xlsx's overview category.
-
-    Only years where at least 90 % of the flows have a value are included, so
-    a final year with only a handful of flows calculated is left out. The
-    page receives every flow's median and 2.5/97.5 percentiles; it sums them
-    per pool pair itself and keeps the value-to-pixel scale fixed across all
+    JavaScript in plot/sankey_template.html, with a year slider, a toggle that
+    hides the dominant trade flows (SANKEY_HIDDEN_KEYWORDS), and link
+    colouring by N species or by Report.xlsx's overview category. The page
+    receives every flow's median and 2.5/97.5 percentiles; it sums them per
+    pool pair itself and keeps the value-to-pixel scale fixed across all
     years.
     """
     os.makedirs(output_dir, exist_ok=True)
+    years = _sankey_years(df_flows)
 
     df = df_flows[df_flows['year'] >= 1990].copy()
     ends = df['flow_name'].apply(extract_source_target)
@@ -504,45 +568,125 @@ def plot_global_sankey_interactive(df_flows, output_dir="output_files/plots"):
     df['t'] = [e[1].split('.')[0] for e in ends]
     df = df[(df['s'] != df['t']) & df['s'].isin(SANKEY_POOLS) & df['t'].isin(SANKEY_POOLS)]
 
-    counts = df[df['value'].notna()].groupby('year')['flow_name'].nunique()
-    years = sorted(counts[counts >= 0.9 * counts.max()].index.astype(int))
-    years = list(range(years[0], years[-1] + 1))
+    def node_of(code, is_source):
+        pool = code.split('.')[0]
+        return pool + ('_in' if is_source else '_out') if pool in ('AT', 'RW') else pool
 
-    category_map = _load_flow_categories()
-    hidden_regex = "|".join(SANKEY_HIDDEN_KEYWORDS)
-    flows = []
-    for flow_name, g in df.groupby('flow_name'):
-        g = g.set_index('year').reindex(years)
-        values = g['value'].fillna(0.0).clip(lower=0.0)
-        if values.max() <= 0:
-            continue
-        flows.append({
-            's': g['s'].dropna().iloc[0],
-            't': g['t'].dropna().iloc[0],
-            'name': '-'.join(flow_name.split('-')[2:]),
-            'sp': _get_species_key(flow_name),
-            'cat': category_map.get(flow_name, 'other/unclassified'),
-            'hide': bool(re.search(hidden_regex, flow_name.upper())),
-            'v': values.round(4).tolist(),
-            'lo': g['p2_5'].fillna(0.0).clip(lower=0.0).round(4).tolist(),
-            'hi': g['p97_5'].fillna(0.0).clip(lower=0.0).round(4).tolist(),
-        })
+    roles = {'AT_in': 'inputs', 'RW_in': 'imports', 'AT_out': 'emissions', 'RW_out': 'exports'}
+    nodes = {n: {'name': SANKEY_POOLS[n.split('_')[0]][0], 'color': SANKEY_POOLS[n.split('_')[0]][1],
+                 'role': roles.get(n, '')} for col in NATIONAL_SANKEY_COLS for n in col}
+    data = {
+        'title': 'Sankey diagram of nitrogen flows in Norway',
+        'years': years,
+        'layout': {'cols': NATIONAL_SANKEY_COLS, 'colHeads': NATIONAL_SANKEY_HEADS,
+                   'marginL': 120, 'marginR': 130, 'mainH': 470, 'nodeGap': 16},
+        'nodes': nodes,
+        'loopNote': 'Flows that go back to an earlier column (e.g. feed and fertilizer to agriculture, '
+                    'fish catch to industry) are drawn as loops below the diagram.',
+        'flows': _sankey_flow_records(df, years, node_of, lambda fn, s, t: '-'.join(fn.split('-')[2:]),
+                                      "|".join(SANKEY_HIDDEN_KEYWORDS)),
+    }
+    return _write_sankey_page(data, "global_nitrogen_sankey.html", output_dir)
+
+
+def _subpool_names():
+    """Subpool code -> name, from the subpool page titles in report_pages.py, e.g. 'EF.EC' -> 'Energy conversion'."""
+    from report_pages import PAGES
+    names = {}
+    for page in PAGES:
+        m = re.match(r'(.*) \((\w+\.\w+)\)$', page['title'])
+        if page['kind'] == 'subpool' and m:
+            names[m.group(2)] = m.group(1)
+    return names
+
+
+def _subpool_columns(subpools, internal):
+    """
+    Column (0, 1, ...) of each subpool in a pool diagram. internal maps
+    (source, target) subpool pairs to their largest yearly flow. Pairs are
+    added largest first as long as they keep the graph acyclic; each subpool
+    then sits one column right of its furthest upstream subpool, and the
+    pairs left out are drawn as loops back to an earlier column.
+    """
+    edges = []
+    def reaches(a, b):
+        stack, seen = [a], set()
+        while stack:
+            n = stack.pop()
+            if n == b:
+                return True
+            seen.add(n)
+            stack += [t for s, t in edges if s == n and t not in seen]
+        return False
+    for (s, t), _ in sorted(internal.items(), key=lambda kv: -kv[1]):
+        if not reaches(t, s):
+            edges.append((s, t))
+    col = {sp: 0 for sp in subpools}
+    for _ in subpools:
+        for s, t in edges:
+            col[t] = max(col[t], col[s] + 1)
+    return col
+
+
+def plot_pool_sankey_interactive(df_flows, pool, output_dir="output_files/plots"):
+    """
+    Writes the Sankey diagram for one pool's page (sankey_<pool>.html), with
+    the same page as the national diagram: the pool's subpools in the middle,
+    flows from other pools on the left and to other pools on the right (other
+    pools shown at pool level; the tooltip names their subpool), and the
+    flows between the subpools. No flows are hidden.
+    """
+    os.makedirs(output_dir, exist_ok=True)
+    years = _sankey_years(df_flows)
+
+    df = df_flows[df_flows['year'] >= 1990].copy()
+    ends = df['flow_name'].apply(extract_source_target)
+    df['s'] = [e[0] for e in ends]
+    df['t'] = [e[1] for e in ends]
+    in_pool_s = df['s'].str.split('.').str[0] == pool
+    in_pool_t = df['t'].str.split('.').str[0] == pool
+    df = df[(in_pool_s | in_pool_t) & (df['s'] != df['t'])]
+
+    subpools = sorted(set(df.loc[in_pool_s, 's']) | set(df.loc[in_pool_t, 't']))
+    internal = df[df['s'].isin(subpools) & df['t'].isin(subpools)].groupby(['s', 't'])['value'].max().to_dict()
+    sub_col = _subpool_columns(subpools, internal)
+    n_sub_cols = max(sub_col.values()) + 1
+
+    def node_of(code, is_source):
+        if code in subpools:
+            return code
+        return code.split('.')[0] + ('_in' if is_source else '_out')
+
+    def name_of(flow_name, s, t):
+        name = '-'.join(flow_name.split('-')[2:])
+        other = t if s in subpools else s
+        if other in subpools or other.split('.')[0] == other.split('.')[1]:
+            return name
+        return f"{name} ({'to' if s in subpools else 'from'} {other})"
+
+    flows = _sankey_flow_records(df, years, node_of, name_of)
+    used = {f['s'] for f in flows} | {f['t'] for f in flows}
+    pool_order = list(SANKEY_POOLS)
+    sources = [p + '_in' for p in pool_order if p + '_in' in used]
+    targets = [p + '_out' for p in pool_order if p + '_out' in used]
+    cols = [sources] + [[sp for sp in subpools if sub_col[sp] == c] for c in range(n_sub_cols)] + [targets]
+
+    names = _subpool_names()
+    nodes = {sp: {'name': names.get(sp, sp), 'color': SANKEY_POOLS[pool][1], 'role': sp} for sp in subpools}
+    for n in sources + targets:
+        p = n.split('_')[0]
+        nodes[n] = {'name': SANKEY_POOLS[p][0], 'color': SANKEY_POOLS[p][1], 'role': ''}
 
     data = {
+        'title': f'Sankey diagram of nitrogen flows in the {SANKEY_POOLS[pool][0]} pool',
         'years': years,
-        'pools': {code: {'name': name, 'color': color} for code, (name, color) in SANKEY_POOLS.items()},
-        'species': SANKEY_SPECIES_COLORS,
-        'categories': SANKEY_CATEGORY_COLORS,
-        'hiddenNames': sorted({f['name'] for f in flows if f['hide']}),
+        'layout': {'cols': cols, 'colHeads': ['From other pools'] + ['Subpools'] + [''] * (n_sub_cols - 1) + ['To other pools'],
+                   'marginL': 150, 'marginR': 150, 'mainH': 400, 'nodeGap': 34},
+        'nodes': nodes,
+        'loopNote': 'Flows between subpools that go back to an earlier column are drawn as loops below the diagram.',
         'flows': flows,
     }
-    with open(SANKEY_TEMPLATE, encoding='utf-8') as fh:
-        html = fh.read().replace('__DATA__', json.dumps(data, separators=(',', ':')))
-    out_path = os.path.join(output_dir, "global_nitrogen_sankey.html")
-    with open(out_path, 'w', encoding='utf-8') as fh:
-        fh.write(html)
-    print(f"[SUCCESS] Sankey-diagram generert -> {out_path}")
-    return "global_nitrogen_sankey.html"
+    return _write_sankey_page(data, f"sankey_{pool}.html", output_dir)
 
 
 def extract_source_target(flow_name):
@@ -816,6 +960,8 @@ def process_and_export_mc_results(all_records):
 
     print("\n[PLOTTING] Generating global interactive Sankey diagram across all years...")
     plot_global_sankey_interactive(df_balance_input, output_dir=plot_dir)
+    for pool in POOL_SANKEYS:
+        plot_pool_sankey_interactive(df_balance_input, pool, output_dir=plot_dir)
         
     print("\n" + "="*60)
     print("[SUCCESS] All MC iterations processed, statistics saved, and plots generated successfully.")

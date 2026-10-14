@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Nitrogen Flows Norway</title>
+<title>Nitrogen Flow Diagram</title>
 <style>
   :root {
     --bg: #ffffff;
@@ -58,7 +58,7 @@
 <div class="wrap">
   <div class="bar">
     <div class="year" id="yearLabel"></div>
-    <div><span class="lbl">Flows</span><span class="seg" id="segScope">
+    <div id="scopeBox"><span class="lbl">Flows</span><span class="seg" id="segScope">
       <button data-v="all" class="on">All flows</button>
       <button data-v="hide">Hide fertilizer, ammonia &amp; crude-oil trade</button></span></div>
     <div><span class="lbl">Colour by</span><span class="seg" id="segColor">
@@ -70,7 +70,7 @@
     <input type="range" id="slider" min="0" step="1">
   </div>
   <div class="ticks" id="ticks"></div>
-  <div class="scroll"><svg id="chart" role="img" aria-label="Sankey diagram of nitrogen flows in Norway"></svg></div>
+  <div class="scroll"><svg id="chart" role="img" ></svg></div>
   <div class="legend" id="legend"></div>
   <div class="note" id="note"></div>
 </div>
@@ -78,26 +78,17 @@
 <script>
 const DATA = __DATA__;
 
-const W = 1160, M_L = 120, M_R = 130, TOP = 34, MAIN_H = 470, NODE_W = 14, PAD = 16;
+// Page-specific layout: node columns (left to right), column headings, margins for the outer labels and the
+// height of the main diagram and the gap between nodes in a column come from DATA, so the same page draws the national and the pool diagrams.
+const W = 1160, TOP = 34, NODE_W = 14;
+const { cols: COLS, colHeads: COL_HEADS, marginL: M_L, marginR: M_R, mainH: MAIN_H, nodeGap: PAD } = DATA.layout;
 const LANE_GAP = 4, LOOP_TOP_GAP = 22, LEG_GAP = 4, ARC_R = 6;
-const COLS = [
-  ['AT_in', 'RW_in'],
-  ['FS', 'AG'],
-  ['MP'],
-  ['HS'],
-  ['PR'],
-  ['EF', 'HY'],
-  ['AT_out', 'RW_out'],
-];
-const COL_HEADS = ['Inputs', 'Primary production', 'Industry & trade', 'Households', 'Residues', '', 'Outputs'];
 const colX = c => M_L + c * (W - M_L - M_R - NODE_W) / (COLS.length - 1);
 const nodeCol = {}, nodeOrder = {};
 COLS.forEach((ids, c) => ids.forEach((id, i) => { nodeCol[id] = c; nodeOrder[id] = i; }));
 const NODE_IDS = COLS.flat();
-const poolOf = id => id.split('_')[0];
-const nodeRole = id => id.endsWith('_in') ? (poolOf(id) === 'RW' ? 'imports' : 'inputs')
-                     : id.endsWith('_out') ? (poolOf(id) === 'RW' ? 'exports' : 'emissions') : '';
-const nodeName = id => DATA.pools[poolOf(id)].name + (nodeRole(id) ? ' (' + nodeRole(id) + ')' : '');
+const nodeRole = id => DATA.nodes[id].role;
+const nodeName = id => DATA.nodes[id].name + (nodeRole(id) ? ' (' + nodeRole(id) + ')' : '');
 
 const state = { scope: 'all', color: 'species', yi: DATA.years.length - 1, playing: null };
 const fmt = v => v >= 100 ? v.toFixed(0) : v >= 10 ? v.toFixed(1) : v.toFixed(2);
@@ -107,8 +98,7 @@ function buildLinks(scope, color) {
   const map = new Map();
   DATA.flows.forEach(f => {
     if (scope === 'hide' && f.hide) return;
-    const s = f.s === 'AT' || f.s === 'RW' ? f.s + '_in' : f.s;
-    const t = f.t === 'AT' || f.t === 'RW' ? f.t + '_out' : f.t;
+    const s = f.s, t = f.t;
     const key = color === 'species' ? f.sp : f.cat;
     const id = s + '|' + t + '|' + key;
     if (!map.has(id)) map.set(id, { id, s, t, key, flows: [] });
@@ -209,6 +199,8 @@ function linkPath(l, g) {
 }
 
 const svg = document.getElementById('chart');
+svg.setAttribute('aria-label', DATA.title);
+if (!DATA.hiddenNames.length) document.getElementById('scopeBox').style.display = 'none';
 const NS = 'http://www.w3.org/2000/svg';
 const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const a in attrs) e.setAttribute(a, attrs[a]); parent && parent.appendChild(e); return e; };
 const tip = document.getElementById('tip');
@@ -236,14 +228,14 @@ function rebuild() {
     drawn.links[l.id] = p;
   });
   NODE_IDS.forEach(n => {
-    const r = el('rect', { width: NODE_W, fill: DATA.pools[poolOf(n)].color, rx: 1.5 }, gn);
+    const r = el('rect', { width: NODE_W, fill: DATA.nodes[n].color, rx: 1.5 }, gn);
     r.addEventListener('mousemove', e => showNodeTip(e, n));
     r.addEventListener('mouseleave', hideTip);
     drawn.nodes[n] = r;
     const c = nodeCol[n];
     const anchor = c === 0 ? 'end' : 'start';
     const t = el('text', { class: 'node-label', 'text-anchor': anchor, 'dominant-baseline': 'middle' }, gt);
-    const a = el('tspan', {}, t); a.textContent = DATA.pools[poolOf(n)].name;
+    const a = el('tspan', {}, t); a.textContent = DATA.nodes[n].name;
     const b = el('tspan', { class: 'v' }, t);
     drawn.labels[n] = { t, b, anchor };
   });
@@ -271,7 +263,7 @@ function drawLegend() {
   document.getElementById('note').innerHTML =
     'Values are Monte Carlo medians in kt N per year; hover a flow for its components and 95% intervals. ' +
     'The scale is the same for every year' + (state.scope === 'hide' ? ' within this view (it differs from the "All flows" view).' : '.') +
-    ' Flows that go back to an earlier column (e.g. feed and fertilizer to agriculture, fish catch to industry) are drawn as loops below the diagram.' +
+    (cur.links.some(l => l.loop) ? ' ' + DATA.loopNote : '') +
     (state.scope === 'hide' ? '<br>Hidden: ' + DATA.hiddenNames.join(', ') + '.' : '');
 }
 
