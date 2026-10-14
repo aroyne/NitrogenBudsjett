@@ -197,6 +197,10 @@ data_files/
 # untracked-elsewhere folder instead.
 !/parameters/N_parameters.xlsx
 
+# Report.xlsx is tracked: the official reporting template, with the flow
+# categories used by the Sankey diagrams; main_mc.py writes the results into it.
+!/Report.xlsx
+
 # Litteratur (lokal mappe, ikke synces)
 litteratur/
 
