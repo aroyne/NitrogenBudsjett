@@ -442,8 +442,9 @@ SANKEY_HIDDEN_KEYWORDS = ["AMMONIA IMPORT", "AMMONIA EXPORT", "AMMONIA SYNTHESIS
 
 SANKEY_TEMPLATE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "plot", "sankey_template.html")
 
-# Pools whose page gets a Sankey diagram of its subpools (plot_pool_sankey_interactive).
-POOL_SANKEYS = ['EF', 'AG', 'MP', 'FS', 'PR', 'HY']
+# Pools whose page gets a Sankey diagram of its subpools (plot_pool_sankey_interactive); a pool without
+# subpools (HS.HS, AT.AT, RW.RW) is drawn as a single node.
+POOL_SANKEYS = ['EF', 'AG', 'MP', 'FS', 'PR', 'HY', 'HS', 'AT', 'RW']
 
 # Columns of the national diagram, left to right; AT and RW appear twice, as
 # inputs/imports on the left and emissions/exports on the right.
@@ -672,7 +673,7 @@ def plot_pool_sankey_interactive(df_flows, pool, output_dir="output_files/plots"
     cols = [sources] + [[sp for sp in subpools if sub_col[sp] == c] for c in range(n_sub_cols)] + [targets]
 
     names = _subpool_names()
-    nodes = {sp: {'name': names.get(sp, sp), 'color': SANKEY_POOLS[pool][1], 'role': sp} for sp in subpools}
+    nodes = {sp: {'name': names.get(sp, SANKEY_POOLS[pool][0]), 'color': SANKEY_POOLS[pool][1], 'role': sp} for sp in subpools}
     for n in sources + targets:
         p = n.split('_')[0]
         nodes[n] = {'name': SANKEY_POOLS[p][0], 'color': SANKEY_POOLS[p][1], 'role': ''}
@@ -680,7 +681,7 @@ def plot_pool_sankey_interactive(df_flows, pool, output_dir="output_files/plots"
     data = {
         'title': f'Sankey diagram of nitrogen flows in the {SANKEY_POOLS[pool][0]} pool',
         'years': years,
-        'layout': {'cols': cols, 'colHeads': ['From other pools'] + ['Subpools'] + [''] * (n_sub_cols - 1) + ['To other pools'],
+        'layout': {'cols': cols, 'colHeads': ['From other pools'] + ['Subpools' if len(subpools) > 1 else ''] + [''] * (n_sub_cols - 1) + ['To other pools'],
                    'marginL': 150, 'marginR': 150, 'mainH': 400, 'nodeGap': 34},
         'nodes': nodes,
         'loopNote': 'Flows between subpools that go back to an earlier column are drawn as loops below the diagram.',

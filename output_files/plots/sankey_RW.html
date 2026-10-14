@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nitrogen Flow Diagram</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --text: #1f2933;
+    --muted: #616e7c;
+    --line: #d9dee3;
+    --panel: #f5f7f9;
+    --accent: #1a365d;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 8px 4px 12px; }
+  .bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-bottom: 6px; }
+  .year { font-size: 32px; font-weight: 700; font-variant-numeric: tabular-nums; min-width: 80px; color: var(--accent); }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  .seg button { border: 0; background: var(--bg); color: var(--muted); font: inherit; font-size: 13px;
+    padding: 6px 11px; cursor: pointer; }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button.on { background: var(--accent); color: #fff; }
+  .lbl { font-size: 12px; color: var(--muted); margin-right: 4px; }
+  .timeline { display: flex; align-items: center; gap: 10px; margin: 4px 0 2px; }
+  .timeline input[type=range] { flex: 1; accent-color: var(--accent); }
+  .play { border: 1px solid var(--line); background: var(--bg); border-radius: 50%; width: 34px; height: 34px;
+    cursor: pointer; font-size: 13px; color: var(--accent); flex: none; }
+  .ticks { position: relative; height: 16px; font-size: 11px; color: var(--muted); margin: 0 8px 4px 52px; }
+  .ticks span { position: absolute; transform: translateX(-50%); }
+  .scroll { overflow-x: auto; }
+  svg { width: 100%; min-width: 760px; height: auto; display: block; }
+  .node-label { font-size: 12px; fill: var(--text); paint-order: stroke; stroke: var(--bg); stroke-width: 3px;
+    stroke-linejoin: round; pointer-events: none; }
+  .node-label .v { fill: var(--muted); font-size: 11px; }
+  .scale { font-size: 11px; fill: var(--muted); }
+  .col-head { font-size: 11px; fill: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  path.link { fill: none; stroke-linecap: butt; transition: stroke-opacity .15s; }
+  .dim path.link { stroke-opacity: 0.08 !important; }
+  .dim path.link.hl { stroke-opacity: 1 !important; }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .legend span.sw { display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-right: 5px; vertical-align: -2px; }
+  .note { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+  #tip { position: fixed; pointer-events: none; background: rgba(255,255,255,.97); border: 1px solid #b8c0c8;
+    border-radius: 5px; padding: 7px 10px; font-size: 12px; line-height: 1.45; box-shadow: 0 2px 8px rgba(0,0,0,.12);
+    display: none; max-width: 360px; z-index: 10; }
+  #tip b { font-size: 13px; }
+  #tip table { border-collapse: collapse; margin-top: 3px; }
+  #tip td { padding: 0 6px 0 0; vertical-align: top; }
+  #tip td.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  #tip .ci { color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar">
+    <div class="year" id="yearLabel"></div>
+    <div id="scopeBox"><span class="lbl">Flows</span><span class="seg" id="segScope">
+      <button data-v="all" class="on">All flows</button>
+      <button data-v="hide">Hide fertilizer, ammonia &amp; crude-oil trade</button></span></div>
+    <div><span class="lbl">Colour by</span><span class="seg" id="segColor">
+      <button data-v="species" class="on">N species</button>
+      <button data-v="category">Category</button></span></div>
+  </div>
+  <div class="timeline">
+    <button class="play" id="play" title="Play / pause">&#9654;</button>
+    <input type="range" id="slider" min="0" step="1">
+  </div>
+  <div class="ticks" id="ticks"></div>
+  <div class="scroll"><svg id="chart" role="img" ></svg></div>
+  <div class="legend" id="legend"></div>
+  <div class="note" id="note"></div>
+</div>
+<div id="tip"></div>
+<script>
+const DATA = {"species":{"Nmix":"rgba(76, 175, 80, 0.6)","N2":"rgba(140, 140, 140, 0.6)","NH3 / RDN":"rgba(255, 152, 0, 0.6)","NOx / OXN":"rgba(244, 67, 54, 0.6)","N2O":"rgba(156, 39, 176, 0.6)"},"categories":{"useful output":"rgba(76, 175, 80, 0.6)","N wasted":"rgba(244, 67, 54, 0.6)","import":"rgba(33, 150, 243, 0.6)","recycling":"rgba(255, 152, 0, 0.6)","other/unclassified":"rgba(160, 160, 160, 0.6)"},"hiddenNames":[],"title":"Sankey diagram of nitrogen flows in the Rest of the world pool","years":[1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],"layout":{"cols":[["AT_in","AG_in","MP_in","PR_in","EF_in"],["RW.RW"],["AT_out","AG_out","MP_out","PR_out","EF_out","HY_out"]],"colHeads":["From other pools","","To other pools"],"marginL":150,"marginR":150,"mainH":400,"nodeGap":34},"nodes":{"RW.RW":{"name":"Rest of the world","color":"#4a5568","role":"RW.RW"},"AT_in":{"name":"Atmosphere","color":"#1a365d","role":""},"AG_in":{"name":"Agriculture","color":"#2f855a","role":""},"MP_in":{"name":"Materials & products","color":"#d69e2e","role":""},"PR_in":{"name":"Processing of residues","color":"#97266d","role":""},"EF_in":{"name":"Energy & fuels","color":"#c53030","role":""},"AT_out":{"name":"Atmosphere","color":"#1a365d","role":""},"AG_out":{"name":"Agriculture","color":"#2f855a","role":""},"MP_out":{"name":"Materials & products","color":"#d69e2e","role":""},"PR_out":{"name":"Processing of residues","color":"#97266d","role":""},"EF_out":{"name":"Energy & fuels","color":"#c53030","role":""},"HY_out":{"name":"Hydrosphere","color":"#2b6cb0","role":""}},"loopNote":"Flows between subpools that go back to an earlier column are drawn as loops below the diagram.","flows":[{"s":"AG_in","t":"RW.RW","name":"Live animal export-Nmix (from AG.MM)","sp":"Nmix","cat":"useful output","hide":false,"v":[0.0031,0.0034,0.0034,0.0043,0.0044,0.0044,0.0048,0.0045,0.013,0.0084,0.0105,0.0043,0.0084,0.0043,0.0097,0.0042,0.0311,0.0093,0.0056,0.0075,0.0071,0.0078,0.0065,0.0073,0.0126,0.0174,0.012,0.0078,0.0083,0.0128,0.0169,0.0171,0.0158,0.0194,0.0198],"lo":[0.0019,0.002,0.0021,0.0026,0.0027,0.0026,0.0029,0.0027,0.0077,0.005,0.0065,0.0026,0.0051,0.0025,0.0059,0.0025,0.019,0.0057,0.0034,0.0044,0.0042,0.0046,0.0039,0.0044,0.0078,0.0106,0.0073,0.0047,0.005,0.0078,0.0103,0.0105,0.0097,0.0119,0.0122],"hi":[0.0046,0.0051,0.0051,0.0063,0.0064,0.0065,0.0071,0.0066,0.0193,0.0124,0.0154,0.0065,0.0123,0.0064,0.0144,0.0063,0.047,0.0136,0.0084,0.011,0.0105,0.0115,0.0096,0.0108,0.0185,0.0255,0.0174,0.0115,0.0122,0.0187,0.0248,0.0252,0.0233,0.0287,0.0294]},{"s":"AT_in","t":"RW.RW","name":"Atmospheric outflow-OXN","sp":"NOx / OXN","cat":"other/unclassified","hide":false,"v":[40.3723,40.3723,40.3723,40.3723,40.3723,40.3723,40.3723,42.2004,40.1637,42.6109,38.3952,39.7831,38.112,38.8453,40.1296,36.1303,35.4078,36.6625,32.4952,32.5152,37.7037,33.5949,31.3097,33.046,32.4615,32.7151,33.3874,37.5116,37.7076,35.4494,34.4452,33.3456,30.6291,28.6206,25.0054],"lo":[26.1997,26.1997,26.1997,26.1997,26.1997,26.1997,26.1997,27.3502,26.0303,27.6163,24.8841,25.7836,24.7005,25.1758,26.0082,23.4162,22.948,23.7611,21.0603,21.0732,24.4359,21.773,20.292,21.4172,21.0385,21.2305,21.6385,24.3114,24.4384,22.9749,22.3241,21.6114,19.8509,18.5492,16.2061],"hi":[54.223,54.223,54.223,54.223,54.223,54.223,54.223,56.8737,54.1289,57.4271,51.7454,53.616,51.3637,52.3521,54.083,48.693,47.7193,49.4102,43.794,43.8209,50.8135,45.2761,42.1963,44.5363,43.7486,43.9388,44.9964,50.5546,50.8187,47.7754,46.422,44.9401,41.279,38.5722,33.6999]},{"s":"AT_in","t":"RW.RW","name":"Atmospheric outflow-RDN","sp":"NH3 / RDN","cat":"other/unclassified","hide":false,"v":[10.7114,10.7114,10.7114,10.7114,10.7114,10.7114,10.7114,11.4731,10.6586,10.6391,10.4156,10.7131,10.7544,10.8838,10.6185,10.4281,10.4454,10.4095,10.7176,10.7067,10.7758,11.3112,11.8327,12.6419,11.8071,11.6941,11.7309,13.7993,15.9762,12.2516,12.8542,13.5991,13.4567,13.055,12.8542],"lo":[6.9512,6.9512,6.9512,6.9512,6.9512,6.9512,6.9512,7.4358,6.9079,6.8952,6.7504,6.9432,6.97,7.0538,6.8819,6.7585,6.7697,6.7465,6.9461,6.9391,6.9838,7.3309,7.6688,8.1933,7.6522,7.589,7.6028,8.9434,10.3542,7.9403,8.3308,8.8136,8.7214,8.461,8.3308],"hi":[14.3862,14.3862,14.3862,14.3862,14.3862,14.3862,14.3862,15.4624,14.3647,14.3383,14.0372,14.4381,14.4938,14.6681,14.3106,14.0541,14.0773,14.029,14.4442,14.4295,14.5226,15.2442,15.947,17.0376,15.9125,15.7061,15.8098,18.5974,21.5312,16.5116,17.3237,18.3275,18.1357,17.5943,17.3237]},{"s":"EF_in","t":"RW.RW","name":"Fuel export-Nmix (from EF.EC)","sp":"Nmix","cat":"useful output","hide":false,"v":[174.4832,208.7008,236.6228,254.1297,283.1324,309.3223,347.136,349.6133,333.3481,327.0669,349.5403,359.0507,344.0934,323.6382,316.8465,285.5133,258.4476,251.5149,233.2723,222.7901,200.6135,178.3749,163.7293,157.3632,160.7449,164.6873,175.222,172.5742,158.5996,156.8149,193.3775,201.8137,192.9476,210.2131,207.9753],"lo":[31.7019,36.5486,43.4198,46.2534,50.2078,54.2387,60.8237,62.0079,58.6442,58.3863,61.6723,61.652,60.7168,58.4345,57.0882,52.0893,50.0552,49.0042,48.054,43.7728,39.3442,35.9657,32.8262,32.9715,31.9729,32.6326,32.1598,33.4734,31.3015,31.796,37.2888,35.265,31.1915,34.4784,33.5906],"hi":[1061.161,1273.5481,1438.3004,1546.4392,1726.1598,1888.0133,2119.3709,2132.4165,2034.0595,1993.2904,2132.9523,2196.9081,2100.4621,1971.4523,1930.4366,1736.8717,1559.481,1517.0041,1395.4082,1340.9175,1208.49,1069.2835,981.9918,938.6867,965.2381,989.5692,1064.7164,1039.8985,953.9461,938.8798,1166.8214,1231.7675,1188.8954,1292.5653,1281.998]},{"s":"EF_in","t":"RW.RW","name":"Export of transport fuels-Nmix (from EF.TR)","sp":"Nmix","cat":"useful output","hide":false,"v":[0.4355,0.3347,0.372,0.4225,0.4409,0.3575,0.491,0.3483,0.2545,0.2277,0.2462,0.1518,0.085,0.061,0.0794,0.159,0.1496,0.1317,0.146,0.0861,0.0659,0.1658,0.1318,0.116,0.0396,0.0752,0.0558,0.0494,0.0492,0.0558,0.1032,0.2913,0.0896,0.1658,0.1181],"lo":[0.2788,0.2146,0.238,0.2705,0.2822,0.2291,0.3143,0.2224,0.1606,0.1426,0.1544,0.0911,0.0463,0.0257,0.042,0.094,0.0857,0.0728,0.0878,0.0419,0.0332,0.0971,0.0767,0.067,0.0118,0.0334,0.0184,0.0054,0.0012,0.0108,0.0537,0.1771,0.0364,0.0931,0.0588],"hi":[0.6318,0.4868,0.542,0.617,0.6428,0.5198,0.7122,0.5094,0.384,0.3469,0.3756,0.2623,0.1818,0.1678,0.1799,0.2812,0.2899,0.275,0.252,0.2108,0.1569,0.3025,0.2484,0.2207,0.126,0.1997,0.1703,0.19,0.2023,0.1971,0.2369,0.4888,0.2521,0.3378,0.285]},{"s":"MP_in","t":"RW.RW","name":"Feed export-Nmix (from MP.FP)","sp":"Nmix","cat":"useful output","hide":false,"v":[6.5848,9.0962,10.2534,5.0739,7.8069,10.5644,11.9505,11.5054,11.6113,11.9311,12.347,12.2643,14.6401,17.5319,15.4853,15.5906,13.2078,13.4875,12.6529,11.5028,11.8693,10.2862,11.1131,10.3269,11.7983,14.1747,14.6013,14.2268,15.5006,15.1421,16.8786,18.6554,16.9588,19.2031,20.3319],"lo":[4.1562,5.767,6.503,3.2118,4.9596,6.7146,7.6228,7.3136,7.3749,7.5749,7.7929,7.8342,9.2687,11.0758,9.7615,9.7878,8.3536,8.5342,7.9801,7.311,7.554,6.5138,7.0625,6.5914,7.5771,9.0623,9.2958,9.1024,9.9268,9.7003,10.8395,11.8657,10.8508,12.2396,12.9719],"hi":[9.1901,12.4954,14.1742,7.0785,10.744,14.617,16.5621,15.8807,15.9671,16.3951,16.9887,16.9168,20.2797,24.4295,21.4647,21.4939,18.2135,18.6878,17.5134,15.8907,16.4114,14.1342,15.2865,14.1764,16.2452,19.397,20.047,19.5582,21.3704,20.8929,23.2608,25.7753,23.4284,26.6455,28.0725]},{"s":"MP_in","t":"RW.RW","name":"Food export-Nmix (from MP.FP)","sp":"Nmix","cat":"useful output","hide":false,"v":[21.6247,24.8369,27.2839,31.1548,36.4641,39.0136,43.4729,48.6449,45.8025,50.1578,51.9303,49.4756,49.2606,48.9705,46.7096,48.4549,47.2372,53.8221,57.4367,66.5255,70.3233,64.341,67.5295,65.9959,71.0998,67.7332,63.2318,68.27,70.2907,68.5156,68.852,77.4139,74.3348,70.074,67.9281],"lo":[13.8506,15.9253,17.4217,19.963,23.3982,24.9568,27.7671,31.0565,29.2717,32.0737,33.1169,31.5387,31.3882,31.1796,29.7603,30.8723,30.1055,34.2088,36.4985,42.2332,44.6417,40.8392,42.86,41.874,45.1119,42.97,40.1283,43.3294,44.6155,43.4928,43.7134,49.1232,47.1786,44.4623,43.1239],"hi":[30.5643,35.2599,38.5689,44.1984,51.8307,55.5286,61.8977,69.267,65.2046,71.4195,74.0249,70.4988,70.2317,69.8128,66.5633,69.0605,67.3137,76.7876,81.9763,94.9968,100.4261,91.8665,96.4315,94.219,101.5295,96.735,90.2827,97.4917,100.375,97.8496,98.3672,110.6283,106.2463,100.1631,97.0814]},{"s":"MP_in","t":"RW.RW","name":"Mineral fertilizer export-Nmix (from MP.OP)","sp":"Nmix","cat":"useful output","hide":false,"v":[430.2368,355.4435,347.4335,405.5059,462.5771,502.6271,490.6121,456.5697,377.471,418.5222,528.6596,493.6159,648.1727,596.8937,589.0259,527.2588,612.9958,641.7687,613.4514,383.921,651.8383,628.9698,650.8491,720.1035,684.8915,699.6459,662.1491,723.5928,714.1981,754.968,790.1869,728.538,755.1932,659.8733,772.9704],"lo":[345.1242,285.1271,278.7017,325.2858,371.0668,403.1938,393.5557,366.2477,302.7969,335.7271,424.0763,395.9652,519.9465,478.8119,472.5005,422.9527,491.7285,514.8094,492.094,307.971,522.8869,504.5424,522.0934,577.6474,549.4013,561.2369,531.158,580.4464,572.9102,605.6147,633.8664,584.4133,605.7954,529.3324,620.0558],"hi":[523.0143,432.0923,422.3551,492.9504,562.3286,611.0151,596.4092,555.0257,458.8699,508.7735,642.6613,600.0606,787.9466,725.6096,716.0452,640.9585,745.184,780.1616,745.7378,466.7109,792.4026,764.6026,791.2,875.3887,832.5835,850.5196,804.9369,879.6305,868.2098,917.7714,960.5851,885.642,918.0453,802.1703,939.656]},{"s":"MP_in","t":"RW.RW","name":"Other goods export-Nmix (from MP.OP)","sp":"Nmix","cat":"useful output","hide":false,"v":[8.9847,7.0942,6.8157,7.4414,7.5481,8.0628,7.8535,8.0521,8.2193,8.606,8.9289,8.7026,9.0053,8.735,8.4484,8.6046,8.8498,8.4627,8.9232,8.4804,9.0455,8.6603,8.9,10.1074,11.0333,12.0165,12.4245,12.0264,20.1987,33.5995,27.7664,32.401,26.3095,22.5348,20.3163],"lo":[5.7619,4.5583,4.3778,4.7825,4.8413,5.1588,5.0353,5.1464,5.2553,5.5145,5.723,5.5785,5.7793,5.6135,5.4098,5.5184,5.6417,5.4152,5.6915,5.3901,5.7509,5.5079,5.576,6.3341,6.9215,7.5246,7.7934,7.5645,12.8657,21.3501,17.6104,20.5259,16.7358,14.323,12.7936],"hi":[12.272,9.649,9.2378,10.0825,10.229,10.9469,10.6532,10.9418,11.1516,11.6809,12.1281,11.7827,12.2304,11.8398,11.4615,11.681,12.0775,11.5935,12.2267,11.6059,12.3853,11.8754,12.3081,14.1539,15.5069,16.9917,17.4602,16.8674,27.9527,45.6861,37.8506,44.1091,36.1595,31.0924,28.3622]},{"s":"PR_in","t":"RW.RW","name":"Export for recycling-Nmix (from PR.SO)","sp":"Nmix","cat":"useful output","hide":false,"v":[0.272,0.2935,0.3622,0.4252,0.5159,0.5991,0.726,0.8624,0.8746,1.0983,1.0029,0.9607,0.8779,0.865,1.0857,1.2608,1.4393,2.0605,1.8256,1.7615,1.7456,1.9154,2.1358,2.4769,2.8867,2.6874,2.8501,3.0778,3.2027,3.1376,3.1166,3.2664,3.0319,3.2156,2.9996],"lo":[0.1773,0.1912,0.2372,0.278,0.3368,0.3898,0.4735,0.5623,0.5694,0.716,0.6514,0.6294,0.5798,0.5714,0.7136,0.8286,0.9429,1.3547,1.2088,1.1689,1.1439,1.26,1.4109,1.638,1.896,1.7629,1.8724,2.0338,2.1239,2.0679,2.0521,2.1515,1.9953,2.1216,1.9746],"hi":[0.3816,0.413,0.511,0.6003,0.7276,0.8435,1.0198,1.2113,1.2257,1.5406,1.4033,1.3314,1.2173,1.1992,1.5048,1.7475,1.9988,2.8445,2.5285,2.4272,2.4232,2.6523,2.9596,3.4276,3.9938,3.7218,3.9517,4.2557,4.4271,4.3309,4.3208,4.5235,4.198,4.4625,4.1548]},{"s":"PR_in","t":"RW.RW","name":"Export for reuse-Nmix (from PR.SO)","sp":"Nmix","cat":"useful output","hide":false,"v":[0.0118,0.0127,0.0198,0.0313,0.0365,0.0393,0.0467,0.0607,0.0672,0.0801,0.0826,0.0834,0.0846,0.0805,0.1009,0.1208,0.1281,0.142,0.1582,0.165,0.18,0.2072,0.212,0.2343,0.2607,0.2761,0.2831,0.3264,0.3621,0.3713,0.3356,0.3162,0.3137,0.3087,0.3018],"lo":[0.0074,0.0079,0.0124,0.0196,0.0228,0.0246,0.0292,0.038,0.0421,0.0501,0.0517,0.0522,0.053,0.0504,0.0632,0.0757,0.0802,0.0889,0.099,0.1033,0.1127,0.1297,0.1327,0.1467,0.1632,0.1729,0.1773,0.2044,0.2268,0.2325,0.2102,0.198,0.1965,0.1933,0.189],"hi":[0.0168,0.018,0.0281,0.0444,0.0517,0.0558,0.0662,0.086,0.0953,0.1135,0.1172,0.1182,0.12,0.1142,0.1431,0.1714,0.1817,0.2014,0.2243,0.234,0.2552,0.2938,0.3006,0.3322,0.3696,0.3915,0.4015,0.4629,0.5135,0.5265,0.476,0.4484,0.4449,0.4378,0.4279]},{"s":"PR_in","t":"RW.RW","name":"Solid waste export-Nmix (from PR.SO)","sp":"Nmix","cat":"N wasted","hide":false,"v":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0002,0.1759,0.0809,0.0928,0.1271,0.1596,0.1434,0.0625,0.0145,0.3612,0.8534,0.9767,0.8606,0.3558,0.1484,0.1703,0.1871,0.1809,0.2068,0.2407,0.1746,0.1583,0.0712],"lo":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0001,0.0964,0.0443,0.0509,0.0697,0.0875,0.0786,0.0343,0.0079,0.198,0.4678,0.5354,0.4718,0.195,0.0813,0.0934,0.1026,0.0992,0.1134,0.132,0.0957,0.0868,0.0391],"hi":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0003,0.2833,0.1303,0.1495,0.2047,0.2571,0.2309,0.1007,0.0233,0.5818,1.3746,1.5733,1.3862,0.5731,0.239,0.2744,0.3014,0.2914,0.3331,0.3877,0.2812,0.255,0.1148]},{"s":"RW.RW","t":"AG_out","name":"Animal feed import-Nmix (to AG.MM)","sp":"Nmix","cat":"import","hide":false,"v":[24.8835,19.8844,15.7242,17.2336,23.681,20.9425,21.8927,22.3779,22.3138,22.2502,14.0249,17.2555,19.5185,22.9902,22.1819,19.5336,22.9946,26.0716,29.3326,24.3387,28.1459,29.0068,32.8424,34.2438,36.6008,33.9821,33.6577,33.4771,35.482,35.8119,32.5869,33.703,32.8175,29.1043,34.0453],"lo":[21.1238,16.88,13.3484,14.6298,20.103,13.5951,14.212,14.527,14.4853,14.444,11.914,14.6474,16.5519,19.5088,18.7491,16.4998,19.5128,22.1368,24.9033,20.5544,23.8561,24.5551,27.885,29.0759,31.0904,28.8263,28.4243,28.2961,30.0967,30.4377,27.5447,28.5762,27.8641,24.7084,28.9218],"hi":[28.6752,22.9143,18.1202,19.8596,27.2894,28.8937,30.2047,30.8742,30.7857,30.6979,16.1549,19.9381,22.5563,26.5676,25.6315,22.6274,26.5697,30.0402,33.8395,28.2247,32.5148,33.4924,37.8331,39.4264,42.1317,39.2859,38.9295,38.679,41.0166,41.2979,37.6329,38.9412,37.7917,33.6106,39.1932]},{"s":"RW.RW","t":"AG_out","name":"Live animal import-Nmix (to AG.MM)","sp":"Nmix","cat":"import","hide":false,"v":[0.0058,0.0077,0.0093,0.0129,0.0207,0.019,0.0227,0.0211,0.0184,0.02,0.0235,0.0181,0.0174,0.0177,0.0265,0.026,0.0246,0.0288,0.0265,0.0203,0.0168,0.0176,0.0201,0.0201,0.0199,0.0191,0.0182,0.0176,0.016,0.0151,0.016,0.0174,0.0216,0.0126,0.0122],"lo":[0.0034,0.0045,0.0055,0.0077,0.0125,0.0114,0.0136,0.0125,0.0108,0.0117,0.0139,0.0106,0.0103,0.0103,0.0156,0.0152,0.0143,0.0169,0.0155,0.012,0.0099,0.0104,0.0119,0.012,0.0118,0.0114,0.0108,0.0104,0.0095,0.0089,0.0094,0.0102,0.0127,0.0074,0.0072],"hi":[0.0088,0.0116,0.0139,0.0193,0.0304,0.0278,0.0327,0.031,0.0275,0.0293,0.0347,0.027,0.0259,0.0263,0.0388,0.0387,0.0365,0.0428,0.0394,0.0308,0.0253,0.0263,0.0301,0.0301,0.03,0.0286,0.0272,0.0264,0.024,0.0231,0.0246,0.0266,0.0332,0.0194,0.0187]},{"s":"RW.RW","t":"AG_out","name":"Mineral fertilizer import-Nmix (to AG.SM)","sp":"Nmix","cat":"import","hide":false,"v":[30.0375,26.0325,25.0312,23.0287,23.0287,19.0237,8.01,7.0087,13.0162,14.0175,12.015,17.0212,39.1378,37.4537,37.5458,36.042,36.6547,39.8117,40.5095,37.3586,19.0147,30.9236,30.2177,34.6082,36.048,37.5448,43.0167,41.9934,47.275,49.5548,50.9736,53.2084,38.7644,43.253,45.1854],"lo":[24.0952,20.8825,20.0794,18.473,18.473,15.2603,6.4254,5.6222,10.4413,11.2444,9.6381,13.654,31.3953,30.0444,30.1183,28.9119,29.4034,31.9358,32.4957,29.9681,15.2531,24.8061,24.2398,27.7617,28.9167,30.1175,34.5068,33.686,37.9227,39.7515,40.8896,42.6823,31.0957,34.6964,36.2465],"hi":[36.5148,31.6462,30.429,27.9947,27.9947,23.1261,9.7373,8.5201,15.8231,17.0403,14.6059,20.6917,47.5776,45.5304,45.6423,43.8142,44.5591,48.3968,49.2451,45.4147,23.1151,37.592,36.7339,42.0712,43.8215,45.6411,52.2929,51.049,57.4695,60.241,61.9657,64.6824,47.1236,52.5802,54.9293]},{"s":"RW.RW","t":"AT_out","name":"Atmospheric inflow-OXN","sp":"NOx / OXN","cat":"import","hide":false,"v":[34.814,34.814,34.814,34.814,34.814,34.814,34.814,33.5122,31.3863,37.8597,39.5292,32.8967,32.3021,38.2439,28.9688,37.7725,39.0506,33.9038,33.2234,38.6648,33.4941,39.1711,32.7283,32.6895,43.2487,40.2369,37.7402,31.751,39.9983,41.5752,34.7465,28.3253,34.7465,30.7295,31.7338],"lo":[22.5927,22.5927,22.5927,22.5927,22.5927,22.5927,22.5927,21.7194,20.3416,24.537,25.619,21.3205,20.9351,24.786,18.7748,24.4805,25.3089,21.9732,21.5322,25.0588,21.7077,25.3869,21.2114,21.1862,28.0297,26.1119,24.4596,20.578,25.923,26.9451,22.5193,18.3577,22.5193,19.9159,20.5668],"hi":[46.7578,46.7578,46.7578,46.7578,46.7578,46.7578,46.7578,45.1646,42.2996,51.0237,53.2738,44.3351,43.5338,51.5415,39.0415,50.9063,52.6288,45.6924,44.7754,52.1088,45.1402,52.7911,44.1082,44.0558,58.2865,54.0412,50.8627,42.7911,53.9059,56.0312,46.828,38.1741,46.828,41.4144,42.7678]},{"s":"RW.RW","t":"AT_out","name":"Atmospheric inflow-RDN","sp":"NH3 / RDN","cat":"import","hide":false,"v":[16.6599,16.6599,16.6599,16.6599,16.6599,16.6599,16.6599,15.8047,15.1897,18.5954,18.7925,15.4501,15.5457,18.3785,13.9453,18.455,17.1904,14.3143,14.8144,20.462,19.0849,24.5771,19.0556,16.9702,26.7004,23.0225,19.6393,17.3715,24.3643,19.8838,20.1851,16.9572,23.6999,22.3944,27.8172],"lo":[10.8115,10.8115,10.8115,10.8115,10.8115,10.8115,10.8115,10.2431,9.8445,12.0517,12.1795,10.0133,10.0752,11.9112,9.038,11.9607,11.1412,9.2771,9.6013,13.2615,12.369,15.9285,12.35,10.9984,17.3047,14.9405,12.7283,11.2585,15.7906,12.8868,13.082,10.9901,15.36,14.5139,18.0285],"hi":[22.3754,22.3754,22.3754,22.3754,22.3754,22.3754,22.3754,21.3001,20.4712,25.0611,25.3268,20.8222,20.951,24.7688,18.7942,24.8719,23.1676,19.2914,19.9655,27.5768,25.7209,33.1227,25.6813,22.8708,35.9843,30.921,26.468,23.4117,32.8359,26.7975,27.2036,22.8534,31.9405,30.1811,37.4895]},{"s":"RW.RW","t":"EF_out","name":"Fuel import-Nmix (to EF.EC)","sp":"Nmix","cat":"import","hide":false,"v":[24.2399,21.6635,20.7511,23.823,25.3884,26.9241,27.5581,28.9978,31.1757,30.9444,28.5004,25.9037,20.5066,22.3327,23.99,24.7852,20.9927,20.5266,18.5293,14.0866,17.3048,15.4822,15.6925,21.8752,17.4359,18.3994,15.0179,22.1223,25.4588,23.5304,22.6237,22.6707,21.3824,22.3135,20.2575],"lo":[14.0449,12.4058,12.0052,13.6062,14.9504,15.672,15.9089,16.6618,17.8874,17.57,16.8178,15.3627,12.2946,13.4354,14.5605,14.6328,12.6027,11.5277,10.6655,7.892,9.8112,8.8846,8.9512,12.0902,10.047,10.5016,8.6585,12.2077,13.7115,12.8077,12.0762,12.6389,12.5955,12.3316,11.5744],"hi":[47.9914,45.4673,38.1192,44.2582,43.7379,48.8246,48.8369,53.459,60.0543,61.3403,47.3426,43.9854,33.7456,36.2355,38.5558,43.7194,33.0392,43.5599,33.6529,32.5301,39.3204,32.8481,33.4114,50.1032,36.2955,36.9073,25.2972,50.558,71.2955,68.5378,65.5079,56.7391,36.3562,47.8756,38.0872]},{"s":"RW.RW","t":"EF_out","name":"Import of transport fuel-Nmix (to EF.TR)","sp":"Nmix","cat":"import","hide":false,"v":[0.0979,0.1293,0.1387,0.0334,0.159,0.0909,0.104,0.0874,0.1959,0.2188,0.1786,0.216,0.2683,0.264,0.2674,0.1644,0.2408,0.1959,0.253,0.1841,0.3309,0.2674,0.3462,0.4323,0.3846,0.3973,0.3829,0.2199,0.2318,0.2522,0.2295,0.1406,0.3815,0.3269,0.4388],"lo":[0.0626,0.0829,0.089,0.0204,0.1019,0.0573,0.0667,0.0553,0.1263,0.1424,0.1154,0.1399,0.1746,0.1722,0.1737,0.1064,0.1567,0.1275,0.1646,0.1199,0.2153,0.174,0.2245,0.2807,0.2495,0.2579,0.249,0.1431,0.151,0.1636,0.1494,0.0904,0.2488,0.2126,0.2857],"hi":[0.1429,0.1883,0.1991,0.0552,0.2316,0.1379,0.1518,0.1301,0.2802,0.3111,0.2541,0.3071,0.3813,0.3747,0.3795,0.2338,0.3402,0.2778,0.3587,0.2618,0.4676,0.3777,0.4887,0.6107,0.5427,0.561,0.5405,0.3118,0.3292,0.358,0.3264,0.2017,0.5414,0.4644,0.6209]},{"s":"RW.RW","t":"HY_out","name":"Aquaculture feed import-Nmix (to HY.AC)","sp":"Nmix","cat":"import","hide":false,"v":[4.2493,5.9086,6.2781,6.9649,11.3508,15.413,18.9415,22.7424,26.6238,31.9044,33.6581,34.7245,37.271,39.2831,42.4009,43.4678,46.39,54.7423,54.5798,61.8817,65.3884,74.5676,87.457,83.7552,90.5189,94.7391,91.6622,91.1876,95.2959,103.1511,106.922,119.3644,118.8669,117.6107,118.7654],"lo":[1.6935,3.338,4.1268,4.9124,8.4973,11.8138,14.856,18.1425,21.4044,25.7697,26.2472,27.3298,29.44,31.1674,33.8141,34.7508,37.2097,44.085,44.0708,50.209,53.3659,61.1712,72.1662,69.207,74.7835,78.1869,75.7534,75.6177,79.4279,85.8323,89.4956,99.9101,99.4937,98.4423,99.4087],"hi":[7.418,9.2514,9.0509,9.3905,14.5918,19.2778,23.5151,28.1197,33.2056,40.0775,41.4929,42.4853,45.3841,47.7042,51.3152,52.5066,56.111,66.2942,65.732,74.6426,78.8322,89.7785,105.1526,100.5688,108.5507,113.4498,109.7563,109.0581,113.5804,122.6977,125.7125,140.3415,139.7566,138.2797,139.6372]},{"s":"RW.RW","t":"MP_out","name":"Food import-Nmix (to MP.FP)","sp":"Nmix","cat":"import","hide":false,"v":[17.7107,16.0457,20.9172,20.4967,28.5526,23.1965,29.2626,26.9202,26.159,29.4323,27.688,28.8137,28.9402,26.5962,23.3449,23.9355,30.0636,41.8463,29.8839,29.3743,30.995,33.1432,35.0965,35.8024,37.3725,33.5952,33.3324,32.3022,36.8464,34.921,33.0297,34.2006,30.436,30.2243,33.9875],"lo":[11.3931,10.2979,13.4418,13.1197,18.3027,14.8211,18.7016,17.3005,16.7288,18.9674,17.8142,18.4902,18.6269,17.0879,14.992,15.4829,19.5175,27.2696,19.2726,18.8825,20.0461,21.4397,22.6721,23.1866,24.1497,21.6169,21.4555,20.7545,23.7386,22.4167,21.1974,21.8885,19.4245,19.2927,21.7591],"hi":[24.3432,22.1583,28.7744,28.2474,39.3027,32.1613,40.4217,37.3084,36.2287,40.7955,38.4332,39.873,40.1647,36.7474,32.1549,32.9893,41.4324,57.4435,41.0038,40.479,42.7889,45.6881,48.5545,49.4456,51.6484,46.2715,45.8704,44.4431,50.8092,48.1565,45.4088,47.0893,41.995,41.7812,46.9152]},{"s":"RW.RW","t":"MP_out","name":"Ammonia import -Nmix (to MP.OP)","sp":"Nmix","cat":"import","hide":false,"v":[170.4514,186.7656,151.8821,251.8985,196.7223,268.4104,277.9863,284.6275,409.1871,474.3045,244.0288,286.8193,277.9793,294.5187,226.5631,353.7562,505.7673,446.8931,304.6328,149.2411,328.4654,352.9017,389.7695,391.7111,419.7332,323.1653,367.8638,490.7982,450.1928,411.2479,447.882,542.0813,413.3636,359.5221,497.4503],"lo":[109.9545,120.476,97.9734,162.4913,126.9,173.1461,179.3234,183.6062,263.9535,305.9568,157.4151,185.0201,179.3158,189.9845,146.1477,228.1954,326.2527,288.2746,196.5085,96.2705,211.8873,227.6509,251.4339,252.682,270.7585,208.4653,237.3007,316.602,290.4121,265.2905,288.9234,349.6876,266.6594,231.9288,320.8972],"hi":[232.0931,254.3044,206.8058,342.9913,267.8631,365.4781,378.5172,387.5586,557.16,645.8237,332.276,390.5431,378.5043,401.0245,308.4934,481.6824,688.6645,608.4996,414.7957,203.2105,447.2523,480.526,530.7271,533.3661,571.5221,440.0323,500.8969,668.2879,613.0021,559.9743,609.8577,738.1212,562.8595,489.5483,677.35]},{"s":"RW.RW","t":"MP_out","name":"Other goods import -Nmix (to MP.OP)","sp":"Nmix","cat":"import","hide":false,"v":[15.3901,16.9178,17.0374,22.7764,22.2848,24.526,27.4016,25.6006,26.9998,25.5965,28.0434,23.199,22.5467,23.1191,26.061,27.9942,25.5114,28.071,26.4011,21.8942,24.5648,28.3847,25.4862,32.5477,43.856,46.3372,28.5232,47.7648,32.869,26.6879,26.3821,28.9725,26.6481,26.4309,28.9134],"lo":[9.8853,10.8458,10.98,14.7064,14.3081,15.7456,17.6499,16.4345,17.3649,16.4408,18.0299,14.9254,14.4844,14.8496,16.7648,18.0006,16.2921,17.966,16.8821,13.9986,15.7389,18.2269,16.2789,21.0571,28.285,29.8987,18.3219,30.7981,21.1786,17.1804,16.9155,18.6105,17.1436,17.0157,18.6587],"hi":[20.9428,22.9801,23.1116,30.8498,30.2967,33.5074,37.2084,34.8997,36.8201,34.8355,38.1473,31.7248,30.7848,31.5468,35.549,38.1183,34.5364,38.0512,35.7511,29.5744,33.3036,38.5846,34.5157,44.2134,59.7448,63.1362,38.6596,64.8373,44.627,36.1734,35.6795,39.2866,36.1009,35.849,39.3142]},{"s":"RW.RW","t":"PR_out","name":"Solid waste import-Nmix (to PR.SO)","sp":"Nmix","cat":"import","hide":false,"v":[0.1811,0.1719,0.1765,0.1566,0.2324,0.298,0.2101,0.1954,0.228,0.1642,0.2466,0.295,0.3523,0.332,0.3167,0.3766,0.5958,0.4775,0.5171,0.6287,0.6873,0.6246,0.6522,0.5149,0.4701,0.4372,0.4703,0.4497,0.391,0.4833,0.4005,0.5836,0.5727,0.791,0.6075],"lo":[0.1178,0.1123,0.1147,0.1019,0.1514,0.1947,0.1367,0.1269,0.1492,0.1067,0.1607,0.1928,0.2309,0.2188,0.2064,0.2415,0.3727,0.31,0.34,0.416,0.4523,0.4111,0.4309,0.3398,0.3091,0.2833,0.3028,0.29,0.2476,0.3134,0.2604,0.3768,0.3665,0.496,0.3895],"hi":[0.2538,0.2411,0.2475,0.2184,0.3256,0.4141,0.2933,0.2719,0.3176,0.2274,0.3434,0.4107,0.4882,0.4631,0.4405,0.5278,0.8539,0.6566,0.7119,0.8655,0.9478,0.8706,0.8978,0.7084,0.6489,0.605,0.6589,0.6236,0.5527,0.6652,0.5501,0.7987,0.8042,1.1379,0.8534]}]};
+
+// Page-specific layout: node columns (left to right), column headings, margins for the outer labels and the
+// height of the main diagram and the gap between nodes in a column come from DATA, so the same page draws the national and the pool diagrams.
+const W = 1160, TOP = 34, NODE_W = 14;
+const { cols: COLS, colHeads: COL_HEADS, marginL: M_L, marginR: M_R, mainH: MAIN_H, nodeGap: PAD } = DATA.layout;
+const LANE_GAP = 4, LOOP_TOP_GAP = 22, LEG_GAP = 4, ARC_R = 6;
+const colX = c => M_L + c * (W - M_L - M_R - NODE_W) / (COLS.length - 1);
+const nodeCol = {}, nodeOrder = {};
+COLS.forEach((ids, c) => ids.forEach((id, i) => { nodeCol[id] = c; nodeOrder[id] = i; }));
+const NODE_IDS = COLS.flat();
+const nodeRole = id => DATA.nodes[id].role;
+const nodeName = id => DATA.nodes[id].name + (nodeRole(id) ? ' (' + nodeRole(id) + ')' : '');
+
+const state = { scope: 'all', color: 'species', yi: DATA.years.length - 1, playing: null };
+const fmt = v => v >= 100 ? v.toFixed(0) : v >= 10 ? v.toFixed(1) : v.toFixed(2);
+
+// One drawn link per (source node, target node, colour key) in a given scope/colour mode.
+function buildLinks(scope, color) {
+  const map = new Map();
+  DATA.flows.forEach(f => {
+    if (scope === 'hide' && f.hide) return;
+    const s = f.s, t = f.t;
+    const key = color === 'species' ? f.sp : f.cat;
+    const id = s + '|' + t + '|' + key;
+    if (!map.has(id)) map.set(id, { id, s, t, key, flows: [] });
+    map.get(id).flows.push(f);
+  });
+  const links = [...map.values()];
+  links.forEach(l => {
+    l.v = DATA.years.map((_, yi) => l.flows.reduce((a, f) => a + f.v[yi], 0));
+    l.loop = nodeCol[l.t] <= nodeCol[l.s];
+  });
+  return links;
+}
+
+function nodeTotals(links, yi) {
+  const tin = {}, tout = {};
+  NODE_IDS.forEach(n => { tin[n] = 0; tout[n] = 0; });
+  links.forEach(l => { tout[l.s] += l.v[yi]; tin[l.t] += l.v[yi]; });
+  return { tin, tout };
+}
+
+// Scale (px per kt N) is fixed across all years within a scope, chosen so the fullest column in any year fills MAIN_H.
+function scaleFor(links) {
+  let k = Infinity;
+  DATA.years.forEach((_, yi) => {
+    const { tin, tout } = nodeTotals(links, yi);
+    COLS.forEach(ids => {
+      const sum = ids.reduce((a, n) => a + Math.max(tin[n], tout[n]), 0);
+      if (sum > 0) k = Math.min(k, (MAIN_H - PAD * (ids.length - 1)) / sum);
+    });
+  });
+  return k;
+}
+
+// Backward links (to the same or an earlier column) run in fixed lanes below the diagram; each lane is as wide as
+// that link's largest value over all years, so the lanes never move when the year changes.
+function lanesFor(links, k) {
+  const loops = links.filter(l => l.loop);
+  loops.forEach(l => { l.wmax = Math.max(...l.v) * k; l.span = nodeCol[l.s] - nodeCol[l.t]; });
+  loops.sort((a, b) => a.span - b.span || nodeCol[b.s] - nodeCol[a.s] || b.wmax - a.wmax);
+  let y = TOP + MAIN_H + LOOP_TOP_GAP;
+  loops.forEach((l, i) => { l.lane = i; l.laneY = y + l.wmax / 2; y += l.wmax + LANE_GAP; });
+  // Vertical legs: the loop in the innermost lane leaves a node lowest and turns down closest to it, so loops
+  // sharing a node nest instead of crossing.
+  const legs = (end, sign) => {
+    const byNode = {};
+    loops.forEach(l => (byNode[l[end]] = byNode[l[end]] || []).push(l));
+    Object.values(byNode).forEach(ls => {
+      let off = LEG_GAP;
+      ls.sort((a, b) => a.lane - b.lane).forEach(l => {
+        const r = l.wmax / 2 + ARC_R;
+        off += r;
+        l[end + 'Leg'] = sign * off;
+        off += l.wmax / 2 + LANE_GAP;
+      });
+    });
+  };
+  legs('s', 1); legs('t', -1);
+  return y;
+}
+
+function layout(links, k, yi) {
+  const { tin, tout } = nodeTotals(links, yi);
+  const nodes = {};
+  COLS.forEach((ids, c) => {
+    const hs = ids.map(n => Math.max(tin[n], tout[n]) * k);
+    const total = hs.reduce((a, b) => a + b, 0) + PAD * (ids.length - 1);
+    let y = TOP + (MAIN_H - total) / 2;
+    ids.forEach((n, i) => {
+      nodes[n] = { id: n, x: colX(c), y, h: hs[i], tin: tin[n], tout: tout[n] };
+      y += hs[i] + PAD;
+    });
+  });
+  const geo = {};
+  NODE_IDS.forEach(n => {
+    const node = nodes[n];
+    const out = links.filter(l => l.s === n);
+    const inc = links.filter(l => l.t === n);
+    const byTarget = (a, b) => (a.loop - b.loop) || (a.loop ? b.lane - a.lane : (nodes[a.t].y - nodes[b.t].y) || nodeOrder[a.t] - nodeOrder[b.t]);
+    const bySource = (a, b) => (a.loop - b.loop) || (a.loop ? b.lane - a.lane : (nodes[a.s].y - nodes[b.s].y) || nodeOrder[a.s] - nodeOrder[b.s]);
+    let y = node.y;
+    out.sort(byTarget).forEach(l => { const w = l.v[yi] * k; const g = geo[l.id] || (geo[l.id] = {}); g.sy = y + w / 2; g.w = w; y += w; });
+    y = node.y;
+    inc.sort(bySource).forEach(l => { const w = l.v[yi] * k; const g = geo[l.id] || (geo[l.id] = {}); g.ty = y + w / 2; y += w; });
+  });
+  return { nodes, geo };
+}
+
+function linkPath(l, g) {
+  const x0 = colX(nodeCol[l.s]) + NODE_W, x1 = colX(nodeCol[l.t]);
+  if (!l.loop) {
+    const xm = (x0 + x1) / 2;
+    return `M${x0},${g.sy}C${xm},${g.sy} ${xm},${g.ty} ${x1},${g.ty}`;
+  }
+  // Racetrack loop: right from the source, down a vertical leg, left along its lane, up a leg, right into the target.
+  const r = g.w / 2 + ARC_R, ls = x0 + l.sLeg, lt = x1 + l.tLeg, y = l.laneY;
+  return `M${x0},${g.sy}H${ls - r}A${r},${r} 0 0 1 ${ls},${g.sy + r}V${y - r}A${r},${r} 0 0 1 ${ls - r},${y}` +
+         `H${lt + r}A${r},${r} 0 0 1 ${lt},${y - r}V${g.ty + r}A${r},${r} 0 0 1 ${lt + r},${g.ty}H${x1}`;
+}
+
+const svg = document.getElementById('chart');
+svg.setAttribute('aria-label', DATA.title);
+if (!DATA.hiddenNames.length) document.getElementById('scopeBox').style.display = 'none';
+const NS = 'http://www.w3.org/2000/svg';
+const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const a in attrs) e.setAttribute(a, attrs[a]); parent && parent.appendChild(e); return e; };
+const tip = document.getElementById('tip');
+
+let cur = null;      // {links, k, bottom, lay}
+let drawn = null;    // element handles for the current scope/colour
+
+function colourOf(l) { return (state.color === 'species' ? DATA.species : DATA.categories)[l.key]; }
+
+function rebuild() {
+  const links = buildLinks(state.scope, state.color);
+  const k = scaleFor(links);
+  const bottom = lanesFor(links, k);
+  cur = { links, k, bottom };
+  svg.innerHTML = '';
+  const H = bottom + 40;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  COL_HEADS.forEach((t, c) => { if (t) el('text', { x: colX(c) + NODE_W / 2, y: 14, 'text-anchor': c === 0 ? 'start' : c === COLS.length - 1 ? 'end' : 'middle', class: 'col-head' }, svg).textContent = t; });
+  const gl = el('g', {}, svg), gn = el('g', {}, svg), gt = el('g', {}, svg);
+  drawn = { links: {}, nodes: {}, labels: {} };
+  links.sort((a, b) => Math.max(...b.v) - Math.max(...a.v)).forEach(l => {
+    const p = el('path', { class: 'link', stroke: colourOf(l), 'stroke-opacity': 1 }, gl);
+    p.addEventListener('mousemove', e => showLinkTip(e, l));
+    p.addEventListener('mouseleave', hideTip);
+    drawn.links[l.id] = p;
+  });
+  NODE_IDS.forEach(n => {
+    const r = el('rect', { width: NODE_W, fill: DATA.nodes[n].color, rx: 1.5 }, gn);
+    r.addEventListener('mousemove', e => showNodeTip(e, n));
+    r.addEventListener('mouseleave', hideTip);
+    drawn.nodes[n] = r;
+    const c = nodeCol[n];
+    const anchor = c === 0 ? 'end' : 'start';
+    const t = el('text', { class: 'node-label', 'text-anchor': anchor, 'dominant-baseline': 'middle' }, gt);
+    const a = el('tspan', {}, t); a.textContent = DATA.nodes[n].name;
+    const b = el('tspan', { class: 'v' }, t);
+    drawn.labels[n] = { t, b, anchor };
+  });
+  drawScaleBar(bottom);
+  drawLegend();
+  cur.lay = layout(links, k, state.yi);
+  apply(cur.lay);
+  postHeight();
+}
+
+function drawScaleBar(bottom) {
+  const steps = [1000, 500, 200, 100, 50, 20, 10, 5];
+  const kt = steps.find(s => s * cur.k <= 60) || 5;
+  const h = kt * cur.k, x = W - M_R + 30, y = bottom + 4;
+  const g = el('g', {}, svg);
+  el('rect', { x, y, width: NODE_W, height: h, fill: '#9aa5b1' }, g);
+  el('text', { x: x - 6, y: y + h / 2, 'text-anchor': 'end', 'dominant-baseline': 'middle', class: 'scale' }, g).textContent = kt + ' kt N';
+}
+
+function drawLegend() {
+  const map = state.color === 'species' ? DATA.species : DATA.categories;
+  const used = new Set(cur.links.map(l => l.key));
+  document.getElementById('legend').innerHTML = Object.entries(map).filter(([k]) => used.has(k))
+    .map(([k, c]) => `<span><span class="sw" style="background:${c}"></span>${k}</span>`).join('');
+  document.getElementById('note').innerHTML =
+    'Values are Monte Carlo medians in kt N per year; hover a flow for its components and 95% intervals. ' +
+    'The scale is the same for every year' + (state.scope === 'hide' ? ' within this view (it differs from the "All flows" view).' : '.') +
+    (cur.links.some(l => l.loop) ? ' ' + DATA.loopNote : '') +
+    (state.scope === 'hide' ? '<br>Hidden: ' + DATA.hiddenNames.join(', ') + '.' : '');
+}
+
+function apply(lay) {
+  const { nodes, geo } = lay;
+  cur.links.forEach(l => {
+    const g = geo[l.id], p = drawn.links[l.id];
+    if (!g || g.w <= 0) { p.setAttribute('d', ''); return; }
+    p.setAttribute('d', linkPath(l, g));
+    p.setAttribute('stroke-width', Math.max(g.w, 0.6));
+  });
+  NODE_IDS.forEach(n => {
+    const nd = nodes[n], r = drawn.nodes[n], lab = drawn.labels[n];
+    r.setAttribute('x', nd.x); r.setAttribute('y', nd.y); r.setAttribute('height', Math.max(nd.h, 0.5));
+    const lx = lab.anchor === 'end' ? nd.x - 6 : nd.x + NODE_W + 6;
+    lab.t.setAttribute('x', lx); lab.t.setAttribute('y', nd.y + nd.h / 2);
+    [...lab.t.childNodes].forEach(ts => ts.setAttribute('x', lx));
+    lab.t.childNodes[1].setAttribute('dy', '1.2em');
+    lab.t.childNodes[0].setAttribute('dy', '-0.45em');
+    lab.b.textContent = (nodeRole(n) ? nodeRole(n) + ' · ' : '') + fmt(Math.max(nd.tin, nd.tout)) + ' kt N';
+    lab.t.style.display = nd.h > 0 || nd.tin + nd.tout > 0 ? '' : 'none';
+  });
+}
+
+// Tween between two layouts so a year change reads as growth/shrinkage rather than a jump.
+let anim = null;
+function goToYear(yi, duration = 450) {
+  state.yi = yi;
+  document.getElementById('slider').value = yi;
+  document.getElementById('yearLabel').textContent = DATA.years[yi];
+  const from = cur.lay, to = layout(cur.links, cur.k, yi);
+  cur.lay = to;
+  if (anim) cancelAnimationFrame(anim);
+  if (!from || duration === 0) { apply(to); return; }
+  const t0 = performance.now();
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const step = now => {
+    let t = Math.min(1, (now - t0) / duration); t = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    const nodes = {}, geo = {};
+    for (const n in to.nodes) { const a = from.nodes[n], b = to.nodes[n];
+      nodes[n] = { ...b, y: lerp(a.y, b.y, t), h: lerp(a.h, b.h, t), tin: lerp(a.tin, b.tin, t), tout: lerp(a.tout, b.tout, t) }; }
+    for (const id in to.geo) { const a = from.geo[id] || to.geo[id], b = to.geo[id];
+      geo[id] = { sy: lerp(a.sy, b.sy, t), ty: lerp(a.ty, b.ty, t), w: lerp(a.w, b.w, t) }; }
+    apply({ nodes, geo });
+    if (t < 1) anim = requestAnimationFrame(step);
+  };
+  anim = requestAnimationFrame(step);
+  if (tip.style.display === 'block' && tip._refresh) tip._refresh();
+}
+
+function placeTip(e) {
+  const pad = 14, r = tip.getBoundingClientRect();
+  let x = e.clientX + pad, y = e.clientY + pad;
+  if (x + r.width > window.innerWidth - 4) x = e.clientX - r.width - pad;
+  if (y + r.height > window.innerHeight - 4) y = e.clientY - r.height - pad;
+  tip.style.left = Math.max(4, x) + 'px'; tip.style.top = Math.max(4, y) + 'px';
+}
+function highlight(ids) {
+  svg.classList.add('dim');
+  cur.links.forEach(l => drawn.links[l.id].classList.toggle('hl', ids.has(l.id)));
+}
+function hideTip() { tip.style.display = 'none'; tip._refresh = null; svg.classList.remove('dim'); }
+
+function showLinkTip(e, l) {
+  const yi = state.yi;
+  const rows = l.flows.filter(f => f.v[yi] > 0).sort((a, b) => b.v[yi] - a.v[yi])
+    .map(f => `<tr><td>${f.name}</td><td class="n">${fmt(f.v[yi])}</td><td class="n ci">[${fmt(f.lo[yi])}–${fmt(f.hi[yi])}]</td></tr>`).join('');
+  tip.innerHTML = `<b>${nodeName(l.s)} → ${nodeName(l.t)}</b><br>${l.key}: <b>${fmt(l.v[yi])} kt N</b> (${DATA.years[yi]})<table>${rows}</table>`;
+  tip.style.display = 'block'; placeTip(e);
+  highlight(new Set([l.id]));
+}
+function showNodeTip(e, n) {
+  const nd = cur.lay.nodes[n];
+  tip.innerHTML = `<b>${nodeName(n)}</b> (${DATA.years[state.yi]})<br>In: ${fmt(nd.tin)} kt N<br>Out: ${fmt(nd.tout)} kt N`;
+  tip.style.display = 'block'; placeTip(e);
+  highlight(new Set(cur.links.filter(l => l.s === n || l.t === n).map(l => l.id)));
+}
+
+// Height of the content itself: documentElement.scrollHeight is never less than the iframe, so the iframe could not shrink.
+function postHeight() {
+  if (window.parent !== window) window.parent.postMessage({ sankeyHeight: Math.ceil(document.querySelector('.wrap').getBoundingClientRect().height) }, '*');
+}
+window.addEventListener('resize', postHeight);
+window.addEventListener('load', postHeight);
+
+function seg(id, key) {
+  document.querySelectorAll('#' + id + ' button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('#' + id + ' button').forEach(x => x.classList.toggle('on', x === b));
+    state[key] = b.dataset.v; rebuild();
+  }));
+}
+seg('segScope', 'scope'); seg('segColor', 'color');
+
+const slider = document.getElementById('slider');
+slider.max = DATA.years.length - 1;
+slider.addEventListener('input', () => goToYear(+slider.value, 250));
+const ticks = document.getElementById('ticks');
+DATA.years.forEach((y, i) => {
+  if (y % 5 !== 0 && i !== 0 && i !== DATA.years.length - 1) return;
+  const s = document.createElement('span'); s.textContent = y;
+  s.style.left = (100 * i / (DATA.years.length - 1)) + '%';
+  ticks.appendChild(s);
+});
+
+const playBtn = document.getElementById('play');
+playBtn.addEventListener('click', () => {
+  if (state.playing) { clearInterval(state.playing); state.playing = null; playBtn.innerHTML = '&#9654;'; return; }
+  if (state.yi === DATA.years.length - 1) goToYear(0, 0);
+  playBtn.innerHTML = '&#10074;&#10074;';
+  state.playing = setInterval(() => {
+    if (state.yi >= DATA.years.length - 1) { clearInterval(state.playing); state.playing = null; playBtn.innerHTML = '&#9654;'; return; }
+    goToYear(state.yi + 1, 550);
+  }, 700);
+});
+
+// Optional start view from the URL hash, e.g. #hide, #category or #1995 (combinable: #hide,1995).
+location.hash.slice(1).split(/[,&]/).forEach(h => {
+  if (h === 'hide') state.scope = 'hide';
+  if (h === 'category') state.color = 'category';
+  const yi = DATA.years.indexOf(+h); if (yi >= 0) state.yi = yi;
+});
+document.querySelectorAll('#segScope button').forEach(b => b.classList.toggle('on', b.dataset.v === state.scope));
+document.querySelectorAll('#segColor button').forEach(b => b.classList.toggle('on', b.dataset.v === state.color));
+rebuild();
+goToYear(state.yi, 0);
+</script>
+</body>
+</html>

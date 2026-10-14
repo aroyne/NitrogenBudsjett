@@ -17,7 +17,7 @@ This pool is divided into two operational sub-pools. Explore them using the side
 
 ## Interactive Flow Diagram
 
-Flows between the subpools of PR and to and from the other pools. Use the slider or press **Play** to step through the years; the scale is the same for every year. Hover a flow to see the individual flows it contains, with their 95 % uncertainty intervals.
+Nitrogen flows into and out of PR and between its subpools. Use the slider or press **Play** to step through the years; the scale is the same for every year. Hover a flow to see the individual flows it contains, with their 95 % uncertainty intervals.
 
 <iframe id="nnb-sankey" src="../output_files/plots/sankey_PR.html" width="100%" height="800" style="border:0;" scrolling="no"></iframe>
 <script>window.addEventListener("message", function (e) { if (e.data && e.data.sankeyHeight) { document.getElementById("nnb-sankey").style.height = e.data.sankeyHeight + "px"; } });</script>

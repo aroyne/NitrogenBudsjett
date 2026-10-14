@@ -17,7 +17,7 @@ The hydrosphere ecosystem is split into three operational modules. Explore them 
 
 ## Interactive Flow Diagram
 
-Flows between the subpools of HY and to and from the other pools. Use the slider or press **Play** to step through the years; the scale is the same for every year. Hover a flow to see the individual flows it contains, with their 95 % uncertainty intervals.
+Nitrogen flows into and out of HY and between its subpools. Use the slider or press **Play** to step through the years; the scale is the same for every year. Hover a flow to see the individual flows it contains, with their 95 % uncertainty intervals.
 
 <iframe id="nnb-sankey" src="../output_files/plots/sankey_HY.html" width="100%" height="800" style="border:0;" scrolling="no"></iframe>
 <script>window.addEventListener("message", function (e) { if (e.data && e.data.sankeyHeight) { document.getElementById("nnb-sankey").style.height = e.data.sankeyHeight + "px"; } });</script>

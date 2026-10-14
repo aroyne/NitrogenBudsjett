@@ -123,7 +123,7 @@ def _frontmatter(page):
     return "---\n" + "\n".join(lines) + "\n---\n\n"
 
 
-def get_sankey_markdown(pool_code, plot_files, plot_dir, relative_depth="", target_format='html'):
+def get_sankey_markdown(pool_code, plot_files, plot_dir, relative_depth="", target_format='html', has_subpools=True):
     """Iframe with the pool's Sankey diagram (sankey_<pool>.html), if it exists; the page reports its own height."""
     sankey_file = f"sankey_{pool_code}.html"
     if target_format != "html" or sankey_file not in plot_files:
@@ -131,7 +131,7 @@ def get_sankey_markdown(pool_code, plot_files, plot_dir, relative_depth="", targ
     return (
         f"\n---\n\n"
         f"## Interactive Flow Diagram\n\n"
-        f"Flows between the subpools of {pool_code} and to and from the other pools. Use the slider or press "
+        f"Nitrogen flows into and out of {pool_code}{' and between its subpools' if has_subpools else ''}. Use the slider or press "
         f"**Play** to step through the years; the scale is the same for every year. Hover a flow to see the "
         f"individual flows it contains, with their 95 % uncertainty intervals.\n\n"
         f'<iframe id="nnb-sankey" src="{relative_depth}{plot_dir}/{sankey_file}" '
@@ -151,7 +151,9 @@ def _page_header(page, plot_files, plot_dir, target_format):
                 + "\n\n### Description\n")
     body = page['intro']
     if page['balance']:
-        sankey = get_sankey_markdown(page['balance'], plot_files, plot_dir, "../", target_format) if page['kind'] == 'pool' else ""
+        has_subpools = any(p['kind'] == 'subpool' and p.get('parent') == page['title'] for p in PAGES)
+        sankey = (get_sankey_markdown(page['balance'], plot_files, plot_dir, "../", target_format, has_subpools)
+                  if page['kind'] == 'pool' else "")
         body = body.replace('{BALANCE}', sankey + get_balance_image_markdown(
             page['balance'], plot_files, plot_dir, relative_depth="../", target_format=target_format))
     return _frontmatter(page) + body

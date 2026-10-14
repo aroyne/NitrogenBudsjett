@@ -11,6 +11,15 @@ This section contains all documented nitrogen flows leaving the Atmosphere pool.
 
 ---
 
+## Interactive Flow Diagram
+
+Nitrogen flows into and out of AT. Use the slider or press **Play** to step through the years; the scale is the same for every year. Hover a flow to see the individual flows it contains, with their 95 % uncertainty intervals.
+
+<iframe id="nnb-sankey" src="../output_files/plots/sankey_AT.html" width="100%" height="800" style="border:0;" scrolling="no"></iframe>
+<script>window.addEventListener("message", function (e) { if (e.data && e.data.sankeyHeight) { document.getElementById("nnb-sankey").style.height = e.data.sankeyHeight + "px"; } });</script>
+
+---
+
 ## Interactive Mass Balance Overview (1990-2024)
 
 Hover over the chart to inspect specific streams, or click legend items to toggle visibility.
