@@ -445,9 +445,6 @@ def find_household_waste(preloaded_data, current_params, dataset_noise):
       not included: they have no counterpart in 05282, and waste from the
       waste management sector is largely residues from treating waste that
       has already been counted.
-    Table 05282 also shows a real dip in 2009 in construction and services
-    (financial crisis and/or the change from SN2002 to SN2007 in 2008); it is
-    not corrected.
     """
     household_waste = {y: 0.0 for y in range(1990, 2024)}
 
