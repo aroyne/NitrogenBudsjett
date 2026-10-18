@@ -12,7 +12,8 @@ import openpyxl
 
 from calculations.utils import (
     EXPECTED_YEARS,
-    process_generic_trade_flow
+    process_generic_trade_flow,
+    floor_residual_at_zero
 )
 
 
@@ -160,7 +161,7 @@ def get_aquafeed_budget(fish_harvested_N, year, current_params, dataset_noise):
     return total_feed_N, eaten_feed_N, waste_val, excretia_val
 
 
-def _get_marine_feed_share(year, current_params, dataset_noise):
+def _get_marine_feed_share(year, current_params):
     """
     Fraction of aquaculture feed (by mass) that is of marine origin (fish
     meal + fish oil) in a given year, used by get_aquafeed_import_fraction
@@ -169,22 +170,23 @@ def _get_marine_feed_share(year, current_params, dataset_noise):
 
     Declined roughly linearly from 89.4% in 1990 to 22.4% in 2020 (Aas et
     al. 2022, Figure 1: marine protein + marine oil shares), held flat
-    outside that range.
+    outside that range. The uncertainty comes from the two end-point
+    parameters only; no interpolation noise is applied, since a multiplicative
+    factor on a share can push it above 1.
     """
     share_1990 = float(current_params.get("marine_feed_share_1990"))
     share_2020 = float(current_params.get("marine_feed_share_2020"))
-    noise_interp = dataset_noise['trend interpolation']
 
     if year >= 2020:
         return share_2020
     elif year <= 1990:
-        return share_1990 * noise_interp
+        return share_1990
     else:
         frac = (year - 1990) / (2020 - 1990)
-        return (share_1990 + frac * (share_2020 - share_1990)) * noise_interp
+        return share_1990 + frac * (share_2020 - share_1990)
 
 
-def _get_marine_import_fraction(year, current_params, dataset_noise):
+def _get_marine_import_fraction(year, current_params):
     """
     Fraction of the marine-ingredient portion of aquafeed that is imported
     (as opposed to domestically produced from Norwegian fisheries
@@ -197,12 +199,12 @@ def _get_marine_import_fraction(year, current_params, dataset_noise):
     total import fraction) and marine_feed_share_2020 gives an implied ~64%
     marine-ingredient import dependence today, close enough to the 2000
     level to treat as a plateau rather than continued growth, absent further
-    data points between 2000 and today.
+    data points between 2000 and today. As for _get_marine_feed_share, no
+    interpolation noise is applied, so the fraction stays within [0, 1].
     """
     total_import_2020 = float(current_params.get("aquafeed_import_fraction"))
     marine_share_2020 = float(current_params.get("marine_feed_share_2020"))
     plateau = (total_import_2020 - (1.0 - marine_share_2020)) / marine_share_2020
-    noise_interp = dataset_noise['trend interpolation']
 
     if year >= 2000:
         return plateau
@@ -210,10 +212,10 @@ def _get_marine_import_fraction(year, current_params, dataset_noise):
         return 0.0
     else:
         frac = (year - 1985) / (2000 - 1985)
-        return plateau * frac * noise_interp
+        return plateau * frac
 
 
-def get_aquafeed_import_fraction(year, current_params, dataset_noise):
+def get_aquafeed_import_fraction(year, current_params):
     """
     Overall fraction of total aquafeed N that is imported, used by
     MP.FP-HY.AC-Feed to coastal aquaculture-Nmix in mp_mc.py and
@@ -230,8 +232,8 @@ def get_aquafeed_import_fraction(year, current_params, dataset_noise):
     import dependence plateaus, since a growing share of the total is the
     always-imported non-marine portion.
     """
-    marine_share = _get_marine_feed_share(year, current_params, dataset_noise)
-    marine_import_frac = _get_marine_import_fraction(year, current_params, dataset_noise)
+    marine_share = _get_marine_feed_share(year, current_params)
+    marine_import_frac = _get_marine_import_fraction(year, current_params)
     return marine_share * marine_import_frac + (1.0 - marine_share) * 1.0
 
 
@@ -368,7 +370,7 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
             value_2012_base = v_base
 
         year_values[year] = {
-            'value': max(0.0, v_base * noise_10514),
+            'value': v_base * noise_10514,
             'comment': 'ok',
             'data_sources': 'SSB'
         }
@@ -405,7 +407,7 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
             mean_year_count += 1
 
         year_values[year] = {
-            'value': max(0.0, v_scaled * noise_05282),
+            'value': v_scaled * noise_05282,
             'comment': 'ok',
             'data_sources': 'SSB'
         }
@@ -414,7 +416,7 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
     final_mean = (mean_val_accumulator / mean_year_count) if mean_year_count > 0 else 0.0
     for year in range(1990, 1995):
         year_values[year] = {
-            'value': max(0.0, final_mean * noise_05282 * noise_trend),
+            'value': final_mean * noise_05282 * noise_trend,
             'comment': 'ok',
             'data_sources': 'extrapolated'
         }
@@ -964,7 +966,10 @@ def find_recycling(preloaded_data, current_params, current_trade_factors, datase
     for year, val in export_reuse.items():
         if year in year_values: year_values[year] -= val
 
-    return year_values
+    # Domestic recycling minus export for recycling and reuse, from
+    # independent sources, so the residual can go negative.
+    return {year: floor_residual_at_zero(val, 'PR.SO-MP.OP-Recycling-Nmix', year)
+            for year, val in year_values.items()}
 
 
 def find_treated_wastewater_discharge(df_05280, df_utslipp, dataset_noise):
@@ -989,13 +994,13 @@ def find_treated_wastewater_discharge(df_05280, df_utslipp, dataset_noise):
         year = int(years_row.iloc[col_idx])
         val_t = float(values_row.iloc[col_idx])
         val_kt_N = (val_t / 1000.0) * noise_ww
-        ww_discharge[year] = max(0.0, val_kt_N)
+        ww_discharge[year] = val_kt_N
 
     # --- PART 2: historical series, 1997-2001 (utslipp_avløp.xlsx) ---
     for r_idx in range(1, min(6, len(df_utslipp))):
         year = int(df_utslipp.iloc[r_idx, 0])
         val_kt_N = float(df_utslipp.iloc[r_idx, 1]) * noise_ww
-        ww_discharge[year] = max(0.0, val_kt_N)
+        ww_discharge[year] = val_kt_N
 
         if year == 1997:
             value_1997 = val_kt_N

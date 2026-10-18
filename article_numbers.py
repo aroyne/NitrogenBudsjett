@@ -5,10 +5,10 @@ Numbers quoted in the article, collected in one table per topic:
   2. NUE for agriculture,
   3. the other figures quoted in the manuscript, by manuscript section.
 
-Each row gives the mean of the median series over a start and an end period,
-the 2.5-97.5 % interval of the same mean across MC iterations (variant (i):
-each iteration is one consistent time series), and the Mann-Kendall p-value
-of the median series. Series that depend on Fodder crops (how N is split
+Each row gives the mean of the central series (the deterministic run) over a
+start and an end period, the 2.5-97.5 % interval of the same mean across MC
+iterations (variant (i): each iteration is one consistent time series), and
+the Mann-Kendall p-value of the central series. Series that depend on Fodder crops (how N is split
 between AG.MM and AG.SM) use Fodder crops scaled from 2021 on so that the
 change from 2020 to 2021 equals that in Eurostat's Gross Nutrient Balance
 (cfa.fodder_crops_level_adjusted), because SSB changed the method for eng til
@@ -128,13 +128,11 @@ def _mean(series_or_row, period):
 
 
 def summarize(label, fn, df, sims, fodder=False, mc=True, function=''):
-    """One table row: start/end period means as the median and 2.5-97.5 %
-    interval across MC iterations of each iteration's own period mean
-    (variant (i)), or of the median series if the row has no MC, and the
-    Mann-Kendall p-value of the median series over 1990-2024. If fodder,
-    Fodder crops is level-adjusted (see fodder_adjusted). For balances the median of the sum is used rather than the sum
-    of the medians, which can fall outside the interval (e.g. HY.AC, which
-    balances exactly in every iteration)."""
+    """One table row: start/end period means of the central series, with the
+    2.5-97.5 % interval across MC iterations of each iteration's own period
+    mean (variant (i)), and the Mann-Kendall p-value of the central series
+    over 1990-2024. If fodder, Fodder crops is level-adjusted (see
+    fodder_adjusted)."""
     end = END
     if fodder:
         df, sims = fodder_adjusted(df, sims)
@@ -146,25 +144,29 @@ def summarize(label, fn, df, sims, fodder=False, mc=True, function=''):
            'p': p, 'trend_end': YEARS[-1], 'mc': mc}
     if mc:
         matrix = mc_matrix(fn, sims, function + (' [fodder adjusted]' if fodder else ''))
-        row['start_value'], *row['start_ci'] = np.percentile(_mean(matrix, START), [50, 2.5, 97.5])
-        row['end_value'], *row['end_ci'] = np.percentile(_mean(matrix, end), [50, 2.5, 97.5])
+        row['start_ci'] = np.percentile(_mean(matrix, START), [2.5, 97.5])
+        row['end_ci'] = np.percentile(_mean(matrix, end), [2.5, 97.5])
     return row
 
 
 def period_value(label, fn, df, sims, period, function='', fodder=False):
-    """Mean over one period, median and 2.5-97.5 % across MC iterations."""
+    """Mean of the central series over one period, with the 2.5-97.5 %
+    interval across MC iterations."""
     if fodder:
         df, sims = fodder_adjusted(df, sims)
+    value = _mean(fn(df).reindex(YEARS).values, period)
     matrix = mc_matrix(fn, sims, function + (' [fodder adjusted]' if fodder else ''))
-    value, *ci = np.percentile(_mean(matrix, period), [50, 2.5, 97.5])
+    ci = np.percentile(_mean(matrix, period), [2.5, 97.5])
     return {'label': label, 'function': function, 'period': period, 'value': value, 'ci': ci}
 
 
 def ratio_row(label, fn, df, sims, start, end, function=''):
-    """Mean over end divided by mean over start within each MC iteration,
-    median and 2.5-97.5 %."""
+    """Mean over end divided by mean over start: for the central series, and
+    the 2.5-97.5 % interval of the same ratio within each MC iteration."""
+    values = fn(df).reindex(YEARS).values
+    value = _mean(values, end) / _mean(values, start)
     matrix = mc_matrix(fn, sims, function)
-    value, *ci = np.percentile(_mean(matrix, end) / _mean(matrix, start), [50, 2.5, 97.5])
+    ci = np.percentile(_mean(matrix, end) / _mean(matrix, start), [2.5, 97.5])
     return {'label': label, 'function': function, 'start': start, 'end': end, 'value': value, 'ci': ci}
 
 
@@ -364,8 +366,8 @@ def _word_rows(rows, first_column, label_of):
         mark = '†' if r['fodder'] else ''
         out.append({
             first_column: label,
-            '1990-1992 median [2.5-97.5 %]': f"{whole(r['start_value'])} [{whole(r['start_ci'][0])}, {whole(r['start_ci'][1])}]",
-            '2022-2024 median [2.5-97.5 %]': f"{whole(r['end_value'])} [{whole(r['end_ci'][0])}, {whole(r['end_ci'][1])}]{mark}",
+            '1990-1992 central [2.5-97.5 %]': f"{whole(r['start_value'])} [{whole(r['start_ci'][0])}, {whole(r['start_ci'][1])}]",
+            '2022-2024 central [2.5-97.5 %]': f"{whole(r['end_value'])} [{whole(r['end_ci'][0])}, {whole(r['end_ci'][1])}]{mark}",
             'Mann-Kendall p': fmt_p(r['p']) + mark,
         })
     return pd.DataFrame(out)
@@ -383,8 +385,8 @@ def write_word_table(pool_rows_, nue_rows_):
         nue.to_excel(writer, index=False, sheet_name='NUE')
         note = pd.DataFrame({'Merknad': [
             "† Fodder crops fra 2021 skalert slik at endringen 2020–2021 er lik Eurostats (GNB), i hver MC-iterasjon (SSBs metodeskifte for eng til slått i 2021).",
-            "Verdi: median av periodesnittet over MC-iterasjonene (variant (i)). Intervall: 2,5-97,5 % av samme snitt.",
-            "MK p: Mann-Kendall på medianserien. Balanser i kt N/år, NUE i %, avrundet til hele tall.",
+            "Verdi: periodesnittet i den deterministiske kjøringen (sentralverdi). Intervall: 2,5-97,5 % av samme snitt over MC-iterasjonene (variant (i)).",
+            "MK p: Mann-Kendall på sentralserien. Balanser i kt N/år, NUE i %, avrundet til hele tall.",
         ]})
         note.to_excel(writer, index=False, sheet_name='Merknader')
     print(f"Skrevet: {OUTPUT_WORD_TABLE}")
@@ -427,7 +429,7 @@ def main():
 - Modellkjøring: `{cfa.STATS_FILE}` skrevet {stats_time}, {len(sims)} MC-iterasjoner
 - Git HEAD ved generering: `{head}`
 
-**Lesing av tabellene.** Hver MC-iterasjon gir ett snitt over perioden (variant (i), feil fullt korrelert i tid). Verdien er medianen av disse snittene, og intervallet er 2,5- og 97,5-persentilen. Rader uten MC viser snittet av medianserien. MK p er Mann-Kendall-testen på medianserien. Forholdstall mot 2005 for NOx og NH3 har nesten ingen MC-spredning, fordi usikkerheten i disse er en faktor som er lik for alle år og faller bort i forholdet. Rader merket † avhenger av hvordan Fodder crops fordeler N mellom AG.MM og AG.SM. SSB endret metoden for eng til slått i 2021, og modellen korrigerer ikke spranget. For disse radene er Fodder crops fra 2021 derfor skalert slik at endringen fra 2020 til 2021 er lik endringen i Eurostats nitrogenbalanse (Gross Nutrient Balance, grovfôr), regnet i hver MC-iterasjon for seg (`fodder_crops_level_adjusted`). Eurostat beregner den norske balansen selv fra 2020 og har et mye mindre sprang i 2021. Kolonnen «Beregning» viser funksjonen i `calculations_for_article.py` (eller i dette skriptet), dokumentert i `claude_tekst/2026-09-25_calculations_for_article_metodenotat.md`. Alle balanser er tilførsel minus fraførsel (kt N/år), uten interne strømmer mellom delpooler i samme pool.
+**Lesing av tabellene.** Hver MC-iterasjon gir ett snitt over perioden (variant (i), feil fullt korrelert i tid). Verdien er snittet i den deterministiske kjøringen (sentralverdien), og intervallet er 2,5- og 97,5-persentilen av MC-iterasjonenes snitt. MK p er Mann-Kendall-testen på sentralserien. Forholdstall mot 2005 for NOx og NH3 har nesten ingen MC-spredning, fordi usikkerheten i disse er en faktor som er lik for alle år og faller bort i forholdet. Rader merket † avhenger av hvordan Fodder crops fordeler N mellom AG.MM og AG.SM. SSB endret metoden for eng til slått i 2021, og modellen korrigerer ikke spranget. For disse radene er Fodder crops fra 2021 derfor skalert slik at endringen fra 2020 til 2021 er lik endringen i Eurostats nitrogenbalanse (Gross Nutrient Balance, grovfôr), regnet i hver MC-iterasjon for seg (`fodder_crops_level_adjusted`). Eurostat beregner den norske balansen selv fra 2020 og har et mye mindre sprang i 2021. Kolonnen «Beregning» viser funksjonen i `calculations_for_article.py` (eller i dette skriptet), dokumentert i `claude_tekst/2026-09-25_calculations_for_article_metodenotat.md`. Alle balanser er tilførsel minus fraførsel (kt N/år), uten interne strømmer mellom delpooler i samme pool.
 
 ## 1. Balanser for pooler og delpooler (kt N/år)
 

@@ -1,6 +1,6 @@
 """
 Aggregates raw Monte Carlo iteration records into per-flow statistics
-(process_and_export_mc_results: medians, 95% CIs, CV%), exports them to
+(process_and_export_mc_results: central values, 95% intervals, CV%), exports them to
 MC_Reporting_Statistics.xlsx, and generates the time-series, pool-balance and
 Sankey plots used in the GitHub Pages report.
 """
@@ -180,9 +180,9 @@ def plot_pool_balance_interactive(df_flows, pool_code, net_interval, output_dir=
 
 def plot_flow_timeseries_interactive(df_flow, flow_name, population, output_dir="output_files/plots"):
     """
-    Interactive Plotly time-series plot (HTML) for a single N flow: median line
-    (most likely value) plus a shaded 95% uncertainty band (2.5-97.5
-    percentile). Two buttons above the plot switch between the flow in
+    Interactive Plotly time-series plot (HTML) for a single N flow: the
+    central value (deterministic run) plus a shaded 95% uncertainty band
+    (2.5-97.5 percentile of the MC iterations). Two buttons above the plot switch between the flow in
     kt N/year and per capita in kg N/person/year.
     """
     os.makedirs(output_dir, exist_ok=True)
@@ -194,17 +194,17 @@ def plot_flow_timeseries_interactive(df_flow, flow_name, population, output_dir=
     # the percentiles can be divided by it directly.
     pop = population.reindex(years).values
     variants = [
-        (df_flow[['p2_5', 'median', 'p97_5']].values, 'kt N/year', 'Nitrogen Flow (kt N / year)', '.3f', True),
+        (df_flow[['p2_5', 'central', 'p97_5']].values, 'kt N/year', 'Nitrogen Flow (kt N / year)', '.3f', True),
         # Significant digits rather than fixed decimals: small flows are well
         # below 0.001 kg N/person/year.
-        (df_flow[['p2_5', 'median', 'p97_5']].values * 1.0e6 / pop[:, None],  # kt N -> kg N
+        (df_flow[['p2_5', 'central', 'p97_5']].values * 1.0e6 / pop[:, None],  # kt N -> kg N
          'kg N/person/year', 'Nitrogen Flow (kg N / person / year)', '.3g', False),
     ]
 
     fig = go.Figure()
 
     for values, unit, _, fmt, visible in variants:
-        p2_5, median, p97_5 = values[:, 0], values[:, 1], values[:, 2]
+        p2_5, central, p97_5 = values[:, 0], values[:, 1], values[:, 2]
         fig.add_trace(go.Scatter(
             x=years, y=p97_5, visible=visible,
             mode='lines', line=dict(width=0), showlegend=False, hoverinfo='skip'
@@ -217,13 +217,13 @@ def plot_flow_timeseries_interactive(df_flow, flow_name, population, output_dir=
             hoverinfo='skip'
         ))
         fig.add_trace(go.Scatter(
-            x=years, y=median, visible=visible,
+            x=years, y=central, visible=visible,
             mode='lines', line=dict(color='navy', width=2.5),
-            name='Median (most likely value)',
+            name='Central value (deterministic)',
             customdata=np.stack([p2_5, p97_5], axis=-1),
             hovertemplate=(
                 "<b>Year: %{x}</b><br>" +
-                f"Most likely value: %{{y:{fmt}}} {unit}<br>" +
+                f"Central value: %{{y:{fmt}}} {unit}<br>" +
                 f"95% interval: %{{customdata[0]:{fmt}}} – %{{customdata[1]:{fmt}}} {unit}" +
                 "<extra></extra>"
             )
@@ -507,7 +507,7 @@ def _sankey_flow_records(df, years, node_of, name_of, hidden_regex=None):
     """
     One record per flow for the Sankey page: source/target node ids (from
     node_of(source code, is_source)), tooltip name, species and overview
-    category, and the median and 2.5/97.5 percentiles for every year. Flows
+    category, and the central value and 2.5/97.5 percentiles for every year. Flows
     that are zero in all years are left out.
     """
     category_map = _load_flow_categories()
@@ -556,7 +556,7 @@ def plot_global_sankey_interactive(df_flows, output_dir="output_files/plots"):
     JavaScript in plot/sankey_template.html, with a year slider, a toggle that
     hides the dominant trade flows (SANKEY_HIDDEN_KEYWORDS), and link
     colouring by N species or by Report.xlsx's overview category. The page
-    receives every flow's median and 2.5/97.5 percentiles; it sums them per
+    receives every flow's central value and 2.5/97.5 percentiles; it sums them per
     pool pair itself and keeps the value-to-pixel scale fixed across all
     years.
     """
@@ -722,7 +722,10 @@ def _net_balance_interval(df_all, source, target, pool_code, lo=2.5, hi=97.5):
         keep = pd.Series(True, index=df_all.index)
     sign = (target.str.startswith(pool_code) & keep).astype(float) - (source.str.startswith(pool_code) & keep).astype(float)
     signed = df_all.assign(signed=df_all['value'].fillna(0.0) * sign)
-    net = signed[sign != 0].groupby(['year', 'sim_id'])['signed'].sum()
+    # The interval comes from the random iterations; sim_id 0 is the
+    # deterministic run (the central value), used only if it is the only one.
+    use = (sign != 0) & ((df_all['sim_id'] > 0) | (df_all['sim_id'].max() == 0))
+    net = signed[use].groupby(['year', 'sim_id'])['signed'].sum()
     q = net.groupby(level='year').quantile([lo / 100, hi / 100]).unstack()
     return q.iloc[:, 0], q.iloc[:, 1]
 
@@ -784,9 +787,15 @@ def process_and_export_mc_results(all_records):
         
     df_all_trimmed = pd.concat(trimmed_chunks, ignore_index=True)
 
-    # 2. Calculate statistics across all sim_ids
-    print("[STATISTICS] Calculating medians and 95% confidence intervals...")
-    summary_df = df_all_trimmed.groupby(['flow_name', 'year']).agg(
+    # 2. Central value and MC statistics. The central value (best estimate) is
+    # the deterministic run, sim_id 0. The interval and the other statistics
+    # come from the random iterations, sim_id >= 1 (or from sim_id 0 alone in
+    # a deterministic-only run).
+    print("[STATISTICS] Calculating central values and 95% intervals...")
+    is_random = df_all_trimmed['sim_id'] > 0
+    df_mc = df_all_trimmed[is_random] if is_random.any() else df_all_trimmed
+    central = df_all_trimmed[df_all_trimmed['sim_id'] == 0].set_index(['flow_name', 'year'])['value']
+    summary_df = df_mc.groupby(['flow_name', 'year']).agg(
         median=('value', np.median),
         mean=('value', np.mean),
         p2_5=('value', lambda x: np.percentile(x, 2.5)),
@@ -795,16 +804,21 @@ def process_and_export_mc_results(all_records):
         comment=('comment', 'first'),
         data_sources=('data_sources', 'first')
     ).reset_index()
+    summary_df.insert(2, 'central', central.reindex(
+        pd.MultiIndex.from_frame(summary_df[['flow_name', 'year']])).to_numpy())
+    outside = ((summary_df['central'] < summary_df['p2_5']) | (summary_df['central'] > summary_df['p97_5'])).sum()
+    if outside:
+        print(f"[STATISTICS] {outside} flow-years have the central value outside the MC 95% interval.")
 
     # 3. Calculate uncertainty metrics
     summary_df['unc_down_percent'] = np.where(
-        summary_df['median'] > 0, 
-        ((summary_df['median'] - summary_df['p2_5']) / summary_df['median']) * 100, 
+        summary_df['central'] > 0,
+        ((summary_df['central'] - summary_df['p2_5']) / summary_df['central']) * 100,
         0.0
     )
     summary_df['unc_up_percent'] = np.where(
-        summary_df['median'] > 0, 
-        ((summary_df['p97_5'] - summary_df['median']) / summary_df['median']) * 100, 
+        summary_df['central'] > 0,
+        ((summary_df['p97_5'] - summary_df['central']) / summary_df['central']) * 100,
         0.0
     )
     summary_df['cv_percent'] = np.where(
@@ -812,7 +826,7 @@ def process_and_export_mc_results(all_records):
         (summary_df['std'] / summary_df['mean']) * 100,
         0.0
     )
-    # Half-width of the 95% CI, expressed as a percentage of the median - this is the
+    # Half-width of the 95% CI, expressed as a percentage of the central value - this is the
     # 'relative uncertainty' figure the reporting guidelines define, not the CV above.
     summary_df['uncertainty_percent'] = (summary_df['unc_down_percent'] + summary_df['unc_up_percent']) / 2
 
@@ -822,7 +836,7 @@ def process_and_export_mc_results(all_records):
     excel_path = os.path.join(output_dir, 'MC_Reporting_Statistics.xlsx')
     
     summary_df_rounded = summary_df.round({
-        'median': 4, 'mean': 4, 'p2_5': 4, 'p97_5': 4, 'std': 4,
+        'central': 4, 'median': 4, 'mean': 4, 'p2_5': 4, 'p97_5': 4, 'std': 4,
         'unc_down_percent': 2, 'unc_up_percent': 2, 'cv_percent': 2, 'uncertainty_percent': 2
     })
     summary_df_rounded.to_excel(excel_path, index=False)
@@ -856,11 +870,11 @@ def process_and_export_mc_results(all_records):
         plt.plot(df_flow['year'], df_flow['p97_5'], color='steelblue', linestyle=':', linewidth=1, alpha=0.7)
         
         plt.plot(
-            df_flow['year'], 
-            df_flow['median'], 
-            color='navy', 
-            linewidth=2.5, 
-            label='Median (50th percentile)'
+            df_flow['year'],
+            df_flow['central'],
+            color='navy',
+            linewidth=2.5,
+            label='Central value (deterministic)'
         )
         
         flow_start = df_flow['year'].min()
@@ -905,9 +919,9 @@ def process_and_export_mc_results(all_records):
     df_balance_input['source'] = [r[0] for r in res]
     df_balance_input['target'] = [r[1] for r in res]
     
-    # The balance plots use each flow's median; the Sankey diagram also reads
-    # 'uncertainty' (the flow's standard deviation).
-    df_balance_input['value'] = df_balance_input['median']
+    # The balance plots and the Sankey diagram use each flow's central value;
+    # the Sankey diagram also reads 'uncertainty' (the flow's standard deviation).
+    df_balance_input['value'] = df_balance_input['central']
     df_balance_input['uncertainty'] = df_balance_input['std']
     
     # 2. Hent ut alle unike pool-koder som faktisk er til stede i dataene

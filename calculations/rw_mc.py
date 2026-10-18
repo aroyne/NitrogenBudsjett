@@ -209,7 +209,7 @@ def _add_aquaculture_feed_import_mc(results, preloaded_data, current_params, dat
         total_feed_N, _, _, _ = get_aquafeed_budget(fish_harvested_N, year, current_params, dataset_noise)
         # get_aquafeed_import_fraction (see its docstring) replaces a flat
         # import share with one that varies by year.
-        import_fraction = get_aquafeed_import_fraction(year, current_params, dataset_noise)
+        import_fraction = get_aquafeed_import_fraction(year, current_params)
         imported_feed_N = total_feed_N * import_fraction
 
         results.append({

@@ -14,7 +14,8 @@ from calculations.utils import (
     report_missing_years,
     process_generic_trade_flow,
     load_crltap_emissions_to_N,
-    add_flat_carryforward_year
+    add_flat_carryforward_year,
+    floor_residual_at_zero
 )
 from calculations.shared_flow_calculations import (
     find_aquaculture_production,
@@ -707,14 +708,8 @@ def _add_aquaculture_feed_mc(results, preloaded_data, current_params, dataset_no
         # get_aquafeed_import_fraction (see its docstring) replaces a flat
         # import share with one that varies by year, matching
         # RW.RW-HY.AC-Aquaculture feed import-Nmix in rw_mc.py.
-        import_fraction = get_aquafeed_import_fraction(year, current_params, dataset_noise)
+        import_fraction = get_aquafeed_import_fraction(year, current_params)
         domestic_feed_N = total_feed_N * (1.0 - import_fraction)
-        # aquafeed_import_fraction's PERT uncertainty range extends above 1.0
-        # (base 0.92 +/- 20% -> up to 1.104), which propagates through the
-        # marine-import plateau in get_aquafeed_import_fraction, so
-        # (1 - import_fraction) can still go negative for some MC draws even
-        # though it represents a fraction.
-        domestic_feed_N = max(0.0, domestic_feed_N)
             
         results.append({
             'flow_name': flow_code,
@@ -1332,8 +1327,10 @@ def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trad
     inflow_count = {}
     outflow_count = {}
 
+    # A component is missing for a year only when it has no value (None/NaN,
+    # as in 'not done' rows); 0.0 is a valid value, e.g. a floored residual.
     def add_flow(year, val, totals_dict, count_dict):
-        if val == 0 or val is None or pd.isna(val):
+        if val is None or pd.isna(val):
             return
         totals_dict[year] = totals_dict.get(year, 0.0) + float(val)
         count_dict[year] = count_dict.get(year, 0) + 1
@@ -1502,15 +1499,12 @@ def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trad
             comment = f'not done'
             data_sources = f'Missing items in mass balance: found {n_in}/{N_IN} inputs and {n_out}/{N_OUT} outputs'
 
-        # value is a residual of 6 independently-sourced inflows minus 5
-        # independently-sourced outflows, so - unlike most clamps in this
-        # codebase - it isn't provably non-negative by construction. Floored
-        # at 0.0 as an intentional domain floor (a negative N flow has no
-        # physical meaning), not proven dead code.
+        # value is a residual of 6 independently sourced inflows minus 5
+        # independently sourced outflows, so it can go negative.
         results.append({
             'flow_name': flow_code,
             'year': year,
-            'value': float(max(0.0, value)),
+            'value': float(floor_residual_at_zero(value, flow_code, year)),
             'comment': comment,
             'data_sources': data_sources
         })

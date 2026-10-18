@@ -15,6 +15,26 @@ start_year = 1984
 end_year = 2025
 EXPECTED_YEARS = set(range(start_year, end_year + 1))
 
+# Residual flows (computed as a difference of independently sourced series)
+# that came out negative and were set to 0, as (flow_code, year, value).
+# main_mc.py collects and clears this after every iteration and reports how
+# often each residual is floored.
+RESIDUAL_FLOOR_LOG = []
+
+
+def floor_residual_at_zero(value, flow_code, year):
+    """
+    Returns max(0, value) for a residual flow and records the cases where the
+    residual was negative in RESIDUAL_FLOOR_LOG. Only for flows that are
+    differences of independent series; a negative N flow has no physical
+    meaning, but how often the floor is hit is reported, since flooring
+    shifts the flow's distribution upwards.
+    """
+    if value < 0:
+        RESIDUAL_FLOOR_LOG.append((flow_code, year, float(value)))
+        return 0.0
+    return value
+
 
 
 def report_missing_years(flow_code, missing_years, results,

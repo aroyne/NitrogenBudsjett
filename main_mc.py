@@ -22,7 +22,8 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from data_loader import load_all_data
 from calculations.n_params import NParameters
-from mc_sampler import MCSampler, DEFAULT_SEED
+from mc_sampler import MCSampler, DEFAULT_SEED, TRUNCATED_NORMAL_DRAWS
+from calculations import utils as calc_utils
 from report_generator import generate_github_pages_report
 from utils_stat import process_and_export_mc_results
 
@@ -87,7 +88,7 @@ def write_mc_flows_to_international_report(summary_df):
         return
 
     sheet = workbook[SHEET_NAME]
-    print("[EXCEL] Skriver oppdaterte MC-resultater (Median og CV%) til Excel-databasen...")
+    print("[EXCEL] Skriver oppdaterte MC-resultater (sentralverdi og usikkerhet) til Excel-databasen...")
 
     # Column layout of the '2a. Database N flows' sheet.
     FIRST_DATA_ROW = 3     # data starts on row 3, after the two header rows
@@ -102,7 +103,7 @@ def write_mc_flows_to_international_report(summary_df):
     for _, row_data in summary_df.iterrows():
         flow_name = str(row_data["flow_name"]).strip()
         year = int(row_data["year"]) 
-        value = row_data["median"]
+        value = row_data["central"]
         uncertainty_percent = row_data["uncertainty_percent"]
         comment = row_data.get("comment", "")
         data_sources = row_data.get("data_sources", "")
@@ -187,11 +188,37 @@ def run_once(preloaded_data, current_params, dataset_noise, current_trade_factor
         'mp': lambda: execute_calculations_mp(preloaded_data, current_params, dataset_noise, current_trade_factors),
         'pr': lambda: execute_calculations_pr(preloaded_data, current_params, dataset_noise, current_trade_factors),
     }
+    calc_utils.RESIDUAL_FLOOR_LOG.clear()
     records = []
     for pool in POOL_ORDER:
         if pool in selected_pools:
             records.extend(runners[pool]())
     return records
+
+
+def write_residual_floor_report(floor_records, nsim, path='output_files/MC_residual_floors.csv'):
+    """
+    How often each residual flow was negative and set to 0
+    (calculations.utils.floor_residual_at_zero), per flow and year: share of
+    the random iterations, whether the deterministic run was floored, and the
+    median of the negative values. Written to path and printed.
+    """
+    cols = ['flow_name', 'year', 'sim_id', 'value']
+    # A residual computed in a shared function called from two pools is
+    # logged twice per iteration.
+    df = pd.DataFrame(floor_records, columns=cols).drop_duplicates(['flow_name', 'year', 'sim_id'])
+    n_random = max(nsim - 1, 1)
+    rnd = df[df['sim_id'] > 0]
+    summary = rnd.groupby(['flow_name', 'year']).agg(
+        n_floored=('value', 'size'), median_negative_value=('value', 'median')).reset_index()
+    summary['share_floored'] = summary['n_floored'] / n_random
+    det = set(map(tuple, df.loc[df['sim_id'] == 0, ['flow_name', 'year']].to_numpy()))
+    summary['deterministic_floored'] = [(f, y) in det for f, y in zip(summary['flow_name'], summary['year'])]
+    summary.to_csv(path, index=False)
+    print(f"[INFO] Avkapping ved 0 i rester: {len(summary)} strøm-år berørt, skrevet til {path}.")
+    for flow, g in summary.groupby('flow_name'):
+        print(f"  {flow}: {len(g)} år, maks {100 * g['share_floored'].max():.1f} % av iterasjonene"
+              f"{' (også deterministisk: ' + str(sorted(g.loc[g.deterministic_floored, 'year'])) + ')' if g.deterministic_floored.any() else ''}")
 
 
 def setup_iteration(base_params, sampler, i):
@@ -234,8 +261,10 @@ def main():
 
     print("[INFO] Trekker alle MC-verdier på forhånd...")
     sampler = MCSampler(base_params, preloaded_data['trade_params'], args.nsim, seed=args.seed)
+    print(f"[INFO] {TRUNCATED_NORMAL_DRAWS[0]} normalfordelte trekk under 0 er trukket på nytt.")
 
     all_mc_records = []
+    floor_records = []
 
     print(f"\n[INFO] Starter simuleringsløkke: Kjører {args.nsim} iterasjoner...")
     start_time = time.time()
@@ -251,11 +280,13 @@ def main():
             row_copy = row.copy()
             row_copy['sim_id'] = i
             all_mc_records.append(row_copy)
+        floor_records.extend((f, y, i, v) for f, y, v in calc_utils.RESIDUAL_FLOOR_LOG)
 
     elapsed_time = time.time() - start_time
     print(f"[SUKSESS] Simulering av {args.nsim} runder fullført på {elapsed_time:.4f} sekunder.")
 
     os.makedirs('output_files', exist_ok=True)
+    write_residual_floor_report(floor_records, args.nsim)
     run_info = {'seed': args.seed, 'nsim': args.nsim, 'pools': selected_pools,
                 'finished': time.strftime('%Y-%m-%d %H:%M:%S')}
     with open('output_files/MC_run_info.json', 'w') as f:

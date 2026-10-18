@@ -18,10 +18,10 @@ main_mc.py run that regenerates MC_Reporting_Statistics.xlsx) to refresh the
 numbers used in the article.
 
 Each series is reported twice over:
-- from the run's median values (MC_Reporting_Statistics.xlsx), with a
-  Mann-Kendall p-value and a Theil-Sen slope with its 95 % confidence
-  interval. These describe how well the trend is determined given the
-  year-to-year scatter of the median series only.
+- from the run's central values (the deterministic run, column 'central' in
+  MC_Reporting_Statistics.xlsx), with a Mann-Kendall p-value and a Theil-Sen
+  slope with its 95 % confidence interval. These describe how well the trend
+  is determined given the year-to-year scatter of the central series only.
 - from every individual MC iteration (MC_Raw_Simulations.csv.gz), recomputing
   the same series and Theil-Sen trend within each simulation and reporting
   the 2.5-97.5 percentile range. This carries the model's own parameter and
@@ -191,7 +191,7 @@ _FLOW_INDEX = {}
 
 def _flow_index(df):
     """Flow names (in order of first appearance), flow and year positions,
-    and the flow x year array of 'median' values with a mask of the
+    and the flow x year array of 'central' values with a mask of the
     (flow, year) pairs present in df. Built once per DataFrame."""
     entry = _FLOW_INDEX.get(id(df))
     if entry is not None and entry[0] is df:
@@ -200,7 +200,7 @@ def _flow_index(df):
     year_codes, year_values = pd.factorize(df['year'])
     values = np.full((len(names), len(year_values)), np.nan)
     present = np.zeros(values.shape, dtype=bool)
-    values[flow_codes, year_codes] = df['median'].to_numpy(dtype=float)
+    values[flow_codes, year_codes] = df['central'].to_numpy(dtype=float)
     present[flow_codes, year_codes] = True
     index = {'names': list(names), 'row': {n: i for i, n in enumerate(names)},
              'col': {y: j for j, y in enumerate(year_values)}, 'values': values, 'present': present}
@@ -230,8 +230,8 @@ def _flow_values(df, flow_name, years):
 
 
 def flow_series(df, flow_name, years=ANALYSIS_YEARS):
-    """Median value of one flow_name for each year in `years`."""
-    return pd.Series(_flow_values(df, flow_name, years), index=pd.Index(list(years), name='year'), name='median')
+    """Central value of one flow_name for each year in `years`."""
+    return pd.Series(_flow_values(df, flow_name, years), index=pd.Index(list(years), name='year'), name='central')
 
 
 def sum_flows(df, flow_names, years=ANALYSIS_YEARS):
@@ -274,10 +274,10 @@ def fodder_crops_level_adjusted(df):
     which has no step; grazing is about 13 % of the flow."""
     flow = FODDER_CROPS[0]
     is_flow = df['flow_name'] == flow
-    values = df.loc[is_flow].set_index('year')['median']
+    values = df.loc[is_flow].set_index('year')['central']
     ratio = values[FODDER_METHOD_CHANGE_YEAR - 1] / values[FODDER_METHOD_CHANGE_YEAR] * _gnb_fodder_change()
     out = df.copy()
-    out.loc[is_flow & (out['year'] >= FODDER_METHOD_CHANGE_YEAR), 'median'] *= ratio
+    out.loc[is_flow & (out['year'] >= FODDER_METHOD_CHANGE_YEAR), 'central'] *= ratio
     return out
 
 
@@ -443,7 +443,7 @@ AG_SM_NUE_COMPONENTS = [
 
 
 def ag_sm_nue_decomposition(df, years=ANALYSIS_YEARS):
-    """Start/end period averages and 1990-2024 trend (median series) for each
+    """Start/end period averages and 1990-2024 trend (central series) for each
     input and output of Q1c, plus the input and output totals, to show which
     flows drive the AG.SM NUE trend."""
     years = list(years)
@@ -1068,7 +1068,7 @@ def household_waste_sector_shares(n_draws=1000, seed=MC_RESAMPLE_SEED, periods=H
     wf = wf.set_index('waste_category')
     base_share = _period_share(household_waste_by_sector(wf['N_frac'].to_dict()), periods)
     waste_draws = {cat: draw_values(item_rng(seed, 'waste_fractions', cat), n_draws, r.N_frac,
-                                    r.lower_bound, r.upper_bound, r.uncertainty_type, r.distribution_type)
+                                    r.lower_bound, r.upper_bound, r.uncertainty_type, r.distribution_type, r.bounds)
                    for cat, r in wf.iterrows()}
     draws = []
     for k in range(n_draws):
@@ -1141,7 +1141,9 @@ MC_FLOW_PATTERN = r'AT\.AT|HY\.'
 
 def load_raw_simulations(years=ANALYSIS_YEARS, all_flows=False):
     """One small DataFrame per MC iteration, holding that iteration's value
-    for every flow used here (or every flow in the model, if all_flows). The value goes in a 'median' column so every
+    for every flow used here (or every flow in the model, if all_flows). The
+    deterministic run (sim_id 0) is left out: it is the central series in the
+    statistics file, not an MC draw. The value goes in a 'central' column so every
     question function (which reads flow values via flow_series) runs
     unchanged on a single iteration.
 
@@ -1156,11 +1158,11 @@ def load_raw_simulations(years=ANALYSIS_YEARS, all_flows=False):
         )
     raw = pd.read_csv(RAW_FILE, usecols=['flow_name', 'year', 'value', 'sim_id'])
     keep = raw['flow_name'].isin(MC_FLOWS) | raw['flow_name'].str.contains(MC_FLOW_PATTERN, regex=True) | all_flows
-    raw = raw[keep & raw['year'].isin(list(years))]
+    raw = raw[keep & raw['year'].isin(list(years)) & (raw['sim_id'] > 0)]
     duplicated = raw.duplicated(['sim_id', 'flow_name', 'year']).sum()
     if duplicated:
         raise ValueError(f"{duplicated} duplicated (sim_id, flow_name, year) rows in {RAW_FILE}")
-    raw = raw.rename(columns={'value': 'median'})
+    raw = raw.rename(columns={'value': 'central'})
     return [g for _, g in raw.groupby('sim_id')]
 
 
@@ -1300,7 +1302,7 @@ SERIES = [
 
 
 def summarize_series(key, label, series_fn, mc, df, sims, years=ANALYSIS_YEARS):
-    """All reported statistics for one series: the median series itself,
+    """All reported statistics for one series: the central series itself,
     its start/end period averages, the trend statistics from trend_report,
     and (if mc) the per-iteration matrix and the MC percentiles under
     both error structures: variant (i)
@@ -1328,7 +1330,7 @@ def summarize_series(key, label, series_fn, mc, df, sims, years=ANALYSIS_YEARS):
 
 
 # Sub-periods for series whose 1990-2024 trend hides distinct phases. The
-# boundaries are read off the median series: Consumer goods steps up in
+# boundaries are read off the central series: Consumer goods steps up in
 # 1993-1995 and again around 2005; food export rises to 2000, is flat to
 # 2006, rises to 2010 and is flat after; food products to households are
 # flat until 2005.
@@ -1365,7 +1367,7 @@ PERIOD_MEANS = {
 
 
 def period_mean_interval(result, start_year, end_year, years=ANALYSIS_YEARS, seed=MC_RESAMPLE_SEED):
-    """Mean of the median series over start_year-end_year, with the
+    """Mean of the central series over start_year-end_year, with the
     2.5/50/97.5 percentiles of the same mean across MC iterations under
     variant (i) (each iteration's own years) and variant (ii) (each year
     drawn from a random iteration, as in mc_trend_interval_independent_years)."""
@@ -1376,7 +1378,7 @@ def period_mean_interval(result, start_year, end_year, years=ANALYSIS_YEARS, see
     picks = rng.integers(0, matrix.shape[0], size=matrix.shape)
     resampled = matrix[picks, np.arange(matrix.shape[1])]
     return {
-        'median_series': result['series'].loc[start_year:end_year].mean(),
+        'central_series': result['series'].loc[start_year:end_year].mean(),
         'mc_i': tuple(np.percentile(matrix.mean(axis=1), [2.5, 50, 97.5])),
         'mc_ii': tuple(np.percentile(resampled.mean(axis=1), [2.5, 50, 97.5])),
     }
@@ -1391,7 +1393,7 @@ PERIOD_RATIOS = {
 
 def period_ratio_interval(result, start, end, years=ANALYSIS_YEARS):
     """Mean over the end period divided by mean over the start period, for
-    the median series and as 2.5/50/97.5 percentiles across MC iterations
+    the central series and as 2.5/50/97.5 percentiles across MC iterations
     (variant (i); each iteration's own years)."""
     years = list(years)
     m = result['mc']['matrix']
@@ -1399,7 +1401,7 @@ def period_ratio_interval(result, start, end, years=ANALYSIS_YEARS):
     ratio = m[:, cols(*end)].mean(axis=1) / m[:, cols(*start)].mean(axis=1)
     s = result['series']
     return {
-        'median_series': s.loc[end[0]:end[1]].mean() / s.loc[start[0]:start[1]].mean(),
+        'central_series': s.loc[end[0]:end[1]].mean() / s.loc[start[0]:start[1]].mean(),
         'mc_i': tuple(np.percentile(ratio, [2.5, 50, 97.5])),
     }
 
@@ -1420,7 +1422,7 @@ def period_means(results, periods=PERIOD_MEANS):
 
 
 def segment_trends(results, segments=SEGMENTS, years=ANALYSIS_YEARS):
-    """trend_report on each sub-period of the median series, keyed by
+    """trend_report on each sub-period of the central series, keyed by
     (series key, start year, end year). For series with an MC matrix, the
     same sub-period is also run through MC variants (i) and (ii), which give
     the first and last three years' averages of the sub-period with MC
@@ -1493,7 +1495,7 @@ def main():
         print_summary(result)
     print("\nOther period averages")
     for (key, a, b), m in period_means(results).items():
-        print(f"  {key} {a}-{b}: {m['median_series']:.2f}  MC (i) {m['mc_i'][1]:.2f} [{m['mc_i'][0]:.2f}, {m['mc_i'][2]:.2f}]"
+        print(f"  {key} {a}-{b}: {m['central_series']:.2f}  MC (i) {m['mc_i'][1]:.2f} [{m['mc_i'][0]:.2f}, {m['mc_i'][2]:.2f}]"
               f"  MC (ii) {m['mc_ii'][1]:.2f} [{m['mc_ii'][0]:.2f}, {m['mc_ii'][2]:.2f}]")
     print("\nSub-period trends")
     for (key, a, b), trend in segment_trends(results).items():

@@ -11,7 +11,8 @@ import pandas as pd
 from calculations.utils import (
     EXPECTED_YEARS,
     report_missing_years,
-    add_flat_carryforward_year
+    add_flat_carryforward_year,
+    floor_residual_at_zero
 )
 from calculations.shared_flow_calculations import (
     find_aquaculture_production,
@@ -112,13 +113,9 @@ def _add_inflow_to_coastal_waters(results, preloaded_data, current_params, datas
             if year in ww_discharge_dict:
                 val -= ww_discharge_dict[year]
 
-            # Unlike the other clamps in this file, this one is not proven
-            # unreachable by construction: it's a residual of independently
-            # sourced series (TEOTIL3 total, aquaculture, wastewater), so a
-            # data mismatch could in principle drive it negative. Kept as an
-            # intentional domain floor (a negative N flow has no physical
-            # meaning) rather than removed.
-            val = max(0.0, val)
+            # Residual of independently sourced series (TEOTIL3 total,
+            # aquaculture, wastewater), so it can go negative.
+            val = floor_residual_at_zero(val, flow_code, year)
             outflow_tracker.loc[year, 'entries'] = 1
             outflow_tracker.loc[year, 'value'] = val
 

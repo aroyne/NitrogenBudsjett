@@ -8,7 +8,8 @@ import pandas as pd
 from calculations.utils import (
     EXPECTED_YEARS,
     report_missing_years,
-    process_generic_trade_flow
+    process_generic_trade_flow,
+    floor_residual_at_zero
 )
 
 def execute_calculations_at(preloaded_data, current_params, dataset_noise, current_trade_factors):
@@ -224,9 +225,8 @@ def _add_OP_N2_fixation_mc(results, preloaded_data, current_params, ammonia_impo
         window_years = [y for y in (year - 1, year, year + 1) if y in raw_values]
         value = sum(raw_values[y] for y in window_years) / len(window_years)
         # The averaging above smooths most, but not all, of the underlying
-        # trade data's year-to-year noise - a negative N2-fixation flow has
-        # no physical meaning, so floored at 0.0.
-        value = max(0.0, value)
+        # trade data's year-to-year noise; the residual can still go negative.
+        value = floor_residual_at_zero(value, flow_code, year)
 
         collected_years.add(year)
         comment = 'ok'
