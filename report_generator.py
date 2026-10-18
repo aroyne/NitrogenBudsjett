@@ -480,7 +480,10 @@ def fix_all_citations_in_folder(paths, bib_filename):
 # ==============================================================================
 
 def build_landing_page(output_filename, current_date_str, bib_filename, target_format="html"):
-    """Genererer hovedlandingssiden (index.md) med kritisk advarsel og oppdaterte Sankey-lenker."""
+    """Genererer hovedlandingssiden (index.md) med kritisk advarsel og oppdaterte Sankey-lenker.
+    The text between the page's MANUAL:INDEX_TEXT markers is kept from the
+    existing index.md and edited there directly."""
+    manual_text = _extract_manual_block(output_filename, 'INDEX_TEXT')
     with open(output_filename, 'w', encoding='utf-8') as f:
         f.write("---\nlayout: default\ntitle: Home\nnav_order: 1\n---\n\n")
         f.write("# Nitrogen Budget for Norway\n\n")
@@ -496,6 +499,7 @@ def build_landing_page(output_filename, current_date_str, bib_filename, target_f
         f.write("Use the navigation menu on the left side to explore the individual nitrogen pools ")
         f.write("(e.g., Forests and Semi-natural Vegetation, Agriculture, Atmosphere, Hydrosphere, Rest of the World) ")
         f.write("and access detailed statistical time-series graphs, methodological explanations, and parameterizations for each specific flow.\n\n")
+        f.write(_wrap_manual_block(manual_text if manual_text is not None else '', 'INDEX_TEXT') + "\n")
         
         if target_format == "html":
             f.write("### Interactive National Nitrogen Flow Map\n")
