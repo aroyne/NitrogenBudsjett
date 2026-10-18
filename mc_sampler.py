@@ -199,6 +199,22 @@ def _draw_row(seed, group, item_id, n, val, row):
         raise ValueError(f"{group} / {item_id}: {e}") from e
 
 
+class DatasetNoise:
+    """
+    Uncertainty factors for the data sets in one MC iteration.
+    factor(key, year) is the multiplicative factor for data set `key` in
+    `year`. Each data set has one factor per iteration, the same for all
+    years; the calculations ask for it per year so that a year-to-year part
+    can be added here without changing them.
+    """
+
+    def __init__(self, factors):
+        self._factors = dict(factors)
+
+    def factor(self, key, year):
+        return self._factors[key]
+
+
 class MCSampler:
     """
     Holds the drawn values for all MC inputs of one run.
@@ -264,14 +280,15 @@ class MCSampler:
 
     def iteration(self, i):
         """
-        Returns (param_overrides, dataset_noise, trade_factors) for iteration i.
+        Returns (param_overrides, dataset_noise, trade_factors) for iteration
+        i; dataset_noise is a DatasetNoise.
         param_overrides goes to NParameters.override_global_params.
         """
         param_overrides = {}
         for group in [g for g, *_ in STANDARD_SHEETS] + ['animal_products', 'protein_food_items']:
             for key, arr in self.draws[group].items():
                 param_overrides[key] = float(arr[i])
-        dataset_noise = {k: float(a[i]) for k, a in self.draws['dataset_uncertainties'].items()}
+        dataset_noise = DatasetNoise({k: float(a[i]) for k, a in self.draws['dataset_uncertainties'].items()})
         trade_factors = {k: float(a[i]) for k, a in self.draws['trade_parameters'].items()}
         return param_overrides, dataset_noise, trade_factors
 

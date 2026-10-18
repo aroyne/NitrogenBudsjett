@@ -71,14 +71,13 @@ def _add_utmark_grazing_emissions_mc(results, preloaded_data, current_params, da
 
     flow_code = 'FS.OL-AT.AT-Emissions-N2O'
     collected_years = set()
-    noise_val = dataset_noise['UNFCCC_N2O_agri_soils']
     for year in sorted(utmark):
         if year not in EXPECTED_YEARS:
             continue
         collected_years.add(year)
         results.append({
             'flow_name': flow_code, 'year': year,
-            'value': float(utmark[year]['n2o'] * noise_val),
+            'value': float(utmark[year]['n2o'] * dataset_noise.factor('UNFCCC_N2O_agri_soils', year)),
             'comment': 'ok', 'data_sources': 'UNFCCC CRT Table3.D, utmark share'
         })
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
@@ -107,8 +106,7 @@ def _add_fo_denitrification_emissions_mc(results, preloaded_data, current_params
         collected_years.add(year)
 
         raw_val = float(df_unfccc.iloc[row, 3])
-        noise_val = dataset_noise[dataset_key]
-        perturbed_raw = raw_val * noise_val
+        perturbed_raw = raw_val * dataset_noise.factor(dataset_key, year)
 
         value = perturbed_raw * N2O_to_N * n2_n2o_ratio
 
@@ -155,8 +153,7 @@ def _add_land_leaching_mc(results, preloaded_data, current_params, dataset_noise
         year = int(year)
         collected_years.add(year)
 
-        noise_val = dataset_noise[dataset_key]
-        perturbed_raw = raw_val * noise_val
+        perturbed_raw = raw_val * dataset_noise.factor(dataset_key, year)
 
         value = perturbed_raw * frac
 
@@ -171,8 +168,7 @@ def _add_land_leaching_mc(results, preloaded_data, current_params, dataset_noise
         collected_years.add(year)
 
         raw_val = float(df_teotil3.iloc[r, teotil3_col]) / 1000
-        noise_val = dataset_noise[dataset_key]
-        value = raw_val * noise_val
+        value = raw_val * dataset_noise.factor(dataset_key, year)
 
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
@@ -229,8 +225,7 @@ def _add_fuel_wood_for_households_mc(results, preloaded_data, current_params, da
         collected_years.add(year)
         
         raw_val = float(df_ved.iloc[r, 1])
-        noise_val = dataset_noise[dataset_key]
-        perturbed_raw = raw_val * noise_val
+        perturbed_raw = raw_val * dataset_noise.factor(dataset_key, year)
         
         value = perturbed_raw * N_content 
         
@@ -269,7 +264,6 @@ def _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'FS.OL-AG.MM-Grazing-Nmix'
     collected_years = set()
     data_sources = 'SSB table 12660'
-    noise_ssb = dataset_noise['12660']
     Jones = float(current_params.get("Jones_factor"))
     protein_cont = float(current_params.get("protein_cont_grazing")) * 1e-9  # g protein/FEm -> kt protein/FEm
 
@@ -296,22 +290,21 @@ def _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise):
     # deposited during grazing per animal category (kg N/yr)
     reindeer_kt = {year: cats['3.B.4.h.ii.'] * 1e-6
                    for year, cats in preloaded_data['ag_prp_by_category_crt'].items()}
-    noise_crt = dataset_noise['UNFCCC_manure_applied']
 
     first_year = int(animals.index.min())
     for year in range(1990, 2026):
         if year >= first_year:
-            n = {group: animals.loc[year, group] * noise_ssb for group in fem_1996}
+            n = {group: animals.loc[year, group] * dataset_noise.factor('12660', year) for group in fem_1996}
             src = data_sources
         else:
-            n = {group: animals.loc[first_year, group] * noise_ssb for group in fem_1996}
+            n = {group: animals.loc[first_year, group] * dataset_noise.factor('12660', year) for group in fem_1996}
             n['sauer'] *= sheep_index[year] / sheep_index[first_year]
             src = 'SSB table 12660, 1995 level; sheep scaled with SSB table 03710'
         fem = sum(n[group] * fem_per_animal[group] for group in fem_1996)
         collected_years.add(year)
         results.append({
             'flow_name': flow_code, 'year': year,
-            'value': fem * protein_cont / Jones + reindeer_kt.get(year, 0.0) * noise_crt,
+            'value': fem * protein_cont / Jones + reindeer_kt.get(year, 0.0) * dataset_noise.factor('UNFCCC_manure_applied', year),
             'comment': 'ok', 'data_sources': src
         })
 

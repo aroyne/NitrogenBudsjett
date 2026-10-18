@@ -63,7 +63,6 @@ def _add_inflow_to_coastal_waters(results, preloaded_data, current_params, datas
     collected_years = set()
 
     key_teotil = 'TEOTIL'
-    noise_teotil = dataset_noise[key_teotil]
 
     ww_discharge_dict = find_treated_wastewater_discharge(
         df_05280=preloaded_data.get('hy_ssb_05280_raw'),
@@ -78,7 +77,7 @@ def _add_inflow_to_coastal_waters(results, preloaded_data, current_params, datas
     for year, raw_val in teotil2['diffuse_to_coast'].items():
         year = int(year)
         collected_years.add(year)
-        val = raw_val * noise_teotil
+        val = raw_val * dataset_noise.factor(key_teotil, year)
 
         outflow_tracker.loc[year, 'entries'] = 1
         outflow_tracker.loc[year, 'value'] = val
@@ -108,7 +107,7 @@ def _add_inflow_to_coastal_waters(results, preloaded_data, current_params, datas
             # then minus treated wastewater discharge below - both have their
             # own dedicated flows and must not be double-counted here.
             val = (float(df_t3_coast.iloc[r, 1]) / 1000.0) - (float(df_t3_source.iloc[r, 3]) / 1000.0)
-            val *= noise_teotil
+            val *= dataset_noise.factor(key_teotil, year)
 
             if year in ww_discharge_dict:
                 val -= ww_discharge_dict[year]
@@ -145,7 +144,6 @@ def _add_wild_shellfish_and_macroalgae(results, preloaded_data, current_params, 
     seaweed_N_frac = float(current_params.get("seaweed_N_frac"))
     
     key_fisk = 'Fiskeridirektoratet'
-    noise_fisk = dataset_noise[key_fisk]
 
     # 'hy_art_raw' <- art.xlsx (data_loader.py DATA_MAP): Fiskeridirektoratet
     # catch statistics by species ("Fangst fordelt på art"), 2000-2024
@@ -176,7 +174,7 @@ def _add_wild_shellfish_and_macroalgae(results, preloaded_data, current_params, 
             val = shellfish_kt * fish_N_frac + algae_kt * seaweed_N_frac
 
             results.append({
-                'flow_name': flow_code, 'year': year, 'value': val * noise_fisk,
+                'flow_name': flow_code, 'year': year, 'value': val * dataset_noise.factor(key_fisk, year),
                 'comment': 'ok', 'data_sources': 'Fiskeridirektoratet'
             })
 
@@ -190,7 +188,7 @@ def _add_wild_shellfish_and_macroalgae(results, preloaded_data, current_params, 
             val = (float(df_fiske_old.iloc[r, 3]) * fish_N_frac) + (float(df_fiske_old.iloc[r, 4]) * seaweed_N_frac)
 
             results.append({
-                'flow_name': flow_code, 'year': year, 'value': val * noise_fisk,
+                'flow_name': flow_code, 'year': year, 'value': val * dataset_noise.factor(key_fisk, year),
                 'comment': 'ok', 'data_sources': 'Fiskeridirektoratet'
             })
 
@@ -220,7 +218,6 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
     key_teotil = 'TEOTIL'
     key_interp = 'trend interpolation'
 
-    noise_teotil = dataset_noise[key_teotil]
 
     # 2013 onward: read retention directly from the TEOTIL3 matrix.
     # 'hy_teotil3_retention' <- teotil3_n_summary.xlsx (data_loader.py
@@ -235,7 +232,7 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
         year = int(float(val_at_col0))
         if year in EXPECTED_YEARS and year >= 2013:
             collected_years.add(year)
-            base_ret_val = (float(df_t3_ret.iloc[r, 1]) / 1000.0) * noise_teotil
+            base_ret_val = (float(df_t3_ret.iloc[r, 1]) / 1000.0) * dataset_noise.factor(key_teotil, year)
 
             results.append({'flow_name': flow_n2, 'year': year, 'value': base_ret_val * (1.0 - fraction_N2O),
                             'comment': 'ok', 'data_sources': 'NIVA TEOTIL3'})
@@ -250,7 +247,6 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
     t3_diffuse_to_coast = (t3_coast - t3_src['aquaculture_totn_tonnes']
                            - t3_src['large-wastewater_totn_tonnes'] - t3_src['spredt_totn_tonnes'])
     ret_ratio = t3_ret.mean() / t3_diffuse_to_coast.loc[t3_ret.index].mean()
-    noise_interp = dataset_noise[key_interp]
 
     missing_years = {y for y in EXPECTED_YEARS if y >= 1990} - collected_years
 
@@ -259,7 +255,7 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
             collected_years.add(year)
 
             hist_ret_val = outflow_tracker.loc[year, 'value'] * ret_ratio
-            hist_ret_val *= noise_interp
+            hist_ret_val *= dataset_noise.factor(key_interp, year)
 
             results.append({'flow_name': flow_n2, 'year': year, 'value': hist_ret_val * (1.0 - fraction_N2O),
                             'comment': 'ok', 'data_sources': 'Calculation model'})
@@ -296,7 +292,6 @@ def _add_wild_fish_catch(results, preloaded_data, current_params, dataset_noise)
     
     fish_N_frac = float(current_params.get("fish_N_frac"))
     key_fisk = 'Fiskeridirektoratet'
-    noise_fisk = dataset_noise[key_fisk]
 
     # 'hy_art_raw' <- art.xlsx (data_loader.py DATA_MAP): Fiskeridirektoratet
     # catch statistics by species ("Fangst fordelt på art"), 2000-2024
@@ -319,7 +314,7 @@ def _add_wild_fish_catch(results, preloaded_data, current_params, dataset_noise)
                 if not pd.isna(df_art.iloc[r_idx, col]):
                     val += float(df_art.iloc[r_idx, col])
 
-            val_kt_N = (val / 1000.0) * fish_N_frac * noise_fisk
+            val_kt_N = (val / 1000.0) * fish_N_frac * dataset_noise.factor(key_fisk, year)
             results.append({
                 'flow_name': flow_code, 'year': year, 'value': val_kt_N,
                 'comment': 'ok', 'data_sources': 'Fiskeridirektoratet'
@@ -341,7 +336,7 @@ def _add_wild_fish_catch(results, preloaded_data, current_params, dataset_noise)
         if year in EXPECTED_YEARS:
             collected_years.add(year)
             # Column 1: pelagic fish (1000 tons); column 2: bottom fish (1000 tons)
-            val = (float(df_fiske_old.iloc[r, 1]) + float(df_fiske_old.iloc[r, 2])) * fish_N_frac * noise_fisk
+            val = (float(df_fiske_old.iloc[r, 1]) + float(df_fiske_old.iloc[r, 2])) * fish_N_frac * dataset_noise.factor(key_fisk, year)
 
             results.append({
                 'flow_name': flow_code, 'year': year, 'value': val,

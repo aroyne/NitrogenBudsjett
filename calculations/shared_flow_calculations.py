@@ -29,7 +29,6 @@ def find_aquaculture_production(df_aqua_modern, df_aqua_old, current_params, dat
 
     fish_N_frac = float(current_params.get('fish_N_frac'))
     key_fisk = 'Fiskeridirektoratet'
-    noise_aqua = dataset_noise[key_fisk]
 
     # --- Modern data (1994 onward) ---
     for col in df_aqua_modern.columns:
@@ -38,7 +37,7 @@ def find_aquaculture_production(df_aqua_modern, df_aqua_old, current_params, dat
         value_tonn = col_data.sum()
 
         # tonnes / 1000 -> kt round weight, times N fraction and activity noise
-        val_kt_N = (value_tonn / 1000) * fish_N_frac * noise_aqua
+        val_kt_N = (value_tonn / 1000) * fish_N_frac * dataset_noise.factor(key_fisk, year)
 
         aquaculture_production[year] = val_kt_N
 
@@ -48,7 +47,7 @@ def find_aquaculture_production(df_aqua_modern, df_aqua_old, current_params, dat
         value_base = float(row.iloc[1])
 
         # kt round weight * N fraction * activity noise
-        val_kt_N = value_base * fish_N_frac * noise_aqua
+        val_kt_N = value_base * fish_N_frac * dataset_noise.factor(key_fisk, year)
 
         aquaculture_production[year] = val_kt_N
 
@@ -73,19 +72,17 @@ def find_recovered_lost_fish_N(df_losses, aquaculture_production, current_params
     """
     weight = float(current_params.get('lost_fish_avg_weight'))
     fish_N_frac = float(current_params.get('fish_N_frac'))
-    noise_aqua = dataset_noise['Fiskeridirektoratet']
-    noise_trend = dataset_noise['trend interpolation']
 
     lost_N = {}
     for year, row in df_losses.iterrows():
         if year >= 2007:
             # 1000 fish * kg/fish = tonnes; / 1000 -> kt
-            lost_N[year] = (row['dead'] + row['discarded']) * weight / 1000.0 * fish_N_frac * noise_aqua
+            lost_N[year] = (row['dead'] + row['discarded']) * weight / 1000.0 * fish_N_frac * dataset_noise.factor('Fiskeridirektoratet', year)
 
     ratio = np.mean([lost_N[y] / aquaculture_production[y] for y in range(2007, 2012)])
     for year, harvest_N in aquaculture_production.items():
         if year < 2007:
-            lost_N[year] = harvest_N * ratio * noise_trend
+            lost_N[year] = harvest_N * ratio * dataset_noise.factor('trend interpolation', year)
 
     return lost_N
 
@@ -278,7 +275,6 @@ def find_feedstock_fuel(preloaded_data, current_params, dataset_noise):
     """
     year_values = {}
 
-    noise_energy = float(dataset_noise['11561'])
 
     GWh_per_TJ = float(current_params.get('GWh_per_TJ'))
     coal_NCV         = float(current_params.get('coal_NCV'))
@@ -304,7 +300,7 @@ def find_feedstock_fuel(preloaded_data, current_params, dataset_noise):
         if pd.notna(year_val) and pd.notna(value_val) and value_val != '-':
             year = int(year_val)
             value = float(value_val) / (GWh_per_TJ * coal_NCV) * coal_N_frac
-            year_values[year] = year_values.get(year, 0.0) + (value * noise_energy)
+            year_values[year] = year_values.get(year, 0.0) + (value * dataset_noise.factor('11561', year))
 
     # --- Oil and oil products, excl. bio (rows 108-142, 1990-2024) ---
     for row_idx in range(108, 143):
@@ -318,7 +314,7 @@ def find_feedstock_fuel(preloaded_data, current_params, dataset_noise):
             year = int(year_val)
             non_lpg = float(value_val) * (1.0 - lpg_share[year])
             value = non_lpg / (GWh_per_TJ * oil_NCV) * oil_N_frac
-            year_values[year] = year_values.get(year, 0.0) + (value * noise_energy)
+            year_values[year] = year_values.get(year, 0.0) + (value * dataset_noise.factor('11561', year))
 
     return year_values
 
@@ -345,9 +341,6 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
     year_values = {}
     wet_org_N = float(current_params.get('wet_organic'))
 
-    noise_05282 = float(dataset_noise['05282'])
-    noise_10514 = float(dataset_noise['10514'])
-    noise_trend = float(dataset_noise['trend interpolation'])
 
     value_2012_base = 0.0
 
@@ -370,7 +363,7 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
             value_2012_base = v_base
 
         year_values[year] = {
-            'value': v_base * noise_10514,
+            'value': v_base * dataset_noise.factor('10514', year),
             'comment': 'ok',
             'data_sources': 'SSB'
         }
@@ -407,7 +400,7 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
             mean_year_count += 1
 
         year_values[year] = {
-            'value': v_scaled * noise_05282,
+            'value': v_scaled * dataset_noise.factor('05282', year),
             'comment': 'ok',
             'data_sources': 'SSB'
         }
@@ -416,7 +409,7 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
     final_mean = (mean_val_accumulator / mean_year_count) if mean_year_count > 0 else 0.0
     for year in range(1990, 1995):
         year_values[year] = {
-            'value': final_mean * noise_05282 * noise_trend,
+            'value': final_mean * dataset_noise.factor('05282', year) * dataset_noise.factor('trend interpolation', year),
             'comment': 'ok',
             'data_sources': 'extrapolated'
         }
@@ -450,9 +443,6 @@ def find_household_waste(preloaded_data, current_params, dataset_noise):
     """
     household_waste = {y: 0.0 for y in range(1990, 2024)}
 
-    noise_05282 = float(dataset_noise['05282'])
-    noise_10514 = float(dataset_noise['10514'])
-    noise_interp = float(dataset_noise['trend interpolation'])
 
     paper_N   = float(current_params.waste_N_frac('paper'))
     plastic_N = float(current_params.waste_N_frac('plastic'))
@@ -497,11 +487,11 @@ def find_household_waste(preloaded_data, current_params, dataset_noise):
     for year, col_idx in cols_05282.items():
         value = (sector_N(df_05282, rows_05282, col_idx, [9])
                  + sector_N(df_05282, rows_05282, col_idx, [5, 6]) * services_construction_scale)
-        household_waste[year] = value * noise_05282
+        household_waste[year] = value * dataset_noise.factor('05282', year)
     value_1995 = household_waste[1995]
 
     for year, col_idx in cols_10514.items():
-        household_waste[year] = sector_N(df_10514, rows_10514, col_idx, [6, 7, 9]) * noise_10514
+        household_waste[year] = sector_N(df_10514, rows_10514, col_idx, [6, 7, 9]) * dataset_noise.factor('10514', year)
 
     # =========================================================================
     # EXTRAPOLATION, 1990-1994
@@ -519,7 +509,7 @@ def find_household_waste(preloaded_data, current_params, dataset_noise):
     change_per_year = (value_1995 - value_1990) / 5.0
     
     for idx, year in enumerate(range(1990, 1995)):
-        household_waste[year] = (value_1990 + change_per_year * idx) * noise_interp
+        household_waste[year] = (value_1990 + change_per_year * idx) * dataset_noise.factor('trend interpolation', year)
 
     return household_waste
 
@@ -550,9 +540,6 @@ def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params,
     hazardous_N = float(current_params.waste_N_frac('hazardous'))
     mixed_N     = float(current_params.waste_N_frac('mixed_waste'))
     
-    noise_05282 = float(dataset_noise['05282'])
-    noise_10514 = float(dataset_noise['10514'])
-    noise_trend = float(dataset_noise['trend interpolation'])        
 
     arr_05282 = df_05282.values
     arr_10514 = df_10514.values
@@ -584,7 +571,7 @@ def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params,
         if year == 1995:
             base_value_1995 = value_base
 
-        industry_waste[year] = value_base * noise_05282
+        industry_waste[year] = value_base * dataset_noise.factor('05282', year)
 
     # --- PART 2: YEARS 2012-2024 (table 10514) ---
     # Same c offsets 2, 3, 8 select the same three sectors in this table, even
@@ -610,7 +597,7 @@ def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params,
         # Mixed waste (row 23 -> index 22)
         for c in [2, 3, 8]: value_base += float(arr_10514[22, col + c]) * mixed_N
 
-        industry_waste[year] = value_base * noise_10514
+        industry_waste[year] = value_base * dataset_noise.factor('10514', year)
 
     # --- PART 3: LINEAR EXTRAPOLATION BACK TO 1990 ---
     waste_kt_1992 = float(df_hist_waste.iloc[1, 2])
@@ -626,7 +613,7 @@ def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params,
         base_value_extrapolated = base_value_1992 + (change_per_year * step)
         step += 1
         # Noise applied once, at the end, not to the raw calibration inputs above.
-        industry_waste[year] = base_value_extrapolated * noise_05282 * noise_trend
+        industry_waste[year] = base_value_extrapolated * dataset_noise.factor('05282', year) * dataset_noise.factor('trend interpolation', year)
 
     return industry_waste
 
@@ -640,10 +627,8 @@ def find_industrial_crop_products(df_gnb_sheet30, dataset_noise):
     year_values = {}
 
     key_gnb = 'Gross nutrient balance'
-    noise_gnb_val = dataset_noise[key_gnb]
 
     key_interp = 'trend interpolation'
-    noise_interp_val = dataset_noise[key_interp]
 
     year_row = df_gnb_sheet30.iloc[8]
     value_row = df_gnb_sheet30.iloc[10]
@@ -659,7 +644,7 @@ def find_industrial_crop_products(df_gnb_sheet30, dataset_noise):
             try:
                 year = int(year_val)
                 base_value = float(val_val) * 1.0e-3  # kg -> kt
-                value = base_value * noise_gnb_val
+                value = base_value * dataset_noise.factor(key_gnb, year)
 
                 year_values[year] = value
             except ValueError:
@@ -671,7 +656,7 @@ def find_industrial_crop_products(df_gnb_sheet30, dataset_noise):
         mean_value = float(np.mean(list(year_values.values())))
 
         for year in range(2017, 2020):
-            value_interp = mean_value * noise_interp_val
+            value_interp = mean_value * dataset_noise.factor(key_interp, year)
 
             year_values[year] = value_interp
 
@@ -683,7 +668,7 @@ def find_industrial_crop_products(df_gnb_sheet30, dataset_noise):
     # balance, which calls this function directly, sees the same value.
     if 2024 not in year_values and all(y in year_values for y in (2021, 2022, 2023)):
         avg_value = sum(year_values[y] for y in (2021, 2022, 2023)) / 3.0
-        year_values[2024] = avg_value * noise_interp_val
+        year_values[2024] = avg_value * dataset_noise.factor(key_interp, 2024)
 
     return year_values
 
@@ -696,7 +681,6 @@ def find_industrial_round_wood(preloaded_data, current_params, dataset_noise):
     """
     year_values = {}
 
-    noise_faostat = dataset_noise['Forestry production and trade']
     wood_density  = float(current_params.get('wood_density'))
     conifer_N     = float(current_params.get('conifer_N_frac'))
     nonconifer_N   = float(current_params.get('nonconifer_N_frac'))
@@ -729,7 +713,7 @@ def find_industrial_round_wood(preloaded_data, current_params, dataset_noise):
     for year in EXPECTED_YEARS:
         value = total_N_per_year.get(year, 0.0)
         if value > 0:
-            year_values[year] = value * noise_faostat
+            year_values[year] = value * dataset_noise.factor('Forestry production and trade', year)
 
     return year_values
 
@@ -745,8 +729,6 @@ def find_industrial_waste_fuels(df_bio_08205, df_bio_11561, current_params, data
     """
     year_values = {}
 
-    noise_08205 = float(dataset_noise['08205'])
-    noise_11561 = float(dataset_noise['11561'])
 
     NCV              = float(current_params.get('firewood_NCV'))
     N_content        = float(current_params.get('firewood_N_frac'))
@@ -765,7 +747,7 @@ def find_industrial_waste_fuels(df_bio_08205, df_bio_11561, current_params, data
         return gwh / GWh_per_TJ / NCV * N_content
 
     for year, gwh in gwh_08205.items():
-        year_values[year] = gwh_to_kt_N(gwh) * noise_08205
+        year_values[year] = gwh_to_kt_N(gwh) * dataset_noise.factor('08205', year)
 
     # --- PART 2: 1990-2002 from the energy balance, scaled to table 08205 ---
     # The scaling uses the first five years both series cover (2003-2007),
@@ -776,7 +758,7 @@ def find_industrial_waste_fuels(df_bio_08205, df_bio_11561, current_params, data
     scale = sum(gwh_08205[y] for y in overlap) / sum(gwh_11561[y] for y in overlap)
 
     for year in range(1990, first_08205):
-        year_values[year] = gwh_to_kt_N(gwh_11561[year] * scale) * noise_11561
+        year_values[year] = gwh_to_kt_N(gwh_11561[year] * scale) * dataset_noise.factor('11561', year)
 
     return year_values
 
@@ -796,17 +778,14 @@ def find_non_edible_animal_products(df_hides_clean, df_wool, df_sheep, current_p
     """
     year_values = {}
 
-    noise_faostat = dataset_noise['Crops and livestock products']
-    noise_ssb = dataset_noise['03710']
-    noise_wool = dataset_noise['Landbruksdirektoratet_wool']
-    noise_trend = dataset_noise['trend interpolation']
 
     N_content_hides = current_params.get('prod_Raw hides and skins')
     wool_pr_sheep = current_params.get('wool_per_sheep')
     N_content_wool = current_params.get('wool_N_frac')
 
     df_hides = df_hides_clean.copy()
-    df_hides['N_amount'] = df_hides['Value'] * float(N_content_hides) * 1e-5 * float(noise_faostat)
+    hides_noise = df_hides['Year'].map(lambda y: dataset_noise.factor('Crops and livestock products', int(y)))
+    df_hides['N_amount'] = df_hides['Value'] * float(N_content_hides) * 1e-5 * hides_noise
     total_N_per_year = df_hides.groupby('Year')['N_amount'].sum().to_dict()
 
     for year in range(1990, 2025):
@@ -816,13 +795,13 @@ def find_non_edible_animal_products(df_hides_clean, df_wool, df_sheep, current_p
             # Reported wool deliveries (Landbruksdirektoratet)
             wool_row = df_wool[df_wool['år'] == year]
             if not wool_row.empty:
-                value += float(wool_row['ull'].iloc[0]) * float(N_content_wool) * float(noise_wool)
+                value += float(wool_row['ull'].iloc[0]) * float(N_content_wool) * float(dataset_noise.factor('Landbruksdirektoratet_wool', year))
 
         elif year != 2001:
             # Wool extrapolated from SSB sheep counts
             sheep_row = df_sheep[df_sheep['År'] == year]
             if not sheep_row.empty:
-                value += float(sheep_row['Husdyr (sau)'].iloc[0]) * float(wool_pr_sheep) * float(N_content_wool) * 1e-6 * float(noise_ssb)
+                value += float(sheep_row['Husdyr (sau)'].iloc[0]) * float(wool_pr_sheep) * float(N_content_wool) * 1e-6 * float(dataset_noise.factor('03710', year))
 
         else:
             # 2001 interpolated from the surrounding years' sheep counts
@@ -833,7 +812,7 @@ def find_non_edible_animal_products(df_hides_clean, df_wool, df_sheep, current_p
                     float(sheep_prev['Husdyr (sau)'].iloc[0]) +
                     float(sheep_next['Husdyr (sau)'].iloc[0])
                 )
-                value += (avg_sheep * float(wool_pr_sheep) * float(N_content_wool) * 1e-6 * float(noise_ssb)) * float(noise_trend)
+                value += (avg_sheep * float(wool_pr_sheep) * float(N_content_wool) * 1e-6 * float(dataset_noise.factor('03710', year))) * float(dataset_noise.factor('trend interpolation', year))
                 
         year_values[year] = value
 
@@ -844,9 +823,6 @@ def find_recycling(preloaded_data, current_params, current_trade_factors, datase
                     prepared_trade_recycling, prepared_trade_reuse, trade_params):
     year_values = {y: 0.0 for y in range(1990, 2025)}
     
-    noise_05281 = float(dataset_noise['05281'])
-    noise_10513 = float(dataset_noise['10513'])
-    noise_old = float(dataset_noise['historical_waste'])
 
     paper_N   = float(current_params.waste_N_frac('paper'))
     plastic_N = float(current_params.waste_N_frac('plastic'))
@@ -886,7 +862,7 @@ def find_recycling(preloaded_data, current_params, current_trade_factors, datase
         if n_frac > 0:
             for col_idx, year in col_to_year_05281.items():
                 val_kt = float(df_05281.iloc[idx, col_idx])
-                year_values[year] += val_kt * n_frac * noise_05281
+                year_values[year] += val_kt * n_frac * dataset_noise.factor('05281', year)
 
     value_1995 = year_values.get(1995, 0.0)
 
@@ -918,7 +894,7 @@ def find_recycling(preloaded_data, current_params, current_trade_factors, datase
         if n_frac > 0:
             for col_idx, year in col_to_year_10513.items():
                 val_kt = float(df_10513.iloc[idx, col_idx])
-                year_values[year] += val_kt * n_frac * noise_10513
+                year_values[year] += val_kt * n_frac * dataset_noise.factor('10513', year)
                 
     household_waste = find_household_waste(preloaded_data, current_params, dataset_noise)
     
@@ -955,7 +931,7 @@ def find_recycling(preloaded_data, current_params, current_trade_factors, datase
             rec_frac = float(sheet.cell(row=r, column=2).value) / 100
             r += 1
             
-        value = waste * N_frac * rec_frac * noise_old
+        value = waste * N_frac * rec_frac * dataset_noise.factor('historical_waste', year)
         year_values[year] = value        
         
     export_resirk = find_export_for_recycling([], preloaded_data, current_params, current_trade_factors, dataset_noise)
@@ -982,7 +958,6 @@ def find_treated_wastewater_discharge(df_05280, df_utslipp, dataset_noise):
     ww_discharge = {}
 
     key_ssb = '05280'
-    noise_ww = dataset_noise[key_ssb]
 
     value_1997 = 0.0
 
@@ -993,13 +968,13 @@ def find_treated_wastewater_discharge(df_05280, df_utslipp, dataset_noise):
     for col_idx in range(3, min(26, df_05280.shape[1])):
         year = int(years_row.iloc[col_idx])
         val_t = float(values_row.iloc[col_idx])
-        val_kt_N = (val_t / 1000.0) * noise_ww
+        val_kt_N = (val_t / 1000.0) * dataset_noise.factor(key_ssb, year)
         ww_discharge[year] = val_kt_N
 
     # --- PART 2: historical series, 1997-2001 (utslipp_avløp.xlsx) ---
     for r_idx in range(1, min(6, len(df_utslipp))):
         year = int(df_utslipp.iloc[r_idx, 0])
-        val_kt_N = float(df_utslipp.iloc[r_idx, 1]) * noise_ww
+        val_kt_N = float(df_utslipp.iloc[r_idx, 1]) * dataset_noise.factor(key_ssb, year)
         ww_discharge[year] = val_kt_N
 
         if year == 1997:

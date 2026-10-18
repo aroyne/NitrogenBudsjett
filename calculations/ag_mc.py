@@ -92,8 +92,6 @@ def _add_food_crop_products_flow_mc(results, preloaded_data, current_params, dat
     # 07479, cereal harvest, 1000 t)
     workbook = preloaded_data.get('ag_gnb_workbook')
     cereal_harvest = preloaded_data['ssb_cereal_harvest_07479']['kornavling_1000t']
-    noise_val = dataset_noise['Gross nutrient balance']
-    noise_ssb = dataset_noise['07479']
 
     def read_sheet(name, factor):
         return read_year_value_row(workbook[name], year_values=None, year_row=9, value_row=11,
@@ -111,7 +109,7 @@ def _add_food_crop_products_flow_mc(results, preloaded_data, current_params, dat
         results.append({
             'flow_name': flow_code,
             'year': year,
-            'value': float(value * noise_val),
+            'value': float(value * dataset_noise.factor('Gross nutrient balance', year)),
             'comment': comment,
             'data_sources': data_sources,
         })
@@ -131,7 +129,7 @@ def _add_food_crop_products_flow_mc(results, preloaded_data, current_params, dat
             other = other_crops[before] + w * (other_crops[after[0]] - other_crops[before])
         else:
             n_per_t, other = n_per_harvest[before], other_crops[before]
-        value = (n_per_t * cereal_harvest[year] * noise_ssb + other) * noise_val
+        value = (n_per_t * cereal_harvest[year] * dataset_noise.factor('07479', year) + other) * dataset_noise.factor('Gross nutrient balance', year)
         collected_years.add(year)
         results.append({
             'flow_name': flow_code,
@@ -219,9 +217,7 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
     hay_dm = float(current_params.get("hay_DM_frac"))
 
     key_13648 = '13648'
-    noise_13648_val = dataset_noise[key_13648]
     key_05772 = '05772'
-    noise_05772_val = dataset_noise[key_05772]
 
     # 'ssb_13648_raw' <- data_files/13648_20260916-101847.xlsx: SSB table 13648
     # (agricultural yield), covers 2021-2025. Laid out with years down rows
@@ -255,7 +251,7 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
 
         if pd.notna(val5) and pd.notna(val6):
             base_value = (float(val5) + float(val6) * green_dm) * N_content
-            year_entries[year] = {'value': base_value * noise_13648_val, 'data_sources': 'SSB table 13648'}
+            year_entries[year] = {'value': base_value * dataset_noise.factor(key_13648, year), 'data_sources': 'SSB table 13648'}
 
     for col_idx in range(1, 22):
         year_val = df_05772.iloc[2, col_idx]
@@ -267,7 +263,7 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
             if year not in EXPECTED_YEARS:
                 continue
             base_value = (float(val4) * green_dm + float(val5) * hay_dm) * N_content
-            value = base_value * noise_05772_val
+            value = base_value * dataset_noise.factor(key_05772, year)
             if value < 0:
                 value = 0.0
             year_entries[year] = {'value': value, 'data_sources': 'SSB table 05772'}
@@ -286,14 +282,13 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
             if year < 1995:
                 hay *= hay_energy_basis
             base_value = (hay * hay_dm + float(val3) * green_dm) * N_content
-            value = base_value * noise_05772_val
+            value = base_value * dataset_noise.factor(key_05772, year)
             year_entries[year] = {'value': value, 'data_sources': 'SSB Jordbruksstatistikk'}
 
     # Innmark grazing (Budsjettnemnda for jordbruket Totalkalkylen), added on
     # top of the harvested-forage value for each year rather than as its own
     # row - see this function's docstring for why.
     df_innmark = preloaded_data.get('ag_innmark_grazing_raw')
-    noise_bfj_val = dataset_noise['BFJ_totalkalkylen_grazing']
     n_content_grazing = float(current_params.get("protein_cont_grazing")) / Jones / 1.0e9  # g protein/FEm -> kt N/FEm
 
     for row_idx in range(1, df_innmark.shape[0]):
@@ -306,7 +301,7 @@ def _add_fodder_crops_flow_mc(results, preloaded_data, current_params, dataset_n
         if year not in EXPECTED_YEARS or year not in year_entries:
             continue
 
-        grazing_value = float(fem_1000) * 1000 * n_content_grazing * noise_bfj_val  # 1000 FEm -> FEm -> kt N
+        grazing_value = float(fem_1000) * 1000 * n_content_grazing * dataset_noise.factor('BFJ_totalkalkylen_grazing', year)  # 1000 FEm -> FEm -> kt N
         year_entries[year]['value'] += grazing_value
         year_entries[year]['data_sources'] += ' + BFJ Totalkalkylen, Eng-beite'
 
@@ -385,7 +380,6 @@ def _add_ag_n2o_emissions_mc(results, preloaded_data, current_params, dataset_no
     data_sources = 'UNFCCC CRT'
 
     conv_N2O = float(current_params.get("N2O_to_N_factor"))
-    noise_val = dataset_noise[dataset_key]
     df_unfccc = preloaded_data.get('unfccc_ark1_raw')
 
     for r_idx in range(len(df_unfccc)):
@@ -401,7 +395,7 @@ def _add_ag_n2o_emissions_mc(results, preloaded_data, current_params, dataset_no
             base_value = float(ton_val) * conv_N2O
             if utmark_losses is not None:
                 base_value -= utmark_losses[year]['n2o']
-            value = base_value * noise_val
+            value = base_value * dataset_noise.factor(dataset_key, year)
 
             results.append({
                 'flow_name': flow_code,
@@ -429,7 +423,6 @@ def _add_ag_leaching_mc(results, preloaded_data, dataset_noise, flow_code, value
     comment = 'ok'
 
     key_leach = 'UNFCCC_N_leaching'
-    noise_val = dataset_noise[key_leach]
 
     df_leaching = preloaded_data.get('ag_leaching_csv')
     years = df_leaching['year'].values
@@ -444,7 +437,7 @@ def _add_ag_leaching_mc(results, preloaded_data, dataset_noise, flow_code, value
         base_value = float(values[i])
         if utmark_losses is not None:
             base_value -= utmark_losses[year]['leaching']
-        value = base_value * noise_val
+        value = base_value * dataset_noise.factor(key_leach, year)
 
         results.append({
             'flow_name': flow_code,
@@ -469,7 +462,6 @@ def _add_animal_products_flow_mc(results, preloaded_data, current_params, datase
     # data_loader.py to individual livestock products, no aggregates)
     df_fao = preloaded_data.get('fao_animal_production_clean')
     key_fao = 'Crops and livestock products'
-    noise_val = dataset_noise[key_fao]
 
     def get_perturbed_product_frac(item_name):
         param_key = f"prod_{str(item_name).strip()}"
@@ -485,7 +477,7 @@ def _add_animal_products_flow_mc(results, preloaded_data, current_params, datase
         if year in total_N_per_year:
             collected_years.add(year)
             base_value = float(total_N_per_year[year])
-            value = base_value * noise_val
+            value = base_value * dataset_noise.factor(key_fao, year)
 
             results.append({
                 'flow_name': flow_code,
@@ -580,7 +572,6 @@ def _add_manure_application_flow_mc(results, preloaded_data, current_params, dat
 
     fam_values = preloaded_data.get('ag_manure_applied_crt')
     prp_values = preloaded_data.get('ag_manure_prp_crt')
-    noise_val = dataset_noise['UNFCCC_manure_applied']
 
     for year in sorted(set(fam_values) & set(prp_values)):
         if year not in EXPECTED_YEARS:
@@ -589,7 +580,7 @@ def _add_manure_application_flow_mc(results, preloaded_data, current_params, dat
 
         innmark_frac = 1.0 - utmark_losses[year]['utmark_frac']
         base_value_t = fam_values[year] + prp_values[year] * innmark_frac
-        value = (base_value_t * 1.0e-3) * noise_val  # t N -> kt N
+        value = (base_value_t * 1.0e-3) * dataset_noise.factor('UNFCCC_manure_applied', year)  # t N -> kt N
 
         results.append({
             'flow_name': flow_code,
@@ -610,7 +601,6 @@ def _add_utmark_manure_flow_mc(results, current_params, dataset_noise, utmark_lo
     """
     flow_code = 'AG.MM-FS.OL-Manure from grazing on unmanaged land-Nmix'
     collected_years = set()
-    noise_val = dataset_noise['UNFCCC_manure_applied']
 
     for year in sorted(utmark_losses):
         if year not in EXPECTED_YEARS:
@@ -619,7 +609,7 @@ def _add_utmark_manure_flow_mc(results, current_params, dataset_noise, utmark_lo
         results.append({
             'flow_name': flow_code,
             'year': year,
-            'value': float(utmark_losses[year]['manure'] * noise_val),
+            'value': float(utmark_losses[year]['manure'] * dataset_noise.factor('UNFCCC_manure_applied', year)),
             'comment': 'ok',
             'data_sources': 'UNFCCC CRT Table3.D and 3.B(b), SSB'
         })
@@ -647,10 +637,9 @@ def _add_live_animal_export_mc(results, preloaded_data, current_params, dataset_
     prot_frac = float(current_params.get("live_animal_protein_frac"))
     prot_to_N = float(current_params.get("Jones_factor"))
     key_fao = 'Crops and livestock products'
-    noise_fao_val = dataset_noise[key_fao]
 
     df_round = final_data.copy()
-    df_round['perturbed_value'] = df_round['Value'] * noise_fao_val
+    df_round['perturbed_value'] = df_round['Value'] * df_round['Year'].map(lambda y: dataset_noise.factor(key_fao, int(y)))
 
     def get_perturbed_weight(item_name):
         clean_item = str(item_name).strip()

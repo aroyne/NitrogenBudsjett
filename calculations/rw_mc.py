@@ -113,9 +113,7 @@ def _add_animal_feed_import_mc(results, preloaded_data, current_params, dataset_
     global_dom_frac_fallback = float(current_params.get(param_key_dom_frac))
     
     key_kraft = 'Kraftforstatistikk'
-    noise_kraft = dataset_noise[key_kraft]
     key_total = 'Totalkalkylen'
-    noise_total = dataset_noise[key_total]
 
     # Newer years (Landbruksdirektoratet), 2000 onward.
     N_cont_sum = 0
@@ -133,8 +131,8 @@ def _add_animal_feed_import_mc(results, preloaded_data, current_params, dataset_
             base_carb = float(row['value_carb'])
             base_prot = float(row['value_prot'])
 
-            value_carb = base_carb * noise_kraft
-            value_prot = base_prot * noise_kraft
+            value_carb = base_carb * dataset_noise.factor(key_kraft, year)
+            value_prot = base_prot * dataset_noise.factor(key_kraft, year)
 
             imported_feed_N = (value_carb * N_content_carb + value_prot * N_content_prot) / 1000
 
@@ -164,7 +162,7 @@ def _add_animal_feed_import_mc(results, preloaded_data, current_params, dataset_
             collected_years.add(year)
             
             base_feed_tonn = float(row['value'])                
-            feed_tonn = base_feed_tonn * noise_total
+            feed_tonn = base_feed_tonn * dataset_noise.factor(key_total, year)
             
             # 'dom_frac' (domestically produced fraction) is reported directly
             # for 1985-1994; later years fall back to the cross-year average.
@@ -234,10 +232,8 @@ def _add_live_animal_import_mc(results, preloaded_data, current_params, dataset_
     prot_to_N = float(current_params.get("Jones_factor"))
 
     key_fao = 'Crops and livestock products'
-    noise_fao = dataset_noise[key_fao]
-
     df_round = final_data.copy()
-    df_round['perturbed_value'] = df_round['Value'] * noise_fao
+    df_round['perturbed_value'] = df_round['Value'] * df_round['Year'].map(lambda y: dataset_noise.factor(key_fao, int(y)))
 
     def get_perturbed_weight(item_name):
         param_key = f"weight_{str(item_name).strip()}"
@@ -277,7 +273,6 @@ def _add_mineral_fertilizer_import_mc(results, preloaded_data, current_params, d
     # nutrient, import and export quantity
     final_data = preloaded_data.get('fao_mineral_fertilizer')
     key_fert = 'Fertilizer by nutrient'
-    noise_fert = dataset_noise[key_fert]
 
     final_data.columns = [col.strip() for col in final_data.columns]
     import_data = final_data[final_data['Element'].str.strip() == 'Import quantity']
@@ -287,7 +282,7 @@ def _add_mineral_fertilizer_import_mc(results, preloaded_data, current_params, d
         if year in total_fert_per_year:
             collected_years.add(year)
             base_value = float(total_fert_per_year[year])
-            perturbed_value = base_value * noise_fert
+            perturbed_value = base_value * dataset_noise.factor(key_fert, year)
 
             value_kt = perturbed_value / 1000.0  # tonnes -> kt
 
@@ -329,8 +324,7 @@ def _add_atmospheric_inflow_mc(results, flow_code, value_col, df_rw, current_par
             data_sources = 'EMEP SR tables'
 
         base_value = float(df_rw.iloc[r, value_col]) / 10
-        noise_val = dataset_noise[dataset_key]
-        value = base_value * noise_val
+        value = base_value * dataset_noise.factor(dataset_key, year)
 
         results.append({
             'flow_name': flow_code,

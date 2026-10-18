@@ -111,8 +111,7 @@ def _deposition_flow_mc(results, flow_code, class4, poll, preloaded_data, curren
             base_value = float(tonn_val) / 1000
             data_sources = 'NILU and geodata.no'
             
-            noise_val = dataset_noise[key_dep]
-            value = base_value * noise_val
+            value = base_value * dataset_noise.factor(key_dep, year)
                 
             if year == 2016:
                 value_2016 = value
@@ -137,8 +136,7 @@ def _deposition_flow_mc(results, flow_code, class4, poll, preloaded_data, curren
             base_value = value_last
             data_sources = 'extrapolated'
             
-            noise_val = dataset_noise[key_interp]
-            value = base_value * noise_val
+            value = base_value * dataset_noise.factor(key_interp, year)
 
         results.append({
             'flow_name': flow_code,
@@ -158,7 +156,6 @@ def _add_OP_N2_fixation_mc(results, preloaded_data, current_params, ammonia_impo
     
     dataset_key = 'Fertilizer by nutrient'
     data_sources = 'FAOSTAT Fertilizer by nutrient + SSB (3-year moving average)'
-    noise_val = dataset_noise[dataset_key]
 
     # 'faostat_fertilizer_production', 'faostat_fertilizer_use' and
     # 'fao_mineral_fertilizer' <- data_files/FAOSTAT_data_en_9-24-2026-2.csv
@@ -199,7 +196,7 @@ def _add_OP_N2_fixation_mc(results, preloaded_data, current_params, ammonia_impo
             production = (float(fert_export[year]) + float(ag_use[year]) - float(fert_import[year])
                           + float(ag_use[year]) * nonag_over_ag)
 
-        perturbed_production = production / 1000 * noise_val  # tN -> ktN
+        perturbed_production = production / 1000 * dataset_noise.factor(dataset_key, year)  # tN -> ktN
 
         # Mass balance proxy for domestic industrial N2 fixation via ammonia
         # synthesis: domestic fertilizer N production, minus imported ammonia
@@ -375,8 +372,7 @@ def _add_atmospheric_outflow_mc(results, flow_code, value_col, df_atm, current_p
             data_sources = 'EMEP SR tables'
 
         base_value = float(df_atm.iloc[r, value_col]) / 10
-        noise_val = dataset_noise[dataset_key]
-        value = base_value * noise_val
+        value = base_value * dataset_noise.factor(dataset_key, year)
 
         results.append({
             'flow_name': flow_code,

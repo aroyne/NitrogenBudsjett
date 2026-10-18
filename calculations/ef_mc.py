@@ -105,7 +105,7 @@ def _add_fuel_for_ec_subsector_mc(results, preloaded_data, current_params, datas
         collected_years.add(year)
         value = sum(tj / float(current_params.get(ncv)) * n_content(n_par, year)
                     for tj, ncv, n_par in zip(group.TJ, group.ncv_param, group.n_param))
-        value *= dataset_noise[dataset_key]
+        value *= dataset_noise.factor(dataset_key, year)
 
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
@@ -178,13 +178,12 @@ def _add_n2o_emissions_mc(results, preloaded_data, dataset_noise, flow_code, val
     collected_years = set()
 
     df = preloaded_data.get('n2o_ec_data')
-    noise_val = dataset_noise[dataset_key]
 
     for _, row in df.iterrows():
         year = int(row['year'])
         collected_years.add(year)
         raw_val = float(row[value_col])
-        value = raw_val * noise_val
+        value = raw_val * dataset_noise.factor(dataset_key, year)
 
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,

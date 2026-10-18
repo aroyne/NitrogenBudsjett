@@ -78,7 +78,7 @@ def add_flat_carryforward_year(results, flow_code, collected_years, from_year, t
     base_value = next((r['value'] for r in results if r['flow_name'] == flow_code and r['year'] == from_year), None)
     if base_value is None or pd.isna(base_value):
         return
-    value = base_value * dataset_noise['trend interpolation']
+    value = base_value * dataset_noise.factor('trend interpolation', to_year)
     collected_years.add(to_year)
     results.append({
         'flow_name': flow_code,
@@ -110,7 +110,7 @@ def add_trend_extrapolated_year(results, flow_code, collected_years, fit_years, 
     values_arr = np.array([p[1] for p in points], dtype=float)
     slope, intercept = np.polyfit(years_arr, values_arr, 1)
     trend_value = slope * to_year + intercept
-    value = trend_value * dataset_noise['trend interpolation']
+    value = trend_value * dataset_noise.factor('trend interpolation', to_year)
     collected_years.add(to_year)
     results.append({
         'flow_name': flow_code,
@@ -139,7 +139,7 @@ def add_multi_year_average_year(results, flow_code, collected_years, avg_years, 
     if not values:
         return
     avg_value = sum(values) / len(values)
-    value = avg_value * dataset_noise['trend interpolation']
+    value = avg_value * dataset_noise.factor('trend interpolation', to_year)
     collected_years.add(to_year)
     results.append({
         'flow_name': flow_code,
@@ -214,7 +214,6 @@ def load_crltap_emissions_to_N(raw_lines, categories, pollutant, conv_to_N, data
     and pollutant, and converts the result to N. Used across ag_mc.py,
     ef_mc.py, mp_mc.py and pr_mc.py for CRLTAP-derived NH3/NOx flows.
     """
-    noise_val = dataset_noise[noise_key]
     valid_lines = raw_lines[skiprows:] if len(raw_lines) > skiprows else []
     yearly_raw_sums = {}
 
@@ -248,7 +247,7 @@ def load_crltap_emissions_to_N(raw_lines, categories, pollutant, conv_to_N, data
     final_sums = {}
     for year, raw_sum in yearly_raw_sums.items():
         base_value = raw_sum * conv_to_N
-        final_sums[year] = base_value * noise_val
+        final_sums[year] = base_value * dataset_noise.factor(noise_key, year)
 
     return final_sums
 
@@ -287,7 +286,6 @@ def process_generic_trade_flow(preloaded_data, current_params, current_trade_fac
     df_vol = preloaded_data['compressed_trade_volume']
 
     dataset_key = '08801'
-    noise_val = dataset_noise[dataset_key]
 
     if isinstance(target_types, (str, int, float)):
         types_to_match = {str(target_types).lower().strip()}
@@ -310,7 +308,8 @@ def process_generic_trade_flow(preloaded_data, current_params, current_trade_fac
         # trade_mapping addition that outpaces trade_params rather than a
         # known gap today.
         v_factors = df_filtered['konv'].astype(str).str.strip().map(current_trade_factors).fillna(0.0)
-        df_filtered['perturbed_amount'] = df_filtered['amount'] * noise_val
+        row_noise = df_filtered['year'].map(lambda y: dataset_noise.factor(dataset_key, int(float(y))))
+        df_filtered['perturbed_amount'] = df_filtered['amount'] * row_noise
         df_filtered['N_amount'] = df_filtered['perturbed_amount'] * v_factors / 1e6
         df_filtered.loc[df_filtered['N_amount'] < 0, 'N_amount'] = 0.0
         for yr_raw, amt in zip(df_filtered['year'].values, df_filtered['N_amount'].values):

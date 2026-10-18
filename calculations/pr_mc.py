@@ -103,7 +103,6 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
     # treatment method, material type and year; rows 59-72 are energy
     # recovery and rows 87-100 incineration without energy recovery.
     df_05281 = preloaded_data.get('ssb_waste_05281')
-    noise_05281 = dataset_noise['05281']
     N_05281, tonnes_05281 = {}, {}
     for col in range(3, 20):
         year = int(float(df_05281.iloc[2, col]))
@@ -118,7 +117,6 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
     # statistical variable, year and treatment method (2012-2024); col+5 is
     # "Levert til forbrenning".
     df_10513 = preloaded_data.get('ssb_waste_10513')
-    noise_10513 = dataset_noise['10513']
     N_10513, tonnes_10513 = {}, {}
     for col in range(1, 110, 9):
         year = int(float(df_10513.iloc[3, col]))
@@ -130,13 +128,13 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
     for year, value in N_05281.items():
         collected_years.add(year)
         results.append({
-            'flow_name': flow_code, 'year': year, 'value': value * scale_05281 * noise_05281,
+            'flow_name': flow_code, 'year': year, 'value': value * scale_05281 * dataset_noise.factor('05281', year),
             'comment': 'ok', 'data_sources': 'SSB table 05281, scaled to the N content of table 10513'
         })
     for year, value in N_10513.items():
         collected_years.add(year)
         results.append({
-            'flow_name': flow_code, 'year': year, 'value': value * noise_10513,
+            'flow_name': flow_code, 'year': year, 'value': value * dataset_noise.factor('10513', year),
             'comment': 'ok', 'data_sources': data_sources
         })
 
@@ -148,8 +146,6 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
     # (data_loader.py DATA_MAP): historical municipal and industry waste
     # compilation, 1985-1995 (quantities, incineration/recycling shares)
     df_hist = preloaded_data.get('waste_historical_fractions')
-    noise_hist = dataset_noise[dataset_key_hist]
-    noise_trend = dataset_noise['trend interpolation']
 
     household_waste = find_household_waste(preloaded_data, current_params, dataset_noise)
     industry_waste = find_other_industry_waste(
@@ -187,7 +183,7 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
             r_iloc += 1
             
         raw_val = waste * inc_frac * calibration
-        value = raw_val*noise_hist*noise_trend
+        value = raw_val*dataset_noise.factor(dataset_key_hist, year)*dataset_noise.factor('trend interpolation', year)
 
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
@@ -259,8 +255,6 @@ def _biologically_treated_N(preloaded_data, current_params, dataset_noise):
     wood_N = float(current_params.waste_N_frac('wood'))
     biogas_loss = float(current_params.get('digestate_loss_fraction'))
     compost_loss = float(current_params.waste_N_frac('compost_N_loss'))
-    noise_10513 = dataset_noise['10513']
-    noise_12818 = dataset_noise['12818']
 
     df_10513 = preloaded_data['ssb_waste_10513']
     N_out = {}
@@ -275,10 +269,10 @@ def _biologically_treated_N(preloaded_data, current_params, dataset_noise):
                     + float(df_10513.iloc[7, col + offset]) * park_N   # park and garden
                     + float(df_10513.iloc[8, col + offset]) * wood_N)  # wood waste
 
-        N_out[year] = (n_in(2) * (1 - biogas_loss) + n_in(3) * (1 - compost_loss)) * noise_10513
+        N_out[year] = (n_in(2) * (1 - biogas_loss) + n_in(3) * (1 - compost_loss)) * dataset_noise.factor('10513', year)
 
     for year in range(1990, 2012):
-        N_out[year] = N_out[2012] * dataset_noise['trend interpolation']
+        N_out[year] = N_out[2012] * dataset_noise.factor('trend interpolation', year)
 
     df_12818 = preloaded_data['ssb_waste_12818']
     shares = {}
@@ -286,8 +280,8 @@ def _biologically_treated_N(preloaded_data, current_params, dataset_noise):
         year = int(float(str(df_12818.iloc[3, col_idx]).strip()))
         total = float(df_12818.iloc[4, col_idx])
         shares[year] = {
-            'agriculture': float(df_12818.iloc[5, col_idx]) / total * noise_12818,
-            'green_and_soil': (float(df_12818.iloc[6, col_idx]) + float(df_12818.iloc[7, col_idx])) / total * noise_12818,
+            'agriculture': float(df_12818.iloc[5, col_idx]) / total * dataset_noise.factor('12818', year),
+            'green_and_soil': (float(df_12818.iloc[6, col_idx]) + float(df_12818.iloc[7, col_idx])) / total * dataset_noise.factor('12818', year),
         }
     first_share_year = min(shares)
     for year in N_out:
@@ -335,7 +329,6 @@ def _add_wastewater_from_landfills_mc(results, preloaded_data, current_params, d
     flow_code = 'PR.SO-PR.WW-Wastewater from landfills-Nmix'
     collected_years = set()
     
-    noise_mildir = float(dataset_noise['norskeutslipp'])
     # 'deponi_utslipp' and 'deponi_tilkobling' <- Utslipp_deponi.xlsx
     # (data_loader.py DATA_MAP, sheets 'Utslipp'/'tilkobling'): annual
     # emissions to water from Norwegian landfills, plus whether each site is
@@ -391,7 +384,7 @@ def _add_wastewater_from_landfills_mc(results, preloaded_data, current_params, d
                 if year not in real_years_data:
                     real_years_data[year] = 0.0
 
-                real_years_data[year] += (n_leachate_tN / 1000.0) * noise_mildir
+                real_years_data[year] += (n_leachate_tN / 1000.0) * dataset_noise.factor('norskeutslipp', year)
 
         except (ValueError, TypeError, IndexError):
             continue
@@ -434,7 +427,6 @@ def _add_so_leaching_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'PR.SO-HY.SW-Leaching-Nmix'
     collected_years = set()
     comment = 'ok'
-    noise_mildir = float(dataset_noise['norskeutslipp'])
 
     # 'deponi_utslipp'/'deponi_tilkobling': see _add_wastewater_from_landfills_mc above.
     uts_raw = preloaded_data.get('deponi_utslipp')
@@ -484,7 +476,7 @@ def _add_so_leaching_mc(results, preloaded_data, current_params, dataset_noise):
                 if year not in real_years_data:
                     real_years_data[year] = 0.0
 
-                real_years_data[year] += (n_leachate_tN / 1000.0) * noise_mildir
+                real_years_data[year] += (n_leachate_tN / 1000.0) * dataset_noise.factor('norskeutslipp', year)
 
         except (ValueError, TypeError, IndexError):
             continue
@@ -711,7 +703,6 @@ def _add_so_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
 
     conv_N2O = float(current_params.get("N2O_to_N_factor"))
     key_n2o = 'UNFCCC_N2O_solid_waste'
-    noise_val = dataset_noise[key_n2o]
 
     # 'n2o_so_raw' <- UNFCCC CRT Table5 (data_loader.py's crt_n2o_so method,
     # reading directly from the NOR-CRT-2026-... folder): N2O emissions from
@@ -731,7 +722,7 @@ def _add_so_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
         collected_years.add(year)
         
         base_value = float(n2o_val) * conv_N2O
-        value = base_value * noise_val
+        value = base_value * dataset_noise.factor(key_n2o, year)
         results.append({
             'flow_name': flow_code, 
             'year': year, 
@@ -803,7 +794,6 @@ def _add_export_for_reuse_mc(results, preloaded_data, current_params, current_tr
 def _add_ag_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'PR.WW-AG.SM-Sewage sludge fertilizer-Nmix'
     dataset_key = '05279'
-    noise_val = dataset_noise[dataset_key]
     collected_years = set()
     comment = 'ok'
     N_content = float(current_params.waste_N_frac('sludge'))
@@ -831,7 +821,7 @@ def _add_ag_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
             
         collected_years.add(year)
         raw_tonnage = float(raw_val)
-        perturbed_tonnage = raw_tonnage*noise_val
+        perturbed_tonnage = raw_tonnage*dataset_noise.factor(dataset_key, year)
         
         value = (perturbed_tonnage / 1000) * N_content 
         
@@ -844,7 +834,6 @@ def _add_ag_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
         })
         
     # 1993-2001
-    noise_val = dataset_noise['historical_waste']
     for r in range(1, 10):  
         year_val = df_hist.iloc[r, 0]
         if year_val is None or pd.isna(year_val): 
@@ -857,7 +846,7 @@ def _add_ag_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
         
         collected_years.add(year)
         raw_tonnage = float(raw_val)
-        perturbed_tonnage = raw_tonnage*noise_val
+        perturbed_tonnage = raw_tonnage*dataset_noise.factor('historical_waste', year)
         
         share = float(df_hist.iloc[r, 3]) / 100  
         value = perturbed_tonnage * share * N_content  
@@ -901,8 +890,6 @@ def _add_hs_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
     # _add_ag_sewage_sludge_fertilizer_mc above.
     df_modern = preloaded_data['sewage_sludge_modern']
     df_hist = preloaded_data['sewage_sludge_historical']
-    noise_modern = dataset_noise[dataset_key]
-    noise_hist = dataset_noise['historical_waste']
     
     # 1. 2002-2024
     data_sources = 'SSB table 05279'
@@ -923,8 +910,8 @@ def _add_hs_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
         tonnage_green = float(val_green) if val_green is not None and not pd.isna(val_green) else 0.0
         tonnage_soil = float(val_soil) if val_soil is not None and not pd.isna(val_soil) else 0.0
         
-        perturbed_green = tonnage_green*noise_modern
-        perturbed_soil = tonnage_soil*noise_modern
+        perturbed_green = tonnage_green*dataset_noise.factor(dataset_key, year)
+        perturbed_soil = tonnage_soil*dataset_noise.factor(dataset_key, year)
         
         value = ((perturbed_green + perturbed_soil) / 1000) * N_content 
         
@@ -949,7 +936,7 @@ def _add_hs_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
         
         collected_years.add(year)
         raw_tonnage = float(raw_val)
-        perturbed_tonnage = raw_tonnage*noise_hist
+        perturbed_tonnage = raw_tonnage*dataset_noise.factor('historical_waste', year)
         
         share = float(df_hist.iloc[r, 2]) / 100  # Kolonne indeks 2 er 'grøntareal %'
         value = perturbed_tonnage * share * N_content  
@@ -989,7 +976,6 @@ def _add_ww_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
 
     conv_N2O = float(current_params.get("N2O_to_N_factor"))
     key_n2o = 'UNFCCC_N2O_wastewater'
-    noise_val = dataset_noise[key_n2o]
 
     # 'n2o_ww_raw' <- UNFCCC CRT Table5 (data_loader.py's crt_n2o_ww method,
     # reading directly from the NOR-CRT-2026-... folder): N2O emissions from
@@ -1009,7 +995,7 @@ def _add_ww_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
         collected_years.add(year)
         
         base_value = float(n2o_val) * conv_N2O
-        value = base_value * noise_val
+        value = base_value * dataset_noise.factor(key_n2o, year)
  
         results.append({
             'flow_name': flow_code, 
@@ -1075,7 +1061,6 @@ def _add_sewage_sludge_landfill_mc(results, preloaded_data, current_params, data
 
     # 1. 2002-2024
     data_sources = 'SSB table 05279'
-    noise_05279 = dataset_noise['05279']
     # Det opprinnelige skriptet stoppet på kolonne 26 i Excel (tilsvarer indeks 25 her)
     for col_idx in range(2, min(25, len(df_modern.columns))):
         year_val = df_modern.iloc[2, col_idx]
@@ -1092,14 +1077,14 @@ def _add_sewage_sludge_landfill_mc(results, preloaded_data, current_params, data
         collected_years.add(year)
         
         tonnage_cover = float(val_cover) if val_cover is not None and not pd.isna(val_cover) else 0.0
-        perturbed_cover = tonnage_cover*noise_05279
+        perturbed_cover = tonnage_cover*dataset_noise.factor('05279', year)
         value = (perturbed_cover / 1000) * N_content
         
         # The 'Slamdeponi' column sometimes holds SSB's '..' (suppressed/not
         # available) placeholder instead of a number, which pd.isna() doesn't
         # catch (it's a real string, not NaN) - hence the isinstance check.
         if val_landfill is not None and not isinstance(val_landfill, str) and not pd.isna(val_landfill):
-            perturbed_landfill = val_landfill*noise_05279
+            perturbed_landfill = val_landfill*dataset_noise.factor('05279', year)
             value += (perturbed_landfill / 1000) * N_content
             
         results.append({
@@ -1111,7 +1096,6 @@ def _add_sewage_sludge_landfill_mc(results, preloaded_data, current_params, data
         })
         
     # 2. 1993-2001
-    noise_hist = dataset_noise['slamdisponering']
     for r in range(1, 10):  
         year_val = df_hist.iloc[r, 0]
         if year_val is None or pd.isna(year_val): 
@@ -1124,7 +1108,7 @@ def _add_sewage_sludge_landfill_mc(results, preloaded_data, current_params, data
         
         collected_years.add(year)
         raw_tonnage = float(raw_val)
-        perturbed_tonnage = raw_tonnage*noise_hist
+        perturbed_tonnage = raw_tonnage*dataset_noise.factor('slamdisponering', year)
         
         share = float(df_hist.iloc[r, 4]) / 100  # Kolonne indeks 4 er '% slamdeponi + avfallsfylling'
         value = perturbed_tonnage * share * N_content  
@@ -1170,7 +1154,6 @@ def _add_ww_N2_emissions_mc(results, preloaded_data, current_params, dataset_noi
     comment = 'ok'
     data_sources = 'treatment plant reports (norskeutslipp.no / veas.nu)'
     dataset_key = 'nitrogenrensing_avlop'
-    noise_val = dataset_noise[dataset_key]
 
     removal_default = float(current_params.get("avlop_removal_default_rate"))
 
@@ -1298,7 +1281,7 @@ def _add_ww_N2_emissions_mc(results, preloaded_data, current_params, dataset_noi
                 # long-run mean is used with the default removal rate.
                 value += plant_means["NRVA"] * _factor(removal_default)
 
-        value *= noise_val
+        value *= dataset_noise.factor(dataset_key, year)
 
         results.append({
             'flow_name': flow_code,
@@ -1328,7 +1311,6 @@ def _add_treated_ww_discharge_mc(results, preloaded_data, current_params, datase
     df_hist = preloaded_data['avlop_utslipp_historical']
 
     # 1. Newer data: 2002 to 2024
-    noise_val = dataset_noise[dataset_key]
     data_sources = 'SSB table 05280'
     max_col = min(26, df_modern.shape[1])
     
@@ -1343,7 +1325,7 @@ def _add_treated_ww_discharge_mc(results, preloaded_data, current_params, datase
         raw_tonnage = float(raw_val)
             
         collected_years.add(year)
-        perturbed_tonnage = raw_tonnage*noise_val
+        perturbed_tonnage = raw_tonnage*dataset_noise.factor(dataset_key, year)
         value = perturbed_tonnage / 1000.0
         
         results.append({
@@ -1355,7 +1337,6 @@ def _add_treated_ww_discharge_mc(results, preloaded_data, current_params, datase
         })
         
     # 2. Historical data: 1997 to 2001
-    noise_val = dataset_noise['utslipp_avløp']
     value_1997 = None
     for r in range(1, 6):
         year_val = df_hist.iloc[r, 0]
@@ -1370,7 +1351,7 @@ def _add_treated_ww_discharge_mc(results, preloaded_data, current_params, datase
         collected_years.add(year)
         raw_tonnage = float(raw_val)
         
-        perturbed_tonnage = raw_tonnage*noise_val
+        perturbed_tonnage = raw_tonnage*dataset_noise.factor('utslipp_avløp', year)
         
         results.append({
             'flow_name': flow_code,

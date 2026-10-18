@@ -168,7 +168,6 @@ def _add_seeds_and_planting_material_mc(results, preloaded_data, current_params,
     seed_rootveg_N = seed_rootveg_prot / Jones
     
     key_dataset = 'Totalkalkylen'
-    noise_totalkalkylen = dataset_noise[key_dataset]
     
     year_values = {}
 
@@ -216,7 +215,7 @@ def _add_seeds_and_planting_material_mc(results, preloaded_data, current_params,
     for year, total_val in year_values.items():
         collected_years.add(year)
 
-        final_val = total_val * noise_totalkalkylen
+        final_val = total_val * dataset_noise.factor(key_dataset, year)
 
         results.append({
             'flow_name': flow_code,
@@ -241,8 +240,6 @@ def _add_farm_animal_feed_mc(results, preloaded_data, current_params, dataset_no
     # (2000 onward) and the domestic share from Jordbruksstatistikk 1994
     # Table 6.10 (1985-1994), which lists all soybean meal as imported.
     
-    noise_kraftfor = dataset_noise['Kraftforstatistikk']
-    noise_totalkalkylen = dataset_noise['Totalkalkylen']
     
     final_yearly_values = {}
 
@@ -265,7 +262,7 @@ def _add_farm_animal_feed_mc(results, preloaded_data, current_params, dataset_no
         val_prot = float(df_raw.iloc[r, 2])
         
         value_kt_N = (val_carb * N_content_carb + val_prot * N_content_prot) / 1000.0
-        value_kt_N_noisy = value_kt_N * noise_kraftfor
+        value_kt_N_noisy = value_kt_N * dataset_noise.factor('Kraftforstatistikk', year)
         
         if year in EXPECTED_YEARS:
             final_yearly_values[year] = {
@@ -309,7 +306,7 @@ def _add_farm_animal_feed_mc(results, preloaded_data, current_params, dataset_no
             dom_frac = float(current_params.get(param_key_dom_frac))
 
         value_kt_N_hist = value_tonn * 1e-3 * N_cont_before_2000 * dom_frac
-        value_kt_N_hist_noisy = value_kt_N_hist * noise_totalkalkylen
+        value_kt_N_hist_noisy = value_kt_N_hist * dataset_noise.factor('Totalkalkylen', year)
 
         if year in EXPECTED_YEARS and year not in final_yearly_values:
             final_yearly_values[year] = {
@@ -364,7 +361,6 @@ def _add_food_industry_wastewater_mc(results, preloaded_data, current_params, da
     
     target_years = {y for y in EXPECTED_YEARS if 1989 <= y <= 2023}
     key_støy = 'norskeutslipp'
-    noise_factor = float(dataset_noise[key_støy])
 
     n_by_year = _industry_n_to_water(preloaded_data, 'FP', connected=True)
 
@@ -372,7 +368,7 @@ def _add_food_industry_wastewater_mc(results, preloaded_data, current_params, da
         if year in target_years:
             collected_years.add(year)
             base_value = float(tonnes) / 1000.0  # t N -> kt N
-            value_noisy = base_value * noise_factor
+            value_noisy = base_value * dataset_noise.factor(key_støy, year)
 
             results.append({
                 'flow_name': flow_code,
@@ -409,12 +405,6 @@ def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise
     cat_intercept  = float(current_params.get('cat_number_trend_intercept'))
     Jones          = float(current_params.get('Jones_factor'))
     
-    noise_13695 = float(dataset_noise['13695'])
-    noise_10249 = float(dataset_noise['10249'])
-    noise_06376 = float(dataset_noise['06376'])
-    noise_pop = float(dataset_noise['06913'])
-    noise_trend = float(dataset_noise['trend interpolation'])
-    noise_food_waste = float(dataset_noise['Stensgard_2023'])
 
     # 'ssb_13695' <- 13695_20260916-120402.xlsx (data_loader.py DATA_MAP): SSB
     # table 13695, food/drink intake per person per day by nutrient content
@@ -450,10 +440,10 @@ def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise
         
         # g/day/person -> kt/year/person
         v_protein_pers = float(df_13695.iloc[6, col]) * 1e-9 * 365
-        pop = float(df_pop.loc[year, 'Befolkning 1. januar']) * noise_pop
+        pop = float(df_pop.loc[year, 'Befolkning 1. januar']) * dataset_noise.factor('06913', year)
         
         v_human_N = (v_protein_pers * pop) / Jones
-        total_N = (v_human_N * noise_13695) + pet_N_year(year)
+        total_N = (v_human_N * dataset_noise.factor('13695', year)) + pet_N_year(year)
         
         year_values[year] = {
             'value': total_N,
@@ -491,10 +481,10 @@ def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise
             if year < 1999:
                 continue
 
-        pop = float(df_pop.loc[year, 'Befolkning 1. januar']) * noise_pop
+        pop = float(df_pop.loc[year, 'Befolkning 1. januar']) * dataset_noise.factor('06913', year)
 
         v_human_N = v_N_pers * pop
-        total_N = (v_human_N * noise_10249) + pet_N_year(year)
+        total_N = (v_human_N * dataset_noise.factor('10249', year)) + pet_N_year(year)
         
         year_values[year] = {
             'value': total_N,
@@ -529,7 +519,7 @@ def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise
     # Assign each individual year to (or interpolate between) the interval(s)
     # covering it.
     for year in range(1984, 1999):
-        pop = float(df_pop.loc[year, 'Befolkning 1. januar']) * noise_pop
+        pop = float(df_pop.loc[year, 'Befolkning 1. januar']) * dataset_noise.factor('06913', year)
         comment = 'ok'
         
         idx_83_85 = next((k for k, v in intervall_mapping.items() if '1983-1985' in v), None)
@@ -553,7 +543,7 @@ def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise
             src = 'SSB'
             
         v_human_N = v_human_pers * pop
-        total_N = (v_human_N * noise_06376) + pet_N_year(year)
+        total_N = (v_human_N * dataset_noise.factor('06376', year)) + pet_N_year(year)
         
         year_values[year] = {
             'value': total_N,
@@ -574,7 +564,7 @@ def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise
     for year in gap_years:
         v_trend = m * year + b
         year_values[year] = {
-            'value': v_trend * noise_trend,
+            'value': v_trend * dataset_noise.factor('trend interpolation', year),
             'comment': 'ok',
             'data_sources': 'interpolated trendline'
         }
@@ -598,10 +588,10 @@ def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise
     percap_2015 = percap_2021 / (1 + food_waste_sectors['change_2015_2021'])
 
     for year in year_values:
-        pop = float(df_pop.loc[year, 'Befolkning 1. januar']) * noise_pop
+        pop = float(df_pop.loc[year, 'Befolkning 1. januar']) * dataset_noise.factor('06913', year)
         frac = min(1.0, max(0.0, (year - 2015) / (2021 - 2015)))
         food_waste_t_per_capita = (percap_2015 + frac * (percap_2021 - percap_2015)).sum()
-        year_values[year]['value'] += food_waste_t_per_capita * pop * food_waste_N_frac / 1000.0 * noise_food_waste
+        year_values[year]['value'] += food_waste_t_per_capita * pop * food_waste_N_frac / 1000.0 * dataset_noise.factor('Stensgard_2023', year)
 
     for year in sorted(year_values.keys()):
         if year in EXPECTED_YEARS:
@@ -626,7 +616,6 @@ def _add_fp_untreated_wastewater_mc(results, preloaded_data, current_params, dat
     target_years = {y for y in EXPECTED_YEARS if 1990 <= y <= 2023}
 
     key_støy = 'norskeutslipp'
-    noise_factor = float(dataset_noise[key_støy])
 
     n_by_year = _industry_n_to_water(preloaded_data, 'FP', connected=False)
 
@@ -636,7 +625,7 @@ def _add_fp_untreated_wastewater_mc(results, preloaded_data, current_params, dat
     for year, tonnes in n_by_year.items():
         if 1994 <= year <= 2023:
             base_value = float(tonnes) / 1000.0  # t N -> kt N
-            value_noisy = base_value * noise_factor
+            value_noisy = base_value * dataset_noise.factor(key_støy, year)
             found_values_94_23[year] = value_noisy
 
             if 1994 <= year <= 1998:
@@ -771,7 +760,6 @@ def _add_ag_mineral_fertilizer_mc(results, preloaded_data, current_params, datas
     # DATA_MAP, split by element): FAOSTAT fertilizer by nutrient, import and
     # export quantity
     data_trade = preloaded_data.get('fao_mineral_fertilizer')
-    noise_factor = float(dataset_noise['Fertilizer by nutrient'])
 
     available_use_years = set(data_use['Year'].unique())
     available_trade_years = set(data_trade['Year'].unique())
@@ -787,8 +775,8 @@ def _add_ag_mineral_fertilizer_mc(results, preloaded_data, current_params, datas
         raw_use_tonnes = float(n_amount_use['Value'].sum())
         raw_imp_tonnes = float(n_amount_imp['Value'].sum())
         
-        raw_use_perturbed = raw_use_tonnes * noise_factor
-        raw_imp_perturbed = raw_imp_tonnes * noise_factor
+        raw_use_perturbed = raw_use_tonnes * dataset_noise.factor('Fertilizer by nutrient', year)
+        raw_imp_perturbed = raw_imp_tonnes * dataset_noise.factor('Fertilizer by nutrient', year)
         
         value = (raw_use_perturbed - raw_imp_perturbed) / 1000.0 # tN -> ktN
                 
@@ -876,7 +864,6 @@ def _add_other_industry_wastewater_mc(results, preloaded_data, current_params, d
     target_years = {y for y in EXPECTED_YEARS if 1989 <= y <= 2023}
 
     key_støy = 'norskeutslipp'
-    noise_factor = float(dataset_noise[key_støy])
 
     n_by_year = _industry_n_to_water(preloaded_data, 'OP', connected=True)
 
@@ -884,7 +871,7 @@ def _add_other_industry_wastewater_mc(results, preloaded_data, current_params, d
         if year in target_years:
             collected_years.add(year)
             base_value = float(tonnes) / 1000.0  # t N -> kt N
-            value_noisy = base_value * noise_factor
+            value_noisy = base_value * dataset_noise.factor(key_støy, year)
 
             results.append({
                 'flow_name': flow_code,
@@ -920,7 +907,6 @@ def _add_hs_mineral_fertilizer_mc(results, preloaded_data, current_params, datas
     nonag_over_ag = nonag_share / ag_share
 
     key_støy = 'Fertilizer by nutrient'
-    noise_factor = float(dataset_noise[key_støy])
 
     # 'faostat_fertilizer_use': see _add_ag_mineral_fertilizer_mc above.
     df_faostat = preloaded_data.get('faostat_fertilizer_use')
@@ -932,7 +918,7 @@ def _add_hs_mineral_fertilizer_mc(results, preloaded_data, current_params, datas
         collected_years.add(year)
         raw_value = float(n_amount_use['Value'].values[0])
         base_value = (raw_value / 1000.0) * nonag_over_ag
-        value_noisy = base_value * noise_factor
+        value_noisy = base_value * dataset_noise.factor(key_støy, year)
         
         results.append({
             'flow_name': flow_code,
@@ -952,9 +938,6 @@ def _add_fo_mineral_fertilizer_mc(results, preloaded_data, current_params, datas
     final_yearly_values = {}
     
     forest_fert_N_per_da = float(current_params.get("forest_fert_N_per_da"))        
-    noise_ssb = float(dataset_noise['05543'])
-    noise_trend = float(dataset_noise['trend interpolation'])
-    noise_hist = float(dataset_noise['skoggjødsling_historisk'])
 
     # 'ssb_05543_raw' <- 05543_20251217-111610.xlsx (data_loader.py DATA_MAP):
     # SSB table 05543, forest fertilization area by region and year
@@ -979,7 +962,7 @@ def _add_fo_mineral_fertilizer_mc(results, preloaded_data, current_params, datas
                 value_kt_N = (area_da * forest_fert_N_per_da) / 1e6
 
                 final_yearly_values[year] = {
-                    'value': value_kt_N * noise_ssb,
+                    'value': value_kt_N * dataset_noise.factor('05543', year),
                     'comment': 'ok',
                     'data_sources': 'SSB tabell 05543'
                 }
@@ -1007,7 +990,7 @@ def _add_fo_mineral_fertilizer_mc(results, preloaded_data, current_params, datas
                 value_kt_N_hist = (area_unit * forest_fert_N_per_da) / 1e2
                 
                 final_yearly_values[year] = {
-                    'value': value_kt_N_hist * noise_hist,
+                    'value': value_kt_N_hist * dataset_noise.factor('skoggjødsling_historisk', year),
                     'comment': 'ok',
                     'data_sources': 'Skoggjødsling før 1995'
                 }
@@ -1030,7 +1013,7 @@ def _add_fo_mineral_fertilizer_mc(results, preloaded_data, current_params, datas
                     v_interp = v0 + (v1 - v0) * (gap_year - y0) / (y1 - y0)
                     
                     final_yearly_values[gap_year] = {
-                        'value': v_interp * noise_trend,
+                        'value': v_interp * dataset_noise.factor('trend interpolation', year),
                         'comment': 'ok',
                         'data_sources': f'Interpolert mellom {y0} og {y1}'
                     }
@@ -1125,7 +1108,6 @@ def _add_op_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
 
     conv_N2O = float(current_params.get("N2O_to_N_factor"))
     key_n2o = 'UNFCCC_N2O_industry'
-    noise_val = dataset_noise[key_n2o]
 
     # 'n2o_nox_op_raw' <- UNFCCC CRT Table2(I) (data_loader.py's crt_n2o_op
     # method, reading directly from the NOR-CRT-2026-... folder): N2O
@@ -1147,7 +1129,7 @@ def _add_op_N2O_emissions_mc(results, preloaded_data, current_params, dataset_no
 
         # Convert N2O mass to N mass via the stoichiometric molar-mass factor.
         base_value = float(n2o_val) * conv_N2O
-        value = base_value * noise_val
+        value = base_value * dataset_noise.factor(key_n2o, year)
 
         results.append({
             'flow_name': flow_code, 
@@ -1170,7 +1152,6 @@ def _add_op_untreated_wastewater_mc(results, preloaded_data, current_params, dat
     # Includes the fertilizer industry's facilities; _add_consumer_goods_mc
     # leaves their share out of the MP.OP mass balance.
     key_støy = 'norskeutslipp'
-    noise_factor = float(dataset_noise[key_støy])
 
     n_by_year = _industry_n_to_water(preloaded_data, 'OP', connected=False)
 
@@ -1178,7 +1159,7 @@ def _add_op_untreated_wastewater_mc(results, preloaded_data, current_params, dat
         if year in target_years:
             collected_years.add(year)
             base_value = float(tonnes) / 1000.0  # t N -> kt N
-            value_noisy = base_value * noise_factor
+            value_noisy = base_value * dataset_noise.factor(key_støy, year)
 
             results.append({
                 'flow_name': flow_code,
@@ -1209,7 +1190,6 @@ def _add_mineral_fertilizer_export_mc(results, preloaded_data, current_params, d
     data_sources = 'FAOSTAT Fertilizer by Nutrient'
 
     key_gjødsel = 'Fertilizer by nutrient'
-    noise_val = dataset_noise[key_gjødsel]
 
     # 'fao_mineral_fertilizer': see _add_ag_mineral_fertilizer_mc above.
     df_faostat = preloaded_data.get('fao_mineral_fertilizer')
@@ -1230,7 +1210,7 @@ def _add_mineral_fertilizer_export_mc(results, preloaded_data, current_params, d
         if year in fao_dict:
             collected_years.add(year)
             base_value = fao_dict[year] / 1000.0 # tN -> ktN
-            value = base_value * noise_val
+            value = base_value * dataset_noise.factor(key_gjødsel, year)
             results.append({
                 'flow_name': flow_code,
                 'year': year,
@@ -1286,7 +1266,6 @@ def _get_excluded_fertilizer_chemicals_by_year(preloaded_data, current_trade_fac
     these commodities.
     """
     df_vol = preloaded_data['compressed_trade_volume']
-    noise_val = dataset_noise['08801']
     impeks_target = ['1', '1.0'] if is_import else ['2', '2.0']
     mask = (df_vol['konv'].astype(str).str.strip().isin(_CONSUMER_GOODS_EXCLUDED_KONV)) & \
            (df_vol['impeks'].astype(str).str.strip().isin(impeks_target))
@@ -1296,7 +1275,7 @@ def _get_excluded_fertilizer_chemicals_by_year(preloaded_data, current_trade_fac
     result = {}
     for yr_raw, amt, vf in zip(df_filtered['year'].values, df_filtered['amount'].values, v_factors.values):
         yr = int(float(yr_raw))
-        result[yr] = result.get(yr, 0.0) + amt * noise_val * vf / 1e6
+        result[yr] = result.get(yr, 0.0) + amt * dataset_noise.factor('08801', yr) * vf / 1e6
     return result
 
 
@@ -1455,7 +1434,8 @@ def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trad
     # MP.OP-HY.SW-Untreated wastewater-Nmix outflow (2024 uses the 2023
     # value, as the flow itself does).
     fertilizer_wastewater = _industry_n_to_water(preloaded_data, 'OP', connected=False, fertilizer_industry=True)
-    fertilizer_wastewater = fertilizer_wastewater / 1000.0 * float(dataset_noise['norskeutslipp'])  # t N -> kt N
+    wastewater_noise = pd.Series({y: dataset_noise.factor('norskeutslipp', y) for y in fertilizer_wastewater.index})
+    fertilizer_wastewater = fertilizer_wastewater / 1000.0 * wastewater_noise  # t N -> kt N
     fertilizer_wastewater[2024] = fertilizer_wastewater[2023]
 
     # Each of these must already be in `results` - i.e. its _add_*_mc function
