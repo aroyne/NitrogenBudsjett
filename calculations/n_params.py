@@ -14,6 +14,7 @@ class NParameters:
     def __init__(self, filename="N_parameters.xlsx"):
         # Stored for later use by get_table/get_trade_params/get_trade_mapping.
         self.filename = filename
+        self._table_cache = {}
 
         self.global_params = {}
         df = pd.read_excel(filename, sheet_name='global_parameters')
@@ -48,9 +49,13 @@ class NParameters:
     def get_table(self, sheet_name):
         """
         Return a pandas DataFrame for the given sheet in N_parameters.xlsx.
-        Assumes the first row is the header.
+        Assumes the first row is the header. Each sheet is read from disk once
+        and a copy is returned, so callers can modify it freely and the file
+        is not reopened in every MC iteration.
         """
-        return pd.read_excel(self.filename, sheet_name=sheet_name)
+        if sheet_name not in self._table_cache:
+            self._table_cache[sheet_name] = pd.read_excel(self.filename, sheet_name=sheet_name)
+        return self._table_cache[sheet_name].copy()
 
     def get_trade_params(self):
         df = pd.read_excel(self.filename, sheet_name='trade_parameters')

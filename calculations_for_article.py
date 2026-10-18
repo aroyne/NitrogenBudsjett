@@ -1061,17 +1061,18 @@ def household_waste_sector_shares(n_draws=1000, seed=MC_RESAMPLE_SEED, periods=H
     """Sector shares (%) of household waste N summed over each period: the
     value with median N fractions, and the 2.5/50/97.5 percentiles over
     n_draws draws of the waste N fractions (waste_fractions sheet, same
-    perturbation as main_mc.generate_mc_parameters_fast). The periods
-    bracket the switch from table 05282 to 10514 in 2012."""
-    from main_mc import _draw_perturbed_value
+    perturbation as main_mc via mc_sampler). The periods bracket the switch
+    from table 05282 to 10514 in 2012."""
+    from mc_sampler import draw_values, item_rng
     wf = pd.read_excel('parameters/N_parameters.xlsx', sheet_name='waste_fractions')
     wf = wf.set_index('waste_category')
     base_share = _period_share(household_waste_by_sector(wf['N_frac'].to_dict()), periods)
-    np.random.seed(seed)
-    draws = []
-    for _ in range(n_draws):
-        waste_N = {cat: _draw_perturbed_value(r.N_frac, r.lower_bound, r.upper_bound, r.uncertainty_type, r.distribution_type)
+    waste_draws = {cat: draw_values(item_rng(seed, 'waste_fractions', cat), n_draws, r.N_frac,
+                                    r.lower_bound, r.upper_bound, r.uncertainty_type, r.distribution_type)
                    for cat, r in wf.iterrows()}
+    draws = []
+    for k in range(n_draws):
+        waste_N = {cat: arr[k] for cat, arr in waste_draws.items()}
         draws.append(_period_share(household_waste_by_sector(waste_N), periods))
     stacked = pd.concat(draws, keys=range(n_draws))
     q = stacked.groupby(level=1).quantile([0.025, 0.5, 0.975]).unstack()
