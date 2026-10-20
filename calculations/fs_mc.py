@@ -56,7 +56,7 @@ def _add_utmark_grazing_emissions_mc(results, preloaded_data, current_params, da
         grazing = load_crltap_emissions_to_N(
             raw_lines=raw_lines, categories=['3Da3'], pollutant=pollutant,
             conv_to_N=float(current_params.get(f"{pollutant}_to_N_factor")),
-            dataset_noise=dataset_noise, noise_key='CRLTAP'
+            dataset_noise=dataset_noise
         )
         for year, value in grazing.items():
             if year not in EXPECTED_YEARS:

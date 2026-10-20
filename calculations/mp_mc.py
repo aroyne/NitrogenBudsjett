@@ -1047,8 +1047,7 @@ def _add_op_NH3_emissions_mc(results, preloaded_data, current_params, dataset_no
         categories=MP_OP_CRLTAP_SECTORS,
         pollutant='NH3',
         conv_to_N=conv,
-        dataset_noise=dataset_noise,
-        noise_key='CRLTAP'
+        dataset_noise=dataset_noise
     )
 
     for year, value in sums.items():
@@ -1080,8 +1079,7 @@ def _add_op_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
         categories=MP_OP_CRLTAP_SECTORS,
         pollutant='NOx',
         conv_to_N=conv,
-        dataset_noise=dataset_noise,
-        noise_key='CRLTAP'
+        dataset_noise=dataset_noise
     )
 
     for year, value in sums.items():

@@ -207,12 +207,14 @@ def read_year_value_row(sheet,
     return year_values
 
 
-def load_crltap_emissions_to_N(raw_lines, categories, pollutant, conv_to_N, dataset_noise, noise_key='CRLTAP', skiprows=4, sep=';'):
+def load_crltap_emissions_to_N(raw_lines, categories, pollutant, conv_to_N, dataset_noise, skiprows=4, sep=';'):
     """
     Sums CRLTAP Inventory Submissions emissions (webdabData*.txt, format
     ISO2;YEAR;SECTOR;POLLUTANT;UNIT;NUMBER) over the given NFR sector codes
     and pollutant, and converts the result to N. Used across ag_mc.py,
-    ef_mc.py, mp_mc.py and pr_mc.py for CRLTAP-derived NH3/NOx flows.
+    ef_mc.py, fs_mc.py, mp_mc.py and pr_mc.py for CRLTAP-derived NH3/NOx
+    flows. Each category is multiplied by its own uncertainty factor
+    ('CRLTAP:<code>:<pollutant>', sheet crltap_uncertainties) before summing.
     """
     valid_lines = raw_lines[skiprows:] if len(raw_lines) > skiprows else []
     yearly_raw_sums = {}
@@ -240,16 +242,12 @@ def load_crltap_emissions_to_N(raw_lines, categories, pollutant, conv_to_N, data
                 val_str = parts[5].strip()
                 raw_val = float(val_str) if (val_str and val_str != '-') else 0.0
 
-                yearly_raw_sums[year] = yearly_raw_sums.get(year, 0.0) + raw_val
+                noise_val = dataset_noise.factor(f'CRLTAP:{cat_val}:{pollutant}', year)
+                yearly_raw_sums[year] = yearly_raw_sums.get(year, 0.0) + raw_val * noise_val
         except (ValueError, IndexError):
             continue
 
-    final_sums = {}
-    for year, raw_sum in yearly_raw_sums.items():
-        base_value = raw_sum * conv_to_N
-        final_sums[year] = base_value * dataset_noise.factor(noise_key, year)
-
-    return final_sums
+    return {year: raw_sum * conv_to_N for year, raw_sum in yearly_raw_sums.items()}
 
 def read_trade_data(trade_file):
     """Reads SSB table 08801 raw foreign trade statistics (year, direction,

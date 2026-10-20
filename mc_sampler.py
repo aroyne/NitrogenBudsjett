@@ -220,8 +220,8 @@ class MCSampler:
     Holds the drawn values for all MC inputs of one run.
 
     self.draws maps group -> {key: (nsim,) array}. Groups: the sheet names in
-    STANDARD_SHEETS, 'dataset_uncertainties', 'trade_parameters',
-    'animal_products' and 'protein_food_items'.
+    STANDARD_SHEETS, 'dataset_uncertainties', 'crltap_uncertainties',
+    'trade_parameters', 'animal_products' and 'protein_food_items'.
     """
 
     def __init__(self, base_params, trade_params, nsim, seed=DEFAULT_SEED):
@@ -248,6 +248,27 @@ class MCSampler:
         _check_unique(group, ids)
         for item_id, (_, row) in zip(ids, df.iterrows()):
             add(group, item_id, 1.0, _draw_row(seed, group, item_id, n_random, 1.0, row))
+
+        # CLRTAP inventory: one factor per (noise_group, pollutant), from the
+        # per-category uncertainties in Norway's IIR (Table C6). Categories
+        # computed with the same emission model share a noise_group and
+        # therefore one factor; all other categories are independent, as in
+        # the IIR's own uncertainty analysis. Each NFR code gets the key
+        # 'CRLTAP:<nfr_code>:<pollutant>' in dataset_noise.
+        group = 'crltap_uncertainties'
+        df = base_params.get_table(group)
+        self.crltap_keys = {}
+        for (noise_group, pollutant), rows in df.groupby(['noise_group', 'pollutant'], sort=False):
+            bound_cols = ['lower_bound', 'upper_bound', 'uncertainty_type', 'distribution_type']
+            if len(rows[bound_cols].astype(str).drop_duplicates()) > 1:
+                raise ValueError(f"{group}: ulike grenser innen gruppe {noise_group} / {pollutant}")
+            item_id = f"{noise_group}:{pollutant}"
+            row = rows.iloc[0]
+            add(group, item_id, 1.0, _draw_row(seed, group, item_id, n_random, 1.0, row))
+            for code in rows['nfr_code'].astype(str).str.strip():
+                self.crltap_keys[f"CRLTAP:{code}:{pollutant}"] = item_id
+        if len(self.crltap_keys) != len(df):
+            raise ValueError(f"{group}: duplikat (nfr_code, pollutant)")
 
         # Trade N fractions (NParameters.get_trade_params, indexed by param_id).
         group = 'trade_parameters'
@@ -288,7 +309,10 @@ class MCSampler:
         for group in [g for g, *_ in STANDARD_SHEETS] + ['animal_products', 'protein_food_items']:
             for key, arr in self.draws[group].items():
                 param_overrides[key] = float(arr[i])
-        dataset_noise = DatasetNoise({k: float(a[i]) for k, a in self.draws['dataset_uncertainties'].items()})
+        noise = {k: float(a[i]) for k, a in self.draws['dataset_uncertainties'].items()}
+        crltap = self.draws['crltap_uncertainties']
+        noise.update({k: float(crltap[item_id][i]) for k, item_id in self.crltap_keys.items()})
+        dataset_noise = DatasetNoise(noise)
         trade_factors = {k: float(a[i]) for k, a in self.draws['trade_parameters'].items()}
         return param_overrides, dataset_noise, trade_factors
 

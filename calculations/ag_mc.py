@@ -336,13 +336,12 @@ def _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset
         categories=sectors,
         pollutant=pollutant,
         conv_to_N=conv,
-        dataset_noise=dataset_noise,
-        noise_key='CRLTAP'
+        dataset_noise=dataset_noise
     )
     if utmark_losses is not None:
         grazing = load_crltap_emissions_to_N(
             raw_lines=raw_lines, categories=['3Da3'], pollutant=pollutant,
-            conv_to_N=conv, dataset_noise=dataset_noise, noise_key='CRLTAP'
+            conv_to_N=conv, dataset_noise=dataset_noise
         )
         for year in sums:
             sums[year] -= grazing.get(year, 0.0) * utmark_losses[year]['utmark_frac']
