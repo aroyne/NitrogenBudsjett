@@ -26,7 +26,7 @@ nav_order: 4
 
 - The TEOTIL2 natural diffuse loss is bias-corrected to TEOTIL3 by multiplying with the ratio between the TEOTIL3 and TEOTIL2 means over the years both models cover (2013–2022). This is the method NIVA uses to extend TEOTIL3 back to 1990 in the annual reports Sample (2025)<!--cite:sample_kildefordelte_2025-->, but applied here to the categories the model uses, and without the published 1990–1995 values; here the TEOTIL2 natural diffuse loss is compared with TEOTIL3 wood + upland, which gives a factor of 1.02.
 - Forest is assigned a fraction 0.59 of the scaled value, which is the share of wood in wood + upland in TEOTIL3 over 2013–2023 (0.56–0.60). The other land flow (**FS.OL-HY.SW-Leaching-Nmix**) gets the remaining 0.41.
-- TEOTIL3 has not been updated for 2024 at the time of writing; the 2024 value is a flat carry-forward of 2023, with additional uncertainty (±50%) applied to reflect that it is not a real, independently observed value.
+- TEOTIL3 has not been updated for 2024 at the time of writing; the 2024 value is a flat carry-forward of 2023, with additional uncertainty (±15 %) applied to reflect that it is not a real, independently observed value.
 
 #### Interpretations and comparisons
 

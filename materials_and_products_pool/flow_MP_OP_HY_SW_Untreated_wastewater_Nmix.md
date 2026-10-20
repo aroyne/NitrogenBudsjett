@@ -28,7 +28,7 @@ nav_order: 9
 - Each facility is assigned manually to FP or OP (industry_categories.xlsx), based on the information given in the statistic.
 - A year missing inside a facility's reporting period is filled by linear interpolation between its neighbouring reported years.
 - Facilities that are not connected to the municipal network, or whose connection is unknown, are counted in this flow.
-- Miljødirektoratet's data has not been updated for 2024 at the time of writing; the 2024 value is a flat carry-forward of 2023, with additional uncertainty (±50%) applied to reflect that it is not a real, independently observed value.
+- Miljødirektoratet's data has not been updated for 2024 at the time of writing; the 2024 value is a flat carry-forward of 2023, with additional uncertainty (±15 %) applied to reflect that it is not a real, independently observed value.
 
 #### Interpretations and comparisons
 

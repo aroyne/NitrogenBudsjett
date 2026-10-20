@@ -23,7 +23,7 @@ nav_order: 2
 
 - All N retained in surface water is assumed lost to denitrification, with 1% as N2O (lognormal, 95% interval 0.05–20%) and the rest as N2.
 - For years prior to 2013, retention is calculated from **HY.SW-HY.CW-Inflow to coastal waters-Nmix** with the TEOTIL3 ratio between retention and diffuse inputs to the coast, as for the N2 flow; for those years the inflow is based on bias-corrected TEOTIL2 results (see that flow).
-- TEOTIL3 has not been updated for 2024 at the time of writing; the 2024 value is a flat carry-forward of 2023, with additional uncertainty (±50%) applied to reflect that it is not a real, independently observed value.
+- TEOTIL3 has not been updated for 2024 at the time of writing; the 2024 value is a flat carry-forward of 2023, with additional uncertainty (±15 %) applied to reflect that it is not a real, independently observed value.
 
 #### Interpretations and comparisons
 

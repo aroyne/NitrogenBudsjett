@@ -6,6 +6,7 @@ from calculations.utils import (
     EXPECTED_YEARS,
     read_year_value_row,
     report_missing_years,
+    fill_noise,
     load_crltap_emissions_to_N,
 )
 from calculations.shared_flow_calculations import (
@@ -52,7 +53,7 @@ def execute_calculations_ag(preloaded_data, current_params, dataset_noise, curre
     # Grazing manure on utmark (unmanaged land) and its losses; the
     # inventory counts all grazing manure as input to managed soils, so the
     # utmark losses are removed from the AG.SM flows (see utmark_grazing).
-    utmark_losses = utmark_grazing(preloaded_data, current_params)
+    utmark_losses = utmark_grazing(preloaded_data, current_params, dataset_noise)
     _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.SM-AT.AT-Emissions-NH3', AG_SM_CRLTAP_SECTORS, 'NH3', utmark_losses)
     _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.SM-AT.AT-Emissions-NOx', AG_SM_CRLTAP_SECTORS, 'NOx', utmark_losses)
     _add_ag_n2o_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.SM-AT.AT-Emissions-N2O', 2, 'UNFCCC_N2O_agri_soils', utmark_losses)
@@ -127,9 +128,14 @@ def _add_food_crop_products_flow_mc(results, preloaded_data, current_params, dat
             w = (year - before) / (after[0] - before)
             n_per_t = n_per_harvest[before] + w * (n_per_harvest[after[0]] - n_per_harvest[before])
             other = other_crops[before] + w * (other_crops[after[0]] - other_crops[before])
+            fill = dataset_noise.fill('interpolation', f'{flow_code}:{before}-{after[0]}', year, [before, after[0]])
         else:
             n_per_t, other = n_per_harvest[before], other_crops[before]
-        value = (n_per_t * cereal_harvest[year] * dataset_noise.factor('07479', year) + other) * dataset_noise.factor('Gross nutrient balance', year)
+            fill = dataset_noise.fill('carry', f'{flow_code}:{before}+', year, [before])
+        # The fill uncertainty covers the interpolated N per tonne and other
+        # crops; the cereal harvest itself is reported.
+        value = ((n_per_t * cereal_harvest[year] * dataset_noise.factor('07479', year) + other) * fill
+                 * dataset_noise.factor('Gross nutrient balance', year))
         collected_years.add(year)
         results.append({
             'flow_name': flow_code,
@@ -688,11 +694,14 @@ def _add_N2_emissions_soil_management_mc(results, preloaded_data, current_params
 
     rate_kg_per_ha = float(current_params.get("denitrification_AG_N2_per_ha"))
     area_daa = preloaded_data['ssb_agri_area_05982']['jordbruksareal_i_drift_daa']
+    known_years = list(area_daa.index)
     area_daa = area_daa.reindex(range(area_daa.index.min(), area_daa.index.max() + 1)).interpolate()
 
     for year in sorted(EXPECTED_YEARS):
         collected_years.add(year)
         area_ha = area_daa[year] / 10.0  # daa -> ha
+        if year not in known_years:
+            area_ha *= fill_noise(dataset_noise, flow_code, year, known_years)
         results.append({
             'flow_name': flow_code,
             'year': year,

@@ -12,6 +12,7 @@ import numpy as np
 from calculations.utils import (
     EXPECTED_YEARS,
     report_missing_years,
+    fill_noise,
     process_generic_trade_flow,
     load_crltap_emissions_to_N,
     add_flat_carryforward_year,
@@ -110,8 +111,17 @@ def _industry_n_to_water(preloaded_data, category, connected, dataset_noise, fer
     ]
     per_facility = selected.pivot_table(index='År', columns='AnleggNavn', values='Mengde', aggfunc='sum')
     per_facility = per_facility.reindex(range(per_facility.index.min(), per_facility.index.max() + 1))
+    reported = per_facility.notna()
     per_facility = per_facility.interpolate(limit_area='inside')
-    noise = pd.DataFrame({name: [dataset_noise.factor('norskeutslipp', year, sub=name) for year in per_facility.index]
+
+    def facility_noise(name, year):
+        factor = dataset_noise.factor('norskeutslipp', year, sub=name)
+        if not reported.loc[year, name] and pd.notna(per_facility.loc[year, name]):
+            known = list(reported.index[reported[name]])
+            factor *= fill_noise(dataset_noise, f'norskeutslipp:{name}', year, known)
+        return factor
+
+    noise = pd.DataFrame({name: [facility_noise(name, year) for year in per_facility.index]
                           for name in per_facility.columns}, index=per_facility.index)
     return (per_facility * noise).sum(axis=1, min_count=1).dropna()
 
@@ -534,14 +544,16 @@ def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise
             v_human_pers = total_N_pers_06376[idx_83_85]
             src = 'SSB'
         elif year < 1989:
-            v_human_pers = (total_N_pers_06376[idx_83_85] + total_N_pers_06376[idx_89_91]) / 2.0
-            src = 'interpolated'
+            v_human_pers = ((total_N_pers_06376[idx_83_85] + total_N_pers_06376[idx_89_91]) / 2.0
+                            * dataset_noise.fill('interpolation', f'{flow_code}:1985-1989', year, [1985, 1989]))
+            src = 'mean of the 1983-1985 and 1989-1991 surveys'
         elif year < 1992:
             v_human_pers = total_N_pers_06376[idx_89_91]
             src = 'SSB'
         elif year < 1996:
-            v_human_pers = (total_N_pers_06376[idx_89_91] + total_N_pers_06376[idx_96_98]) / 2.0
-            src = 'interpolated'
+            v_human_pers = ((total_N_pers_06376[idx_89_91] + total_N_pers_06376[idx_96_98]) / 2.0
+                            * dataset_noise.fill('interpolation', f'{flow_code}:1991-1996', year, [1991, 1996]))
+            src = 'mean of the 1989-1991 and 1996-1998 surveys'
         else:
             v_human_pers = total_N_pers_06376[idx_96_98]
             src = 'SSB'
@@ -568,9 +580,9 @@ def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise
     for year in gap_years:
         v_trend = m * year + b
         year_values[year] = {
-            'value': v_trend * dataset_noise.factor('trend interpolation', year),
+            'value': v_trend * fill_noise(dataset_noise, flow_code, year, valid_years),
             'comment': 'ok',
-            'data_sources': 'interpolated trendline'
+            'data_sources': 'linear trend across the survey years'
         }
 
     # Food wasted downstream of the food industry, before it reaches
@@ -1015,7 +1027,7 @@ def _add_fo_mineral_fertilizer_mc(results, preloaded_data, current_params, datas
                     v_interp = v0 + (v1 - v0) * (gap_year - y0) / (y1 - y0)
                     
                     final_yearly_values[gap_year] = {
-                        'value': v_interp * dataset_noise.factor('trend interpolation', year),
+                        'value': v_interp * dataset_noise.fill('interpolation', f'{flow_code}:{y0}-{y1}', gap_year, [y0, y1]),
                         'comment': 'ok',
                         'data_sources': f'Interpolert mellom {y0} og {y1}'
                     }

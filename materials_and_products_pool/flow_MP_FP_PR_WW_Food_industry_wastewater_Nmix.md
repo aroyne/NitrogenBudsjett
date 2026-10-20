@@ -25,7 +25,7 @@ nav_order: 7
 - Each facility is assigned manually to FP or OP (industry_categories.xlsx), based on the information given in the statistic.
 - A year missing inside a facility's reporting period is filled by linear interpolation between its neighbouring reported years.
 - The 2022 report from Biomar's feed factory at Myre (574 t N, against 0.065 t in 2023 and 3.9 t in 2024) is left out as a reporting error, most likely kg reported as tonnes.
-- Miljødirektoratet's data has not been updated for 2024 at the time of writing; the 2024 value is a flat carry-forward of 2023, with additional uncertainty (±50%) applied to reflect that it is not a real, independently observed value.
+- Miljødirektoratet's data has not been updated for 2024 at the time of writing; the 2024 value is a flat carry-forward of 2023, with additional uncertainty (±15 %) applied to reflect that it is not a real, independently observed value.
 
 #### Interpretations and comparisons
 

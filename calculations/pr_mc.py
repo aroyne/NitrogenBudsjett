@@ -183,7 +183,9 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
             r_iloc += 1
             
         raw_val = waste * inc_frac * calibration
-        value = raw_val*dataset_noise.factor(dataset_key_hist, year)*dataset_noise.factor('trend interpolation', year)
+        # The fill uncertainty of the 1990-1994 waste amounts is already in
+        # household_waste and industry_waste.
+        value = raw_val * dataset_noise.factor(dataset_key_hist, year)
 
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
@@ -272,7 +274,7 @@ def _biologically_treated_N(preloaded_data, current_params, dataset_noise):
         N_out[year] = (n_in(2) * (1 - biogas_loss) + n_in(3) * (1 - compost_loss)) * dataset_noise.factor('10513', year)
 
     for year in range(1990, 2012):
-        N_out[year] = N_out[2012] * dataset_noise.factor('trend interpolation', year)
+        N_out[year] = N_out[2012] * dataset_noise.fill('carry', 'biologically treated waste:2012', year, [2012])
 
     df_12818 = preloaded_data['ssb_waste_12818']
     shares = {}
@@ -402,7 +404,8 @@ def _add_wastewater_from_landfills_mc(results, preloaded_data, current_params, d
     final_values = {}
     
     for year in range(1990, 2011):
-        final_values[year] = mean_connected_kt * landfill_ch4[year] / ch4_ref
+        final_values[year] = (mean_connected_kt * landfill_ch4[year] / ch4_ref
+                              * dataset_noise.fill('extrapolation', 'landfill N:CH4 index', year, [2011]))
 
     for year in range(2011, 2026):
         final_values[year] = real_years_data.get(year)
@@ -495,7 +498,8 @@ def _add_so_leaching_mc(results, preloaded_data, current_params, dataset_noise):
     final_values = {}
     
     for year in range(1990, 2011):
-        final_values[year] = mean_unconnected_kt * landfill_ch4[year] / ch4_ref
+        final_values[year] = (mean_unconnected_kt * landfill_ch4[year] / ch4_ref
+                              * dataset_noise.fill('extrapolation', 'landfill N:CH4 index', year, [2011]))
 
     for year in range(2011, 2026):
         final_values[year] = real_years_data.get(year, 0.0)
@@ -861,13 +865,13 @@ def _add_ag_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
     values_93_95 = [res['value'] for res in results if res['flow_name'] == flow_code and res['year'] in [1993, 1994, 1995]]
     mean_val = sum(values_93_95) / 3 if values_93_95 else 0.0
     
-    data_sources_ext = 'extrapolated'
+    data_sources_ext = 'mean of 1993-1995'
     for year in range(1990, 1993):  
         collected_years.add(year)
         results.append({
             'flow_name': flow_code,
             'year': year,
-            'value': mean_val, 
+            'value': mean_val * dataset_noise.fill('carry', 'sewage sludge:1993-1995', year, [1993]), 
             'comment': 'ok',
             'data_sources': data_sources_ext
         })    
@@ -951,13 +955,13 @@ def _add_hs_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
     values_93_95 = [res['value'] for res in results if res['flow_name'] == flow_code and res['year'] in [1993, 1994, 1995]]
     mean_val = sum(values_93_95) / 3 if values_93_95 else 0.0
     
-    data_sources_ext = 'extrapolated'
+    data_sources_ext = 'mean of 1993-1995'
     for year in range(1990, 1993):  
         collected_years.add(year)
         results.append({
             'flow_name': flow_code,
             'year': year,
-            'value': mean_val, 
+            'value': mean_val * dataset_noise.fill('carry', 'sewage sludge:1993-1995', year, [1993]), 
             'comment': 'ok',
             'data_sources': data_sources_ext
         })    
@@ -1123,13 +1127,13 @@ def _add_sewage_sludge_landfill_mc(results, preloaded_data, current_params, data
     values_93_95 = [res['value'] for res in results if res['flow_name'] == flow_code and res['year'] in [1993, 1994, 1995]]
     mean_val = sum(values_93_95) / 3 if values_93_95 else 0.0
     
-    data_sources_ext = 'extrapolated'
+    data_sources_ext = 'mean of 1993-1995'
     for year in range(1990, 1993):  
         collected_years.add(year)
         results.append({
             'flow_name': flow_code,
             'year': year,
-            'value': mean_val, 
+            'value': mean_val * dataset_noise.fill('carry', 'sewage sludge:1993-1995', year, [1993]), 
             'comment': 'ok',
             'data_sources': data_sources_ext
         })    
@@ -1363,13 +1367,13 @@ def _add_treated_ww_discharge_mc(results, preloaded_data, current_params, datase
             value_1997 = perturbed_tonnage
 
     # 3. Extrapolate backward: 1990 to 1996 (constant, based on the perturbed 1997 value)
-    data_sources_ext = 'extrapolated'
+    data_sources_ext = 'held at the 1997 value'
     for year in range(1990, 1997):  
         collected_years.add(year)
         results.append({
             'flow_name': flow_code,
             'year': year,
-            'value': value_1997, 
+            'value': value_1997 * dataset_noise.fill('carry', 'treated wastewater:1997', year, [1997]), 
             'comment': 'ok',
             'data_sources': data_sources_ext
         })    

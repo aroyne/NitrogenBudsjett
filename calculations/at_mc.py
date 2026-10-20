@@ -8,6 +8,7 @@ import pandas as pd
 from calculations.utils import (
     EXPECTED_YEARS,
     report_missing_years,
+    fill_noise,
     process_generic_trade_flow,
     floor_residual_at_zero
 )
@@ -78,7 +79,6 @@ def _deposition_flow_mc(results, flow_code, class4, poll, preloaded_data, curren
     # land classes using the NIBIO AR5 map (see atmosphere_pool/flow_AT_AT_*_Deposition_*.md).
     data = preloaded_data.get('deposition_data')
     key_dep = 'Deposition'
-    key_interp = 'trend interpolation'
 
     mask_base = (data["pollutant"] == poll) & (data["class4"] == class4)
     df_subset = data[mask_base]
@@ -127,16 +127,15 @@ def _deposition_flow_mc(results, flow_code, class4, poll, preloaded_data, curren
             # consistently across all periods, whereas the assimilation methodology
             # for the two most recent periods differs somewhat between them.
             scale_key = 'deposition_scale_2017_OXN' if poll == 'NOx' else 'deposition_scale_2017_RDN'
-            value = value_2016 * float(current_params.get(scale_key))
+            value = (value_2016 * float(current_params.get(scale_key))
+                     * dataset_noise.fill('extrapolation', f'{flow_code}:2016+', year, [2016]))
             value_last = value
-            data_sources = 'NILU and geodata.no'
+            data_sources = 'NILU and geodata.no, 2016 scaled with Blake et al. (2023) trend'
             
         else:
-            # Last year is extrapolated flat forward from value_last
-            base_value = value_last
-            data_sources = 'extrapolated'
-            
-            value = base_value * dataset_noise.factor(key_interp, year)
+            # Held flat at the 2021 value
+            value = value_last * dataset_noise.fill('carry', f'{flow_code}:2021+', year, [2021])
+            data_sources = 'carried forward from 2021'
 
         results.append({
             'flow_name': flow_code,
@@ -355,7 +354,14 @@ def _add_atmospheric_outflow_mc(results, flow_code, value_col, df_atm, current_p
     collected_years = set()
     comment = 'ok'
 
-    for r in range(5, len(df_atm)):
+    # Years marked 'interpolated' in atm_in_out.xlsx (1984-1996: mean of
+    # 1997-2001; 2015: between 2014 and 2016) get the fill uncertainty on
+    # top of the EMEP factor.
+    rows = range(5, len(df_atm))
+    known_years = [int(df_atm.iloc[r, 0]) for r in rows
+                   if pd.notna(df_atm.iloc[r, 0]) and str(df_atm.iloc[r, 5]).strip() != 'interpolated']
+
+    for r in rows:
         year_val = df_atm.iloc[r, 0]
         if pd.isna(year_val):
             continue
@@ -363,16 +369,13 @@ def _add_atmospheric_outflow_mc(results, flow_code, value_col, df_atm, current_p
         year = int(year_val)
         collected_years.add(year)
 
-        status_val = str(df_atm.iloc[r, 5]).strip()
-        if status_val == 'interpolated':
-            dataset_key = 'trend interpolation'
-            data_sources = 'interpolated'
-        else:
-            dataset_key = 'Source-receptor'
-            data_sources = 'EMEP SR tables'
-
         base_value = float(df_atm.iloc[r, value_col]) / 10
-        value = base_value * dataset_noise.factor(dataset_key, year)
+        value = base_value * dataset_noise.factor('Source-receptor', year)
+        if str(df_atm.iloc[r, 5]).strip() == 'interpolated':
+            value *= fill_noise(dataset_noise, flow_code, year, known_years)
+            data_sources = 'filled from EMEP SR tables (see atm_in_out.xlsx)'
+        else:
+            data_sources = 'EMEP SR tables'
 
         results.append({
             'flow_name': flow_code,

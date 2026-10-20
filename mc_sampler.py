@@ -223,6 +223,24 @@ class DatasetNoise:
             return self._factors[key]
         return self._sampler.sub_factor(key, sub, self._i)
 
+    def fill(self, kind, fill_id, year, anchors):
+        """
+        Uncertainty factor for a year that is filled rather than taken from
+        data: 'interpolation' between known years, 'carry' (held flat at or
+        averaged from known years) or 'extrapolation' (an index, a ratio or
+        a calibration against a known year). `anchors` are the known years
+        the value is built from; the distance d to the nearest of them sets
+        the width (sheet fill_uncertainties). It comes in addition to the
+        data set's own factor.
+
+        One standard normal draw per `fill_id` (a flow and its filled
+        period), shared by all years of the period, so the error grows with
+        the distance from the known years and the filled period gets an
+        uncertain trend, not only an uncertain level.
+        """
+        d = min(abs(year - a) for a in anchors)
+        return self._sampler.fill_factor(kind, fill_id, d, self._i)
+
 
 class MCSampler:
     """
@@ -237,6 +255,8 @@ class MCSampler:
         self.nsim = nsim
         self.seed = seed
         self.draws = {}
+        fill = base_params.get_table('fill_uncertainties')
+        self._fill_params = {str(r['kind']).strip(): r for _, r in fill.iterrows()}
         n_random = nsim - 1
 
         def add(group, key, baseline, random_draws):
@@ -326,6 +346,26 @@ class MCSampler:
         dataset_noise = DatasetNoise(noise, self, i)
         trade_factors = {k: float(a[i]) for k, a in self.draws['trade_parameters'].items()}
         return param_overrides, dataset_noise, trade_factors
+
+    def fill_factor(self, kind, fill_id, d, i):
+        """
+        Factor exp(z * sigma(d)) for a filled year at distance d from the
+        nearest known year. u(d) = u0 + k*d (percent, capped where the sheet
+        gives a cap) is the upper 95% bound, so sigma(d) = ln(1 + u/100)/1.96
+        (lognormal around 1). z is one standard normal per fill_id and
+        iteration, drawn on first use from its own stream; z = 0 in row 0.
+        """
+        p = self._fill_params[kind]
+        u = float(p['u0_pct']) + float(p['k_pct_per_year']) * d
+        if pd.notna(p['cap_pct']):
+            u = min(u, float(p['cap_pct']))
+        group = 'fill_z'
+        items = self.draws.setdefault(group, {})
+        if fill_id not in items:
+            z = item_rng(self.seed, group, fill_id).standard_normal(self.nsim - 1)
+            items[fill_id] = np.concatenate(([0.0], z))
+        sigma = np.log(1.0 + u / 100.0) / 1.96
+        return float(np.exp(items[fill_id][i] * sigma))
 
     def sub_factor(self, key, sub, i):
         """

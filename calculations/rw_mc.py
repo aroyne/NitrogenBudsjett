@@ -10,6 +10,7 @@ import pandas as pd
 from calculations.utils import (
     EXPECTED_YEARS,
     report_missing_years,
+    fill_noise,
     process_generic_trade_flow
 )
 from calculations.shared_flow_calculations import find_aquaculture_production, get_aquafeed_budget, get_aquafeed_import_fraction
@@ -307,7 +308,14 @@ def _add_atmospheric_inflow_mc(results, flow_code, value_col, df_rw, current_par
     collected_years = set()
     comment = 'ok'
 
-    for r in range(5, len(df_rw)):
+    # Years marked 'interpolated' in atm_in_out.xlsx (1984-1996: mean of
+    # 1997-2001; 2015: between 2014 and 2016) get the fill uncertainty on
+    # top of the EMEP factor.
+    rows = range(5, len(df_rw))
+    known_years = [int(df_rw.iloc[r, 0]) for r in rows
+                   if pd.notna(df_rw.iloc[r, 0]) and str(df_rw.iloc[r, 5]).strip() != 'interpolated']
+
+    for r in rows:
         year_val = df_rw.iloc[r, 0]
         if pd.isna(year_val):
             continue
@@ -315,16 +323,13 @@ def _add_atmospheric_inflow_mc(results, flow_code, value_col, df_rw, current_par
         year = int(year_val)
         collected_years.add(year)
 
-        status_val = str(df_rw.iloc[r, 5]).strip()
-        if status_val == 'interpolated':
-            dataset_key = 'trend interpolation'
-            data_sources = 'interpolated'
-        else:
-            dataset_key = 'Source-receptor'
-            data_sources = 'EMEP SR tables'
-
         base_value = float(df_rw.iloc[r, value_col]) / 10
-        value = base_value * dataset_noise.factor(dataset_key, year)
+        value = base_value * dataset_noise.factor('Source-receptor', year)
+        if str(df_rw.iloc[r, 5]).strip() == 'interpolated':
+            value *= fill_noise(dataset_noise, flow_code, year, known_years)
+            data_sources = 'filled from EMEP SR tables (see atm_in_out.xlsx)'
+        else:
+            data_sources = 'EMEP SR tables'
 
         results.append({
             'flow_name': flow_code,

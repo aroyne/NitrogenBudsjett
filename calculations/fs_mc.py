@@ -45,7 +45,7 @@ def _add_utmark_grazing_emissions_mc(results, preloaded_data, current_params, da
     (shared_flow_calculations.py). Leaching from this manure is part of
     FS.OL-HY.SW-Leaching-Nmix (TEOTIL3 upland).
     """
-    utmark = utmark_grazing(preloaded_data, current_params)
+    utmark = utmark_grazing(preloaded_data, current_params, dataset_noise)
     # 'ag_crltap_raw_lines' <- webdabData1868031.txt (data_loader.py DATA_MAP):
     # CLRTAP inventory submissions
     raw_lines = preloaded_data['ag_crltap_raw_lines']
@@ -297,7 +297,12 @@ def _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise):
             n = {group: animals.loc[year, group] * dataset_noise.factor('12660', year) for group in fem_1996}
             src = data_sources
         else:
-            n = {group: animals.loc[first_year, group] * dataset_noise.factor('12660', year) for group in fem_1996}
+            # Fill ids shared with utmark_grazing for cattle, so the same
+            # cattle numbers are used for grazing and for manure on utmark.
+            fill = {'storfe': dataset_noise.fill('carry', 'utmark cattle', year, [first_year]),
+                    'geit_og_hest': dataset_noise.fill('carry', 'utmark goats and horses', year, [first_year]),
+                    'sauer': dataset_noise.fill('extrapolation', 'utmark sheep', year, [first_year])}
+            n = {group: animals.loc[first_year, group] * dataset_noise.factor('12660', year) * fill[group] for group in fem_1996}
             n['sauer'] *= sheep_index[year] / sheep_index[first_year]
             src = 'SSB table 12660, 1995 level; sheep scaled with SSB table 03710'
         fem = sum(n[group] * fem_per_animal[group] for group in fem_1996)

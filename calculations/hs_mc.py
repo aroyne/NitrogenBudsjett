@@ -185,13 +185,14 @@ def _add_overland_flow_urban_mc(results, preloaded_data, current_params, dataset
 
     # 1990-2012: TEOTIL2 urban, bias-corrected to the TEOTIL3 urban level
     # (see find_teotil2_bias_corrected). TEOTIL2 uses the same urban value in
-    # every year, so the series carries no information about the trend; the
-    # trend-interpolation noise reflects that.
+    # every year, so the series carries no information about the trend and
+    # is treated as held flat at the first TEOTIL3 year.
     teotil2 = find_teotil2_bias_corrected(preloaded_data)
     for year, raw_val in teotil2['urban'].items():
         year = int(year)
         collected_years.add(year)
-        value = raw_val * dataset_noise.factor(dataset_key, year) * dataset_noise.factor('trend interpolation', year)
+        value = (raw_val * dataset_noise.factor(dataset_key, year)
+                 * dataset_noise.fill('carry', f'{flow_code}:TEOTIL2', year, [2013]))
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
             'comment': 'ok', 'data_sources': 'NIVA TEOTIL2, bias-corrected to TEOTIL3'

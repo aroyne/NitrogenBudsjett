@@ -82,7 +82,7 @@ def find_recovered_lost_fish_N(df_losses, aquaculture_production, current_params
     ratio = np.mean([lost_N[y] / aquaculture_production[y] for y in range(2007, 2012)])
     for year, harvest_N in aquaculture_production.items():
         if year < 2007:
-            lost_N[year] = harvest_N * ratio * dataset_noise.factor('trend interpolation', year)
+            lost_N[year] = harvest_N * ratio * dataset_noise.fill('extrapolation', 'lost farmed fish:2007', year, [2007])
 
     return lost_N
 
@@ -107,11 +107,10 @@ def _get_apparent_aquafeed_retention(year, current_params):
     No separate interpolation noise is applied here (unlike most other
     linear interpolations in this codebase): both endpoints
     (aquafeed_N_retention_1990, aquafeed_N_retention) already carry their
-    own literature-based PERT uncertainty, and this value is used as a
-    divisor downstream (harvested N / retention), so multiplying it by the
-    generic +/-50% 'trend interpolation' noise - sized for interpolated mass
-    quantities, not divisor fractions - would double-count uncertainty and
-    amplify it non-linearly through the division.
+    own literature-based uncertainty, and this value is used as a divisor
+    downstream (harvested N / retention), so a fill uncertainty - sized for
+    filled mass quantities, not divisor fractions - would double-count
+    uncertainty and amplify it non-linearly through the division.
     """
     prot_ret_1990 = float(current_params.get("aquafeed_N_retention_1990"))
     prot_ret_2010 = float(current_params.get("aquafeed_N_retention"))
@@ -429,7 +428,7 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
     final_mean = (mean_val_accumulator / mean_year_count) if mean_year_count > 0 else 0.0
     for year in range(1990, 1995):
         year_values[year] = {
-            'value': final_mean * dataset_noise.factor('trend interpolation', year),
+            'value': final_mean * dataset_noise.fill('carry', 'food industry waste:1995-1999', year, [1995]),
             'comment': 'ok',
             'data_sources': 'extrapolated'
         }
@@ -534,7 +533,8 @@ def find_household_waste(preloaded_data, current_params, dataset_noise):
     change_per_year = (value_1995 - value_1990) / 5.0
     
     for idx, year in enumerate(range(1990, 1995)):
-        household_waste[year] = (value_1990 + change_per_year * idx) * dataset_noise.factor('trend interpolation', year)
+        household_waste[year] = ((value_1990 + change_per_year * idx)
+                                 * dataset_noise.fill('extrapolation', 'household waste:1995', year, [1995]))
 
     return household_waste
 
@@ -638,7 +638,8 @@ def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params,
         base_value_extrapolated = base_value_1992 + (change_per_year * step)
         step += 1
         # Noise applied once, at the end, not to the raw calibration inputs above.
-        industry_waste[year] = base_value_extrapolated * waste_sector_factor('05282', 3, dataset_noise, year) * dataset_noise.factor('trend interpolation', year)
+        industry_waste[year] = (base_value_extrapolated * waste_sector_factor('05282', 3, dataset_noise, year)
+                                * dataset_noise.fill('extrapolation', 'other industry waste:1995', year, [1995]))
 
     return industry_waste
 
@@ -652,8 +653,6 @@ def find_industrial_crop_products(df_gnb_sheet30, dataset_noise):
     year_values = {}
 
     key_gnb = 'Gross nutrient balance'
-
-    key_interp = 'trend interpolation'
 
     year_row = df_gnb_sheet30.iloc[8]
     value_row = df_gnb_sheet30.iloc[10]
@@ -681,9 +680,7 @@ def find_industrial_crop_products(df_gnb_sheet30, dataset_noise):
         mean_value = float(np.mean(list(year_values.values())))
 
         for year in range(2017, 2020):
-            value_interp = mean_value * dataset_noise.factor(key_interp, year)
-
-            year_values[year] = value_interp
+            year_values[year] = mean_value * dataset_noise.fill('carry', 'industrial crops:2016-2020', year, [2016, 2020])
 
     # Eurostat GNB has not published 2024 yet, and 2023 alone looks like a
     # low outlier, so a 3-year average of 2021-2023 is used instead of a
@@ -693,7 +690,7 @@ def find_industrial_crop_products(df_gnb_sheet30, dataset_noise):
     # balance, which calls this function directly, sees the same value.
     if 2024 not in year_values and all(y in year_values for y in (2021, 2022, 2023)):
         avg_value = sum(year_values[y] for y in (2021, 2022, 2023)) / 3.0
-        year_values[2024] = avg_value * dataset_noise.factor(key_interp, 2024)
+        year_values[2024] = avg_value * dataset_noise.fill('carry', 'industrial crops:2021-2023', 2024, [2023])
 
     return year_values
 
@@ -837,7 +834,8 @@ def find_non_edible_animal_products(df_hides_clean, df_wool, df_sheep, current_p
                     float(sheep_prev['Husdyr (sau)'].iloc[0]) +
                     float(sheep_next['Husdyr (sau)'].iloc[0])
                 )
-                value += (avg_sheep * float(wool_pr_sheep) * float(N_content_wool) * 1e-6 * float(dataset_noise.factor('03710', year))) * float(dataset_noise.factor('trend interpolation', year))
+                value += (avg_sheep * float(wool_pr_sheep) * float(N_content_wool) * 1e-6 * float(dataset_noise.factor('03710', year))
+                          * dataset_noise.fill('interpolation', 'sheep 2001', year, [2000, 2002]))
                 
         year_values[year] = value
 
@@ -1007,7 +1005,7 @@ def find_treated_wastewater_discharge(df_05280, df_utslipp, dataset_noise):
 
     # --- PART 3: 1990-1996, held flat at the 1997 value ---
     for year in range(1990, 1997):
-        ww_discharge[year] = value_1997
+        ww_discharge[year] = value_1997 * dataset_noise.fill('carry', 'treated wastewater:1997', year, [1997])
 
     return ww_discharge
 
@@ -1124,7 +1122,7 @@ UTMARK_GRAZING_SHARE_PARAMS = {
 }
 
 
-def utmark_grazing(preloaded_data, current_params):
+def utmark_grazing(preloaded_data, current_params, dataset_noise):
     """
     Manure deposited by grazing animals on utmark (unmanaged land) and the
     losses from it, per year, in kt N. Used by ag_mc.py (innmark share of PRP
@@ -1172,6 +1170,8 @@ def utmark_grazing(preloaded_data, current_params):
         nex_per_head = (sum(pop * nex for pop, nex in excr.values())
                         / sum(pop for pop, _ in excr.values()))  # kg N/head/yr
         n_cattle = utmark_animals.loc[max(year, first_count_year), 'storfe']
+        if year < first_count_year:
+            n_cattle *= dataset_noise.fill('carry', 'utmark cattle', year, [first_count_year])
         cattle_prp = sum(cats[c] for c in CATTLE_PRP_CATEGORIES)
         cattle_utmark = min(n_cattle * nex_per_head * weeks_cattle / 52.0, cattle_prp)  # kg N
         utmark_kg = sum(cats[c] * shares[c] for c in shares) + cattle_utmark

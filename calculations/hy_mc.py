@@ -218,7 +218,6 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
     fraction_N2O = float(current_params.get("surface_water_fraction_to_N2O"))
 
     key_teotil = 'TEOTIL:retention'
-    key_interp = 'trend interpolation'
 
 
     # 2013 onward: read retention directly from the TEOTIL3 matrix.
@@ -257,7 +256,8 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
             collected_years.add(year)
 
             hist_ret_val = outflow_tracker.loc[year, 'raw'] * ret_ratio
-            hist_ret_val *= dataset_noise.factor(key_teotil, year) * dataset_noise.factor(key_interp, year)
+            hist_ret_val *= (dataset_noise.factor(key_teotil, year)
+                             * dataset_noise.fill('extrapolation', 'surface water retention:2013', year, [2013]))
 
             results.append({'flow_name': flow_n2, 'year': year, 'value': hist_ret_val * (1.0 - fraction_N2O),
                             'comment': 'ok', 'data_sources': 'Calculation model'})
