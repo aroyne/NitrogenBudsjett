@@ -359,6 +359,12 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
     """
     year_values = {}
     wet_org_N = float(current_params.get('wet_organic'))
+    mixed_N = float(current_params.waste_N_frac('mixed_waste'))
+    # Share of manufacturing's mixed waste that comes from the food industry
+    # (SSB table 14457: 36 % in 2015, 33 % in 2022). Table 10514 reports
+    # mixed waste as its own category; before 2012 the same waste was spread
+    # across the material types, including wet organic waste.
+    food_mixed_share = float(current_params.get('food_industry_share_mixed_waste'))
 
 
     value_2012_base = 0.0
@@ -378,6 +384,14 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
         for c in (1, 3, 8):
             v = float(df_10514.iloc[6, p_col+c]) * wet_org_N
             v_base += v
+            if c == 3:
+                # Mixed waste (row 23 -> index 22) from the food industry. Not
+                # part of v_base, the anchor for scaling 05282: before 2012 this
+                # waste was spread across material types and is counted partly
+                # here (wet organic) and partly in other industry waste (other
+                # materials), so the two flows each step at 2012 while their
+                # sum does not.
+                v += float(df_10514.iloc[22, p_col+c]) * mixed_N * food_mixed_share
             v_noisy += v * waste_sector_factor('10514', c, dataset_noise, year)
 
         if year == 2012:
@@ -566,7 +580,7 @@ def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params,
     other_mat_N = float(current_params.waste_N_frac('other_materials'))
     hazardous_N = float(current_params.waste_N_frac('hazardous'))
     mixed_N     = float(current_params.waste_N_frac('mixed_waste'))
-    
+    food_mixed_share = float(current_params.get('food_industry_share_mixed_waste'))
 
     arr_05282 = df_05282.values
     arr_10514 = df_10514.values
@@ -621,8 +635,11 @@ def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params,
         for c in [2, 3, 8]: value_base += float(arr_10514[23, col + c]) * other_mat_N
         # Hazardous waste (row 22 -> index 21)
         for c in [2, 3, 8]: value_base += float(arr_10514[21, col + c]) * hazardous_N
-        # Mixed waste (row 23 -> index 22)
-        for c in [2, 3, 8]: value_base += float(arr_10514[22, col + c]) * mixed_N
+        # Mixed waste (row 23 -> index 22); the food industry's share of
+        # manufacturing's mixed waste goes to find_food_industry_waste.
+        for c in [2, 3, 8]:
+            share_here = 1.0 - food_mixed_share if c == 3 else 1.0
+            value_base += float(arr_10514[22, col + c]) * mixed_N * share_here
 
         industry_waste[year] = value_base * waste_sector_factor('10514', 3, dataset_noise, year)
 

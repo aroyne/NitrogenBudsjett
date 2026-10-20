@@ -27,6 +27,7 @@ nav_order: 6
 - This flow uses wet organic waste ("Våtorganisk avfall") from the source sectors "Jord-, skogbruk og fiske", "Industri" and "Annen eller uspesifisert næring", multiplied by an N content of 0.9% (Table 50 in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)<!--cite:schappi_annexes_2025-->).
 - We assume that the 2011 value should have been equal to that in 2012, and scale the values prior to 2011 by the ratio between the 2011 and 2012 value.
 - For 1990–1994 we extrapolate using the mean value for 1995–1999.
+- From 2012 the flow also includes the food industry's share of mixed waste from "Industri" in table 10514 (35%, from [SSB table 14457](https://www.ssb.no/statbank1/table/14457/): 36% in 2015 and 33% in 2022). Before 2012 this waste was spread across the material types in table 05282, partly as wet organic waste (counted here) and partly as other materials (counted in MP.OP-PR.SO-Other industry waste-Nmix). The scaling of 1995–2011 therefore uses wet organic waste only, so the flow steps up by about 0.6 kt N in 2012 while the sum with other industry waste does not change. SSB table 14457 also shows that 99–100% of the wet organic waste from manufacturing comes from the food industry.
 
 #### Interpretations and comparisons
 
