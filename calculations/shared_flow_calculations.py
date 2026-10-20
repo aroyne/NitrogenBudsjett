@@ -408,7 +408,9 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
         year = int(float(year_val))
 
         # Wet organic waste (row 14 -> index 13), same three sectors as above
-        scale = value_2012_base / value_2011_base
+        # The ratio itself is uncertain (0.23-0.27 with other reference
+        # years), one draw for all years scaled with it.
+        scale = value_2012_base / value_2011_base * dataset_noise.factor('splice:food industry waste 2012', 2011)
         v_scaled = 0.0
         for c in (1, 3, 8):
             v_scaled += (float(df_05282.iloc[13, p_col+c]) * wet_org_N * scale
@@ -779,8 +781,11 @@ def find_industrial_waste_fuels(df_bio_08205, df_bio_11561, current_params, data
     gwh_11561 = df_bio_11561['GWh']
     scale = sum(gwh_08205[y] for y in overlap) / sum(gwh_11561[y] for y in overlap)
 
+    # The level comes from 08205, so these years take 08205's factor, plus
+    # the uncertainty of the scaling factor itself.
+    scale *= dataset_noise.factor('splice:industrial waste fuels', first_08205)
     for year in range(1990, first_08205):
-        year_values[year] = gwh_to_kt_N(gwh_11561[year] * scale) * dataset_noise.factor('11561', year)
+        year_values[year] = gwh_to_kt_N(gwh_11561[year] * scale) * dataset_noise.factor('08205', year)
 
     return year_values
 
@@ -1028,7 +1033,7 @@ def teotil3_table(df_raw):
     return df.set_index('year').astype(float)
 
 
-def find_teotil2_bias_corrected(preloaded_data):
+def find_teotil2_bias_corrected(preloaded_data, dataset_noise):
     """
     TEOTIL2 national totals for the years before TEOTIL3 starts, bias-corrected
     to the TEOTIL3 level. Used by hy_mc.py, fs_mc.py and hs_mc.py for 1990-2012.
@@ -1053,8 +1058,14 @@ def find_teotil2_bias_corrected(preloaded_data):
     inputs to surface water before retention. The ratio F absorbs this
     difference in level for each category.
 
+    Each factor F, and the share reaching the coast, has its own
+    uncertainty ('splice:TEOTIL <category>' in dataset_uncertainties, width
+    from the year-to-year spread of the ratio in the overlap years), one
+    draw for all years before TEOTIL3. The TEOTIL data set factors
+    themselves are applied by the callers.
+
     Returns a DataFrame indexed by year (the TEOTIL2 years before the first
-    TEOTIL3 year), in kt N, without MC noise:
+    TEOTIL3 year), in kt N:
       'forest_and_other_land' - TEOTIL2 natural diffuse loss scaled to TEOTIL3
           wood + upland, the quantity fs_mc.py splits into FS.FO and FS.OL.
       'urban' - TEOTIL2 urban scaled to TEOTIL3 urban (before retention), as
@@ -1077,8 +1088,9 @@ def find_teotil2_bias_corrected(preloaded_data):
     overlap = t2.index.intersection(t3.index)
     years_before_t3 = t2.index[t2.index < t3.index.min()]
 
-    def factor(t3_series, t2_series):
-        return t3_series.loc[overlap].mean() / t2_series.loc[overlap].mean()
+    def factor(t3_series, t2_series, name):
+        return (t3_series.loc[overlap].mean() / t2_series.loc[overlap].mean()
+                * dataset_noise.factor(f'splice:TEOTIL {name}', years_before_t3[0]))
 
     # TEOTIL2 'nat_diff' covers forest, mountain, lakes and the background
     # part of agricultural land; TEOTIL3 splits these into separate columns.
@@ -1091,7 +1103,7 @@ def find_teotil2_bias_corrected(preloaded_data):
         'urban': (t3['urban_totn_tonnes'], t2['urban_tot-n_kt']),
         'industry': (t3['industry_totn_tonnes'], t2['ind_tot-n_kt']),
     }
-    scaled = {name: factor(t3_s, t2_s) * t2_s.loc[years_before_t3]
+    scaled = {name: factor(t3_s, t2_s, name) * t2_s.loc[years_before_t3]
               for name, (t3_s, t2_s) in categories.items()}
 
     # Share of the four categories that reaches the coast in TEOTIL3: total to
@@ -1101,10 +1113,12 @@ def find_teotil2_bias_corrected(preloaded_data):
     t3_diffuse_to_coast = (t3_to_coast - t3['aquaculture_totn_tonnes']
                            - t3['large-wastewater_totn_tonnes'] - t3['spredt_totn_tonnes'])
     t3_diffuse_before_retention = sum(t3_s for t3_s, _ in categories.values())
-    to_coast_share = t3_diffuse_to_coast.loc[overlap].mean() / t3_diffuse_before_retention.loc[overlap].mean()
+    to_coast_share = (t3_diffuse_to_coast.loc[overlap].mean() / t3_diffuse_before_retention.loc[overlap].mean()
+                      * dataset_noise.factor('splice:TEOTIL to-coast share', years_before_t3[0]))
 
     return pd.DataFrame({
-        'forest_and_other_land': factor(t3_forest_and_other_land, t2['nat_diff_tot-n_kt']) * t2['nat_diff_tot-n_kt'].loc[years_before_t3],
+        'forest_and_other_land': (factor(t3_forest_and_other_land, t2['nat_diff_tot-n_kt'], 'forest and other land')
+                                  * t2['nat_diff_tot-n_kt'].loc[years_before_t3]),
         'urban': scaled['urban'],
         'diffuse_to_coast': sum(scaled.values()) * to_coast_share,
     })

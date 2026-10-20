@@ -73,7 +73,7 @@ def _add_inflow_to_coastal_waters(results, preloaded_data, current_params, datas
     # 1990-2012: TEOTIL2 background, agriculture, urban and industry reaching
     # the coast, bias-corrected to TEOTIL3 (see find_teotil2_bias_corrected).
     # Aquaculture and wastewater are not included - they have their own flows.
-    teotil2 = find_teotil2_bias_corrected(preloaded_data)
+    teotil2 = find_teotil2_bias_corrected(preloaded_data, dataset_noise)
     for year, raw_val in teotil2['diffuse_to_coast'].items():
         year = int(year)
         collected_years.add(year)
@@ -247,7 +247,8 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
     t3_coast = teotil3_table(preloaded_data['hy_teotil3_to_coast'])['totn_to-coast_tonnes']
     t3_diffuse_to_coast = (t3_coast - t3_src['aquaculture_totn_tonnes']
                            - t3_src['large-wastewater_totn_tonnes'] - t3_src['spredt_totn_tonnes'])
-    ret_ratio = t3_ret.mean() / t3_diffuse_to_coast.loc[t3_ret.index].mean()
+    ret_ratio = (t3_ret.mean() / t3_diffuse_to_coast.loc[t3_ret.index].mean()
+                 * dataset_noise.factor('splice:TEOTIL retention ratio', 2012))
 
     missing_years = {y for y in EXPECTED_YEARS if y >= 1990} - collected_years
 

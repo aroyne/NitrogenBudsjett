@@ -307,6 +307,7 @@ def _add_atmospheric_inflow_mc(results, flow_code, value_col, df_rw, current_par
     """
     collected_years = set()
     comment = 'ok'
+    splice_pollutant = {1: 'OXN', 3: 'RDN'}[value_col]
 
     # Years marked 'interpolated' in atm_in_out.xlsx (1984-1996: mean of
     # 1997-2001; 2015: between 2014 and 2016) get the fill uncertainty on
@@ -325,6 +326,10 @@ def _add_atmospheric_inflow_mc(results, flow_code, value_col, df_rw, current_par
 
         base_value = float(df_rw.iloc[r, value_col]) / 10
         value = base_value * dataset_noise.factor('Source-receptor', year)
+        # 1984-2006 are scaled for the break in the EMEP model in 2007
+        # (emep_sr_norway.py); the break factor has its own uncertainty.
+        if year < 2007:
+            value *= dataset_noise.factor(f'splice:EMEP 2007 {splice_pollutant}', 2006)
         if str(df_rw.iloc[r, 5]).strip() == 'interpolated':
             value *= fill_noise(dataset_noise, flow_code, year, known_years)
             data_sources = 'filled from EMEP SR tables (see atm_in_out.xlsx)'

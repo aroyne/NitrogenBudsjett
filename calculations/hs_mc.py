@@ -187,7 +187,7 @@ def _add_overland_flow_urban_mc(results, preloaded_data, current_params, dataset
     # (see find_teotil2_bias_corrected). TEOTIL2 uses the same urban value in
     # every year, so the series carries no information about the trend and
     # is treated as held flat at the first TEOTIL3 year.
-    teotil2 = find_teotil2_bias_corrected(preloaded_data)
+    teotil2 = find_teotil2_bias_corrected(preloaded_data, dataset_noise)
     for year, raw_val in teotil2['urban'].items():
         year = int(year)
         collected_years.add(year)
