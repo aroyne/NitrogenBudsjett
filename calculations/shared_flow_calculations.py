@@ -318,6 +318,26 @@ def find_feedstock_fuel(preloaded_data, current_params, dataset_noise):
 
     return year_values
 
+# Sector column offsets (from each year's first column) in SSB tables 05282
+# and 10514, grouped by how SSB estimates the waste. Each group has its own
+# uncertainty row ('<table>:<group>' in dataset_uncertainties), independent
+# of the other groups and of the other table: private households build on
+# municipal collection data, the other groups on models per employee
+# (05282) or on waste received by treatment plants (10514).
+WASTE_SECTOR_GROUPS = {
+    # 05282's services/construction and primary-sector values are only used
+    # scaled to their 2012 level in 10514, and then take 10514's factor.
+    '05282': {2: 'industry', 3: 'industry', 8: 'industry', 9: 'households'},
+    '10514': {1: 'primary', 2: 'industry', 3: 'industry', 8: 'industry',
+              6: 'services_construction', 7: 'services_construction', 9: 'households'},
+}
+
+
+def waste_sector_factor(table, offset, dataset_noise, year):
+    """Uncertainty factor for one sector column of table 05282 or 10514."""
+    return dataset_noise.factor(f"{table}:{WASTE_SECTOR_GROUPS[table][offset]}", year)
+
+
 def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
     """
     Computes N in food industry waste (used by mp_mc.py for
@@ -355,23 +375,24 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
         # Wet organic waste (row 7 -> index 6); p_col+1, +3 and +8 are the
         # Jord-/skogbruk/fiske, Industri and Annen/uspesifisert sector columns
         v_base = 0.0
-        v_base += float(df_10514.iloc[6, p_col+1]) * wet_org_N
-        v_base += float(df_10514.iloc[6, p_col+3]) * wet_org_N
-        v_base += float(df_10514.iloc[6, p_col+8]) * wet_org_N
+        v_noisy = 0.0
+        for c in (1, 3, 8):
+            v = float(df_10514.iloc[6, p_col+c]) * wet_org_N
+            v_base += v
+            v_noisy += v * waste_sector_factor('10514', c, dataset_noise, year)
 
         if year == 2012:
             value_2012_base = v_base
 
         year_values[year] = {
-            'value': v_base * dataset_noise.factor('10514', year),
+            'value': v_noisy,
             'comment': 'ok',
             'data_sources': 'SSB'
         }
 
-    if value_2012_base == 0.0:
-        raise ValueError("[KRITISK] Fant ikke basisverdi for år 2012 i Tabell 10514. Skalering umulig!")
-
     # --- PART 2: years 1995-2011 (table 05282), scaled to match 2012's level ---
+    # The level comes from 10514, so the scaled values get 10514's sector
+    # factors; 05282 only contributes the year-to-year shape.
     p_col_2011 = 162 - 1
     value_2011_base = float(df_05282.iloc[13, p_col_2011+1]) * wet_org_N
     value_2011_base += float(df_05282.iloc[13, p_col_2011+3]) * wet_org_N
@@ -388,19 +409,18 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
         year = int(float(year_val))
 
         # Wet organic waste (row 14 -> index 13), same three sectors as above
-        v_base = 0.0
-        v_base += float(df_05282.iloc[13, p_col+1]) * wet_org_N
-        v_base += float(df_05282.iloc[13, p_col+3]) * wet_org_N
-        v_base += float(df_05282.iloc[13, p_col+8]) * wet_org_N
-
-        v_scaled = v_base * (value_2012_base / value_2011_base)
+        scale = value_2012_base / value_2011_base
+        v_scaled = 0.0
+        for c in (1, 3, 8):
+            v_scaled += (float(df_05282.iloc[13, p_col+c]) * wet_org_N * scale
+                         * waste_sector_factor('10514', c, dataset_noise, year))
 
         if 1995 <= year < 2000:
             mean_val_accumulator += v_scaled
             mean_year_count += 1
 
         year_values[year] = {
-            'value': v_scaled * dataset_noise.factor('05282', year),
+            'value': v_scaled,
             'comment': 'ok',
             'data_sources': 'SSB'
         }
@@ -409,7 +429,7 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
     final_mean = (mean_val_accumulator / mean_year_count) if mean_year_count > 0 else 0.0
     for year in range(1990, 1995):
         year_values[year] = {
-            'value': final_mean * dataset_noise.factor('05282', year) * dataset_noise.factor('trend interpolation', year),
+            'value': final_mean * dataset_noise.factor('trend interpolation', year),
             'comment': 'ok',
             'data_sources': 'extrapolated'
         }
@@ -485,13 +505,18 @@ def find_household_waste(preloaded_data, current_params, dataset_noise):
                                    / sector_N(df_05282, rows_05282, cols_05282[2011], [5, 6]))
 
     for year, col_idx in cols_05282.items():
-        value = (sector_N(df_05282, rows_05282, col_idx, [9])
-                 + sector_N(df_05282, rows_05282, col_idx, [5, 6]) * services_construction_scale)
-        household_waste[year] = value * dataset_noise.factor('05282', year)
+        # Services and construction are scaled to their 2012 level in 10514
+        # and therefore get 10514's factor for that group.
+        household_waste[year] = (
+            sector_N(df_05282, rows_05282, col_idx, [9]) * waste_sector_factor('05282', 9, dataset_noise, year)
+            + sector_N(df_05282, rows_05282, col_idx, [5, 6]) * services_construction_scale
+            * waste_sector_factor('10514', 7, dataset_noise, year))
     value_1995 = household_waste[1995]
 
     for year, col_idx in cols_10514.items():
-        household_waste[year] = sector_N(df_10514, rows_10514, col_idx, [6, 7, 9]) * dataset_noise.factor('10514', year)
+        household_waste[year] = (
+            sector_N(df_10514, rows_10514, col_idx, [9]) * waste_sector_factor('10514', 9, dataset_noise, year)
+            + sector_N(df_10514, rows_10514, col_idx, [6, 7]) * waste_sector_factor('10514', 7, dataset_noise, year))
 
     # =========================================================================
     # EXTRAPOLATION, 1990-1994
@@ -571,7 +596,7 @@ def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params,
         if year == 1995:
             base_value_1995 = value_base
 
-        industry_waste[year] = value_base * dataset_noise.factor('05282', year)
+        industry_waste[year] = value_base * waste_sector_factor('05282', 3, dataset_noise, year)
 
     # --- PART 2: YEARS 2012-2024 (table 10514) ---
     # Same c offsets 2, 3, 8 select the same three sectors in this table, even
@@ -597,7 +622,7 @@ def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params,
         # Mixed waste (row 23 -> index 22)
         for c in [2, 3, 8]: value_base += float(arr_10514[22, col + c]) * mixed_N
 
-        industry_waste[year] = value_base * dataset_noise.factor('10514', year)
+        industry_waste[year] = value_base * waste_sector_factor('10514', 3, dataset_noise, year)
 
     # --- PART 3: LINEAR EXTRAPOLATION BACK TO 1990 ---
     waste_kt_1992 = float(df_hist_waste.iloc[1, 2])
@@ -613,7 +638,7 @@ def find_other_industry_waste(df_05282, df_10514, df_hist_waste, current_params,
         base_value_extrapolated = base_value_1992 + (change_per_year * step)
         step += 1
         # Noise applied once, at the end, not to the raw calibration inputs above.
-        industry_waste[year] = base_value_extrapolated * dataset_noise.factor('05282', year) * dataset_noise.factor('trend interpolation', year)
+        industry_waste[year] = base_value_extrapolated * waste_sector_factor('05282', 3, dataset_noise, year) * dataset_noise.factor('trend interpolation', year)
 
     return industry_waste
 

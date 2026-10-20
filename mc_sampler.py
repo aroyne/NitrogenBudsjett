@@ -206,13 +206,22 @@ class DatasetNoise:
     `year`. Each data set has one factor per iteration, the same for all
     years; the calculations ask for it per year so that a year-to-year part
     can be added here without changing them.
+
+    factor(key, year, sub=...) is an independent factor for one part of the
+    data set (a facility, a sector), drawn from the same row in
+    dataset_uncertainties (MCSampler.sub_factor). It is used where the errors
+    of the parts are independent, so that they partly cancel in the sum.
     """
 
-    def __init__(self, factors):
+    def __init__(self, factors, sampler=None, i=0):
         self._factors = dict(factors)
+        self._sampler = sampler
+        self._i = i
 
-    def factor(self, key, year):
-        return self._factors[key]
+    def factor(self, key, year, sub=None):
+        if sub is None:
+            return self._factors[key]
+        return self._sampler.sub_factor(key, sub, self._i)
 
 
 class MCSampler:
@@ -246,7 +255,9 @@ class MCSampler:
         df = base_params.get_table(group)
         ids = df['dataset_name'].astype(str).str.strip()
         _check_unique(group, ids)
+        self._dataset_rows = {}
         for item_id, (_, row) in zip(ids, df.iterrows()):
+            self._dataset_rows[item_id] = row
             add(group, item_id, 1.0, _draw_row(seed, group, item_id, n_random, 1.0, row))
 
         # CLRTAP inventory: one factor per (noise_group, pollutant), from the
@@ -312,9 +323,24 @@ class MCSampler:
         noise = {k: float(a[i]) for k, a in self.draws['dataset_uncertainties'].items()}
         crltap = self.draws['crltap_uncertainties']
         noise.update({k: float(crltap[item_id][i]) for k, item_id in self.crltap_keys.items()})
-        dataset_noise = DatasetNoise(noise)
+        dataset_noise = DatasetNoise(noise, self, i)
         trade_factors = {k: float(a[i]) for k, a in self.draws['trade_parameters'].items()}
         return param_overrides, dataset_noise, trade_factors
+
+    def sub_factor(self, key, sub, i):
+        """
+        Factor for part `sub` of data set `key` in iteration i. The (nsim,)
+        array is drawn the first time the part is asked for, from its own
+        random-number stream, so the values do not depend on the order in
+        which parts are asked for. Row 0 is 1.0 (deterministic baseline).
+        """
+        group = 'dataset_uncertainties_sub'
+        item_id = f"{key}:{sub}"
+        items = self.draws.setdefault(group, {})
+        if item_id not in items:
+            rnd = _draw_row(self.seed, group, item_id, self.nsim - 1, 1.0, self._dataset_rows[key])
+            items[item_id] = np.concatenate(([1.0], rnd))
+        return float(items[item_id][i])
 
     def to_long(self):
         """All drawn values in long format: sim_id, group, id, value."""

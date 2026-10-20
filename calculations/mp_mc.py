@@ -71,7 +71,7 @@ def protein_per_group(current_params, mapping_sheet, group_index):
     return pd.Series(protein_fractions, index=group_index)
 
 
-def _industry_n_to_water(preloaded_data, category, connected, fertilizer_industry=None):
+def _industry_n_to_water(preloaded_data, category, connected, dataset_noise, fertilizer_industry=None):
     """
     Total N (t) per year reported to Miljødirektoratet by the facilities in
     `category` ('FP' or 'OP') that are (connected=True) or are not or may not
@@ -80,7 +80,9 @@ def _industry_n_to_water(preloaded_data, category, connected, fertilizer_industr
     flagged/not flagged as fertilizer industry. A year missing inside a
     facility's reporting period is filled by linear interpolation between its
     neighbouring reported years; years before a facility's first or after its
-    last report are not filled.
+    last report are not filled. Each facility's series is multiplied by its
+    own uncertainty factor ('norskeutslipp', sub=facility name): the
+    facilities report independently, so their errors are independent.
 
     'mildir_emissions' <- Årlig utslipp til vann - Landbasert 02-02-2026.xlsx
     (data_loader.py DATA_MAP): Miljødirektoratet emissions data for
@@ -108,7 +110,10 @@ def _industry_n_to_water(preloaded_data, category, connected, fertilizer_industr
     ]
     per_facility = selected.pivot_table(index='År', columns='AnleggNavn', values='Mengde', aggfunc='sum')
     per_facility = per_facility.reindex(range(per_facility.index.min(), per_facility.index.max() + 1))
-    return per_facility.interpolate(limit_area='inside').sum(axis=1, min_count=1).dropna()
+    per_facility = per_facility.interpolate(limit_area='inside')
+    noise = pd.DataFrame({name: [dataset_noise.factor('norskeutslipp', year, sub=name) for year in per_facility.index]
+                          for name in per_facility.columns}, index=per_facility.index)
+    return (per_facility * noise).sum(axis=1, min_count=1).dropna()
 
 
 def execute_calculations_mp(preloaded_data, current_params, dataset_noise, current_trade_factors=None):
@@ -360,15 +365,14 @@ def _add_food_industry_wastewater_mc(results, preloaded_data, current_params, da
     data_sources = 'Miljødirektoratet'
     
     target_years = {y for y in EXPECTED_YEARS if 1989 <= y <= 2023}
-    key_støy = 'norskeutslipp'
 
-    n_by_year = _industry_n_to_water(preloaded_data, 'FP', connected=True)
+    n_by_year = _industry_n_to_water(preloaded_data, 'FP', connected=True, dataset_noise=dataset_noise)
 
     for year, tonnes in n_by_year.items():
         if year in target_years:
             collected_years.add(year)
             base_value = float(tonnes) / 1000.0  # t N -> kt N
-            value_noisy = base_value * dataset_noise.factor(key_støy, year)
+            value_noisy = base_value
 
             results.append({
                 'flow_name': flow_code,
@@ -615,9 +619,8 @@ def _add_fp_untreated_wastewater_mc(results, preloaded_data, current_params, dat
     
     target_years = {y for y in EXPECTED_YEARS if 1990 <= y <= 2023}
 
-    key_støy = 'norskeutslipp'
 
-    n_by_year = _industry_n_to_water(preloaded_data, 'FP', connected=False)
+    n_by_year = _industry_n_to_water(preloaded_data, 'FP', connected=False, dataset_noise=dataset_noise)
 
     found_values_94_23 = {}
     mean_value_94_98 = 0.0
@@ -625,7 +628,7 @@ def _add_fp_untreated_wastewater_mc(results, preloaded_data, current_params, dat
     for year, tonnes in n_by_year.items():
         if 1994 <= year <= 2023:
             base_value = float(tonnes) / 1000.0  # t N -> kt N
-            value_noisy = base_value * dataset_noise.factor(key_støy, year)
+            value_noisy = base_value
             found_values_94_23[year] = value_noisy
 
             if 1994 <= year <= 1998:
@@ -863,15 +866,14 @@ def _add_other_industry_wastewater_mc(results, preloaded_data, current_params, d
     
     target_years = {y for y in EXPECTED_YEARS if 1989 <= y <= 2023}
 
-    key_støy = 'norskeutslipp'
 
-    n_by_year = _industry_n_to_water(preloaded_data, 'OP', connected=True)
+    n_by_year = _industry_n_to_water(preloaded_data, 'OP', connected=True, dataset_noise=dataset_noise)
 
     for year, tonnes in n_by_year.items():
         if year in target_years:
             collected_years.add(year)
             base_value = float(tonnes) / 1000.0  # t N -> kt N
-            value_noisy = base_value * dataset_noise.factor(key_støy, year)
+            value_noisy = base_value
 
             results.append({
                 'flow_name': flow_code,
@@ -1149,15 +1151,14 @@ def _add_op_untreated_wastewater_mc(results, preloaded_data, current_params, dat
     target_years = {y for y in EXPECTED_YEARS if 1989 <= y <= 2023}
     # Includes the fertilizer industry's facilities; _add_consumer_goods_mc
     # leaves their share out of the MP.OP mass balance.
-    key_støy = 'norskeutslipp'
 
-    n_by_year = _industry_n_to_water(preloaded_data, 'OP', connected=False)
+    n_by_year = _industry_n_to_water(preloaded_data, 'OP', connected=False, dataset_noise=dataset_noise)
 
     for year, tonnes in n_by_year.items():
         if year in target_years:
             collected_years.add(year)
             base_value = float(tonnes) / 1000.0  # t N -> kt N
-            value_noisy = base_value * dataset_noise.factor(key_støy, year)
+            value_noisy = base_value
 
             results.append({
                 'flow_name': flow_code,
@@ -1431,9 +1432,8 @@ def _add_consumer_goods_mc(results, preloaded_data, current_params, current_trad
     # The fertilizer industry's own wastewater is likewise left out of the
     # MP.OP-HY.SW-Untreated wastewater-Nmix outflow (2024 uses the 2023
     # value, as the flow itself does).
-    fertilizer_wastewater = _industry_n_to_water(preloaded_data, 'OP', connected=False, fertilizer_industry=True)
-    wastewater_noise = pd.Series({y: dataset_noise.factor('norskeutslipp', y) for y in fertilizer_wastewater.index})
-    fertilizer_wastewater = fertilizer_wastewater / 1000.0 * wastewater_noise  # t N -> kt N
+    fertilizer_wastewater = _industry_n_to_water(preloaded_data, 'OP', connected=False, dataset_noise=dataset_noise, fertilizer_industry=True)
+    fertilizer_wastewater = fertilizer_wastewater / 1000.0  # t N -> kt N
     fertilizer_wastewater[2024] = fertilizer_wastewater[2023]
 
     # Each of these must already be in `results` - i.e. its _add_*_mc function

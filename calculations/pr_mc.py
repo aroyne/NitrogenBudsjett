@@ -384,7 +384,7 @@ def _add_wastewater_from_landfills_mc(results, preloaded_data, current_params, d
                 if year not in real_years_data:
                     real_years_data[year] = 0.0
 
-                real_years_data[year] += (n_leachate_tN / 1000.0) * dataset_noise.factor('norskeutslipp', year)
+                real_years_data[year] += (n_leachate_tN / 1000.0) * dataset_noise.factor('norskeutslipp', year, sub=anlegg_name)
 
         except (ValueError, TypeError, IndexError):
             continue
@@ -476,7 +476,7 @@ def _add_so_leaching_mc(results, preloaded_data, current_params, dataset_noise):
                 if year not in real_years_data:
                     real_years_data[year] = 0.0
 
-                real_years_data[year] += (n_leachate_tN / 1000.0) * dataset_noise.factor('norskeutslipp', year)
+                real_years_data[year] += (n_leachate_tN / 1000.0) * dataset_noise.factor('norskeutslipp', year, sub=anlegg_name)
 
         except (ValueError, TypeError, IndexError):
             continue
