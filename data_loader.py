@@ -292,11 +292,10 @@ def load_all_data(selected_pools):
 
         elif method == 'csv_faostat_fertilizer':
             # One FAOSTAT Fertilizers by Nutrient export (Nutrient nitrogen N
-            # total) holding all four elements, split by element. Production
-            # keeps its Flag column, since at_mc.py only uses the reported
-            # figure where FAOSTAT has not imputed it.
+            # total) holding all four elements, split by element. The
+            # Production element is not used (production is derived from the
+            # other elements in at_mc.py).
             df_fert = pd.read_csv(filepath)
-            preloaded['faostat_fertilizer_production'] = df_fert[df_fert['Element'] == 'Production'][['Year', 'Element', 'Value', 'Flag']].copy()
             preloaded['faostat_fertilizer_use'] = df_fert[df_fert['Element'] == 'Agricultural Use'][['Year', 'Element', 'Value']].copy()
             preloaded['fao_mineral_fertilizer'] = df_fert[df_fert['Element'].isin(['Import quantity', 'Export quantity'])][['Year', 'Element', 'Value']].copy()
         elif method == 'text_lines':

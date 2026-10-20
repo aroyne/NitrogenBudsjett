@@ -156,15 +156,12 @@ def _add_OP_N2_fixation_mc(results, preloaded_data, current_params, ammonia_impo
     dataset_key = 'Fertilizer by nutrient'
     data_sources = 'FAOSTAT Fertilizer by nutrient + SSB (3-year moving average)'
 
-    # 'faostat_fertilizer_production', 'faostat_fertilizer_use' and
-    # 'fao_mineral_fertilizer' <- data_files/FAOSTAT_data_en_9-24-2026-2.csv
-    # (FAOSTAT Fertilizers by Nutrient, nutrient nitrogen N total; split by
-    # element in data_loader.py)
-    df_prod = preloaded_data['faostat_fertilizer_production']
+    # 'faostat_fertilizer_use' and 'fao_mineral_fertilizer' <-
+    # data_files/FAOSTAT_data_en_9-24-2026-2.csv (FAOSTAT Fertilizers by
+    # Nutrient, nutrient nitrogen N total; split by element in data_loader.py)
     df_use = preloaded_data['faostat_fertilizer_use']
     df_trade = preloaded_data['fao_mineral_fertilizer']
 
-    reported_production = df_prod[df_prod['Flag'] != 'I'].set_index('Year')['Value']
     ag_use = df_use.set_index('Year')['Value']
     fert_import = df_trade[df_trade['Element'] == 'Import quantity'].set_index('Year')['Value']
     fert_export = df_trade[df_trade['Element'] == 'Export quantity'].set_index('Year')['Value']
@@ -182,26 +179,21 @@ def _add_OP_N2_fixation_mc(results, preloaded_data, current_params, ammonia_impo
         if year not in ag_use.index:
             continue
 
-        # FAOSTAT reports domestic fertilizer N production directly up to
-        # 2001; from 2002 onward the Production element is imputed (flag I)
-        # and has not been revised along with FAOSTAT's own export figures,
-        # so it no longer matches them. For imputed years, production is
-        # instead derived from the MP.OP fertilizer balance: everything
-        # leaving MP.OP as fertilizer (export, agricultural use not covered by
-        # import, non-agricultural use) must have been produced domestically.
-        # FAOSTAT's elements come from different statistics (production,
-        # sales, trade) and each has its own factor (sub=element); derived
-        # production carries the factors of the elements it is built from,
-        # the same ones used for those quantities in mp_mc.py and rw_mc.py.
+        # Domestic fertilizer N production is derived from the MP.OP
+        # fertilizer balance in every year: everything leaving MP.OP as
+        # fertilizer (export, agricultural use not covered by import,
+        # non-agricultural use) must have been produced domestically.
+        # FAOSTAT's own production figure is imputed from 2002 and not
+        # consistent with its revised exports; up to 2001 it matches the
+        # derived value within 1 % except 1992 (+13 %) and 1993 (+9 %).
+        # Each element has its own factor (sub=element), the same ones used
+        # for those quantities in mp_mc.py and rw_mc.py.
         def element(name, value):
             return float(value) * dataset_noise.factor(dataset_key, year, sub=name)
 
-        if year in reported_production.index:
-            production = element('production', reported_production[year])
-        else:
-            use = element('use', ag_use[year])
-            production = (element('export', fert_export[year]) + use - element('import', fert_import[year])
-                          + use * nonag_over_ag)
+        use = element('use', ag_use[year])
+        production = (element('export', fert_export[year]) + use - element('import', fert_import[year])
+                      + use * nonag_over_ag)
 
         perturbed_production = production / 1000  # tN -> ktN
 

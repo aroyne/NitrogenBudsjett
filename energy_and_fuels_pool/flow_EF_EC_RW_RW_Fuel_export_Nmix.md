@@ -23,7 +23,7 @@ nav_order: 7
 
 #### Assumptions
 
-- N contents: crude oil (HS 2709) 0.25% (lognormal with this median and 0.02% and 1.5% as the lower and upper end of the 95% intervals), residual fuel oil 0.45%, gas/diesel oil 0.0133%, kerosene 0.1%, other oils 0.0375%, bitumen 0.7%, coal and coke 1.0–1.85% and peat 0.2%; gasoline, naphtha and natural gas condensate are included with zero N (Table 15: gasoline 0, naphtha and NGL not specified).
+- N contents: crude oil (HS 2709) 0.10% (lognormal with this median and 0.05% and 0.20% as the lower and upper end of the 95% interval, from Equinor's assays of 21 Norwegian crudes: 0.01–0.20% total nitrogen, about 0.12% weighted by production in 2020–2024 and 0.08% in the 1990s), residual fuel oil 0.45%, gas/diesel oil 0.0133%, kerosene 0.1%, other oils 0.0375%, bitumen 0.7%, coal and coke 1.0–1.85% and peat 0.2%; gasoline, naphtha and natural gas condensate are included with zero N (Table 15: gasoline 0, naphtha and NGL not specified).
 - The selection of HS codes and fuel types is defined in the trade mapping sheet of N_parameters.xlsx.
 
 #### Interpretations and comparisons

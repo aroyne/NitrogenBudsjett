@@ -23,7 +23,7 @@ nav_order: 15
 #### Assumptions
 
 - The flow is found through mass balance: domestic fertilizer N production, minus imported ammonia (not domestically fixed), plus exported ammonia (domestically fixed before leaving the country).
-- Domestic fertilizer N production is FAOSTAT's reported production up to 2001. From 2002 it is derived from the fertilizer balance of the MP.OP sub-pool: export + agricultural use − import + non-agricultural use (MP.OP-HS.HS-Mineral fertilizer-Nmix, 2% of total use), so that all mineral fertilizer leaving MP.OP is accounted for by domestic production.
+- Domestic fertilizer N production is derived from the fertilizer balance of the MP.OP sub-pool in every year: export + agricultural use − import + non-agricultural use (MP.OP-HS.HS-Mineral fertilizer-Nmix, 2% of total use), so that all mineral fertilizer leaving MP.OP is accounted for by domestic production. Up to 2001 this matches FAOSTAT's reported production within 1%, except 1992 (13% lower than reported) and 1993 (9% lower).
 - The combined value is smoothed with a centred 3-year moving average, since actual ammonia production is a continuous industrial process and presumably much steadier than the underlying trade statistics suggest on their own – annual trade figures are sensitive to shipment timing around year-end and to inventory/stock effects, which can otherwise dominate the apparent year-to-year change.
 - The result is floored at zero, since a negative N2-fixation flow has no physical meaning.
 

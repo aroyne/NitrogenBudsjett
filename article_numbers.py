@@ -7,8 +7,11 @@ Numbers quoted in the article, collected in one table per topic:
 
 Each row gives the mean of the central series (the deterministic run) over a
 start and an end period, the 2.5-97.5 % interval of the same mean across MC
-iterations (variant (i): each iteration is one consistent time series), and
-the Mann-Kendall p-value of the central series. Series that depend on Fodder crops (how N is split
+iterations (each iteration is one consistent time series), and the change
+from the start to the end period with its MC interval and the share of
+iterations with the same sign as the central change. The change is relative
+(%) for positive quantities and absolute (kt N, or percentage points for
+NUE) for balances and NUE. Series that depend on Fodder crops (how N is split
 between AG.MM and AG.SM) use Fodder crops scaled from 2021 on so that the
 change from 2020 to 2021 equals that in Eurostat's Gross Nutrient Balance
 (cfa.fodder_crops_level_adjusted), because SSB changed the method for eng til
@@ -127,25 +130,40 @@ def _mean(series_or_row, period):
     return series_or_row[..., cols].mean(axis=-1)
 
 
-def summarize(label, fn, df, sims, fodder=False, mc=True, function=''):
+def _change(start, end, absolute):
+    return end - start if absolute else (end / start - 1.0) * 100.0
+
+
+def summarize(label, fn, df, sims, fodder=False, mc=True, function='', absolute=False):
     """One table row: start/end period means of the central series, with the
     2.5-97.5 % interval across MC iterations of each iteration's own period
-    mean (variant (i)), and the Mann-Kendall p-value of the central series
-    over 1990-2024. If fodder, Fodder crops is level-adjusted (see
-    fodder_adjusted)."""
+    mean, and the change from start to end: central value, 2.5-97.5 % interval
+    of the change within each iteration, and the share of iterations whose
+    change has the same sign as the central one. absolute=True gives the
+    change in the quantity's own unit (balances, NUE); otherwise in % (also
+    used when the start value is not positive). If fodder, Fodder crops is
+    level-adjusted (see fodder_adjusted)."""
     end = END
     if fodder:
         df, sims = fodder_adjusted(df, sims)
-    series = fn(df)
-    values = series.reindex(YEARS).values
-    _, _, p = cfa.mann_kendall(values)
-    row = {'label': label, 'function': function, 'fodder': fodder, 'end': end,
-           'start_value': _mean(values, START), 'end_value': _mean(values, end),
-           'p': p, 'trend_end': YEARS[-1], 'mc': mc}
+    values = fn(df).reindex(YEARS).values
+    start_value, end_value = _mean(values, START), _mean(values, end)
+    absolute = absolute or not start_value > 0
     if mc:
         matrix = mc_matrix(fn, sims, function + (' [fodder adjusted]' if fodder else ''))
-        row['start_ci'] = np.percentile(_mean(matrix, START), [2.5, 97.5])
-        row['end_ci'] = np.percentile(_mean(matrix, end), [2.5, 97.5])
+        starts, ends = _mean(matrix, START), _mean(matrix, end)
+        # A relative change is meaningless if the start value can be zero or
+        # negative in the Monte Carlo; use the absolute change instead.
+        absolute = absolute or not np.percentile(starts, 2.5) > 0
+    row = {'label': label, 'function': function, 'fodder': fodder, 'end': end, 'mc': mc,
+           'start_value': start_value, 'end_value': end_value, 'absolute': absolute,
+           'change': _change(start_value, end_value, absolute)}
+    if mc:
+        row['start_ci'] = np.percentile(starts, [2.5, 97.5])
+        row['end_ci'] = np.percentile(ends, [2.5, 97.5])
+        changes = _change(starts, ends, absolute)
+        row['change_ci'] = np.percentile(changes, [2.5, 97.5])
+        row['same_sign'] = float(np.mean(np.sign(changes) == np.sign(row['change'])))
     return row
 
 
@@ -184,10 +202,6 @@ def fmt(x):
     return f"{x:.2f}"
 
 
-def fmt_p(p):
-    return '<0.001' if p < 0.001 else f"{p:.3f}"
-
-
 def period_label(period):
     return str(period[0]) if period[0] == period[1] else f"{period[0]}–{str(period[1])[2:]}"
 
@@ -196,8 +210,17 @@ def value_ci(value, ci):
     return f"{fmt(value)} [{fmt(ci[0])}, {fmt(ci[1])}]"
 
 
+def change_text(r):
+    unit = '' if r['absolute'] else ' %'
+    text = f"{r['change']:+.1f}{unit}".replace('-', '−')
+    if r['mc']:
+        lo, hi = (f"{x:+.1f}".replace('-', '−') for x in r['change_ci'])
+        text += f" [{lo}, {hi}] ({r['same_sign']:.0%})"
+    return text
+
+
 def trend_table(rows):
-    out = ["| Størrelse | 1990–92 [MC (i) 2,5–97,5 %] | Slutt [MC (i) 2,5–97,5 %] | MK p (periode) | Beregning |",
+    out = ["| Størrelse | 1990–92 [MC 2,5–97,5 %] | Slutt [MC 2,5–97,5 %] | Endring [MC 2,5–97,5 %] (andel samme fortegn) | Beregning |",
            "|---|---:|---:|---:|---|"]
     for r in rows:
         mark = ' †' if r['fodder'] else ''
@@ -206,7 +229,7 @@ def trend_table(rows):
         else:
             start, end = fmt(r['start_value']), fmt(r['end_value'])
         out.append(f"| {r['label']}{mark} | {start} | {period_label(r['end'])}: {end} "
-                   f"| {fmt_p(r['p'])} (1990–{r['trend_end']}) | `{r['function']}` |")
+                   f"| {change_text(r)} | `{r['function']}` |")
     return "\n".join(out)
 
 
@@ -229,30 +252,30 @@ def pool_rows(df, sims):
     rows = []
     for pool, subpools in POOLS.items():
         rows.append(summarize(f"**{pool}**", lambda d, p=pool: cfa.pool_balance(d, p), df, sims,
-                              function=f"pool_balance('{pool}')"))
+                              function=f"pool_balance('{pool}')", absolute=True))
         rows[-1]['code'] = WORD_TABLE_LABELS.get(pool, pool)
         for sub in subpools:
             rows.append(summarize(f"&nbsp;&nbsp;{sub}", lambda d, p=sub: cfa.pool_balance(d, p), df, sims,
-                                  fodder=sub in FODDER_DEPENDENT_POOLS, function=f"pool_balance('{sub}')"))
+                                  fodder=sub in FODDER_DEPENDENT_POOLS, function=f"pool_balance('{sub}')", absolute=True))
             rows[-1]['code'] = sub
     rows.append(summarize("**Hele økonomien** (mot AT.AT, HY.CW, RW.RW)", national_balance, df, sims,
-                          function='national_balance'))
+                          function='national_balance', absolute=True))
     rows.append(summarize("**Hele økonomien uten olje og gjødselproduksjon**",
                           lambda d: national_balance(d, exclude=OIL_FERTILIZER_FLOWS), df, sims,
-                          function='national_balance(exclude=…)'))
+                          function='national_balance(exclude=…)', absolute=True))
     return rows
 
 
 def nue_rows(df, sims):
     q2 = lambda d: cfa.q2_corrected_ag_whole_nue(d)[1]  # noqa: E731
     return [
-        summarize("Q1a AG-NUE, hele jordbruket (eksterne strømmer)", cfa.q1a_ag_whole_nue, df, sims, function='q1a_ag_whole_nue'),
-        summarize("Q1b AG.MM-NUE", cfa.q1b_ag_mm_nue, df, sims, fodder=True, function='q1b_ag_mm_nue'),
-        summarize("Q1c AG.SM-NUE", cfa.q1c_ag_sm_nue, df, sims, fodder=True, function='q1c_ag_sm_nue'),
-        summarize("Q2 AG-NUE korrigert for fôrimport", q2, df, sims, fodder=True, function='q2_corrected_ag_whole_nue'),
-        summarize("Q3 matsystem-NUE, landbasert", cfa.q3_food_system_nue, df, sims, function='q3_food_system_nue'),
+        summarize("Q1a AG-NUE, hele jordbruket (eksterne strømmer)", cfa.q1a_ag_whole_nue, df, sims, function='q1a_ag_whole_nue', absolute=True),
+        summarize("Q1b AG.MM-NUE", cfa.q1b_ag_mm_nue, df, sims, fodder=True, function='q1b_ag_mm_nue', absolute=True),
+        summarize("Q1c AG.SM-NUE", cfa.q1c_ag_sm_nue, df, sims, fodder=True, function='q1c_ag_sm_nue', absolute=True),
+        summarize("Q2 AG-NUE korrigert for fôrimport", q2, df, sims, fodder=True, function='q2_corrected_ag_whole_nue', absolute=True),
+        summarize("Q3 matsystem-NUE, landbasert", cfa.q3_food_system_nue, df, sims, function='q3_food_system_nue', absolute=True),
         summarize("Q3 matsystem-NUE med villfisk og akvakultur", cfa.q3_food_system_nue_incl_fish, df, sims,
-                  function='q3_food_system_nue_incl_fish'),
+                  function='q3_food_system_nue_incl_fish', absolute=True),
         summarize("Fjørfe + svin, andel av N i husdyrprodukter (%) (uten MC)",
                   lambda d: cfa.poultry_pork_share_of_animal_products(), df, sims, mc=False,
                   function='poultry_pork_share_of_animal_products'),
@@ -368,7 +391,7 @@ def _word_rows(rows, first_column, label_of):
             first_column: label,
             '1990-1992 central [2.5-97.5 %]': f"{whole(r['start_value'])} [{whole(r['start_ci'][0])}, {whole(r['start_ci'][1])}]",
             '2022-2024 central [2.5-97.5 %]': f"{whole(r['end_value'])} [{whole(r['end_ci'][0])}, {whole(r['end_ci'][1])}]{mark}",
-            'Mann-Kendall p': fmt_p(r['p']) + mark,
+            'Change [2.5-97.5 %] (share same sign)': change_text(r) + mark,
         })
     return pd.DataFrame(out)
 
@@ -386,7 +409,7 @@ def write_word_table(pool_rows_, nue_rows_):
         note = pd.DataFrame({'Merknad': [
             "† Fodder crops fra 2021 skalert slik at endringen 2020–2021 er lik Eurostats (GNB), i hver MC-iterasjon (SSBs metodeskifte for eng til slått i 2021).",
             "Verdi: periodesnittet i den deterministiske kjøringen (sentralverdi). Intervall: 2,5-97,5 % av samme snitt over MC-iterasjonene (variant (i)).",
-            "MK p: Mann-Kendall på sentralserien. Balanser i kt N/år, NUE i %, avrundet til hele tall.",
+            "Endring 1990–92 til 2022–24: balanser i kt N/år, NUE i prosentpoeng, andre størrelser i %; intervall regnet i hver MC-iterasjon; i parentes andelen iterasjoner med samme fortegn som sentralverdien. Balanser i kt N/år, NUE i %, avrundet til hele tall.",
         ]})
         note.to_excel(writer, index=False, sheet_name='Merknader')
     print(f"Skrevet: {OUTPUT_WORD_TABLE}")
@@ -429,7 +452,7 @@ def main():
 - Modellkjøring: `{cfa.STATS_FILE}` skrevet {stats_time}, {len(sims)} MC-iterasjoner
 - Git HEAD ved generering: `{head}`
 
-**Lesing av tabellene.** Hver MC-iterasjon gir ett snitt over perioden (variant (i), feil fullt korrelert i tid). Verdien er snittet i den deterministiske kjøringen (sentralverdien), og intervallet er 2,5- og 97,5-persentilen av MC-iterasjonenes snitt. MK p er Mann-Kendall-testen på sentralserien. Forholdstall mot 2005 for NOx og NH3 har nesten ingen MC-spredning, fordi usikkerheten i disse er en faktor som er lik for alle år og faller bort i forholdet. Rader merket † avhenger av hvordan Fodder crops fordeler N mellom AG.MM og AG.SM. SSB endret metoden for eng til slått i 2021, og modellen korrigerer ikke spranget. For disse radene er Fodder crops fra 2021 derfor skalert slik at endringen fra 2020 til 2021 er lik endringen i Eurostats nitrogenbalanse (Gross Nutrient Balance, grovfôr), regnet i hver MC-iterasjon for seg (`fodder_crops_level_adjusted`). Eurostat beregner den norske balansen selv fra 2020 og har et mye mindre sprang i 2021. Kolonnen «Beregning» viser funksjonen i `calculations_for_article.py` (eller i dette skriptet), dokumentert i `claude_tekst/2026-09-25_calculations_for_article_metodenotat.md`. Alle balanser er tilførsel minus fraførsel (kt N/år), uten interne strømmer mellom delpooler i samme pool.
+**Lesing av tabellene.** Hver MC-iterasjon er én sammenhengende tidsserie: registrerte data og spørreundersøkelser har egen usikkerhetsfaktor for hvert år, mens modeller, inventarer, antakelser og skjøter har samme faktor for alle år. Verdien er snittet i den deterministiske kjøringen (sentralverdien), og intervallet er 2,5- og 97,5-persentilen av MC-iterasjonenes snitt. Endringen fra startperioden til sluttperioden er regnet i hver iterasjon; intervallet er 2,5- og 97,5-persentilen av disse, og tallet i parentes er andelen iterasjoner med samme fortegn som sentralverdien. En endring regnes som robust når intervallet ikke omfatter null. Endringen er absolutt for balanser (kt N/år) og NUE (prosentpoeng), ellers relativ (%). Forholdstall mot 2005 for NOx og NH3 har nesten ingen MC-spredning, fordi usikkerheten i disse er en faktor som er lik for alle år og faller bort i forholdet. Rader merket † avhenger av hvordan Fodder crops fordeler N mellom AG.MM og AG.SM. SSB endret metoden for eng til slått i 2021, og modellen korrigerer ikke spranget. For disse radene er Fodder crops fra 2021 derfor skalert slik at endringen fra 2020 til 2021 er lik endringen i Eurostats nitrogenbalanse (Gross Nutrient Balance, grovfôr), regnet i hver MC-iterasjon for seg (`fodder_crops_level_adjusted`). Eurostat beregner den norske balansen selv fra 2020 og har et mye mindre sprang i 2021. Kolonnen «Beregning» viser funksjonen i `calculations_for_article.py` (eller i dette skriptet), dokumentert i `claude_tekst/2026-09-25_calculations_for_article_metodenotat.md`. Alle balanser er tilførsel minus fraførsel (kt N/år), uten interne strømmer mellom delpooler i samme pool.
 
 ## 1. Balanser for pooler og delpooler (kt N/år)
 
