@@ -203,9 +203,11 @@ class DatasetNoise:
     """
     Uncertainty factors for the data sets in one MC iteration.
     factor(key, year) is the multiplicative factor for data set `key` in
-    `year`. Each data set has one factor per iteration, the same for all
-    years; the calculations ask for it per year so that a year-to-year part
-    can be added here without changing them.
+    `year`. Data sets marked annual_draw = 'yes' in dataset_uncertainties
+    (registered data and surveys, whose errors are mostly new each year)
+    get an independent factor for each year; the others (modelled sources,
+    inventories, assumptions, splice factors) one factor for all years,
+    since their errors are mostly systematic.
 
     factor(key, year, sub=...) is an independent factor for one part of the
     data set (a facility, a sector), drawn from the same row in
@@ -219,6 +221,9 @@ class DatasetNoise:
         self._i = i
 
     def factor(self, key, year, sub=None):
+        if self._sampler is not None and key in self._sampler.annual_keys:
+            item_id = key if sub is None else f"{key}:{sub}"
+            return self._sampler.annual_factor(key, item_id, year, self._i)
         if sub is None:
             return self._factors[key]
         return self._sampler.sub_factor(key, sub, self._i)
@@ -276,8 +281,14 @@ class MCSampler:
         ids = df['dataset_name'].astype(str).str.strip()
         _check_unique(group, ids)
         self._dataset_rows = {}
+        self.annual_keys = set()
         for item_id, (_, row) in zip(ids, df.iterrows()):
             self._dataset_rows[item_id] = row
+            annual = str(row['annual_draw']).strip().lower()
+            if annual not in ('yes', 'no'):
+                raise ValueError(f"{group} / {item_id}: annual_draw må være 'yes' eller 'no'")
+            if annual == 'yes':
+                self.annual_keys.add(item_id)
             add(group, item_id, 1.0, _draw_row(seed, group, item_id, n_random, 1.0, row))
 
         # CLRTAP inventory: one factor per (noise_group, pollutant), from the
@@ -367,6 +378,21 @@ class MCSampler:
         sigma = np.log(1.0 + u / 100.0) / 1.96
         return float(np.exp(items[fill_id][i] * sigma))
 
+    def annual_factor(self, key, item_id, year, i):
+        """
+        Factor for data set `key` (or one part of it, item_id = key:sub) in
+        one year, independent between years: one (nsim,) array per
+        (item_id, year), drawn on first use from its own stream with the
+        row's distribution. Row 0 is 1.0.
+        """
+        group = 'dataset_uncertainties_annual'
+        draw_id = f"{item_id}@{int(year)}"
+        items = self.draws.setdefault(group, {})
+        if draw_id not in items:
+            rnd = _draw_row(self.seed, group, draw_id, self.nsim - 1, 1.0, self._dataset_rows[key])
+            items[draw_id] = np.concatenate(([1.0], rnd))
+        return float(items[draw_id][i])
+
     def sub_factor(self, key, sub, i):
         """
         Factor for part `sub` of data set `key` in iteration i. The (nsim,)
@@ -383,10 +409,17 @@ class MCSampler:
         return float(items[item_id][i])
 
     def to_long(self):
-        """All drawn values in long format: sim_id, group, id, value."""
+        """
+        All drawn values in long format: sim_id, group, id, value. The
+        annual dataset factors (one array per data set, part and year, about
+        12 000 in a full run) are left out to keep the file small; they can
+        be recreated from the seed.
+        """
         frames = []
         sim_ids = np.arange(self.nsim)
         for group, items in self.draws.items():
+            if group == 'dataset_uncertainties_annual':
+                continue
             for key, arr in items.items():
                 frames.append(pd.DataFrame({'sim_id': sim_ids, 'group': group,
                                             'id': key, 'value': arr}))

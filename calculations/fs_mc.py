@@ -302,7 +302,7 @@ def _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise):
             fill = {'storfe': dataset_noise.fill('carry', 'utmark cattle', year, [first_year]),
                     'geit_og_hest': dataset_noise.fill('carry', 'utmark goats and horses', year, [first_year]),
                     'sauer': dataset_noise.fill('extrapolation', 'utmark sheep', year, [first_year])}
-            n = {group: animals.loc[first_year, group] * dataset_noise.factor('12660', year) * fill[group] for group in fem_1996}
+            n = {group: animals.loc[first_year, group] * dataset_noise.factor('12660', first_year) * fill[group] for group in fem_1996}
             n['sauer'] *= sheep_index[year] / sheep_index[first_year]
             src = 'SSB table 12660, 1995 level; sheep scaled with SSB table 03710'
         fem = sum(n[group] * fem_per_animal[group] for group in fem_1996)

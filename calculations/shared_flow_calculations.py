@@ -781,11 +781,13 @@ def find_industrial_waste_fuels(df_bio_08205, df_bio_11561, current_params, data
     gwh_11561 = df_bio_11561['GWh']
     scale = sum(gwh_08205[y] for y in overlap) / sum(gwh_11561[y] for y in overlap)
 
-    # The level comes from 08205, so these years take 08205's factor, plus
-    # the uncertainty of the scaling factor itself.
-    scale *= dataset_noise.factor('splice:industrial waste fuels', first_08205)
+    # The level comes from 08205 in the overlap years, so these years take
+    # 08205's factor averaged over the same years, plus the uncertainty of
+    # the scaling factor itself.
+    level_08205 = sum(dataset_noise.factor('08205', y) for y in overlap) / len(overlap)
+    scale *= level_08205 * dataset_noise.factor('splice:industrial waste fuels', first_08205)
     for year in range(1990, first_08205):
-        year_values[year] = gwh_to_kt_N(gwh_11561[year] * scale) * dataset_noise.factor('08205', year)
+        year_values[year] = gwh_to_kt_N(gwh_11561[year] * scale)
 
     return year_values
 
