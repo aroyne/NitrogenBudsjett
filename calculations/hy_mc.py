@@ -27,7 +27,7 @@ def execute_calculations_hy(preloaded_data, current_params, dataset_noise):
     results = []
     
     years_sorted = sorted(list(EXPECTED_YEARS))
-    outflow_tracker = pd.DataFrame({'value': 0.0, 'entries': 0}, index=years_sorted)
+    outflow_tracker = pd.DataFrame({'raw': 0.0, 'entries': 0}, index=years_sorted)
             
     # 'aqua_modern'/'aqua_old' <- A.06.002_20251111-140559.xlsx (1994 onward)
     # and akvakultur_1984_1994.xlsx (data_loader.py DATA_MAP, 'excel_aquaculture'
@@ -62,7 +62,7 @@ def _add_inflow_to_coastal_waters(results, preloaded_data, current_params, datas
     flow_code = 'HY.SW-HY.CW-Inflow to coastal waters-Nmix'
     collected_years = set()
 
-    key_teotil = 'TEOTIL'
+    key_teotil = 'TEOTIL:to_coast'
 
     ww_discharge_dict = find_treated_wastewater_discharge(
         df_05280=preloaded_data.get('hy_ssb_05280_raw'),
@@ -80,7 +80,10 @@ def _add_inflow_to_coastal_waters(results, preloaded_data, current_params, datas
         val = raw_val * dataset_noise.factor(key_teotil, year)
 
         outflow_tracker.loc[year, 'entries'] = 1
-        outflow_tracker.loc[year, 'value'] = val
+        # Stored without the to-coast factor: the retention derived from
+        # this outflow takes the retention factor instead (its level comes from
+        # TEOTIL3's retention), see _add_surface_water_emissions.
+        outflow_tracker.loc[year, 'raw'] = raw_val
 
         results.append({
             'flow_name': flow_code, 'year': year, 'value': val,
@@ -116,7 +119,6 @@ def _add_inflow_to_coastal_waters(results, preloaded_data, current_params, datas
             # aquaculture, wastewater), so it can go negative.
             val = floor_residual_at_zero(val, flow_code, year)
             outflow_tracker.loc[year, 'entries'] = 1
-            outflow_tracker.loc[year, 'value'] = val
 
             results.append({
                 'flow_name': flow_code, 'year': year, 'value': val,
@@ -215,7 +217,7 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
 
     fraction_N2O = float(current_params.get("surface_water_fraction_to_N2O"))
 
-    key_teotil = 'TEOTIL'
+    key_teotil = 'TEOTIL:retention'
     key_interp = 'trend interpolation'
 
 
@@ -254,8 +256,8 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
         if year in outflow_tracker.index and outflow_tracker.loc[year, 'entries'] == 1:
             collected_years.add(year)
 
-            hist_ret_val = outflow_tracker.loc[year, 'value'] * ret_ratio
-            hist_ret_val *= dataset_noise.factor(key_interp, year)
+            hist_ret_val = outflow_tracker.loc[year, 'raw'] * ret_ratio
+            hist_ret_val *= dataset_noise.factor(key_teotil, year) * dataset_noise.factor(key_interp, year)
 
             results.append({'flow_name': flow_n2, 'year': year, 'value': hist_ret_val * (1.0 - fraction_N2O),
                             'comment': 'ok', 'data_sources': 'Calculation model'})

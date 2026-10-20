@@ -175,7 +175,7 @@ def _add_luc_N2O_emissions_mc(results, preloaded_data, current_params, dataset_n
 def _add_overland_flow_urban_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'HS.HS-HY.SW-Overland flow-Nmix'
     collected_years = set()
-    dataset_key = 'TEOTIL'
+    dataset_key = 'TEOTIL:urban'
 
     # 'hy_teotil3_by_source' <- teotil3_n_summary.xlsx (data_loader.py
     # DATA_MAP): relevant N flows extracted from the TEOTIL model, 2013 onward.

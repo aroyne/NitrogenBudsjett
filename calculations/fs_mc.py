@@ -141,7 +141,7 @@ def _add_land_leaching_mc(results, preloaded_data, current_params, dataset_noise
     """
     collected_years = set()
     data_sources = 'TEOTIL'
-    dataset_key = 'TEOTIL'
+    dataset_key = 'TEOTIL:natural'
 
     teotil2 = find_teotil2_bias_corrected(preloaded_data)
     df_teotil3 = preloaded_data.get('hy_teotil3_by_source')
