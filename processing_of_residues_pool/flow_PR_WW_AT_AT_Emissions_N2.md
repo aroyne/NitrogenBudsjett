@@ -26,7 +26,7 @@ nav_order: 2
 
 #### Interpretations and comparisons
 
-- The flow rises from 0.1 kt N in 1995 to 1.5–1.6 kt N around 2000 and 3.4–4.9 kt N since 2012, as more plants have introduced nitrogen removal.
+- The flow rises from 0.1 kt N in 1995 to 1.5–1.6 kt N around 2000 and 3.6–5.2 kt N since 2012, as more plants have introduced nitrogen removal.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

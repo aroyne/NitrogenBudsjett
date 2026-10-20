@@ -22,11 +22,9 @@ nav_order: 2
 - N inputs to soils in settlements (Table 4(I), 0.022 kt N/year): 1.9 kt N of organic fertilizers (such as sewage sludge and compost) applied to settlement areas, with direct emissions at an implied emission factor of 0.006 kg N2O–N per kg N, plus indirect emissions from the part of the N that volatilises (0.39 kt N) or is lost by leaching and run-off (0.44 kt N). Inorganic fertilizer used in settlements is reported under another category (notation key IE).
 - Drained organic soils (Table 4(II), 0.046 kt N/year): area-based emission factors of about 1.5–1.6 kg N2O–N per hectare for forest and wetland converted to settlements (4.0 and 1.6 kha), and emissions from drained organic soils in settlements remaining settlements.
 - Mineralisation of soil organic matter on land converted to settlements (Table 4(III), 0.032 kt N/year): the N released when soil carbon is lost (0.47 kt N on 73 kha in 2024, mainly forest and grassland converted to settlements) gives direct emissions and indirect emissions from leaching (0.011 kg N2O–N per kg N). Mineral soils in settlements remaining settlements are assumed to be in steady state and give no emissions.
-- The inventory gives an uncertainty of 201% (95% interval).
-
 #### Assumptions
 
-- The uncertainty is modelled as a lognormal distribution with the reported value as median.
+- The inventory values are used directly, converted from N2O to N.
 
 #### Interpretations and comparisons
 

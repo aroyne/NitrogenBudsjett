@@ -23,11 +23,9 @@ nav_order: 2
     - Fertilization of forest (Table 4(I), 0.009 kt N/year): 0.47 kt N of inorganic fertilizer, with direct emissions and indirect emissions from volatilised and leached N.
     - Mineralisation of soil organic matter after land-use change to forest (Table 4(III), 0.001 kt N/year).
     - Forest fires (Table 4(IV), 427 ha burned in 2024, 0.0006 kt N/year).
-- The inventory gives an uncertainty of 201% (95% interval).
-
 #### Assumptions
 
-- The uncertainty is modelled as a lognormal distribution with the reported value as median.
+- The inventory values are used directly, converted from N2O to N.
 
 #### Interpretations and comparisons
 

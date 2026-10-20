@@ -28,9 +28,9 @@ nav_order: 7
 
 #### Interpretations and comparisons
 
-- Crude oil dominates the flow, accounting for over 99% of its N content, giving a total on the order of 160–220 kt N per year (2013–2023).
+- Crude oil dominates the flow, accounting for over 99% of its N content. The flow is 70–85 kt N per year in 2012–2024, after a peak of about 145 kt N around 2000 when crude oil exports were highest.
 - The uncertainty of the flow lies mainly in the N content of crude oil, which varies between fields.
-- The flow is broadly consistent with the Norway-specific crude oil N content and export estimate of Hohmann-Marriott (2025)<!--cite:hohmann-marriott_nitrogen_2025-->.
+- Hohmann-Marriott (2025)<!--cite:hohmann-marriott_nitrogen_2025--> used 0.4% N in crude oil, from a few crude oil samples in a laboratory study of produced water (Dudek et al. 2017), about four times the value used here from the assays of Norway's export blends, and their export estimate is correspondingly higher.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

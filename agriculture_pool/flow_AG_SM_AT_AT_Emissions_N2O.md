@@ -28,7 +28,7 @@ nav_order: 3
 #### Interpretations and comparisons
 
 - The flow is about 3.4–3.9 kt N per year, with a slight decrease since 1990.
-- The uncertainty is large (CV about 40%), mainly from the emission factors.
+- The uncertainty is large, mainly from the emission factors (a factor of 3 in Norway's greenhouse gas inventory).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

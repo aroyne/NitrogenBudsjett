@@ -27,7 +27,7 @@ nav_order: 16
 
 #### Interpretations and comparisons
 
-- The flow is about 35–42 kt N per year up to 2021 and falls to 25 kt N in 2024, following lower Norwegian NOx emissions.
+- The flow is about 31–41 kt N per year up to 2021 and falls to 25 kt N in 2024, following lower Norwegian NOx emissions.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
