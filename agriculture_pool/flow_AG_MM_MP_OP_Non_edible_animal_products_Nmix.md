@@ -34,16 +34,16 @@ nav_order: 7
 
 ### Uncertainty
 
-Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-20.
 
-| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
-|---|---|---|---|---|---|
-| FAOSTAT crops and livestock products (production) | Registered data | ±10 %, normal, drawn per year | 8% | 38% | [Animal Products](../agriculture_pool/flow_AG_MM_MP_FP_Animal_products_Nmix.html), [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
-| N content of animal product: Raw hides and skins | Parameter | ±10 % | 8% | 36% | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
-| N content of wool | Parameter | ±10 %, normal | 8% | 21% | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
-| Wool deliveries (Norwegian Agriculture Agency) | Registered data | ±5 %, normal, drawn per year | – | 5% | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
-| Number of sheep (SSB 03710) | Registered data | ±5 %, normal, drawn per year | 2% | – | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
-| Wool per sheep per year | Parameter | ±30 %, normal | 73% | – | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|---|---|
+| FAOSTAT crops and livestock products (production) | Registered data | ±10 %, normal, drawn per year | 8% | 38% | 0.50 | 0.57 | [Animal Products](../agriculture_pool/flow_AG_MM_MP_FP_Animal_products_Nmix.html), [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| N content of animal product: Raw hides and skins | Parameter | ±10 % | 8% | 36% | 0.50 | 0.57 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| N content of wool | Parameter | ±10 %, normal | 8% | 21% | 0.50 | 0.43 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| Wool deliveries (Norwegian Agriculture Agency) | Registered data | ±5 %, normal, drawn per year | – | 5% | – | 0.43 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| Number of sheep (SSB 03710) | Registered data | ±5 %, normal, drawn per year | 2% | – | 0.50 | – | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| Wool per sheep per year | Parameter | ±30 %, normal | 73% | – | 0.50 | – | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
 
 ### References
 

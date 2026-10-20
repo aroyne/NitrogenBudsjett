@@ -220,6 +220,7 @@ def _uncertainty_tables(pages):
         if page is None:
             continue
         shares = g.pivot_table(index='source_id', columns='period', values='share', aggfunc='sum')
+        elast = g.pivot_table(index='source_id', columns='period', values='elasticity', aggfunc='mean')
         keep = shares[(shares >= UNCERTAINTY_MIN_SHARE).any(axis=1)]
         if keep.empty:
             continue
@@ -232,10 +233,14 @@ def _uncertainty_tables(pages):
                  "and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. "
                  "Shares are averages over the years of the period. They are indicative where the flow is a residual close "
                  "to zero or a source has a strongly skewed distribution. "
+                 "Elasticity: relative change in the flow per relative change in the source; a negative value means "
+                 "the flow decreases when the source increases. "
                  f"Computed {when}.", "",
-                 "| Source | Type | Uncertainty (95 %) | " + " | ".join(f"Share of variance {p.replace('-', '–')}" for p in periods)
+                 "| Source | Type | Uncertainty (95 %) | "
+                 + " | ".join(f"Share of variance {p.replace('-', '–')}" for p in periods) + " | "
+                 + " | ".join(f"Elasticity {p.replace('-', '–')}" for p in periods)
                  + " | Other flows affected |",
-                 "|---|---|---|" + "---|" * len(periods) + "---|"]
+                 "|---|---|---|" + "---|" * (2 * len(periods)) + "---|"]
         for sid, row in keep.iterrows():
             r = info.loc[sid]
             others = [f for f in str(r['other_flows']).split(';') if f and f != 'nan']
@@ -244,6 +249,8 @@ def _uncertainty_tables(pages):
                 shown += f" and {len(others) - UNCERTAINTY_MAX_LINKS} more"
             cells = [f"{row[p]:.0%}" if pd.notna(row[p]) and row[p] >= 0.005 else "<1%" if pd.notna(row[p]) else "–"
                      for p in periods]
+            erow = elast.loc[sid].reindex(periods)
+            cells += [f"{erow[p]:.2f}".replace('-', '−') if pd.notna(erow[p]) else "–" for p in periods]
             lines.append(f"| {r['source']} | {r['type']} | {r['uncertainty'] if pd.notna(r['uncertainty']) else ''} | "
                          + " | ".join(cells) + f" | {shown or 'none'} |")
         tables[page['file']] = "\n".join(lines) + "\n"

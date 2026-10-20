@@ -35,13 +35,13 @@ nav_order: 4
 
 ### Uncertainty
 
-Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-20.
 
-| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
-|---|---|---|---|---|---|
-| NH3, Animal manure applied to soils (NFR 3Da2a) | Inventory with published uncertainty | ±36 %, normal | 88% | 90% | none |
-| NH3, Urine and dung deposited by grazing animals (NFR 3Da3) | Inventory with published uncertainty | −58/+138 %, lognormal | 6% | 7% | [Other Land Emissions (NH3)](../forests_and_semi_natural_pool/flow_FS_OL_AT_AT_Emissions_NH3.html) |
-| NH3, Inorganic N-fertilizers (includes also urea application) (NFR 3Da1) | Inventory with published uncertainty | −33.3/+50 %, lognormal | 5% | 3% | none |
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|---|---|
+| NH3, Animal manure applied to soils (NFR 3Da2a) | Inventory with published uncertainty | ±36 %, normal | 88% | 90% | 0.73 | 0.76 | none |
+| NH3, Urine and dung deposited by grazing animals (NFR 3Da3) | Inventory with published uncertainty | −58/+138 %, lognormal | 6% | 7% | 0.07 | 0.08 | [Other Land Emissions (NH3)](../forests_and_semi_natural_pool/flow_FS_OL_AT_AT_Emissions_NH3.html) |
+| NH3, Inorganic N-fertilizers (includes also urea application) (NFR 3Da1) | Inventory with published uncertainty | −33.3/+50 %, lognormal | 5% | 3% | 0.15 | 0.13 | none |
 
 ### References
 

@@ -32,12 +32,12 @@ nav_order: 6
 
 ### Uncertainty
 
-Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-20.
 
-| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
-|---|---|---|---|---|---|
-| N content of traded goods: crude oil | N content of traded goods | 0.0002–0.015, lognormal | 76% | 76% | [Fuel export](../energy_and_fuels_pool/flow_EF_EC_RW_RW_Fuel_export_Nmix.html) |
-| N content of traded goods: bitomenous coal | N content of traded goods | 0.005–0.025, triangular | 1% | 13% | none |
-| N content of traded goods: residual fuel oil | N content of traded goods | 0.001–0.008 (min–max), triangular | 3% | 7% | [Fuel export](../energy_and_fuels_pool/flow_EF_EC_RW_RW_Fuel_export_Nmix.html) |
-| N content of traded goods: coking coal | N content of traded goods | 0.0057–0.0168, triangular | 6% | 3% | none |
-| N content of traded goods: lignite | N content of traded goods | 0.004–0.025 (min–max), triangular | 12% | <1% | none |
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|---|---|
+| N content of traded goods: crude oil | N content of traded goods | 0.0002–0.015, lognormal | 76% | 76% | 0.15 | 0.21 | [Fuel export](../energy_and_fuels_pool/flow_EF_EC_RW_RW_Fuel_export_Nmix.html) |
+| N content of traded goods: bitomenous coal | N content of traded goods | 0.005–0.025, triangular | 1% | 13% | 0.07 | 0.29 | none |
+| N content of traded goods: residual fuel oil | N content of traded goods | 0.001–0.008 (min–max), triangular | 3% | 7% | 0.14 | 0.23 | [Fuel export](../energy_and_fuels_pool/flow_EF_EC_RW_RW_Fuel_export_Nmix.html) |
+| N content of traded goods: coking coal | N content of traded goods | 0.0057–0.0168, triangular | 6% | 3% | 0.23 | 0.17 | none |
+| N content of traded goods: lignite | N content of traded goods | 0.004–0.025 (min–max), triangular | 12% | <1% | 0.31 | 0.00 | none |

@@ -36,13 +36,13 @@ nav_order: 2
 
 ### Uncertainty
 
-Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-20.
 
-| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
-|---|---|---|---|---|---|
-| TEOTIL, leaching from forest and other land | Modelled statistics | ±30 %, normal | 50% | 96% | [Forest Leaching](../forests_and_semi_natural_pool/flow_FS_FO_HY_SW_Leaching_Nmix.html) |
-| Held constant or averaged (2023+) | Gap filling: held constant or averaged | ±15–15 %, lognormal, grows with distance to known year | – | 4% | none |
-| Share of background leaching assigned to other land | Parameter | ±30 %, normal | 49% | – | none |
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|---|---|
+| TEOTIL, leaching from forest and other land | Modelled statistics | ±30 %, normal | 50% | 96% | 1.00 | 1.00 | [Forest Leaching](../forests_and_semi_natural_pool/flow_FS_FO_HY_SW_Leaching_Nmix.html) |
+| Held constant or averaged (2023+) | Gap filling: held constant or averaged | ±15–15 %, lognormal, grows with distance to known year | – | 4% | – | 1.00 | none |
+| Share of background leaching assigned to other land | Parameter | ±30 %, normal | 49% | – | 1.00 | – | none |
 
 ### References
 

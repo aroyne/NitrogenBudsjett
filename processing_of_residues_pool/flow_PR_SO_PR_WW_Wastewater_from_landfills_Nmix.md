@@ -33,19 +33,19 @@ nav_order: 9
 
 ### Uncertainty
 
-Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-20.
 
-| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
-|---|---|---|---|---|---|
-| Facility reports of N to water (Norwegian Environment Agency) (støleheia avfallsanlegg - deponi (avfall sør husholdning as)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 36% | none |
-| Facility reports of N to water (Norwegian Environment Agency) (bjorstaddalen næring deponi (bjorstaddalen næring as)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 28% | none |
-| Facility reports of N to water (Norwegian Environment Agency) (sele avfallsplass - deponi (ivar iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 8% | none |
-| Facility reports of N to water (Norwegian Environment Agency) (grønmo avfallsanlegg - deponi (nedlagt - avslutningsfase) (etterdrift) (oslo kommune eiendoms- og byfornyelsesetaten)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 4% | none |
-| Facility reports of N to water (Norwegian Environment Agency) (solgård avfallsplass - deponi (movar iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 3% | none |
-| Facility reports of N to water (Norwegian Environment Agency) (roaf miljøpark - deponi (romerike avfallsforedling iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 3% | none |
-| Facility reports of N to water (Norwegian Environment Agency) (glør roverudmyra deponi kategori 2, ordinært avfall (renovasjonsselskapet glør iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | 1% | 2% | none |
-| Facility reports of N to water (Norwegian Environment Agency) (esval miljøpark - ordinært deponi (esval miljøpark nes kf)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 2% | none |
-| Extrapolation (landfill N:CH4 index) | Gap filling: extrapolation | ±50–50 %, lognormal, grows with distance to known year | 97% | – | [Leaching from Landfills](../processing_of_residues_pool/flow_PR_SO_HY_SW_Leaching_Nmix.html) |
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|---|---|
+| Facility reports of N to water (Norwegian Environment Agency) (støleheia avfallsanlegg - deponi (avfall sør husholdning as)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 36% | 0.08 | 0.15 | none |
+| Facility reports of N to water (Norwegian Environment Agency) (bjorstaddalen næring deponi (bjorstaddalen næring as)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 28% | 0.09 | 0.13 | none |
+| Facility reports of N to water (Norwegian Environment Agency) (sele avfallsplass - deponi (ivar iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 8% | 0.06 | 0.07 | none |
+| Facility reports of N to water (Norwegian Environment Agency) (grønmo avfallsanlegg - deponi (nedlagt - avslutningsfase) (etterdrift) (oslo kommune eiendoms- og byfornyelsesetaten)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 4% | 0.05 | 0.05 | none |
+| Facility reports of N to water (Norwegian Environment Agency) (solgård avfallsplass - deponi (movar iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 3% | 0.04 | 0.04 | none |
+| Facility reports of N to water (Norwegian Environment Agency) (roaf miljøpark - deponi (romerike avfallsforedling iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 3% | 0.04 | 0.04 | none |
+| Facility reports of N to water (Norwegian Environment Agency) (glør roverudmyra deponi kategori 2, ordinært avfall (renovasjonsselskapet glør iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | 1% | 2% | 0.11 | 0.04 | none |
+| Facility reports of N to water (Norwegian Environment Agency) (esval miljøpark - ordinært deponi (esval miljøpark nes kf)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 2% | 0.02 | 0.04 | none |
+| Extrapolation (landfill N:CH4 index) | Gap filling: extrapolation | ±50–50 %, lognormal, grows with distance to known year | 97% | – | 1.00 | – | [Leaching from Landfills](../processing_of_residues_pool/flow_PR_SO_HY_SW_Leaching_Nmix.html) |
 
 ### References
 

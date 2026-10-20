@@ -39,13 +39,13 @@ nav_order: 5
 
 ### Uncertainty
 
-Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-20.
 
-| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
-|---|---|---|---|---|---|
-| Facility reports of N to water (Norwegian Environment Agency) (DuPont Nutrition Norge AS (tidligere FMC)) | Survey or self-reported data | ±30 %, normal, drawn per year | 73% | 57% | none |
-| Held constant or averaged (2023+) | Gap filling: held constant or averaged | ±15–15 %, lognormal, grows with distance to known year | – | 13% | none |
-| Facility reports of N to water (Norwegian Environment Agency) (Biproduktanlegget på Kverva - laks - Nutrimar AS) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 13% | none |
-| Facility reports of N to water (Norwegian Environment Agency) (Innovamar - slakteri og fiskeforedling - Kverva) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 3% | none |
-| Facility reports of N to water (Norwegian Environment Agency) (Hav Line - Slakteskipet Norwegian Gannet) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 2% | none |
-| Held constant or averaged (1994-1998) | Gap filling: held constant or averaged | ±15–30 %, lognormal, grows with distance to known year | 27% | – | none |
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|---|---|
+| Facility reports of N to water (Norwegian Environment Agency) (DuPont Nutrition Norge AS (tidligere FMC)) | Survey or self-reported data | ±30 %, normal, drawn per year | 73% | 57% | 0.92 | 0.26 | none |
+| Held constant or averaged (2023+) | Gap filling: held constant or averaged | ±15–15 %, lognormal, grows with distance to known year | – | 13% | – | 1.00 | none |
+| Facility reports of N to water (Norwegian Environment Agency) (Biproduktanlegget på Kverva - laks - Nutrimar AS) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 13% | – | 0.09 | none |
+| Facility reports of N to water (Norwegian Environment Agency) (Innovamar - slakteri og fiskeforedling - Kverva) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 3% | – | 0.06 | none |
+| Facility reports of N to water (Norwegian Environment Agency) (Hav Line - Slakteskipet Norwegian Gannet) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 2% | – | 0.05 | none |
+| Held constant or averaged (1994-1998) | Gap filling: held constant or averaged | ±15–30 %, lognormal, grows with distance to known year | 27% | – | 1.00 | – | none |

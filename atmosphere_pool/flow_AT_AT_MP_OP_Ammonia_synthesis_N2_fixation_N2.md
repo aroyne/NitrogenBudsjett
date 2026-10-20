@@ -35,10 +35,10 @@ nav_order: 15
 
 ### Uncertainty
 
-Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-20.
 
-| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
-|---|---|---|---|---|---|
-| FAOSTAT fertilizers by nutrient (export) | Modelled statistics | ±30 %, normal | – | 97% | [Mineral Fertilizer Export](../materials_and_products_pool/flow_MP_OP_RW_RW_Mineral_fertilizer_export_Nmix.html) |
-| FAOSTAT fertilizers by nutrient (use) | Modelled statistics | ±30 %, normal | – | 2% | [Mineral Fertilizer for Agriculture](../materials_and_products_pool/flow_MP_OP_AG_SM_Mineral_fertilizer_Nmix.html), [Mineral Fertilizer for HS](../materials_and_products_pool/flow_MP_OP_HS_HS_Mineral_fertilizer_Nmix.html) |
-| FAOSTAT fertilizers by nutrient (production) | Modelled statistics | ±30 %, normal | 100% | – | none |
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|---|---|
+| FAOSTAT fertilizers by nutrient (export) | Modelled statistics | ±30 %, normal | – | 97% | – | 2.09 | [Mineral Fertilizer Export](../materials_and_products_pool/flow_MP_OP_RW_RW_Mineral_fertilizer_export_Nmix.html) |
+| FAOSTAT fertilizers by nutrient (use) | Modelled statistics | ±30 %, normal | – | 2% | – | 0.31 | [Mineral Fertilizer for Agriculture](../materials_and_products_pool/flow_MP_OP_AG_SM_Mineral_fertilizer_Nmix.html), [Mineral Fertilizer for HS](../materials_and_products_pool/flow_MP_OP_HS_HS_Mineral_fertilizer_Nmix.html) |
+| FAOSTAT fertilizers by nutrient (production) | Modelled statistics | ±30 %, normal | 100% | – | 1.62 | – | none |

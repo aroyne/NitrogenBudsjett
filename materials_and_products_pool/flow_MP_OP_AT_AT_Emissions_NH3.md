@@ -28,13 +28,13 @@ nav_order: 3
 
 ### Uncertainty
 
-Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-20.
 
-| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
-|---|---|---|---|---|---|
-| NH3, Glass production (NFR 2A3) | Inventory with published uncertainty | −69.9/+232 %, lognormal | 26% | 60% | none |
-| NH3, Other mineral products (please specify in the IIR) (NFR 2A6) | Inventory with published uncertainty | −68.2/+214 %, lognormal | 60% | 32% | none |
-| NH3, Nitric acid production (NFR 2B2) | Inventory with published uncertainty | ±10 %, normal | 12% | 8% | none |
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|---|---|
+| NH3, Glass production (NFR 2A3) | Inventory with published uncertainty | −69.9/+232 %, lognormal | 26% | 60% | 0.07 | 0.13 | none |
+| NH3, Other mineral products (please specify in the IIR) (NFR 2A6) | Inventory with published uncertainty | −68.2/+214 %, lognormal | 60% | 32% | 0.11 | 0.10 | none |
+| NH3, Nitric acid production (NFR 2B2) | Inventory with published uncertainty | ±10 %, normal | 12% | 8% | 0.72 | 0.74 | none |
 
 ### References
 

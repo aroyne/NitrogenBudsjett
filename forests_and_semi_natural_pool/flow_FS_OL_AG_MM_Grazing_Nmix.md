@@ -38,17 +38,17 @@ nav_order: 1
 
 ### Uncertainty
 
-Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-20.
 
-| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
-|---|---|---|---|---|---|
-| Protein per feed unit of grazing | Parameter | ±20 %, normal | 40% | 55% | [Fodder Crops Production](../agriculture_pool/flow_AG_SM_AG_MM_Fodder_crops_Nmix.html) |
-| Feed units of sheep on unmanaged land, 1996 | Parameter | ±20 %, normal | 18% | 23% | none |
-| Protein-to-N conversion factor (Jones factor) | Parameter | ±10 %, normal | 8% | 11% | [Live Animal Export](../agriculture_pool/flow_AG_MM_RW_RW_Live_animal_export_Nmix.html), [Fodder Crops Production](../agriculture_pool/flow_AG_SM_AG_MM_Fodder_crops_Nmix.html), [Seeds and Planting Material](../materials_and_products_pool/flow_MP_FP_AG_SM_Seeds_and_planting_material__Nmix.html), [Food Products to Consumers](../materials_and_products_pool/flow_MP_FP_HS_HS_Food_products_Nmix.html) and 1 more |
-| Feed units of cattle on unmanaged land, 1996 | Parameter | ±20 %, normal | 3% | 6% | none |
-| Livestock on unmanaged land (SSB 12660) | Registered data | ±5 %, normal, drawn per year | 3% | 3% | none |
-| Held constant or averaged (utmark cattle) | Gap filling: held constant or averaged | ±15–35 %, lognormal, grows with distance to known year | 4% | – | [Manure Application](../agriculture_pool/flow_AG_MM_AG_SM_Manure_application_Nmix.html), [Manure from Grazing on Unmanaged Land](../agriculture_pool/flow_AG_MM_FS_OL_Manure_from_grazing_on_unmanaged_land_Nmix.html), [N2O emissions from denitrification](../agriculture_pool/flow_AG_SM_AT_AT_Emissions_N2O.html), [NH3 emissions](../agriculture_pool/flow_AG_SM_AT_AT_Emissions_NH3.html) and 5 more |
-| Extrapolation (utmark sheep) | Gap filling: extrapolation | ±15–35 %, lognormal, grows with distance to known year | 22% | – | none |
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|---|---|
+| Protein per feed unit of grazing | Parameter | ±20 %, normal | 40% | 55% | 0.86 | 0.85 | [Fodder Crops Production](../agriculture_pool/flow_AG_SM_AG_MM_Fodder_crops_Nmix.html) |
+| Feed units of sheep on unmanaged land, 1996 | Parameter | ±20 %, normal | 18% | 23% | 0.57 | 0.55 | none |
+| Protein-to-N conversion factor (Jones factor) | Parameter | ±10 %, normal | 8% | 11% | −0.78 | −0.77 | [Live Animal Export](../agriculture_pool/flow_AG_MM_RW_RW_Live_animal_export_Nmix.html), [Fodder Crops Production](../agriculture_pool/flow_AG_SM_AG_MM_Fodder_crops_Nmix.html), [Seeds and Planting Material](../materials_and_products_pool/flow_MP_FP_AG_SM_Seeds_and_planting_material__Nmix.html), [Food Products to Consumers](../materials_and_products_pool/flow_MP_FP_HS_HS_Food_products_Nmix.html) and 1 more |
+| Feed units of cattle on unmanaged land, 1996 | Parameter | ±20 %, normal | 3% | 6% | 0.26 | 0.28 | none |
+| Livestock on unmanaged land (SSB 12660) | Registered data | ±5 %, normal, drawn per year | 3% | 3% | 0.86 | 0.85 | none |
+| Held constant or averaged (utmark cattle) | Gap filling: held constant or averaged | ±15–35 %, lognormal, grows with distance to known year | 4% | – | 0.26 | – | [Manure Application](../agriculture_pool/flow_AG_MM_AG_SM_Manure_application_Nmix.html), [Manure from Grazing on Unmanaged Land](../agriculture_pool/flow_AG_MM_FS_OL_Manure_from_grazing_on_unmanaged_land_Nmix.html), [N2O emissions from denitrification](../agriculture_pool/flow_AG_SM_AT_AT_Emissions_N2O.html), [NH3 emissions](../agriculture_pool/flow_AG_SM_AT_AT_Emissions_NH3.html) and 5 more |
+| Extrapolation (utmark sheep) | Gap filling: extrapolation | ±15–35 %, lognormal, grows with distance to known year | 22% | – | 0.57 | – | none |
 
 ### References
 

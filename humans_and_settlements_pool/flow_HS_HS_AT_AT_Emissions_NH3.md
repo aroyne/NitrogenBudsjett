@@ -34,13 +34,13 @@ nav_order: 1
 
 ### Uncertainty
 
-Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-20.
 
-| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
-|---|---|---|---|---|---|
-| NH3 emission factor per person | Parameter | ±20 %, normal | 75% | 97% | none |
-| Cigarettes per daily smoker per year | Parameter | 3300–5800, triangular | 16% | 1% | none |
-| NH3 emission factor per cigarette | Parameter | ±20 %, normal | 6% | <1% | none |
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|---|---|
+| NH3 emission factor per person | Parameter | ±20 %, normal | 75% | 97% | 0.75 | 0.91 | none |
+| Cigarettes per daily smoker per year | Parameter | 3300–5800, triangular | 16% | 1% | 0.21 | 0.06 | none |
+| NH3 emission factor per cigarette | Parameter | ±20 %, normal | 6% | <1% | 0.21 | 0.06 | none |
 
 ### References
 
