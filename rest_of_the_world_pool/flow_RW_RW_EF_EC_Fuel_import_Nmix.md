@@ -36,8 +36,10 @@ Sources with at least 2% of the variance of this flow in one of the periods, fro
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| N content of traded goods: crude oil | N content of traded goods | 0.0002–0.015, lognormal | 76% | 76% | 0.15 | 0.21 | [Fuel export](../energy_and_fuels_pool/flow_EF_EC_RW_RW_Fuel_export_Nmix.html) |
-| N content of traded goods: bitomenous coal | N content of traded goods | 0.005–0.025, triangular | 1% | 13% | 0.07 | 0.29 | none |
-| N content of traded goods: residual fuel oil | N content of traded goods | 0.001–0.008 (min–max), triangular | 3% | 7% | 0.14 | 0.23 | [Fuel export](../energy_and_fuels_pool/flow_EF_EC_RW_RW_Fuel_export_Nmix.html) |
-| N content of traded goods: coking coal | N content of traded goods | 0.0057–0.0168, triangular | 6% | 3% | 0.23 | 0.17 | none |
-| N content of traded goods: lignite | N content of traded goods | 0.004–0.025 (min–max), triangular | 12% | <1% | 0.31 | 0.00 | none |
+| N content of traded goods: bitomenous coal | N content of traded goods | 0.005–0.025, triangular | 4% | 49% | 0.08 | 0.33 | none |
+| N content of traded goods: residual fuel oil | N content of traded goods | 0.001–0.008 (min–max), triangular | 12% | 24% | 0.15 | 0.26 | [Fuel export](../energy_and_fuels_pool/flow_EF_EC_RW_RW_Fuel_export_Nmix.html) |
+| N content of traded goods: coking coal | N content of traded goods | 0.0057–0.0168, triangular | 24% | 11% | 0.26 | 0.20 | none |
+| N content of traded goods: crude oil | N content of traded goods | 0.0005–0.002, lognormal | 3% | 7% | 0.07 | 0.10 | [Fuel export](../energy_and_fuels_pool/flow_EF_EC_RW_RW_Fuel_export_Nmix.html) |
+| N content of traded goods: anthracite | N content of traded goods | 0.002–0.035 (min–max), triangular | 5% | 5% | 0.09 | 0.09 | none |
+| Traded quantities (SSB 08801) (fuel) | Registered data | ±5 %, normal, drawn per year | 3% | 2% | 1.00 | 1.00 | [Fuel export](../energy_and_fuels_pool/flow_EF_EC_RW_RW_Fuel_export_Nmix.html) |
+| N content of traded goods: lignite | N content of traded goods | 0.004–0.025 (min–max), triangular | 49% | <1% | 0.34 | 0.00 | none |

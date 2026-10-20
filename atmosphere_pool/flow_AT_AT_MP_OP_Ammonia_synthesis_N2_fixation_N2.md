@@ -39,6 +39,5 @@ Sources with at least 2% of the variance of this flow in one of the periods, fro
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| FAOSTAT fertilizers by nutrient (export) | Modelled statistics | ±30 %, normal | – | 97% | – | 2.09 | [Mineral Fertilizer Export](../materials_and_products_pool/flow_MP_OP_RW_RW_Mineral_fertilizer_export_Nmix.html) |
-| FAOSTAT fertilizers by nutrient (use) | Modelled statistics | ±30 %, normal | – | 2% | – | 0.31 | [Mineral Fertilizer for Agriculture](../materials_and_products_pool/flow_MP_OP_AG_SM_Mineral_fertilizer_Nmix.html), [Mineral Fertilizer for HS](../materials_and_products_pool/flow_MP_OP_HS_HS_Mineral_fertilizer_Nmix.html) |
-| FAOSTAT fertilizers by nutrient (production) | Modelled statistics | ±30 %, normal | 100% | – | 1.62 | – | none |
+| FAOSTAT fertilizers by nutrient (export) | Modelled statistics | ±30 %, normal | 92% | 97% | 1.37 | 2.09 | [Mineral Fertilizer Export](../materials_and_products_pool/flow_MP_OP_RW_RW_Mineral_fertilizer_export_Nmix.html) |
+| FAOSTAT fertilizers by nutrient (use) | Modelled statistics | ±30 %, normal | 7% | 2% | 0.38 | 0.31 | [Mineral Fertilizer for Agriculture](../materials_and_products_pool/flow_MP_OP_AG_SM_Mineral_fertilizer_Nmix.html), [Mineral Fertilizer for HS](../materials_and_products_pool/flow_MP_OP_HS_HS_Mineral_fertilizer_Nmix.html) |

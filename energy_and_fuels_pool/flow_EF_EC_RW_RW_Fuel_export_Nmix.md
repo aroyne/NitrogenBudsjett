@@ -39,7 +39,7 @@ Sources with at least 2% of the variance of this flow in one of the periods, fro
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| N content of traded goods: crude oil | N content of traded goods | 0.0002–0.015, lognormal | 100% | 100% | 0.97 | 0.98 | [Fuel Import](../rest_of_the_world_pool/flow_RW_RW_EF_EC_Fuel_import_Nmix.html) |
+| N content of traded goods: crude oil | N content of traded goods | 0.0005–0.002, lognormal | 99% | 99% | 0.94 | 0.96 | [Fuel Import](../rest_of_the_world_pool/flow_RW_RW_EF_EC_Fuel_import_Nmix.html) |
 
 ### References
 
