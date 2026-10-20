@@ -33,6 +33,15 @@ nav_order: 5
 - Mineral fertilizer (1.1 kt N in 2024) and manure spreading (0.65 kt N) are the main sources.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| NOx, Inorganic N-fertilizers (includes also urea application) (NFR 3Da1) | Inventory with published uncertainty | −64.3/+180.1 %, lognormal | 92% | 89% | none |
+| NOx, Animal manure applied to soils (NFR 3Da2a) | Inventory with published uncertainty | −50.4/+101.8 %, lognormal | 7% | 10% | none |
+
 ### References
 
 * EMEP (2025). *Officially reported emission data*. [https://www.ceip.at/webdab-emission-database/reported-emissiondata](https://www.ceip.at/webdab-emission-database/reported-emissiondata)

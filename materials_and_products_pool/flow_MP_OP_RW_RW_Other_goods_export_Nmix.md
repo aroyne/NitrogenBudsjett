@@ -35,6 +35,21 @@ nav_order: 13
 - In 2024 roundwood, chips and wood residues (6.4 kt N) and nitric acid (7.7 kt N) are the largest items, followed by processed wood products (2.7 kt N), hides and leather (1.0 kt N), wool (0.8 kt N) and detergents (0.75 kt N).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| N content of traded goods: roundwood conifer | N content of traded goods | 0.0007–0.0017, triangular | 10% | 75% | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html), [Other Goods Import](../rest_of_the_world_pool/flow_RW_RW_MP_OP_Other_goods_import__Nmix.html) |
+| Traded quantities (SSB 08801) (kjemikalier) | Registered data | ±5 %, normal, drawn per year | <1% | 8% | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html), [Other Goods Import](../rest_of_the_world_pool/flow_RW_RW_MP_OP_Other_goods_import__Nmix.html) |
+| N content of traded goods: nitric acid | N content of traded goods | ±5 %, normal | – | 8% | [Other Goods Import](../rest_of_the_world_pool/flow_RW_RW_MP_OP_Other_goods_import__Nmix.html) |
+| N content of traded goods: wood products | N content of traded goods | ±20 %, normal | 70% | 5% | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html), [Food Import](../rest_of_the_world_pool/flow_RW_RW_MP_FP_Food_import_Nmix.html), [Other Goods Import](../rest_of_the_world_pool/flow_RW_RW_MP_OP_Other_goods_import__Nmix.html) |
+| Traded quantities (SSB 08801) (tre) | Registered data | ±5 %, normal, drawn per year | 6% | 3% | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html), [Other Goods Import](../rest_of_the_world_pool/flow_RW_RW_MP_OP_Other_goods_import__Nmix.html) |
+| N content of traded goods: hides skins | N content of traded goods | ±20 %, normal | 4% | 1% | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html), [Other Goods Import](../rest_of_the_world_pool/flow_RW_RW_MP_OP_Other_goods_import__Nmix.html) |
+| N content of traded goods: silk wool | N content of traded goods | ±20 %, normal | 3% | <1% | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html), [Other Goods Import](../rest_of_the_world_pool/flow_RW_RW_MP_OP_Other_goods_import__Nmix.html) |
+| N content of traded goods: amino compounds | N content of traded goods | ±40 %, normal | 4% | – | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html), [Other Goods Import](../rest_of_the_world_pool/flow_RW_RW_MP_OP_Other_goods_import__Nmix.html) |
+
 ### References
 
 * Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)

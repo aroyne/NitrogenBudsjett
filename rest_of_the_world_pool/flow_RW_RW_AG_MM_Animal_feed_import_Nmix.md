@@ -34,6 +34,17 @@ nav_order: 1
 - 2000 is a low year in the concentrate feed statistics (24% imported raw materials, compared with 25–40% in the following years), not a break between the two sources.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| N content of protein feed ingredients | Parameter | ±10 %, normal | 6% | 64% | [Farm Animal Feed](../materials_and_products_pool/flow_MP_FP_AG_MM_Farm_animal_feed_Nmix.html) |
+| Concentrate feed sales (Norwegian Agriculture Agency) | Registered data | ±5 %, normal, drawn per year | – | 29% | [Farm Animal Feed](../materials_and_products_pool/flow_MP_FP_AG_MM_Farm_animal_feed_Nmix.html) |
+| N content of carbohydrate feed ingredients | Parameter | ±10 %, normal | 1% | 7% | [Farm Animal Feed](../materials_and_products_pool/flow_MP_FP_AG_MM_Farm_animal_feed_Nmix.html) |
+| Totalkalkylen for agriculture (NIBIO) (concentrate) | Modelled statistics | ±30 %, normal | 93% | – | [Farm Animal Feed](../materials_and_products_pool/flow_MP_FP_AG_MM_Farm_animal_feed_Nmix.html) |
+
 ### References
 
 * Bruholt, L. & Longva, S. (1994). *Jordbruksstatistikk 1994*.

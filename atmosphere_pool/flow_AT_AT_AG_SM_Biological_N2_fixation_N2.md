@@ -34,6 +34,14 @@ nav_order: 1
 - In Sweden the value was 34 kt N in 2015 (Moldan et al., 2025<!--cite:moldan_where_2025-->, from the Eurostat Gross Nutrient Balance), about 11 kg N per ha on about 3 million ha of agricultural land; our value gives about 12 kg N per ha on about 1 million ha.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| Biological N fixation in agriculture | Parameter | 8–16, normal | 100% | 100% | none |
+
 ### References
 
 * Bleken, M. A. & Bakken, L. R. (1997). The Nitrogen Cost of Food Production: Norwegian Society. *Ambio, 26*(3), 134-142. [https://www.jstor.org/stable/4314571](https://www.jstor.org/stable/4314571)

@@ -31,6 +31,16 @@ nav_order: 5
 - The flow is about 3.4–6.3 kt N per year. It falls from 5.7 kt N in 1990 to about 3.5–4.5 kt N around 1995–2010 and rises to 6.3 kt N in 2024, following the volume of timber harvested.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| N content of conifer roundwood | Parameter | 0.0007–0.0017, triangular | 78% | 79% | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| Wood density of industrial roundwood | Parameter | 0.32–0.48, triangular | 17% | 17% | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| FAOSTAT forestry production | Registered data | ±10 %, normal, drawn per year | 5% | 4% | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+
 ### References
 
 * Jutterström, S., Stadmark, J., & Moldan, F. (2020). *Swedish National Nitrogen Budget – Forest and semi-natural vegetation*.

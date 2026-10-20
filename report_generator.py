@@ -15,7 +15,10 @@ flows with the same pool and subpool code.
 """
 import os
 import re
+import time
 from datetime import datetime
+
+import pandas as pd
 
 from report_pages import PAGES
 
@@ -185,10 +188,74 @@ def _new_flow_pages(plot_files):
     return new_pages
 
 
+UNCERTAINTY_FILE = 'output_files/MC_uncertainty_contributions.csv'
+UNCERTAINTY_MIN_SHARE = 0.02
+UNCERTAINTY_MAX_LINKS = 4
+
+
+def _flow_file_stem(flow_name):
+    """Plot/page name for a flow code, as in utils_stat.py."""
+    return flow_name.replace('.', '_').replace('-', '_').replace(' ', '_')
+
+
+def _uncertainty_tables(pages):
+    """
+    The "Uncertainty" section for each flow page, keyed by page file name,
+    from output_files/MC_uncertainty_contributions.csv (written by
+    main_mc.py --uncertainty-contributions). Empty if the file does not exist.
+    """
+    if not os.path.exists(UNCERTAINTY_FILE):
+        return {}
+    df = pd.read_csv(UNCERTAINTY_FILE)
+    page_of = {p['file'][len('flow_'):-len('.md')]: p for p in pages if p['kind'] == 'flow'}
+    when = time.strftime('%Y-%m-%d', time.localtime(os.path.getmtime(UNCERTAINTY_FILE)))
+
+    def link(flow):
+        p = page_of.get(_flow_file_stem(flow))
+        return f"[{p['title']}](../{p['folder']}/{p['file'][:-len('.md')]}.html)" if p else flow
+
+    tables = {}
+    for flow, g in df.groupby('flow_name'):
+        page = page_of.get(_flow_file_stem(flow))
+        if page is None:
+            continue
+        shares = g.pivot_table(index='source_id', columns='period', values='share', aggfunc='sum')
+        keep = shares[(shares >= UNCERTAINTY_MIN_SHARE).any(axis=1)]
+        if keep.empty:
+            continue
+        info = g.drop_duplicates('source_id').set_index('source_id')
+        periods = sorted(df['period'].unique())
+        keep = keep.reindex(columns=periods).sort_values(periods[-1], ascending=False, na_position='last')
+        lines = ["", "### Uncertainty", "",
+                 f"Sources with at least {UNCERTAINTY_MIN_SHARE:.0%} of the variance of this flow in one of the periods, "
+                 "from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, "
+                 "and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. "
+                 "Shares are averages over the years of the period. They are indicative where the flow is a residual close "
+                 "to zero or a source has a strongly skewed distribution. "
+                 f"Computed {when}.", "",
+                 "| Source | Type | Uncertainty (95 %) | " + " | ".join(f"Share of variance {p.replace('-', '–')}" for p in periods)
+                 + " | Other flows affected |",
+                 "|---|---|---|" + "---|" * len(periods) + "---|"]
+        for sid, row in keep.iterrows():
+            r = info.loc[sid]
+            others = [f for f in str(r['other_flows']).split(';') if f and f != 'nan']
+            shown = ', '.join(link(f) for f in others[:UNCERTAINTY_MAX_LINKS])
+            if len(others) > UNCERTAINTY_MAX_LINKS:
+                shown += f" and {len(others) - UNCERTAINTY_MAX_LINKS} more"
+            cells = [f"{row[p]:.0%}" if pd.notna(row[p]) and row[p] >= 0.005 else "<1%" if pd.notna(row[p]) else "–"
+                     for p in periods]
+            lines.append(f"| {r['source']} | {r['type']} | {r['uncertainty'] if pd.notna(r['uncertainty']) else ''} | "
+                         + " | ".join(cells) + f" | {shown or 'none'} |")
+        tables[page['file']] = "\n".join(lines) + "\n"
+    return tables
+
+
 def write_pages(plot_files, plot_dir, bib_filename, target_format):
     """Writes every pool, subpool and flow page. Flow pages are only written
     when the flow's plot exists."""
-    for page in PAGES + _new_flow_pages(plot_files):
+    pages = PAGES + _new_flow_pages(plot_files)
+    uncertainty = _uncertainty_tables(pages)
+    for page in pages:
         if page['kind'] == 'flow' and page['file'][len('flow_'):-len('.md')] + '.png' not in plot_files:
             continue
         os.makedirs(page['folder'], exist_ok=True)
@@ -196,6 +263,7 @@ def write_pages(plot_files, plot_dir, bib_filename, target_format):
         block = "FLOW_DESCRIPTION" if page['kind'] == 'flow' else "POOL_TEXT"
         write_page_with_manual_block(path, _page_header(page, plot_files, plot_dir, target_format), NEW_PAGE_TEXT, block)
         with open(path, 'a', encoding='utf-8') as f:
+            f.write(uncertainty.get(page['file'], ''))
             append_bibtex_references(f, bib_filename)
 
 

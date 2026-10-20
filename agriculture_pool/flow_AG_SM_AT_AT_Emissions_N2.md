@@ -32,6 +32,15 @@ nav_order: 2
 - Schäppi et al. (2025) note that the loss rate can vary from below 10 kg N per ha in well-drained soils to above 150 kg N per ha in waterlogged peat soils, so the uncertainty is large.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| N2 loss from agricultural soils per hectare | Parameter | 7–21, triangular | 96% | 100% | none |
+| Interpolation (1989-1999) | Gap filling: interpolation | ±7–15 %, lognormal, grows with distance to known year | 4% | – | none |
+
 ### References
 
 * Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)

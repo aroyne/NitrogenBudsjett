@@ -32,6 +32,19 @@ nav_order: 7
 - The flow is about 1.2–1.3 kt N per year until 2015 and falls to about 1.0 kt N in 2024.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| FAOSTAT crops and livestock products (production) | Registered data | ±10 %, normal, drawn per year | 8% | 38% | [Animal Products](../agriculture_pool/flow_AG_MM_MP_FP_Animal_products_Nmix.html), [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| N content of animal product: Raw hides and skins | Parameter | ±10 % | 8% | 36% | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| N content of wool | Parameter | ±10 %, normal | 8% | 21% | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| Wool deliveries (Norwegian Agriculture Agency) | Registered data | ±5 %, normal, drawn per year | – | 5% | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| Number of sheep (SSB 03710) | Registered data | ±5 %, normal, drawn per year | 2% | – | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| Wool per sheep per year | Parameter | ±30 %, normal | 73% | – | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+
 ### References
 
 * Landbruksdirektoratet (2025). *leveransedata-slakt-2005-2012*. [https://github.com/LandbruksdirektoratetGIT/opendata/tree/main/datasets/leveransedata-slakt-2005-2012](https://github.com/LandbruksdirektoratetGIT/opendata/tree/main/datasets/leveransedata-slakt-2005-2012)

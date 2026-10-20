@@ -31,6 +31,17 @@ nav_order: 1
 - The flow is about 12–15 kt N per year, following the inflow to coastal waters before 2013 and TEOTIL3's retention from 2013.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| TEOTIL, retention in lakes and rivers | Modelled statistics | ±40 %, normal | 43% | 83% | [Surface water N2O emissions](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2O.html) |
+| Share of retained N in surface water emitted as N2O | Parameter | 0.005–0.2, lognormal | 8% | 15% | [Surface water N2O emissions](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2O.html) |
+| Splice TEOTIL3 retention ratio applied before 2013 | Splice between data sources | ±10 %, normal | 3% | – | [Surface water N2O emissions](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2O.html) |
+| Extrapolation (surface water retention:2013) | Gap filling: extrapolation | ±50–50 %, lognormal, grows with distance to known year | 44% | – | [Surface water N2O emissions](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2O.html) |
+
 ### References
 
 * Sample, J. E., Jackson-Blake, L., Vogelsang, C., & Kaste, Ø. (2024). *TEOTIL3: En modell for beregning av kildebaserte tilførsler via elver og direktetilførsler til kyst*.

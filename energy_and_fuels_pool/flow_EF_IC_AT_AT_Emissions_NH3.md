@@ -26,6 +26,16 @@ nav_order: 2
 - NH3 is not a significant product of combustion except where biomass or catalytic NOx reduction is involved.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| NH3, Mobile Combustion in manufacturing the IIR) (NFR 1A2gvii) | Inventory with published uncertainty | −50/+100 %, lognormal | 40% | 64% | none |
+| NH3, Stationary combustion in manufacturing specify in the IIR) (NFR 1A2gviii) | Inventory with published uncertainty | ±24 %, normal | 47% | 24% | none |
+| NH3, Stationary combustion in manufacturing Print (NFR 1A2d) | Inventory with published uncertainty | ±24 %, normal | 13% | 11% | none |
+
 ### References
 
 * EMEP (2025). *Officially reported emission data*. [https://www.ceip.at/webdab-emission-database/reported-emissiondata](https://www.ceip.at/webdab-emission-database/reported-emissiondata)

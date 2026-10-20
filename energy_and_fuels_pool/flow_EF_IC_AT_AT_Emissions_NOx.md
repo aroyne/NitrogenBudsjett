@@ -27,6 +27,14 @@ nav_order: 3
 - Emissions from non-metallic minerals (1A2f, e.g. cement kilns) and pulp and paper (1A2d) have also fallen substantially, while emissions from iron and steel (1A2a) increased after 2010.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| NOx, Mobile Combustion in manufacturing the IIR) (NFR 1A2gvii) | Inventory with published uncertainty | −36.3/+57.1 %, lognormal | 97% | 97% | none |
+
 ### References
 
 * EMEP (2025). *Officially reported emission data*. [https://www.ceip.at/webdab-emission-database/reported-emissiondata](https://www.ceip.at/webdab-emission-database/reported-emissiondata)

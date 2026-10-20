@@ -29,3 +29,12 @@ nav_order: 9
 - The flow rises from 22 kt N in 1990 to about 70 kt N by 2010 and has been roughly stable since, as the growth in farmed fish has been offset by lower wild catches (see HY.AC-MP.FP-Coastal fish and seafood-Nmix and HY.CW-MP.FP-Fish (wild catch)-Nmix).
 - Exports of meat and of cheese are each below 0.5 kt N.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
+
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| N content of traded goods: fish fresh frozen | N content of traded goods | ±20 %, normal | 92% | 94% | [Feed Export](../materials_and_products_pool/flow_MP_FP_RW_RW_Feed_export_Nmix.html), [Food Import](../rest_of_the_world_pool/flow_RW_RW_MP_FP_Food_import_Nmix.html) |
+| Traded quantities (SSB 08801) (kjøtt/fisk/meieri/egg) | Registered data | ±5 %, normal, drawn per year | 7% | 6% | [Food Import](../rest_of_the_world_pool/flow_RW_RW_MP_FP_Food_import_Nmix.html) |

@@ -27,6 +27,19 @@ nav_order: 3
 - Other important sources are commercial and household mobile machinery (1A4aii, 1A4bii), agricultural and forestry machinery (1A4cii) and other mobile sources including military and recreational boats (1A5b).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| NOx, Agriculture/Forestry/Fishing: National fishing (NFR 1A4ciii) | Inventory with published uncertainty | −32.8/+48.7 %, lognormal | 72% | 64% | none |
+| NOx, Commercial/institutional: Mobile (NFR 1A4aii) | Inventory with published uncertainty | −30.9/+44.7 %, lognormal | 17% | 17% | none |
+| NOx, Residential: Household and gardening (mobile) (NFR 1A4bii) | Inventory with published uncertainty | −29.1/+41.1 %, lognormal | 1% | 7% | none |
+| NOx, Other, Mobile (including military, land based and recreational boats) (NFR 1A5b) | Inventory with published uncertainty | ±30.4 %, normal | 3% | 5% | none |
+| NOx, Residential: Stationary (NFR 1A4bi) | Inventory with published uncertainty | −43.8/+77.9 %, lognormal | 3% | 4% | none |
+| NOx, Agriculture/Forestry/Fishing: Off-road vehicles and other machinery (NFR 1A4cii) | Inventory with published uncertainty | −29.2/+41.2 %, lognormal | 3% | 2% | none |
+
 ### References
 
 * EMEP (2025). *Officially reported emission data*. [https://www.ceip.at/webdab-emission-database/reported-emissiondata](https://www.ceip.at/webdab-emission-database/reported-emissiondata)

@@ -34,3 +34,11 @@ nav_order: 2
 - Inorganic fertilizer used in settlements (MP.OP-HS.HS-Mineral fertilizer-Nmix, about 2 kt N) is reported under another category in the inventory (IE), most likely agricultural soils (3.D). Its N2O, below 0.05 kt N per year, may therefore be counted in AG.SM-AT.AT-Emissions-N2O instead of here.
 - The 1.9 kt N of organic fertilizer on settlement areas in the inventory is of the same size as the sewage sludge and biologically treated waste delivered to green areas and soil producers in this model (PR.WW-HS.HS-Sewage sludge fertilizer-Nmix and PR.SO-HS.HS-Biologically treated organic waste-Nmix, together about 2.3 kt N in 2024).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
+
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| N2O from land use (Norway's GHG inventory, CRT 4) | Inventory with published uncertainty | ±201 %, lognormal | 100% | 100% | [Forest Emissions (N2)](../forests_and_semi_natural_pool/flow_FS_FO_AT_AT_Emissions_N2.html), [Forest Emissions (N2O)](../forests_and_semi_natural_pool/flow_FS_FO_AT_AT_Emissions_N2O.html) |

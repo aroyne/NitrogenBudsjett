@@ -39,6 +39,16 @@ nav_order: 1
 - Hohmann-Marriott (2025)<!--cite:hohmann-marriott_nitrogen_2025--> found the domestic supply of animal feed in 2010 to be around 35 kt N, based on FAO statistics of production, export and import of seed cake, which is a dominant ingredient in farm animal feed. This is less than we found when combining domestic and imported animal feed. *(Note: This estimate might be too low, as it leads to a surplus here and a deficit in the AG.MM pool).*
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| N content of carbohydrate feed ingredients | Parameter | ±10 %, normal | 8% | 75% | [Animal Feed Import](../rest_of_the_world_pool/flow_RW_RW_AG_MM_Animal_feed_import_Nmix.html) |
+| Concentrate feed sales (Norwegian Agriculture Agency) | Registered data | ±5 %, normal, drawn per year | – | 24% | [Animal Feed Import](../rest_of_the_world_pool/flow_RW_RW_AG_MM_Animal_feed_import_Nmix.html) |
+| Totalkalkylen for agriculture (NIBIO) (concentrate) | Modelled statistics | ±30 %, normal | 92% | – | [Animal Feed Import](../rest_of_the_world_pool/flow_RW_RW_AG_MM_Animal_feed_import_Nmix.html) |
+
 ### References
 
 * Budsjettnemnda for jordbruket (2025). *Totalkalkylen for jordbruket - statistikk*. [https://www.nibio.no/tjenester/totalkalkylen-statistikk](https://www.nibio.no/tjenester/totalkalkylen-statistikk)

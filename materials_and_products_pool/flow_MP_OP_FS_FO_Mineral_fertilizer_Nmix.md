@@ -31,6 +31,16 @@ nav_order: 6
 - In 2022 only about 3,100 daa were fertilized (0.05 kt N).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| N applied per decare of fertilised forest | Parameter | 12–18, normal | 13% | 50% | none |
+| Forest fertilisation (SSB 05543) | Survey or self-reported data | ±20 %, normal, drawn per year | – | 50% | none |
+| Forest fertilisation before 1995 (NIBIO) | Assumption | ±50 %, triangular | 87% | – | none |
+
 ### References
 
 * Dalen, L. S. (2017). Lønnsomt å gjødsle skog. *NIBIO.no*. [https://www.nibio.no/nyheter/lnnsomt--gjdsle-skog](https://www.nibio.no/nyheter/lnnsomt--gjdsle-skog)

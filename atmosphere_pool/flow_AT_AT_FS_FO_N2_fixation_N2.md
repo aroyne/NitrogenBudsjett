@@ -29,6 +29,15 @@ nav_order: 6
 - The flow is constant at about 18 kt N per year; for comparison, the value for Sweden in 2015 was 39.5 kt N (Moldan et al., 2025)<!--cite:moldan_where_2025-->.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| Biological N fixation in forest, per hectare | Parameter | ±50 %, triangular | 96% | 96% | none |
+| Forest area | Parameter | ±10 %, normal | 4% | 4% | none |
+
 ### References
 
 * Moldan, F., Stadmark, J., Jutterström, S., & Ljunggren, J. (2025). Where does Sweden’s nitrogen go? Building a comprehensive national nitrogen budget. *Environmental Research Letters, 20*(12), 124068. [https://doi.org/10.1088/1748-9326/ae2697](https://doi.org/10.1088/1748-9326/ae2697)

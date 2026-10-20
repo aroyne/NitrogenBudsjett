@@ -45,6 +45,18 @@ nav_order: 3
 - N in food per person decreases from about 5.1 to 4.3 kg N per year (about 73 g protein per person per day in 2024), but part of this change may come from the change of data source in 2018.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| Food consumption from 2018 (SSB 13695) | Survey or self-reported data | ±20 %, normal, drawn per year | – | 78% | none |
+| Protein-to-N conversion factor (Jones factor) | Parameter | ±10 %, normal | 15% | 17% | [Live Animal Export](../agriculture_pool/flow_AG_MM_RW_RW_Live_animal_export_Nmix.html), [Fodder Crops Production](../agriculture_pool/flow_AG_SM_AG_MM_Fodder_crops_Nmix.html), [Grazing on Unmanaged Land](../forests_and_semi_natural_pool/flow_FS_OL_AG_MM_Grazing_Nmix.html), [Seeds and Planting Material](../materials_and_products_pool/flow_MP_FP_AG_SM_Seeds_and_planting_material__Nmix.html) and 1 more |
+| N in pet food per dog per year | Parameter | ±30 %, normal | 1% | 2% | none |
+| Household consumption survey 1983–1998 (SSB 06376) | Survey or self-reported data | ±20 %, normal | 73% | – | none |
+| Interpolation (1991-1996) | Gap filling: interpolation | ±7–9 %, lognormal, grows with distance to known year | 7% | – | none |
+
 ### References
 
 * Mattilsynet (2006). *Matvaretabellen*. [https://www.matvaretabellen.no](https://www.matvaretabellen.no)

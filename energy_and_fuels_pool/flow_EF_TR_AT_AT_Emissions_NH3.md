@@ -31,6 +31,14 @@ nav_order: 2
 - In contrast, emissions from light commercial vehicles (1A3bii) have increased again since 2015, and emissions from heavy-duty vehicles (1A3biii) have grown from 0.006 kt N/year in 2002 to 0.031 kt N in 2024. This is most likely ammonia slip from urea-based selective catalytic reduction (SCR) used to meet Euro VI and Euro 6 NOx limits ([EMEP/EEA Guidebook 2023, ch. 1.A.3.b.i–iv](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023/part-b-sectoral-guidance-chapters/1-energy/1-a-combustion/1-a-3-b-i)). Although still small, light commercial and heavy-duty vehicles together now emit about 0.06 kt N/year, close to half of the passenger-car level in 1990.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| NH3, road transport exhaust (NFR 1A3bi–iv) | Inventory with published uncertainty | −33.3/+50 %, lognormal | 100% | 100% | none |
+
 ### References
 
 * EMEP (2025). *Officially reported emission data*. [https://www.ceip.at/webdab-emission-database/reported-emissiondata](https://www.ceip.at/webdab-emission-database/reported-emissiondata)

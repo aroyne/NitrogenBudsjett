@@ -63,6 +63,14 @@ def parse_arguments():
              "input value to output_files/MC_Raw_Parameters.csv.gz"
     )
     parser.add_argument(
+        '--uncertainty-contributions',
+        action='store_true',
+        help="After the MC run, run a first-order sensitivity analysis "
+             "(uncertainty_contributions.py, about 8 minutes) and write "
+             "output_files/MC_uncertainty_contributions.csv, used for the "
+             "Uncertainty table on each flow page"
+    )
+    parser.add_argument(
         '--seed',
         type=int,
         default=DEFAULT_SEED,
@@ -309,6 +317,13 @@ def main():
         print("[INFO] Kjører UTEN å skrive til offisiell Excel-mal (--no-excel er aktiv).")
     else:
         write_mc_flows_to_international_report(summary_df)
+
+    if args.uncertainty_contributions:
+        import uncertainty_contributions
+        print("[INFO] Beregner bidrag til usikkerhet per strøm (--uncertainty-contributions)...")
+        setup_iteration(base_params, sampler, 0)
+        uncertainty_contributions.write(uncertainty_contributions.compute(
+            run_once, preloaded_data, base_params, selected_pools, args.seed))
 
     # 4. WEBSITE GENERATION
     generate_github_pages_report()

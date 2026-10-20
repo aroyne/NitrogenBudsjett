@@ -30,6 +30,15 @@ nav_order: 9
 - In the Swedish NNB (Moldan et al., 2025)<!--cite:moldan_where_2025-->, N2 fixation in the OL compartment was considered negligible. Our total is therefore not directly comparable to that estimate, but corresponds closely to their separate WL estimate of about 30 kt N (Jutterström et al., 2020)<!--cite:jutterstrom_swedish_2020-->.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| N fixation rate in peat bogs | Parameter | 0–22 (min–max), triangular | 94% | 94% | none |
+| Peat bog area | Parameter | ±20 %, normal | 6% | 6% | none |
+
 ### References
 
 * European Environment Agency (2019). *CORINE Land cover inventory*. [https://www.eea.europa.eu/en/datahub/datahubitem-view/a5144888-ee2a-4e5d-a7b0-2bbf21656348](https://www.eea.europa.eu/en/datahub/datahubitem-view/a5144888-ee2a-4e5d-a7b0-2bbf21656348)

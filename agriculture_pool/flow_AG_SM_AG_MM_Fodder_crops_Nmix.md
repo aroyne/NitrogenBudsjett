@@ -42,6 +42,19 @@ nav_order: 1
 - Hohmann-Marriott (2025)<!--cite:hohmann-marriott_nitrogen_2025--> used similar data sources but arrived at a smaller N flow (40–45 kt N) using a protein content of 8% and N content in protein of 15% (Table S2).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| Protein content of fodder (dry matter) | Parameter | 0.13–0.2, triangular | 49% | 52% | none |
+| Fodder crop yields from 2021 (SSB 13648) | Survey or self-reported data | ±20 %, normal, drawn per year | – | 29% | none |
+| Protein-to-N conversion factor (Jones factor) | Parameter | ±10 %, normal | 10% | 10% | [Live Animal Export](../agriculture_pool/flow_AG_MM_RW_RW_Live_animal_export_Nmix.html), [Grazing on Unmanaged Land](../forests_and_semi_natural_pool/flow_FS_OL_AG_MM_Grazing_Nmix.html), [Seeds and Planting Material](../materials_and_products_pool/flow_MP_FP_AG_SM_Seeds_and_planting_material__Nmix.html), [Food Products to Consumers](../materials_and_products_pool/flow_MP_FP_HS_HS_Food_products_Nmix.html) and 1 more |
+| Fodder crop yields before 2021 (SSB 05772) | Survey or self-reported data | ±20 %, normal, drawn per year | 33% | 7% | none |
+| Grazing in feed units (Budget Committee for Agriculture, Totalkalkylen) | Modelled statistics | ±30 %, normal | 2% | 2% | none |
+| Dry matter share of green fodder and silage yields | Parameter | 0.15–0.4, lognormal | 3% | <1% | none |
+
 ### References
 
 * Bakken, L., Rognlien, A., Prestløkken, E., Volden, H., & Smedshaug, C. (2026). *Nitrogen i norsk jordbruk. Kunnskapsgrunnlag, svakheter og forbedringsmuligheter*.

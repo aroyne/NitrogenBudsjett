@@ -30,6 +30,15 @@ nav_order: 1
 - Hohmann-Marriott (2025)<!--cite:hohmann-marriott_nitrogen_2025--> found 107 kt N from fisheries in 2018, mainly fish, against about 70 kt N here (63 kt N wild fish and 7 kt N shellfish). Their values for crustaceans (8 kt N) and aquaculture (38 kt N in 2018 and 41 kt N in 2020) are close to ours (HY.CW-MP.FP-Shellfish-Nmix and HY.AC-MP.FP-Coastal fish and seafood-Nmix).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| N content of fish and seafood | Parameter | ±10 %, normal | 80% | 80% | [Excretia](../hydrosphere_pool/flow_HY_AC_HY_CW_Excretia_Nmix.html), [Waste feed](../hydrosphere_pool/flow_HY_AC_HY_CW_Waste_feed_Nmix.html), [Aquaculture production](../hydrosphere_pool/flow_HY_AC_MP_FP_Coastal_fish_and_seafood_Nmix.html), [Shellfish](../hydrosphere_pool/flow_HY_CW_MP_FP_Shellfish_Nmix.html) and 2 more |
+| Fisheries and aquaculture statistics (Directorate of Fisheries) (landings) | Registered data | ±5 %, normal, drawn per year | 20% | 20% | [Shellfish](../hydrosphere_pool/flow_HY_CW_MP_FP_Shellfish_Nmix.html) |
+
 ### References
 
 * Fiskeridirektoratet (2025). *Fangst fordelt på art (offisiell statistikk)*. [https://www.fiskeridir.no/statistikk-tall-og-analyse/data-og-statistikk-om-yrkesfiske/fangst/fangst-fordelt-pa-art-offisiell-statistikk](https://www.fiskeridir.no/statistikk-tall-og-analyse/data-og-statistikk-om-yrkesfiske/fangst/fangst-fordelt-pa-art-offisiell-statistikk)

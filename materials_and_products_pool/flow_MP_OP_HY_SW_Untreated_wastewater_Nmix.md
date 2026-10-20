@@ -37,6 +37,17 @@ nav_order: 9
 - Other sources are Borregaard (about 0.1 kt N), the Mongstad refinery and pulp and paper mills.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| Facility reports of N to water (Norwegian Environment Agency) (Yara Porsgrunn) | Survey or self-reported data | ±30 %, normal, drawn per year | 47% | 66% | none |
+| Facility reports of N to water (Norwegian Environment Agency) (Yara Glomfjord) | Survey or self-reported data | ±30 %, normal, drawn per year | 21% | 20% | none |
+| Held constant or averaged (2023+) | Gap filling: held constant or averaged | ±15–15 %, lognormal, grows with distance to known year | – | 9% | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| Facility reports of N to water (Norwegian Environment Agency) (Herøya Industripark) | Survey or self-reported data | ±30 %, normal, drawn per year | 29% | – | none |
+
 ### References
 
 * Miljødirektoratet (2025). *Norske utslipp - Utslipp til luft og vann og generert avfall, Nitrogen totalt*. [https://www.norskeutslipp.no/no/Komponenter/Utslipp/Nitrogen-totalt/?ComponentType=utslipp&ComponentPageID=226](https://www.norskeutslipp.no/no/Komponenter/Utslipp/Nitrogen-totalt/?ComponentType=utslipp&ComponentPageID=226)

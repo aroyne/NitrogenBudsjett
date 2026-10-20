@@ -36,3 +36,16 @@ nav_order: 5
 - From 2013 a number of salmon slaughterhouses and fish processing plants report emissions, which explains much of the increase.
 - The largest single source over the period is DuPont Nutrition Norge (formerly FMC, alginate production from seaweed), with about 0.2 kt N per year.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
+
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| Facility reports of N to water (Norwegian Environment Agency) (DuPont Nutrition Norge AS (tidligere FMC)) | Survey or self-reported data | ±30 %, normal, drawn per year | 73% | 57% | none |
+| Held constant or averaged (2023+) | Gap filling: held constant or averaged | ±15–15 %, lognormal, grows with distance to known year | – | 13% | none |
+| Facility reports of N to water (Norwegian Environment Agency) (Biproduktanlegget på Kverva - laks - Nutrimar AS) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 13% | none |
+| Facility reports of N to water (Norwegian Environment Agency) (Innovamar - slakteri og fiskeforedling - Kverva) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 3% | none |
+| Facility reports of N to water (Norwegian Environment Agency) (Hav Line - Slakteskipet Norwegian Gannet) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 2% | none |
+| Held constant or averaged (1994-1998) | Gap filling: held constant or averaged | ±15–30 %, lognormal, grows with distance to known year | 27% | – | none |

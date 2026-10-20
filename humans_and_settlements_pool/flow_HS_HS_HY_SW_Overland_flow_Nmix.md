@@ -34,6 +34,16 @@ nav_order: 3
 - The values for 1990–2012 are constant and do not show the growth of urban areas over the period.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| TEOTIL, run-off from urban areas | Modelled statistics | −50/+100 %, lognormal | 49% | 99% | none |
+| Splice TEOTIL2 to TEOTIL3, urban areas | Splice between data sources | ±20 %, normal | 3% | – | [N2 emissions from denitrification in surface waters](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2.html), [Surface water N2O emissions](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2O.html), [Inflow to coastal waters](../hydrosphere_pool/flow_HY_SW_HY_CW_Inflow_to_coastal_waters_Nmix.html) |
+| Held constant or averaged (TEOTIL2) | Gap filling: held constant or averaged | ±105–125 %, lognormal, grows with distance to known year | 48% | – | none |
+
 ### References
 
 * Sample, J. E. (2025). *Kildefordelte tilførsler av nitrogen og fosfor til norske kystområder i 2023 – tabeller, figurer og kart*.

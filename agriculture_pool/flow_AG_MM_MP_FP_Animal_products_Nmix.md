@@ -32,6 +32,17 @@ nav_order: 6
 - Beef is stable at about 2.1 kt N.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| FAOSTAT crops and livestock products (production) | Registered data | ±10 %, normal, drawn per year | 73% | 81% | [Non-edible Animal Products](../agriculture_pool/flow_AG_MM_MP_OP_Non_edible_animal_products_Nmix.html), [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| N content of animal product: Milk, Total | Parameter | ±10 % | 24% | 13% | none |
+| N content of animal product: Meat of pig with the bone, fresh or chilled | Parameter | ±10 % | 1% | 2% | none |
+| N content of animal product: Meat of chickens, fresh or chilled | Parameter | ±10 % | <1% | 2% | none |
+
 ### References
 
 * Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)

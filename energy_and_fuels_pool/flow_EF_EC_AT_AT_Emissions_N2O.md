@@ -29,6 +29,14 @@ nav_order: 1
 - N2O from fugitive emissions in the oil and gas sector (1.B.2, in practice only 1.B.2.c Venting and flaring) was 0.011 kt N/year in 1990 (about 30% of the flow), varied mostly around 0.006–0.013 kt N with a short peak of 0.014 kt N in 2007–2008, and has since declined to 0.003 kt N in 2024 (about 4% of the flow); the other 1.B.2 subcategories are reported as not applicable, not occurring or included elsewhere.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| N2O from stationary combustion (Norway's GHG inventory, CRT 1.A) | Inventory with published uncertainty | −66.7/+200 %, lognormal | 100% | 100% | [Industrial emissions (N2O)](../energy_and_fuels_pool/flow_EF_IC_AT_AT_Emissions_N2O.html), [Other energy emissions (N2O)](../energy_and_fuels_pool/flow_EF_OE_AT_AT_Emissions_N2O.html) |
+
 ### References
 
 * Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)

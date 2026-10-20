@@ -34,6 +34,15 @@ nav_order: 3
 - Emissions from other cattle, horses and poultry have increased, while emissions from dairy cattle, sheep and pigs have decreased.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| NH3, manure management, all animal categories (NFR 3B) | Inventory with published uncertainty | ±25 %, normal | 82% | 99% | none |
+| NH3, Agriculture other (please specify in the IIR) (NFR 3I) | Inventory with published uncertainty | −50/+100 %, lognormal | 18% | 1% | none |
+
 ### References
 
 * EMEP (2025). *Officially reported emission data*. [https://www.ceip.at/webdab-emission-database/reported-emissiondata](https://www.ceip.at/webdab-emission-database/reported-emissiondata)

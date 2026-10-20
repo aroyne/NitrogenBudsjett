@@ -31,6 +31,17 @@ nav_order: 9
 - The manure deposited on utmark is slightly smaller than the feed taken up on utmark (FS.OL-AG.MM-Grazing-Nmix, 7.5–8.6 kt N including reindeer), as it should be since part of the N in the feed is retained in growth, milk and wool. The difference is small, and both flows are uncertain: the feed uptake builds on a single estimate for 1996 (Hegrenes & Asheim, 2006), and the manure on the survey of grazing time in 2018.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| Manure N applied to soils and on pasture (Norway's GHG inventory, CRT 3.D) | Inventory with published uncertainty | ±20 %, normal | 64% | 62% | [Manure Application](../agriculture_pool/flow_AG_MM_AG_SM_Manure_application_Nmix.html), [Grazing on Unmanaged Land](../forests_and_semi_natural_pool/flow_FS_OL_AG_MM_Grazing_Nmix.html) |
+| Weeks on unmanaged land per head of cattle | Parameter | 5–12, lognormal | 11% | 22% | [Manure Application](../agriculture_pool/flow_AG_MM_AG_SM_Manure_application_Nmix.html), [N2O emissions from denitrification](../agriculture_pool/flow_AG_SM_AT_AT_Emissions_N2O.html), [NH3 emissions](../agriculture_pool/flow_AG_SM_AT_AT_Emissions_NH3.html), [NOx emissions from soil management](../agriculture_pool/flow_AG_SM_AT_AT_Emissions_NOx.html) and 4 more |
+| Share of sheep grazing manure deposited on unmanaged land | Parameter | ±20 %, normal | 22% | 17% | [Manure Application](../agriculture_pool/flow_AG_MM_AG_SM_Manure_application_Nmix.html), [N2O emissions from denitrification](../agriculture_pool/flow_AG_SM_AT_AT_Emissions_N2O.html), [NH3 emissions](../agriculture_pool/flow_AG_SM_AT_AT_Emissions_NH3.html), [NOx emissions from soil management](../agriculture_pool/flow_AG_SM_AT_AT_Emissions_NOx.html) and 4 more |
+| Held constant or averaged (utmark cattle) | Gap filling: held constant or averaged | ±15–35 %, lognormal, grows with distance to known year | 3% | – | [Manure Application](../agriculture_pool/flow_AG_MM_AG_SM_Manure_application_Nmix.html), [N2O emissions from denitrification](../agriculture_pool/flow_AG_SM_AT_AT_Emissions_N2O.html), [NH3 emissions](../agriculture_pool/flow_AG_SM_AT_AT_Emissions_NH3.html), [NOx emissions from soil management](../agriculture_pool/flow_AG_SM_AT_AT_Emissions_NOx.html) and 5 more |
+
 ### References
 
 * Norwegian Environment Agency (2020). *Calculation of atmospheric nitrogen emissions from manure in Norwegian agriculture: Technical description of the revised model*. [https://www.miljodirektoratet.no/globalassets/publikasjoner/m1848/m1848.pdf](https://www.miljodirektoratet.no/globalassets/publikasjoner/m1848/m1848.pdf)

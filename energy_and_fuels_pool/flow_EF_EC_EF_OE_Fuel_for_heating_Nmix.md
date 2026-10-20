@@ -37,6 +37,20 @@ nav_order: 4
 - Biomass used in the commercial/institutional sector (1.A.4.a, about 3,600 TJ in 2024, roughly 0.9 kt N) is not covered by the fuel wood flow and is therefore not included in the budget.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| N content of gas/diesel oil | Parameter | ±50 %, triangular | 11% | 41% | [Fuel for industry](../energy_and_fuels_pool/flow_EF_EC_EF_IC_Fuel_for_industry_Nmix.html), [Fuel for transport](../energy_and_fuels_pool/flow_EF_EC_EF_TR_Fuel_for_transport_Nmix.html) |
+| Net calorific value of other fossil fuels | Parameter | 10–40, triangular | <1% | 29% | [Fuel for industry](../energy_and_fuels_pool/flow_EF_EC_EF_IC_Fuel_for_industry_Nmix.html) |
+| N content of other fossil fuels | Parameter | ±50 %, triangular | <1% | 24% | [Fuel for industry](../energy_and_fuels_pool/flow_EF_EC_EF_IC_Fuel_for_industry_Nmix.html) |
+| N content of jet kerosene | Parameter | ±50 %, triangular | 46% | 4% | [Fuel for industry](../energy_and_fuels_pool/flow_EF_EC_EF_IC_Fuel_for_industry_Nmix.html), [Fuel for transport](../energy_and_fuels_pool/flow_EF_EC_EF_TR_Fuel_for_transport_Nmix.html) |
+| Fuel consumption (Norway's GHG inventory, CRT 1.A) | Registered data | ±5 %, normal, drawn per year | 2% | 2% | [Fuel for industry](../energy_and_fuels_pool/flow_EF_EC_EF_IC_Fuel_for_industry_Nmix.html), [Fuel for transport](../energy_and_fuels_pool/flow_EF_EC_EF_TR_Fuel_for_transport_Nmix.html) |
+| N content of coal | Parameter | 0.005–0.025, triangular | 35% | <1% | [Fuel for industry](../energy_and_fuels_pool/flow_EF_EC_EF_IC_Fuel_for_industry_Nmix.html), [Fuel used as feedstock](../energy_and_fuels_pool/flow_EF_EC_MP_OP_Fuel_used_as_feedstock_Nmix.html), [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| Net calorific value of coal | Parameter | 19.9–30.5, triangular | 3% | <1% | [Fuel for industry](../energy_and_fuels_pool/flow_EF_EC_EF_IC_Fuel_for_industry_Nmix.html), [Fuel used as feedstock](../energy_and_fuels_pool/flow_EF_EC_MP_OP_Fuel_used_as_feedstock_Nmix.html), [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+
 ### References
 
 * Garg, A., Kazunari, K., & Pulles, T. (2006). Chapter 1. Introduction. *IPCC Guidelines for National Greenhouse Gas Inventories*. [https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_1_Ch1_Introduction.pdf](https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_1_Ch1_Introduction.pdf)

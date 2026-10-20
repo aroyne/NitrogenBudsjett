@@ -28,6 +28,17 @@ nav_order: 4
 - NOx from nitric acid production (2B2) fell from 0.7 kt N in 1990 to 0.1 kt N in 2024, and from pulp and paper (2H1) from 0.24 to 0.09 kt N.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| NOx, Ferroalloys production (NFR 2C2) | Inventory with published uncertainty | ±20 %, normal | 69% | 73% | none |
+| NOx, Aluminium production (NFR 2C3) | Inventory with published uncertainty | −50/+100 %, lognormal | 5% | 21% | none |
+| NOx, Nitric acid production (NFR 2B2) | Inventory with published uncertainty | −42.9/+75 %, lognormal | 18% | 4% | none |
+| NOx, Pulp and paper industry (NFR 2H1) | Inventory with published uncertainty | −50/+100 %, lognormal | 8% | 2% | none |
+
 ### References
 
 * EMEP (2025). *Officially reported emission data*. [https://www.ceip.at/webdab-emission-database/reported-emissiondata](https://www.ceip.at/webdab-emission-database/reported-emissiondata)

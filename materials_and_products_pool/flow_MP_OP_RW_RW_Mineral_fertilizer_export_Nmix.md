@@ -27,6 +27,14 @@ nav_order: 12
 - The fertilizer is produced from ammonia made in Norway (AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2, about 345 kt N in 2024) and imported ammonia (RW.RW-MP.OP-Ammonia import -Nmix, about 500 kt N in 2024).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| FAOSTAT fertilizers by nutrient (export) | Modelled statistics | ±30 %, normal | 100% | 100% | [Ammonia Synthesis N2 Fixation](../atmosphere_pool/flow_AT_AT_MP_OP_Ammonia_synthesis_N2_fixation_N2.html) |
+
 ### References
 
 * FAO (2025). *Fertilizer by nutrient*. [https://www.fao.org/faostat/en/#data/RFN](https://www.fao.org/faostat/en/#data/RFN)

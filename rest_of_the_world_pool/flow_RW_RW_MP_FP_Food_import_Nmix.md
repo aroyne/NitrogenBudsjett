@@ -30,6 +30,20 @@ nav_order: 9
 - The flow rises from about 16 kt N in 1990 to 25–32 kt N per year since 2010.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
+### Uncertainty
+
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Computed 2026-10-20.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|
+| N content of traded goods: fish fresh frozen | N content of traded goods | ±20 %, normal | 31% | 44% | [Feed Export](../materials_and_products_pool/flow_MP_FP_RW_RW_Feed_export_Nmix.html), [Food Export](../materials_and_products_pool/flow_MP_FP_RW_RW_Food_export_Nmix.html) |
+| N content of traded goods: wheat | N content of traded goods | ±20 %, normal | 44% | 25% | [Feed Export](../materials_and_products_pool/flow_MP_FP_RW_RW_Feed_export_Nmix.html), [Food Export](../materials_and_products_pool/flow_MP_FP_RW_RW_Food_export_Nmix.html) |
+| N content of traded goods: organic | N content of traded goods | ±40 %, normal | 1% | 14% | [Feed Export](../materials_and_products_pool/flow_MP_FP_RW_RW_Feed_export_Nmix.html), [Food Export](../materials_and_products_pool/flow_MP_FP_RW_RW_Food_export_Nmix.html), [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html), [Other Goods Export](../materials_and_products_pool/flow_MP_OP_RW_RW_Other_goods_export_Nmix.html) and 1 more |
+| Traded quantities (SSB 08801) (korn/planter) | Registered data | ±5 %, normal, drawn per year | 12% | 6% | [Food Export](../materials_and_products_pool/flow_MP_FP_RW_RW_Food_export_Nmix.html) |
+| Traded quantities (SSB 08801) (kjøtt/fisk/meieri/egg) | Registered data | ±5 %, normal, drawn per year | 2% | 3% | [Food Export](../materials_and_products_pool/flow_MP_FP_RW_RW_Food_export_Nmix.html) |
+| N content of traded goods: cereals | N content of traded goods | ±20 %, normal | 3% | <1% | [Feed Export](../materials_and_products_pool/flow_MP_FP_RW_RW_Feed_export_Nmix.html), [Food Export](../materials_and_products_pool/flow_MP_FP_RW_RW_Food_export_Nmix.html), [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html), [Other Goods Export](../materials_and_products_pool/flow_MP_OP_RW_RW_Other_goods_export_Nmix.html) and 1 more |
+| N content of traded goods: barley | N content of traded goods | ±20 %, normal | 2% | – | [Feed Export](../materials_and_products_pool/flow_MP_FP_RW_RW_Feed_export_Nmix.html) |
+
 ### References
 
 * Eidem, B. & Ruud, T. (2022). *Fôr- og husdyrbaserte verdikjeder i norsk matproduksjon – nåsituasjon og begreper*.
