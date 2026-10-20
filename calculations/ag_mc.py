@@ -482,7 +482,7 @@ def _add_animal_products_flow_mc(results, preloaded_data, current_params, datase
         if year in total_N_per_year:
             collected_years.add(year)
             base_value = float(total_N_per_year[year])
-            value = base_value * dataset_noise.factor(key_fao, year)
+            value = base_value * dataset_noise.factor(key_fao, year, sub='production')
 
             results.append({
                 'flow_name': flow_code,
@@ -644,7 +644,7 @@ def _add_live_animal_export_mc(results, preloaded_data, current_params, dataset_
     key_fao = 'Crops and livestock products'
 
     df_round = final_data.copy()
-    df_round['perturbed_value'] = df_round['Value'] * df_round['Year'].map(lambda y: dataset_noise.factor(key_fao, int(y)))
+    df_round['perturbed_value'] = df_round['Value'] * df_round['Year'].map(lambda y: dataset_noise.factor(key_fao, int(y), sub='live animals'))
 
     def get_perturbed_weight(item_name):
         clean_item = str(item_name).strip()

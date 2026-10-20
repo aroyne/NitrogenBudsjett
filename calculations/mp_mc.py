@@ -230,7 +230,7 @@ def _add_seeds_and_planting_material_mc(results, preloaded_data, current_params,
     for year, total_val in year_values.items():
         collected_years.add(year)
 
-        final_val = total_val * dataset_noise.factor(key_dataset, year)
+        final_val = total_val * dataset_noise.factor(key_dataset, year, sub='seeds')
 
         results.append({
             'flow_name': flow_code,
@@ -321,7 +321,7 @@ def _add_farm_animal_feed_mc(results, preloaded_data, current_params, dataset_no
             dom_frac = float(current_params.get(param_key_dom_frac))
 
         value_kt_N_hist = value_tonn * 1e-3 * N_cont_before_2000 * dom_frac
-        value_kt_N_hist_noisy = value_kt_N_hist * dataset_noise.factor('Totalkalkylen', year)
+        value_kt_N_hist_noisy = value_kt_N_hist * dataset_noise.factor('Totalkalkylen', year, sub='concentrate')
 
         if year in EXPECTED_YEARS and year not in final_yearly_values:
             final_yearly_values[year] = {
@@ -790,8 +790,8 @@ def _add_ag_mineral_fertilizer_mc(results, preloaded_data, current_params, datas
         raw_use_tonnes = float(n_amount_use['Value'].sum())
         raw_imp_tonnes = float(n_amount_imp['Value'].sum())
         
-        raw_use_perturbed = raw_use_tonnes * dataset_noise.factor('Fertilizer by nutrient', year)
-        raw_imp_perturbed = raw_imp_tonnes * dataset_noise.factor('Fertilizer by nutrient', year)
+        raw_use_perturbed = raw_use_tonnes * dataset_noise.factor('Fertilizer by nutrient', year, sub='use')
+        raw_imp_perturbed = raw_imp_tonnes * dataset_noise.factor('Fertilizer by nutrient', year, sub='import')
         
         value = (raw_use_perturbed - raw_imp_perturbed) / 1000.0 # tN -> ktN
                 
@@ -932,7 +932,7 @@ def _add_hs_mineral_fertilizer_mc(results, preloaded_data, current_params, datas
         collected_years.add(year)
         raw_value = float(n_amount_use['Value'].values[0])
         base_value = (raw_value / 1000.0) * nonag_over_ag
-        value_noisy = base_value * dataset_noise.factor(key_støy, year)
+        value_noisy = base_value * dataset_noise.factor(key_støy, year, sub='use')
         
         results.append({
             'flow_name': flow_code,
@@ -1221,7 +1221,7 @@ def _add_mineral_fertilizer_export_mc(results, preloaded_data, current_params, d
         if year in fao_dict:
             collected_years.add(year)
             base_value = fao_dict[year] / 1000.0 # tN -> ktN
-            value = base_value * dataset_noise.factor(key_gjødsel, year)
+            value = base_value * dataset_noise.factor(key_gjødsel, year, sub='export')
             results.append({
                 'flow_name': flow_code,
                 'year': year,
@@ -1284,9 +1284,9 @@ def _get_excluded_fertilizer_chemicals_by_year(preloaded_data, current_trade_fac
     v_factors = df_filtered['konv'].astype(str).str.strip().map(current_trade_factors).fillna(0.0)
 
     result = {}
-    for yr_raw, amt, vf in zip(df_filtered['year'].values, df_filtered['amount'].values, v_factors.values):
+    for yr_raw, amt, vf, typ in zip(df_filtered['year'].values, df_filtered['amount'].values, v_factors.values, df_filtered['type'].values):
         yr = int(float(yr_raw))
-        result[yr] = result.get(yr, 0.0) + amt * dataset_noise.factor('08801', yr) * vf / 1e6
+        result[yr] = result.get(yr, 0.0) + amt * dataset_noise.factor('08801', yr, sub=str(typ).strip()) * vf / 1e6
     return result
 
 

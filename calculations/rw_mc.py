@@ -163,7 +163,7 @@ def _add_animal_feed_import_mc(results, preloaded_data, current_params, dataset_
             collected_years.add(year)
             
             base_feed_tonn = float(row['value'])                
-            feed_tonn = base_feed_tonn * dataset_noise.factor(key_total, year)
+            feed_tonn = base_feed_tonn * dataset_noise.factor(key_total, year, sub='concentrate')
             
             # 'dom_frac' (domestically produced fraction) is reported directly
             # for 1985-1994; later years fall back to the cross-year average.
@@ -234,7 +234,7 @@ def _add_live_animal_import_mc(results, preloaded_data, current_params, dataset_
 
     key_fao = 'Crops and livestock products'
     df_round = final_data.copy()
-    df_round['perturbed_value'] = df_round['Value'] * df_round['Year'].map(lambda y: dataset_noise.factor(key_fao, int(y)))
+    df_round['perturbed_value'] = df_round['Value'] * df_round['Year'].map(lambda y: dataset_noise.factor(key_fao, int(y), sub='live animals'))
 
     def get_perturbed_weight(item_name):
         param_key = f"weight_{str(item_name).strip()}"
@@ -283,7 +283,7 @@ def _add_mineral_fertilizer_import_mc(results, preloaded_data, current_params, d
         if year in total_fert_per_year:
             collected_years.add(year)
             base_value = float(total_fert_per_year[year])
-            perturbed_value = base_value * dataset_noise.factor(key_fert, year)
+            perturbed_value = base_value * dataset_noise.factor(key_fert, year, sub='import')
 
             value_kt = perturbed_value / 1000.0  # tonnes -> kt
 

@@ -176,7 +176,7 @@ def _add_wild_shellfish_and_macroalgae(results, preloaded_data, current_params, 
             val = shellfish_kt * fish_N_frac + algae_kt * seaweed_N_frac
 
             results.append({
-                'flow_name': flow_code, 'year': year, 'value': val * dataset_noise.factor(key_fisk, year),
+                'flow_name': flow_code, 'year': year, 'value': val * dataset_noise.factor(key_fisk, year, sub='landings'),
                 'comment': 'ok', 'data_sources': 'Fiskeridirektoratet'
             })
 
@@ -190,7 +190,7 @@ def _add_wild_shellfish_and_macroalgae(results, preloaded_data, current_params, 
             val = (float(df_fiske_old.iloc[r, 3]) * fish_N_frac) + (float(df_fiske_old.iloc[r, 4]) * seaweed_N_frac)
 
             results.append({
-                'flow_name': flow_code, 'year': year, 'value': val * dataset_noise.factor(key_fisk, year),
+                'flow_name': flow_code, 'year': year, 'value': val * dataset_noise.factor(key_fisk, year, sub='landings'),
                 'comment': 'ok', 'data_sources': 'Fiskeridirektoratet'
             })
 
@@ -317,7 +317,7 @@ def _add_wild_fish_catch(results, preloaded_data, current_params, dataset_noise)
                 if not pd.isna(df_art.iloc[r_idx, col]):
                     val += float(df_art.iloc[r_idx, col])
 
-            val_kt_N = (val / 1000.0) * fish_N_frac * dataset_noise.factor(key_fisk, year)
+            val_kt_N = (val / 1000.0) * fish_N_frac * dataset_noise.factor(key_fisk, year, sub='landings')
             results.append({
                 'flow_name': flow_code, 'year': year, 'value': val_kt_N,
                 'comment': 'ok', 'data_sources': 'Fiskeridirektoratet'
@@ -339,7 +339,7 @@ def _add_wild_fish_catch(results, preloaded_data, current_params, dataset_noise)
         if year in EXPECTED_YEARS:
             collected_years.add(year)
             # Column 1: pelagic fish (1000 tons); column 2: bottom fish (1000 tons)
-            val = (float(df_fiske_old.iloc[r, 1]) + float(df_fiske_old.iloc[r, 2])) * fish_N_frac * dataset_noise.factor(key_fisk, year)
+            val = (float(df_fiske_old.iloc[r, 1]) + float(df_fiske_old.iloc[r, 2])) * fish_N_frac * dataset_noise.factor(key_fisk, year, sub='landings')
 
             results.append({
                 'flow_name': flow_code, 'year': year, 'value': val,

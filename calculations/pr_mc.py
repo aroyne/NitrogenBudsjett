@@ -128,13 +128,13 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
     for year, value in N_05281.items():
         collected_years.add(year)
         results.append({
-            'flow_name': flow_code, 'year': year, 'value': value * scale_05281 * dataset_noise.factor('05281', year),
+            'flow_name': flow_code, 'year': year, 'value': value * scale_05281 * dataset_noise.factor('05281', year, sub='incineration'),
             'comment': 'ok', 'data_sources': 'SSB table 05281, scaled to the N content of table 10513'
         })
     for year, value in N_10513.items():
         collected_years.add(year)
         results.append({
-            'flow_name': flow_code, 'year': year, 'value': value * dataset_noise.factor('10513', year),
+            'flow_name': flow_code, 'year': year, 'value': value * dataset_noise.factor('10513', year, sub='incineration'),
             'comment': 'ok', 'data_sources': data_sources
         })
 
@@ -271,7 +271,7 @@ def _biologically_treated_N(preloaded_data, current_params, dataset_noise):
                     + float(df_10513.iloc[7, col + offset]) * park_N   # park and garden
                     + float(df_10513.iloc[8, col + offset]) * wood_N)  # wood waste
 
-        N_out[year] = (n_in(2) * (1 - biogas_loss) + n_in(3) * (1 - compost_loss)) * dataset_noise.factor('10513', year)
+        N_out[year] = (n_in(2) * (1 - biogas_loss) + n_in(3) * (1 - compost_loss)) * dataset_noise.factor('10513', year, sub='biological treatment')
 
     for year in range(1990, 2012):
         N_out[year] = N_out[2012] * dataset_noise.fill('carry', 'biologically treated waste:2012', year, [2012])

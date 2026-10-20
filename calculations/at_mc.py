@@ -189,13 +189,21 @@ def _add_OP_N2_fixation_mc(results, preloaded_data, current_params, ammonia_impo
         # instead derived from the MP.OP fertilizer balance: everything
         # leaving MP.OP as fertilizer (export, agricultural use not covered by
         # import, non-agricultural use) must have been produced domestically.
-        if year in reported_production.index:
-            production = float(reported_production[year])
-        else:
-            production = (float(fert_export[year]) + float(ag_use[year]) - float(fert_import[year])
-                          + float(ag_use[year]) * nonag_over_ag)
+        # FAOSTAT's elements come from different statistics (production,
+        # sales, trade) and each has its own factor (sub=element); derived
+        # production carries the factors of the elements it is built from,
+        # the same ones used for those quantities in mp_mc.py and rw_mc.py.
+        def element(name, value):
+            return float(value) * dataset_noise.factor(dataset_key, year, sub=name)
 
-        perturbed_production = production / 1000 * dataset_noise.factor(dataset_key, year)  # tN -> ktN
+        if year in reported_production.index:
+            production = element('production', reported_production[year])
+        else:
+            use = element('use', ag_use[year])
+            production = (element('export', fert_export[year]) + use - element('import', fert_import[year])
+                          + use * nonag_over_ag)
+
+        perturbed_production = production / 1000  # tN -> ktN
 
         # Mass balance proxy for domestic industrial N2 fixation via ammonia
         # synthesis: domestic fertilizer N production, minus imported ammonia

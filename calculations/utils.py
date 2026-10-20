@@ -261,7 +261,10 @@ def process_generic_trade_flow(preloaded_data, current_params, current_trade_fac
         # trade_mapping addition that outpaces trade_params rather than a
         # known gap today.
         v_factors = df_filtered['konv'].astype(str).str.strip().map(current_trade_factors).fillna(0.0)
-        row_noise = df_filtered['year'].map(lambda y: dataset_noise.factor(dataset_key, int(float(y))))
+        # One factor per goods category ('type'): errors in declared tonnage
+        # belong to each category, not to all trade at once.
+        row_noise = [dataset_noise.factor(dataset_key, int(float(y)), sub=str(t).strip())
+                     for y, t in zip(df_filtered['year'], df_filtered['type'])]
         df_filtered['perturbed_amount'] = df_filtered['amount'] * row_noise
         df_filtered['N_amount'] = df_filtered['perturbed_amount'] * v_factors / 1e6
         df_filtered.loc[df_filtered['N_amount'] < 0, 'N_amount'] = 0.0

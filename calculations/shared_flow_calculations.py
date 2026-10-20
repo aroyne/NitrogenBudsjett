@@ -37,7 +37,7 @@ def find_aquaculture_production(df_aqua_modern, df_aqua_old, current_params, dat
         value_tonn = col_data.sum()
 
         # tonnes / 1000 -> kt round weight, times N fraction and activity noise
-        val_kt_N = (value_tonn / 1000) * fish_N_frac * dataset_noise.factor(key_fisk, year)
+        val_kt_N = (value_tonn / 1000) * fish_N_frac * dataset_noise.factor(key_fisk, year, sub='aquaculture')
 
         aquaculture_production[year] = val_kt_N
 
@@ -47,7 +47,7 @@ def find_aquaculture_production(df_aqua_modern, df_aqua_old, current_params, dat
         value_base = float(row.iloc[1])
 
         # kt round weight * N fraction * activity noise
-        val_kt_N = value_base * fish_N_frac * dataset_noise.factor(key_fisk, year)
+        val_kt_N = value_base * fish_N_frac * dataset_noise.factor(key_fisk, year, sub='aquaculture')
 
         aquaculture_production[year] = val_kt_N
 
@@ -77,7 +77,7 @@ def find_recovered_lost_fish_N(df_losses, aquaculture_production, current_params
     for year, row in df_losses.iterrows():
         if year >= 2007:
             # 1000 fish * kg/fish = tonnes; / 1000 -> kt
-            lost_N[year] = (row['dead'] + row['discarded']) * weight / 1000.0 * fish_N_frac * dataset_noise.factor('Fiskeridirektoratet', year)
+            lost_N[year] = (row['dead'] + row['discarded']) * weight / 1000.0 * fish_N_frac * dataset_noise.factor('Fiskeridirektoratet', year, sub='losses')
 
     ratio = np.mean([lost_N[y] / aquaculture_production[y] for y in range(2007, 2012)])
     for year, harvest_N in aquaculture_production.items():
@@ -813,7 +813,7 @@ def find_non_edible_animal_products(df_hides_clean, df_wool, df_sheep, current_p
     N_content_wool = current_params.get('wool_N_frac')
 
     df_hides = df_hides_clean.copy()
-    hides_noise = df_hides['Year'].map(lambda y: dataset_noise.factor('Crops and livestock products', int(y)))
+    hides_noise = df_hides['Year'].map(lambda y: dataset_noise.factor('Crops and livestock products', int(y), sub='production'))
     df_hides['N_amount'] = df_hides['Value'] * float(N_content_hides) * 1e-5 * hides_noise
     total_N_per_year = df_hides.groupby('Year')['N_amount'].sum().to_dict()
 
@@ -892,7 +892,7 @@ def find_recycling(preloaded_data, current_params, current_trade_factors, datase
         if n_frac > 0:
             for col_idx, year in col_to_year_05281.items():
                 val_kt = float(df_05281.iloc[idx, col_idx])
-                year_values[year] += val_kt * n_frac * dataset_noise.factor('05281', year)
+                year_values[year] += val_kt * n_frac * dataset_noise.factor('05281', year, sub='recycling')
 
     value_1995 = year_values.get(1995, 0.0)
 
@@ -924,7 +924,7 @@ def find_recycling(preloaded_data, current_params, current_trade_factors, datase
         if n_frac > 0:
             for col_idx, year in col_to_year_10513.items():
                 val_kt = float(df_10513.iloc[idx, col_idx])
-                year_values[year] += val_kt * n_frac * dataset_noise.factor('10513', year)
+                year_values[year] += val_kt * n_frac * dataset_noise.factor('10513', year, sub='recycling')
                 
     household_waste = find_household_waste(preloaded_data, current_params, dataset_noise)
     
