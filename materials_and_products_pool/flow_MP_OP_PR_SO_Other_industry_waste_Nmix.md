@@ -33,8 +33,8 @@ nav_order: 10
 
 #### Interpretations and comparisons
 
-- The flow is about 9–10 kt N per year in the mid-1990s, falls to 6–7 kt N after 2010 and is about 6 kt N in 2024.
-- In 2024 mixed waste accounts for about 60% of the N, and hazardous waste and plastics for about 15% each.
+- The flow is about 6–7 kt N per year in the mid-1990s, 5–6 kt N after 2000 (4.7–4.9 kt N in 2012–2015) and about 6 kt N in 2024.
+- In 2024 mixed waste accounts for about 70% of the N, hazardous waste for about 17% and plastics for about 3%.
 - Since the N contents of mixed waste and other materials are assumed, the level is uncertain.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

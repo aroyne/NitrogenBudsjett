@@ -25,5 +25,5 @@ nav_order: 10
 
 #### Interpretations and comparisons
 
-- The flow rises from about 0.3 kt N in 1990 to about 3 kt N per year since 2018, mainly plastic waste for recycling.
+- The flow rises from about 0.2 kt N in 1990 to about 2 kt N per year since 2017, mainly plastic waste for recycling.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

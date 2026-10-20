@@ -34,7 +34,7 @@ nav_order: 4
 
 #### Interpretations and comparisons
 
-- The flow rises from about 10 kt N in 1990 to 28–32 kt N in 2005–2019, with a dip in 2009, and falls to about 26 kt N in 2024.
+- The flow rises from about 10 kt N in 1990 to 26–32 kt N in 2005–2019, with a dip in 2009–2011, and is about 26 kt N in 2024.
 - Private households account for 40–45% of the N; the rest comes from services and construction, which have grown more than households over the period.
 - The flow rises faster than the population up to 2008. For private households the growth is real: waste per inhabitant rose from about 290 kg in 1995 to about 470 kg in 2011, following higher consumption. The services and construction values follow employment and building activity, and because they are scaled by about 1.66 they make up about two thirds of the flow before 2012 and determine its shape.
 - The dip from 2008 to 2009 (about −4.6 kt N) comes mainly from services (about −3.6 kt N). SSB reported a 19% decrease in waste from services from 2008 to 2009 and wrote that the cause is not known ([SSB 2011](https://www.ssb.no/natur-og-miljo/statistikker/avfhandel/aar/2011-12-12)). The composition also changes abruptly (paper 519 → 338 kt, other materials 59 → 103 kt), which points to a break in the data rather than a real change: the expanded sample of waste collectors, and the full change to the SN2007 industry classification from 2009 (which moved e.g. publishing from manufacturing to services). Construction accounts for about −0.8 kt N, probably a real effect of the financial crisis (SSB reported a further 10% decrease for construction from 2009 to 2010; [SSB 2011](https://www.ssb.no/natur-og-miljo/statistikker/avfregno/aar/2011-12-14)), and private households for about −0.3 kt N.

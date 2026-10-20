@@ -28,7 +28,7 @@ nav_order: 8
 
 #### Interpretations and comparisons
 
-- The flow rises from about 0.7 kt N in 1990 to 3.5 kt N in 2011, jumps to 5.4 kt N in 2012 with the change of table, and is 4.5–7 kt N since.
+- The flow rises from about 0.8 kt N in 1990 to 2.6 kt N in 2011, jumps to 4.2 kt N in 2012 with the change of table, and is 3.4–7.7 kt N since.
 - Table 10513 introduces a new, large "mixed waste" (blandet avfall) reporting category from 2012 with no equivalent in the earlier table 05281, which shows up as the jump from 2011 to 2012.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
