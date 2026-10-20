@@ -997,7 +997,9 @@ def find_treated_wastewater_discharge(df_05280, df_utslipp, dataset_noise):
     # --- PART 2: historical series, 1997-2001 (utslipp_avløp.xlsx) ---
     for r_idx in range(1, min(6, len(df_utslipp))):
         year = int(df_utslipp.iloc[r_idx, 0])
-        val_kt_N = float(df_utslipp.iloc[r_idx, 1]) * dataset_noise.factor(key_ssb, year)
+        # Same factor as for these years in pr_mc.py's
+        # PR.WW-HY.CW-Treated wastewater discharge-Nmix.
+        val_kt_N = float(df_utslipp.iloc[r_idx, 1]) * dataset_noise.factor('utslipp_avløp', year)
         ww_discharge[year] = val_kt_N
 
         if year == 1997:
