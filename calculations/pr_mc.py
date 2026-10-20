@@ -281,9 +281,14 @@ def _biologically_treated_N(preloaded_data, current_params, dataset_noise):
     for col_idx in range(1, 8):
         year = int(float(str(df_12818.iloc[3, col_idx]).strip()))
         total = float(df_12818.iloc[4, col_idx])
+        agri = float(df_12818.iloc[5, col_idx]) / total
+        green = (float(df_12818.iloc[6, col_idx]) + float(df_12818.iloc[7, col_idx])) / total
+        # The factor shifts N between agriculture and green areas/soil; the
+        # amount used for the two together comes from 10513 and stays fixed.
+        agri_noisy = agri * dataset_noise.factor('12818', year)
         shares[year] = {
-            'agriculture': float(df_12818.iloc[5, col_idx]) / total * dataset_noise.factor('12818', year),
-            'green_and_soil': (float(df_12818.iloc[6, col_idx]) + float(df_12818.iloc[7, col_idx])) / total * dataset_noise.factor('12818', year),
+            'agriculture': agri_noisy,
+            'green_and_soil': agri + green - agri_noisy,
         }
     first_share_year = min(shares)
     for year in N_out:
