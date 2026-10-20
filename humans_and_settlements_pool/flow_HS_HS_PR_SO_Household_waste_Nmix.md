@@ -26,7 +26,8 @@ nav_order: 4
 
 #### Assumptions
 
-- The tonnes of each material are multiplied by an N content, mainly from Table 50 in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)<!--cite:schappi_annexes_2025--> (for example wet organic 0.9%, plastic 2.1%, paper 0.28%, mixed waste 0.9%); typical, assumed values are chosen if none are given.
+- The tonnes of each material are multiplied by an N content, mainly from Table 50 in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)<!--cite:schappi_annexes_2025--> (for example wet organic 0.9%, paper 0.28%, mixed waste 0.9%); typical, assumed values are chosen if none are given.
+- Plastic is set to 0.4% N (95% interval 0.2–0.8%) instead of the 2.1% in Table 50: the N-bearing polymers (polyurethane, polyamide, cellulose nitrate, acrylic) make up 0.40–0.44% N of the plastics imported to Norway (HS 39, 1990–2024), domestic polymer production (PE, PP, PVC) contains no N, and amino resins are left out because they are used as glue in wood panels and end up as wood waste. Plastic waste cannot contain more N than the plastic that enters use; the upper bound allows for food residues and other contamination.
 - The change to mixed waste for private households in 2012 changes the N only slightly and is not adjusted.
 - The 1995–2011 values for services and construction are scaled by the ratio of their N in 2012 to that in 2011 (about 1.66).
 - 1990–1994: we assume a linear increase in waste per inhabitant between about 200 kg/person and 289 kg/person in 1995, and a constant N content per unit mass, and extrapolate from the 1995 value back to 1990.
