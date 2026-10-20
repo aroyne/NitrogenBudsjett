@@ -432,7 +432,7 @@ def find_food_industry_waste(df_05282, df_10514, current_params, dataset_noise):
         year_values[year] = {
             'value': final_mean * dataset_noise.fill('carry', 'food industry waste:1995-1999', year, [1995]),
             'comment': 'ok',
-            'data_sources': 'extrapolated'
+            'data_sources': 'Filled (mean of the scaled 1995-1999 values): SSB'
         }
 
     return year_values

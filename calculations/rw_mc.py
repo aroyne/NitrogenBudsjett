@@ -332,7 +332,7 @@ def _add_atmospheric_inflow_mc(results, flow_code, value_col, df_rw, current_par
             value *= dataset_noise.factor(f'splice:EMEP 2007 {splice_pollutant}', 2006)
         if str(df_rw.iloc[r, 5]).strip() == 'interpolated':
             value *= fill_noise(dataset_noise, flow_code, year, known_years)
-            data_sources = 'filled from EMEP SR tables (see atm_in_out.xlsx)'
+            data_sources = f'Filled ({str(df_rw.iloc[r, 6]).strip()}): EMEP SR tables'
         else:
             data_sources = 'EMEP SR tables'
 

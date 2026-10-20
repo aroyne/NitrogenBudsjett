@@ -39,7 +39,9 @@ def _add_mixed_household_waste_mc(results, preloaded_data, current_params, datas
         collected_years.add(year)
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok', 'data_sources': 'SSB'
+            'comment': 'ok',
+            'data_sources': ('Filled (extrapolated from 1995 with waste per inhabitant and population): SSB'
+                             if year < 1995 else 'SSB')
         })
         
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)    
@@ -195,7 +197,7 @@ def _add_overland_flow_urban_mc(results, preloaded_data, current_params, dataset
                  * dataset_noise.fill('carry', f'{flow_code}:TEOTIL2', year, [2013]))
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok', 'data_sources': 'NIVA TEOTIL2, bias-corrected to TEOTIL3'
+            'comment': 'ok', 'data_sources': 'Filled (held flat at the TEOTIL3 level; TEOTIL2 urban is constant): NIVA TEOTIL2, bias-corrected to TEOTIL3'
         })
 
     # 2013 onward: TEOTIL3. The TEOTIL2 series above stops the year before
@@ -228,7 +230,7 @@ def _add_overland_flow_urban_mc(results, preloaded_data, current_params, dataset
     # the source will eventually cover.
     add_flat_carryforward_year(
         results, flow_code, collected_years, 2023, 2024, dataset_noise,
-        data_sources='flat carry-forward from 2023 (TEOTIL3 not updated for 2024)'
+        data_sources='TEOTIL3 not updated for 2024'
     )
 
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)

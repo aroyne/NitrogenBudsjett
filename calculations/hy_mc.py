@@ -131,7 +131,7 @@ def _add_inflow_to_coastal_waters(results, preloaded_data, current_params, datas
     # the source will eventually cover.
     add_flat_carryforward_year(
         results, flow_code, collected_years, 2023, 2024, dataset_noise,
-        data_sources='flat carry-forward from 2023 (TEOTIL3 not updated for 2024)'
+        data_sources='TEOTIL3 not updated for 2024'
     )
 
     missing_years = EXPECTED_YEARS - collected_years
@@ -261,9 +261,9 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
                              * dataset_noise.fill('extrapolation', 'surface water retention:2013', year, [2013]))
 
             results.append({'flow_name': flow_n2, 'year': year, 'value': hist_ret_val * (1.0 - fraction_N2O),
-                            'comment': 'ok', 'data_sources': 'Calculation model'})
+                            'comment': 'ok', 'data_sources': 'Filled (extrapolated from 2013: inflow to coastal waters x TEOTIL3 retention ratio)'})
             results.append({'flow_name': flow_n2o, 'year': year, 'value': hist_ret_val * fraction_N2O,
-                            'comment': 'ok', 'data_sources': 'Calculation model'})
+                            'comment': 'ok', 'data_sources': 'Filled (extrapolated from 2013: inflow to coastal waters x TEOTIL3 retention ratio)'})
 
     # TEOTIL3 has not been updated for 2024; carry the 2023 value forward
     # with extra uncertainty rather than leave the flow silent for a year
@@ -274,11 +274,11 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
     cy_n2, cy_n2o = set(collected_years), set(collected_years)
     add_flat_carryforward_year(
         results, flow_n2, cy_n2, 2023, 2024, dataset_noise,
-        data_sources='flat carry-forward from 2023 (TEOTIL3 not updated for 2024)'
+        data_sources='TEOTIL3 not updated for 2024'
     )
     add_flat_carryforward_year(
         results, flow_n2o, cy_n2o, 2023, 2024, dataset_noise,
-        data_sources='flat carry-forward from 2023 (TEOTIL3 not updated for 2024)'
+        data_sources='TEOTIL3 not updated for 2024'
     )
     collected_years |= cy_n2 | cy_n2o
 
@@ -365,7 +365,9 @@ def _add_aquaculture_internal_flows(results, aquaculture_production_dict, lost_f
             lost_fish_N = lost_fish_N_dict[year]
             results.append({
                 'flow_name': flow_harvest, 'year': year, 'value': fish_harvested_N + lost_fish_N,
-                'comment': 'ok', 'data_sources': 'Fiskeridirektoratet'
+                'comment': 'ok',
+                'data_sources': ('Fiskeridirektoratet; dead and discarded fish filled (extrapolated from 2007 as a share of harvest)'
+                                 if year < 2007 else 'Fiskeridirektoratet')
             })
 
             # 2. Feed waste and faeces to coastal water: get_aquafeed_budget

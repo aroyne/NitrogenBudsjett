@@ -130,12 +130,12 @@ def _deposition_flow_mc(results, flow_code, class4, poll, preloaded_data, curren
             value = (value_2016 * float(current_params.get(scale_key))
                      * dataset_noise.fill('extrapolation', f'{flow_code}:2016+', year, [2016]))
             value_last = value
-            data_sources = 'NILU and geodata.no, 2016 scaled with Blake et al. (2023) trend'
+            data_sources = 'Filled (2016 scaled with the Blake et al. (2023) trend): NILU and geodata.no'
             
         else:
             # Held flat at the 2021 value
             value = value_last * dataset_noise.fill('carry', f'{flow_code}:2021+', year, [2021])
-            data_sources = 'carried forward from 2021'
+            data_sources = 'Filled (held at 2021): NILU and geodata.no'
 
         results.append({
             'flow_name': flow_code,
@@ -381,7 +381,7 @@ def _add_atmospheric_outflow_mc(results, flow_code, value_col, df_atm, current_p
         value = base_value * dataset_noise.factor('Source-receptor', year)
         if str(df_atm.iloc[r, 5]).strip() == 'interpolated':
             value *= fill_noise(dataset_noise, flow_code, year, known_years)
-            data_sources = 'filled from EMEP SR tables (see atm_in_out.xlsx)'
+            data_sources = f'Filled ({str(df_atm.iloc[r, 6]).strip()}): EMEP SR tables'
         else:
             data_sources = 'EMEP SR tables'
 

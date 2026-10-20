@@ -142,7 +142,8 @@ def _add_food_crop_products_flow_mc(results, preloaded_data, current_params, dat
             'year': year,
             'value': float(value),
             'comment': comment,
-            'data_sources': 'Eurostat GNB scaled by SSB cereal harvest (table 07479)',
+            'data_sources': (f'Filled (N per tonne interpolated between {before} and {after[0]}) x SSB cereal harvest (table 07479): Eurostat GNB'
+                             if after else f'Filled (N per tonne held at {before}) x SSB cereal harvest (table 07479): Eurostat GNB'),
         })
 
     missing_years = EXPECTED_YEARS - collected_years
@@ -174,7 +175,9 @@ def _add_industrial_crop_products_flow_mc(results, preloaded_data, current_param
             'year': year,
             'value': float(value),
             'comment': comment,
-            'data_sources': data_sources if year != 2024 else '3-year average of 2021-2023 (Eurostat GNB not yet released for 2024)'
+            'data_sources': (data_sources if year not in (2017, 2018, 2019, 2024) else
+                             'Filled (mean of 2021-2023): Eurostat GNB not yet released for 2024' if year == 2024 else
+                             'Filled (mean of all other years): Eurostat GNB has no data for 2017-2019')
         })
 
     missing_years = EXPECTED_YEARS - collected_years
@@ -528,9 +531,9 @@ def _add_non_edible_animal_products_flow_mc(results, preloaded_data, current_par
             if year > 2004:
                 data_sources = 'FAOSTAT Crops and livestock products + Landbruksdirektoratet'
             elif year != 2001:
-                data_sources = 'FAOSTAT Crops and livestock products + Landbruksdirektoratet + SSB, extrapolated'
+                data_sources = 'FAOSTAT Crops and livestock products + SSB sheep numbers (table 03710) x wool per sheep'
             else:
-                data_sources = 'FAOSTAT Crops and livestock products'
+                data_sources = 'FAOSTAT Crops and livestock products; wool filled (sheep numbers interpolated between 2000 and 2002)'
 
             results.append({
                 'flow_name': flow_code,
@@ -707,7 +710,7 @@ def _add_N2_emissions_soil_management_mc(results, preloaded_data, current_params
             'year': year,
             'value': rate_kg_per_ha * area_ha * 1.0e-6,  # kg N -> kt N
             'comment': comment,
-            'data_sources': data_sources
+            'data_sources': data_sources if year in known_years else data_sources + '; area filled (interpolated)'
         })
 
     missing_years = EXPECTED_YEARS - collected_years

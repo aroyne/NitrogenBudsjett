@@ -396,7 +396,7 @@ def _add_food_industry_wastewater_mc(results, preloaded_data, current_params, da
     # 2024; carry the 2023 value forward with extra uncertainty.
     add_flat_carryforward_year(
         results, flow_code, collected_years, 2023, 2024, dataset_noise,
-        data_sources='flat carry-forward from 2023 (Miljødirektoratet Norske utslipp not updated for 2024)'
+        data_sources='Miljødirektoratet Norske utslipp not updated for 2024'
     )
 
     # Reported against the full EXPECTED_YEARS range (not target_years) so
@@ -546,14 +546,14 @@ def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise
         elif year < 1989:
             v_human_pers = ((total_N_pers_06376[idx_83_85] + total_N_pers_06376[idx_89_91]) / 2.0
                             * dataset_noise.fill('interpolation', f'{flow_code}:1985-1989', year, [1985, 1989]))
-            src = 'mean of the 1983-1985 and 1989-1991 surveys'
+            src = 'Filled (mean of the 1983-1985 and 1989-1991 surveys): SSB'
         elif year < 1992:
             v_human_pers = total_N_pers_06376[idx_89_91]
             src = 'SSB'
         elif year < 1996:
             v_human_pers = ((total_N_pers_06376[idx_89_91] + total_N_pers_06376[idx_96_98]) / 2.0
                             * dataset_noise.fill('interpolation', f'{flow_code}:1991-1996', year, [1991, 1996]))
-            src = 'mean of the 1989-1991 and 1996-1998 surveys'
+            src = 'Filled (mean of the 1989-1991 and 1996-1998 surveys): SSB'
         else:
             v_human_pers = total_N_pers_06376[idx_96_98]
             src = 'SSB'
@@ -582,7 +582,7 @@ def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise
         year_values[year] = {
             'value': v_trend * fill_noise(dataset_noise, flow_code, year, valid_years),
             'comment': 'ok',
-            'data_sources': 'linear trend across the survey years'
+            'data_sources': 'Filled (linear trend across the survey years): SSB'
         }
 
     # Food wasted downstream of the food industry, before it reaches
@@ -653,9 +653,9 @@ def _add_fp_untreated_wastewater_mc(results, preloaded_data, current_params, dat
 
     for year in sorted(list(target_years)):
         if year < 1994:
-            val = calculated_mean
+            val = calculated_mean * dataset_noise.fill('carry', f'{flow_code}:1994-1998', year, [1994])
             comment = 'ok'
-            src = 'Ekstrapolert / Historisk snitt'
+            src = 'Filled (mean of 1994-1998): Miljødirektoratet'
         elif year in found_values_94_23:
             val = found_values_94_23[year]
             comment = 'ok'
@@ -676,7 +676,7 @@ def _add_fp_untreated_wastewater_mc(results, preloaded_data, current_params, dat
     # 2024; carry the 2023 value forward with extra uncertainty.
     add_flat_carryforward_year(
         results, flow_code, collected_years, 2023, 2024, dataset_noise,
-        data_sources='flat carry-forward from 2023 (Miljødirektoratet Norske utslipp not updated for 2024)'
+        data_sources='Miljødirektoratet Norske utslipp not updated for 2024'
     )
 
     # Reported against the full EXPECTED_YEARS range (not target_years) so
@@ -864,7 +864,7 @@ def _add_other_industry_waste_mc(results, preloaded_data, current_params, datase
                 'year': int(year),
                 'value': value,
                 'comment': 'ok',
-                'data_sources': 'SSB, extrapolated' if year < 1995 else data_sources,
+                'data_sources': 'Filled (extrapolated from 1995 with the 1992 and 1995 totals): SSB' if year < 1995 else data_sources,
             })
             
     missing_years = EXPECTED_YEARS - collected_years
@@ -899,7 +899,7 @@ def _add_other_industry_wastewater_mc(results, preloaded_data, current_params, d
     # 2024; carry the 2023 value forward with extra uncertainty.
     add_flat_carryforward_year(
         results, flow_code, collected_years, 2023, 2024, dataset_noise,
-        data_sources='flat carry-forward from 2023 (Miljødirektoratet Norske utslipp not updated for 2024)'
+        data_sources='Miljødirektoratet Norske utslipp not updated for 2024'
     )
 
     # Reported against the full EXPECTED_YEARS range (not target_years) so
@@ -1029,7 +1029,7 @@ def _add_fo_mineral_fertilizer_mc(results, preloaded_data, current_params, datas
                     final_yearly_values[gap_year] = {
                         'value': v_interp * dataset_noise.fill('interpolation', f'{flow_code}:{y0}-{y1}', gap_year, [y0, y1]),
                         'comment': 'ok',
-                        'data_sources': f'Interpolert mellom {y0} og {y1}'
+                        'data_sources': f'Filled (interpolated between {y0} and {y1})'
                     }
 
     for year in sorted(final_yearly_values.keys()):
@@ -1184,7 +1184,7 @@ def _add_op_untreated_wastewater_mc(results, preloaded_data, current_params, dat
     # 2024; carry the 2023 value forward with extra uncertainty.
     add_flat_carryforward_year(
         results, flow_code, collected_years, 2023, 2024, dataset_noise,
-        data_sources='flat carry-forward from 2023 (Miljødirektoratet Norske utslipp not updated for 2024)'
+        data_sources='Miljødirektoratet Norske utslipp not updated for 2024'
     )
 
     # Reported against the full EXPECTED_YEARS range (not target_years) so

@@ -189,7 +189,8 @@ def _add_waste_to_energy_mc(results, preloaded_data, current_params, dataset_noi
 
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': comment_str, 'data_sources': data_sources
+            'comment': comment_str,
+            'data_sources': 'Filled (extrapolated from 1995 with waste amounts and incineration shares 1985-1995): SSB'
         })
         
     missing_years = EXPECTED_YEARS - collected_years
@@ -219,7 +220,7 @@ def _add_recycling_mc(results, preloaded_data, current_params, dataset_noise, cu
             'year': year,
             'value': value,
             'comment': 'ok',
-            'data_sources': data_sources
+            'data_sources': 'Filled (extrapolated from 1995 with recycling shares 1985-1995): SSB' if year < 1995 else data_sources
         })
 
     missing_years = EXPECTED_YEARS - collected_years
@@ -305,9 +306,9 @@ def _add_biologically_treated_flow_mc(results, preloaded_data, current_params, d
     for year in range(1990, 2025):
         collected_years.add(year)
         if year < 2012:
-            source = 'extrapolated'
+            source = 'Filled (held at 2012): SSB tables 10513 and 12818'
         elif year < 2018:
-            source = 'SSB table 10513, use shares from table 12818 (2018)'
+            source = 'SSB table 10513; use shares filled (held at 2018) from table 12818'
         else:
             source = 'SSB tables 10513 and 12818'
         results.append({
@@ -424,7 +425,7 @@ def _add_wastewater_from_landfills_mc(results, preloaded_data, current_params, d
             'year': year,
             'value': val,
             'comment': 'ok',
-            'data_sources': 'Utslipp_deponi.xlsx (Mildir)' if year >= 2011 else 'extrapolated with CRT 5.A landfill CH4'
+            'data_sources': 'Utslipp_deponi.xlsx (Mildir)' if year >= 2011 else 'Filled (extrapolated from 2011 with CRT 5.A landfill CH4)'
         })
 
     missing_years = EXPECTED_YEARS - collected_years
@@ -518,7 +519,7 @@ def _add_so_leaching_mc(results, preloaded_data, current_params, dataset_noise):
             'year': year,
             'value': val,
             'comment': comment,
-            'data_sources': 'Utslipp_deponi.xlsx (Mildir)' if year >= 2011 else 'extrapolated with CRT 5.A landfill CH4'
+            'data_sources': 'Utslipp_deponi.xlsx (Mildir)' if year >= 2011 else 'Filled (extrapolated from 2011 with CRT 5.A landfill CH4)'
         })
 
     missing_years = EXPECTED_YEARS - collected_years
@@ -870,7 +871,7 @@ def _add_ag_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
     values_93_95 = [res['value'] for res in results if res['flow_name'] == flow_code and res['year'] in [1993, 1994, 1995]]
     mean_val = sum(values_93_95) / 3 if values_93_95 else 0.0
     
-    data_sources_ext = 'mean of 1993-1995'
+    data_sources_ext = 'Filled (mean of 1993-1995): SSB table 05279'
     for year in range(1990, 1993):  
         collected_years.add(year)
         results.append({
@@ -960,7 +961,7 @@ def _add_hs_sewage_sludge_fertilizer_mc(results, preloaded_data, current_params,
     values_93_95 = [res['value'] for res in results if res['flow_name'] == flow_code and res['year'] in [1993, 1994, 1995]]
     mean_val = sum(values_93_95) / 3 if values_93_95 else 0.0
     
-    data_sources_ext = 'mean of 1993-1995'
+    data_sources_ext = 'Filled (mean of 1993-1995): SSB table 05279'
     for year in range(1990, 1993):  
         collected_years.add(year)
         results.append({
@@ -1132,7 +1133,7 @@ def _add_sewage_sludge_landfill_mc(results, preloaded_data, current_params, data
     values_93_95 = [res['value'] for res in results if res['flow_name'] == flow_code and res['year'] in [1993, 1994, 1995]]
     mean_val = sum(values_93_95) / 3 if values_93_95 else 0.0
     
-    data_sources_ext = 'mean of 1993-1995'
+    data_sources_ext = 'Filled (mean of 1993-1995): SSB table 05279'
     for year in range(1990, 1993):  
         collected_years.add(year)
         results.append({
@@ -1372,7 +1373,7 @@ def _add_treated_ww_discharge_mc(results, preloaded_data, current_params, datase
             value_1997 = perturbed_tonnage
 
     # 3. Extrapolate backward: 1990 to 1996 (constant, based on the perturbed 1997 value)
-    data_sources_ext = 'held at the 1997 value'
+    data_sources_ext = 'Filled (held at 1997): historical wastewater statistics'
     for year in range(1990, 1997):  
         collected_years.add(year)
         results.append({

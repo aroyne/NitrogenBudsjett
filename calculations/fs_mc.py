@@ -180,7 +180,7 @@ def _add_land_leaching_mc(results, preloaded_data, current_params, dataset_noise
     # the source will eventually cover.
     add_flat_carryforward_year(
         results, flow_code, collected_years, 2023, 2024, dataset_noise,
-        data_sources='flat carry-forward from 2023 (TEOTIL3 not updated for 2024)'
+        data_sources='TEOTIL3 not updated for 2024'
     )
 
     missing_years = EXPECTED_YEARS - collected_years
@@ -304,7 +304,7 @@ def _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise):
                     'sauer': dataset_noise.fill('extrapolation', 'utmark sheep', year, [first_year])}
             n = {group: animals.loc[first_year, group] * dataset_noise.factor('12660', first_year) * fill[group] for group in fem_1996}
             n['sauer'] *= sheep_index[year] / sheep_index[first_year]
-            src = 'SSB table 12660, 1995 level; sheep scaled with SSB table 03710'
+            src = 'Filled (held at 1995; sheep extrapolated with SSB table 03710): SSB table 12660'
         fem = sum(n[group] * fem_per_animal[group] for group in fem_1996)
         collected_years.add(year)
         results.append({
