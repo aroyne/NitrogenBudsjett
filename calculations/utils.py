@@ -77,7 +77,13 @@ def fill_noise(dataset_noise, flow_code, year, known_years, outside='carry'):
     nxt = min(after) if after else None
     anchors = [k for k in (prev, nxt) if k is not None]
     kind = 'interpolation' if prev is not None and nxt is not None else outside
-    return dataset_noise.fill(kind, f'{flow_code}:{prev}-{nxt}', year, anchors)
+    if prev is not None and nxt is not None:
+        period = f'{prev}-{nxt}'
+    elif prev is not None:
+        period = f'{prev}+'
+    else:
+        period = f'before {nxt}'
+    return dataset_noise.fill(kind, f'{flow_code}:{period}', year, anchors)
 
 
 def add_flat_carryforward_year(results, flow_code, collected_years, from_year, to_year, dataset_noise, data_sources):

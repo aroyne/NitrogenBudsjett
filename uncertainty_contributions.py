@@ -24,7 +24,10 @@ to zero (and cut at zero), strongly skewed sources and products of uncertain
 factors. For those the shares are indicative.
 
 Writes output_files/MC_uncertainty_contributions.csv, read by
-report_generator.py for the "Uncertainty" section of each flow page.
+report_generator.py for the "Uncertainty" section of each flow page, and the
+elasticities per flow, year and source to
+output_files/MC_uncertainty_elasticities.csv.gz, read by
+aggregate_uncertainty.py for balances, national totals and NUE.
 """
 import re
 
@@ -37,6 +40,7 @@ STEP = 1.10
 PERIODS = {'1990-1994': (1990, 1994), '2020-2024': (2020, 2024)}
 NSIM_WIDTH = 4001
 OUTPUT_FILE = 'output_files/MC_uncertainty_contributions.csv'
+ELASTICITY_FILE = 'output_files/MC_uncertainty_elasticities.csv.gz'
 
 TYPE_WORDS = {
     'R': 'Registered data',
@@ -144,10 +148,13 @@ def _sources(bp, sampler, wide, seen):
 
 def compute(run_once, preloaded_data, base_params, pools, seed):
     """
-    Runs the sensitivity analysis and returns one row per flow, period and
-    source: share of the variance, elasticity, uncertainty text and the
-    other flows the source affects. base_params must hold the central values
-    (iteration 0) when this is called.
+    Runs the sensitivity analysis and returns (summary, elasticities).
+    summary has one row per flow, period and source: share of the variance,
+    elasticity, uncertainty text and the other flows the source affects.
+    elasticities has one row per flow, year and source, with the source's
+    relative standard deviation and whether it is drawn independently per
+    year. base_params must hold the central values (iteration 0) when this
+    is called.
     """
     trade_params = preloaded_data['trade_params']
     wide = MCSampler(base_params, trade_params, NSIM_WIDTH, seed=seed)
@@ -237,6 +244,7 @@ def compute(run_once, preloaded_data, base_params, pools, seed):
     print(f"[USIKKERHET] {len(sources)} kilder, én modellkjøring per kilde...")
     rows = []
     for i, (sid, name, typ, width, sigma, target) in enumerate(sources):
+        annual = target[0] == 'dataset' and target[1] in sampler.annual_keys
         e = (run(target) / base_nonzero - 1.0) / (STEP - 1.0)
         e = e[e.abs() > 1e-4].dropna()
         for (flow, year), ev in e.items():
@@ -246,11 +254,11 @@ def compute(run_once, preloaded_data, base_params, pools, seed):
                 s, u = fill_sigma(target[1], d) if d is not None else (np.nan, np.nan)
             else:
                 s = sigma
-            rows.append((flow, year, sid, name, typ, width, ev, s, u))
+            rows.append((flow, year, sid, name, typ, width, ev, s, u, annual))
         if i % 100 == 0:
             print(f"[USIKKERHET]   {i}/{len(sources)}")
     res = pd.DataFrame(rows, columns=['flow_name', 'year', 'source_id', 'source', 'type', 'uncertainty',
-                                      'elasticity', 'rel_sd', 'fill_u'])
+                                      'elasticity', 'rel_sd', 'fill_u', 'annual'])
 
     # A fill draw can also move years where it is not applied directly
     # (moving averages, residuals built from filled years of other flows);
@@ -279,9 +287,12 @@ def compute(run_once, preloaded_data, base_params, pools, seed):
                    if pd.notna(r.fill_u_min) else 'grows with distance to known year'), axis=1)
     summary['other_flows'] = [';'.join(f for f in affected[sid] if f != flow)
                               for flow, sid in zip(summary['flow_name'], summary['source_id'])]
-    return summary.drop(columns=['fill_u_min', 'fill_u_max'])
+    elasticities = res[['flow_name', 'year', 'source_id', 'elasticity', 'rel_sd', 'annual']]
+    return summary.drop(columns=['fill_u_min', 'fill_u_max']), elasticities
 
 
-def write(summary, path=OUTPUT_FILE):
+def write(summary, elasticities, path=OUTPUT_FILE, elasticity_path=ELASTICITY_FILE):
     summary.to_csv(path, index=False)
     print(f"[USIKKERHET] Skrevet {path} ({len(summary)} rader)")
+    elasticities.to_csv(elasticity_path, index=False, compression='gzip')
+    print(f"[USIKKERHET] Skrevet {elasticity_path} ({len(elasticities)} rader)")

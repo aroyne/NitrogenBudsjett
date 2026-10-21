@@ -322,7 +322,7 @@ def main():
         import uncertainty_contributions
         print("[INFO] Beregner bidrag til usikkerhet per strøm (--uncertainty-contributions)...")
         setup_iteration(base_params, sampler, 0)
-        uncertainty_contributions.write(uncertainty_contributions.compute(
+        uncertainty_contributions.write(*uncertainty_contributions.compute(
             run_once, preloaded_data, base_params, selected_pools, args.seed))
 
     # 4. WEBSITE GENERATION
