@@ -36,7 +36,6 @@ nav_order: 7
     - MP.OP-RW.RW-Other goods export-Nmix (excluding nitric acid, dicyandiamide and ammonia, for the same reason as the import flow above – MP.OP-RW.RW-Other goods export-Nmix itself still reports the full total including them)
     - MP.OP-EF.IC-Industrial waste fuels-Nmix
 - The trade-based inflow and outflow (Other goods import/export) are adjusted to exclude nitric acid and dicyandiamide specifically: both are fertilizer-production intermediates (ammonium/calcium ammonium nitrate feedstock and a nitrification inhibitor, respectively) reported within the broader 'kjemikalier' (chemicals) trade category alongside genuine consumer-good inputs such as pharmaceuticals, polyamide and resin, which are kept. This distinction is about the fertilizer industry specifically, not industry in general: explosives, though also ammonium-nitrate-based, serve mining and civil engineering rather than fertilizer production and are deliberately left in the balance. A sharp rise in Norwegian nitric acid exports from 2018 onward, most plausibly linked to increased commercial nitric acid trade by domestic fertilizer producers, had been distorting the Consumer goods trend before this adjustment.
-- Negative residuals in individual MC iterations are set to zero.
 
 #### Interpretations and comparisons
 

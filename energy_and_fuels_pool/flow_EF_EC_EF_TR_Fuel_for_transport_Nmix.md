@@ -27,7 +27,7 @@ nav_order: 5
 - Road transport: diesel oil 43 TJ/kt, 0.0133% N; biofuels 27 TJ/kt and 0.0133% N, the Table 15 value for gas/diesel oil used as a proxy. The Table 15 value for liquid biomass, 1%, refers to sewage sludge, while biodiesel (FAME) is made from refined vegetable oils, HVO is hydrotreated, which removes nitrogen compounds, and bioethanol is practically free of nitrogen; the fuel standards EN 14214 and EN 15940 set no limit for N.
 - Railways: liquid fuels 44 TJ/kt, 0.0133% N, as railways use only diesel according to SSB table 11561; solid fuels 25.8 TJ/kt, 1.5% N (as for solid fuels in EF.EC-EF.IC-Fuel for industry-Nmix).
 - Domestic navigation: residual fuel oil 40.4 TJ/kt, 0.45% N; gas/diesel oil 43 TJ/kt, 0.0133% N.
-- In the Monte Carlo simulation the NCVs vary within the IPCC 2006 Table 1.2 ranges (jet kerosene 42.0–45.0, gas/diesel oil 41.4–43.3, residual fuel oil 39.8–41.7, biodiesel 13.6–54.0, liquid fuels 41.4–44.8 and coal 19.9–30.5 TJ/kt), and the N contents within the Table 15 ranges where given (residual fuel oil 0.1–0.8%, coal 0.5–2.5%); N contents for which Table 15 gives only an average (jet kerosene and gas/diesel oil) vary by ±50%.
+- The uncertainty ranges are from IPCC 2006 Table 1.2 for the NCVs and from Table 15 for the N contents where Table 15 gives a range. The ranges for N contents for which Table 15 gives only an average (jet kerosene and gas/diesel oil) are our assumption.
 - Gasoline is not included since its N content is 0 in Table 15, and natural gas (LNG in ferries) is not included either.
 
 #### Interpretations and comparisons

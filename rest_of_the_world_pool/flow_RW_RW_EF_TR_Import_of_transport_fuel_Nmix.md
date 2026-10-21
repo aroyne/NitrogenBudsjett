@@ -27,6 +27,7 @@ nav_order: 7
 #### Interpretations and comparisons
 
 - The flow is small, below 0.5 kt N per year, since transport fuels contain little N.
+- The N content of gasoline is 0 in the central run but 0–0.01% (minimum–maximum) in the Monte Carlo simulation, which gives about half of the Monte Carlo variance in 1990–1994. The uncertainty table does not show gasoline, since a sensitivity analysis around an N content of 0 gives no change in the flow.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

@@ -23,7 +23,7 @@ nav_order: 8
 #### Assumptions
 
 - For years with missing data, we have filled in the average of all other years.
-- Eurostat GNB has not yet published a 2024 figure at the time of writing; the 2024 value is a 3-year average of 2021–2023 (this flow is small and volatile with no clear trend), with additional uncertainty (±15 %) applied to reflect that it is not a real, independently observed value.
+- Eurostat GNB has not yet published a 2024 figure at the time of writing; the 2024 value is a 3-year average of 2021–2023 (this flow is small and volatile with no clear trend).
 
 #### Interpretations and comparisons
 

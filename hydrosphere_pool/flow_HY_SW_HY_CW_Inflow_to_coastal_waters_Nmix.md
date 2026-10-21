@@ -29,7 +29,7 @@ nav_order: 3
 - For 1990–2012, four TEOTIL2 categories are used: natural diffuse loss (background), agriculture, urban areas and industry. Each category is bias-corrected to TEOTIL3 by multiplying with the ratio between the TEOTIL3 and TEOTIL2 means over the years both models cover (2013–2022). This is the method NIVA uses to extend TEOTIL3 back to 1990 in the annual reports Sample (2025)<!--cite:sample_kildefordelte_2025-->, but applied here to the categories the model uses, and without the published 1990–1995 values.
 - The factors are 1.17 for background (compared with TEOTIL3 forest, mountain, lake and agricultural background), 1.83 for agriculture, 19.4 for urban areas (TEOTIL2 has a much lower and constant urban loading) and 0.89 for industry.
 - Since the TEOTIL3 source data are inputs to surface water before retention, the sum of the four scaled categories is multiplied by 0.88, the share of these inputs that reaches the coast in TEOTIL3 over the same years. The factors are calculated from the data each time the model runs.
-- TEOTIL3 has not been updated for 2024 at the time of writing; the 2024 value is a flat carry-forward of 2023, with additional uncertainty (±15 %) applied to reflect that it is not a real, independently observed value.
+- TEOTIL3 has not been updated for 2024 at the time of writing; the 2024 value is held at the 2023 value.
 
 #### Interpretations and comparisons
 

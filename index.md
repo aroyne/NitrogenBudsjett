@@ -28,7 +28,7 @@ Use the navigation menu on the left side to explore the individual nitrogen pool
 - **Central value and band.** With skewed distributions the central value is not in the middle of the band. For a few flows whose best estimate lies at a bound (for example an N content of zero for petrol), the central value can lie at or just outside the edge of the band.
 - **Balances.** Pool balances and their intervals are computed within each run, so flows that share parameters or are derived from each other keep their correlation.
 - **Residual flows.** Flows computed as a difference of other flows (ammonia synthesis, inflow to coastal waters, consumer goods, recycling) are set to zero in the runs where the difference is negative; how often this happens is recorded.
-- **Trends.** Since each data set's uncertainty factor is the same for all years within a run, most of the data uncertainty cancels out in trends over time.
+- **Trends.** Data sets of registered data and surveys get a new uncertainty factor for each year, so their uncertainty also affects trends. Other data sets (inventories, modelled statistics and assumptions) and all parameters are drawn once per run and used for all years, so most of their uncertainty cancels out in trends over time.
 <!-- MANUAL:INDEX_TEXT:END -->
 
 ### Interactive National Nitrogen Flow Map

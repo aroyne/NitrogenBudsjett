@@ -26,7 +26,7 @@ nav_order: 14
 
 #### Interpretations and comparisons
 
-- The flow is constant at about 2 kt N per year, with a large uncertainty (95% interval about 0.1–40 kt N).
+- The flow is constant at about 2 kt N per year, with a large uncertainty (95% interval about 0.1–37 kt N).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
