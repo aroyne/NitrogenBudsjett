@@ -46,7 +46,7 @@ def get_balance_image_markdown(pool_code, plot_files, plot_dir, relative_depth="
                 f"## Mass Balance Overview (1990-2024)\n\n"
                 f"The chart below illustrates the integrated nitrogen mass balance for **{pool_code}**. "
                 f"It includes total system inflows (positive stack), total outflows (negative stack), "
-                f"and the net balance line with estimated uncertainty bounds (±1σ).\n\n"
+                f"and the net balance line with its 95 % Monte Carlo interval (2.5–97.5 percentiles).\n\n"
                 f"![Mass Balance {pool_code}]({relative_depth}{plot_dir}/{balance_file})\n"
             )
     else:

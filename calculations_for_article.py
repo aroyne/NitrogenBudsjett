@@ -332,13 +332,13 @@ FOOD_EXPORT_TYPES = {'korn/planter', 'kjøtt/fisk/meieri/egg', 'mat'}
 # Food import also includes fish by-products not fit for human consumption
 # (rw_mc.py); their konv is fish_fresh_frozen, so they count as fish.
 FOOD_IMPORT_TYPES = FOOD_EXPORT_TYPES | {'fiskebiprodukter'}
-FISH_EXPORT_KONV = 'fish_fresh_frozen'
+FISH_KONV = {'fish_fresh_frozen', 'dried_salted_fish', 'dried_fish'}
 
 
 @functools.lru_cache(maxsize=None)
 def _food_trade_n_by_year(is_import, include_fish, years=ANALYSIS_YEARS):
     """N in food trade (Food import or Food export) per year from the raw
-    trade data, with or without the fish_fresh_frozen konv category. Uses the
+    trade data, with or without the fish konv categories (FISH_KONV). Uses the
     trade_parameters median value (not MC-perturbed) for a single,
     reproducible point estimate, since this breakdown isn't carried in
     MC_Reporting_Statistics.xlsx."""
@@ -353,7 +353,7 @@ def _food_trade_n_by_year(is_import, include_fish, years=ANALYSIS_YEARS):
     is_food = df_vol['type'].astype(str).str.lower().str.strip().isin(types)
     keep = is_direction & is_food
     if not include_fish:
-        keep &= df_vol['konv'] != FISH_EXPORT_KONV
+        keep &= ~df_vol['konv'].isin(FISH_KONV)
     sub = df_vol[keep].copy()
     sub['N_amount'] = sub['amount'] * sub['konv'].map(factors).fillna(0.0) / 1e6
 
@@ -363,8 +363,8 @@ def _food_trade_n_by_year(is_import, include_fish, years=ANALYSIS_YEARS):
 
 
 def food_export_excluding_fish(years=ANALYSIS_YEARS):
-    """MP.FP-RW.RW-Food export-Nmix, with the fish_fresh_frozen konv category
-    removed. Norway's fish exports (the vast majority of Food export by mass)
+    """MP.FP-RW.RW-Food export-Nmix, with the fish konv categories
+    (FISH_KONV) removed. Norway's fish exports (the vast majority of Food export by mass)
     are not matched by any fertilizer/BNF/deposition/import input in Q3's
     denominator, since they come from the sea rather than AG.SM - including
     them in N_food would inflate food-system NUE without a matching

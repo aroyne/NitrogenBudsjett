@@ -28,7 +28,6 @@ nav_order: 4
 #### Interpretations and comparisons
 
 - Since gasoline has no fuel-bound nitrogen, the flow is small (below 0.5 kt N per year) and consists of jet fuel exports.
-- The N content of gasoline is 0 in the central run but 0–0.01% (minimum–maximum) in the Monte Carlo simulation. Since the exported quantities of gasoline are large, this gives most of the Monte Carlo spread from about 2002 on, and the central value lies below the 95% interval in most of these years. The uncertainty table does not show gasoline, since a sensitivity analysis around an N content of 0 gives no change in the flow.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
