@@ -32,12 +32,11 @@ nav_order: 4
 
 ### Uncertainty
 
-Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-21.
+Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-22.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| N content of traded goods: jet fuel | N content of traded goods | ±20 %, normal | 94% | 94% | 1.00 | 1.00 | [Transport Fuel Import](../rest_of_the_world_pool/flow_RW_RW_EF_TR_Import_of_transport_fuel_Nmix.html) |
-| Traded quantities (SSB 08801) (transport_fuel) | Registered data | ±5 %, normal, drawn per year | 6% | 6% | 1.00 | 1.00 | [Transport Fuel Import](../rest_of_the_world_pool/flow_RW_RW_EF_TR_Import_of_transport_fuel_Nmix.html) |
+| N content of traded goods: jet fuel | N content of traded goods | ±50 %, triangular | 99% | 99% | 1.00 | 1.00 | [Transport Fuel Import](../rest_of_the_world_pool/flow_RW_RW_EF_TR_Import_of_transport_fuel_Nmix.html) |
 
 ### References
 
