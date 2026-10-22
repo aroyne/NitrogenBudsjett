@@ -39,11 +39,11 @@ nav_order: 7
 
 #### Interpretations and comparisons
 
-- All errors in the inflows and outflows end up in this flow: a 10% error in Other goods import alone corresponds to about 3 kt N, or about 20% of the flow.
-- The flow rises from about 6–8 kt N per year in 1990–1994 to 10–12 kt N around 2000, 12–17 kt N in 2004–2011 (10 kt N in 2009) and 17–20 kt N in 2012–2022, and falls to about 13 kt N in 2023–2024 (about 2.4 kg N per person).
-- The low level in the early 1990s is mainly due to lower imports of other goods (15–22 kt N against 21–31 kt N from 1995).
+- All errors in the inflows and outflows end up in this flow: a 10% error in Other goods import alone corresponds to about 2.4 kt N, or about 25% of the flow.
+- The flow rises from about 4–6 kt N per year in 1990–1994 to about 9 kt N around 2000, 10–13.5 kt N in 2004–2011 (7.4 kt N in 2009) and 13–16.5 kt N in 2012–2022, and falls to 9–10 kt N in 2023–2024 (about 1.8 kg N per person).
+- The low level in the early 1990s is mainly due to lower imports of other goods (13.5–20 kt N against 18–28 kt N from 1995).
 - The drop in 2023–2024 comes mainly from lower recycling and higher imports of nitric acid, which are excluded from the balance.
-- The 95% interval is wide (7–18 kt N in 2024, 0–9 kt N in 1990), since the flow is the difference between much larger flows; in 1990 about 3 % of the Monte Carlo iterations give a negative difference, which is set to zero.
+- The 95% interval is wide (3–14 kt N in 2024, 0–7 kt N in 1990), since the flow is the difference between much larger flows. A negative difference is set to zero; this happens in about 27% of the Monte Carlo iterations in 1990, about 5% in 1991–1994 and 3% in 1997, and rarely in other years.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

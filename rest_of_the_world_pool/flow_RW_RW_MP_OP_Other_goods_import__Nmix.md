@@ -25,13 +25,14 @@ nav_order: 11
 
 - The quantities are multiplied by an N content per commodity type from the trade mapping sheet of N_parameters.xlsx.
 - Within the plastics and synthetic-textile trade categories, N content is assigned by base polymer rather than a single blended factor: nitrogen-containing polymers (polyamide/nylon, polyurethane, melamine and urea formaldehyde resins, polyacrylonitrile) use the N contents given in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, Table 23, while ordinary commodity plastics and fibres with no nitrogen in their polymer backbone (polyethylene, polypropylene, PVC, polystyrene, polyester, viscose/rayon, cotton) are assigned ~0.
+- Resins without nitrogen (phenolic resins, silicones, polysulfides and polysulfones, petroleum and coumarone-indene resins) are assigned 0; only other amino resins (HS 3909.39) use 30% N (Table 23).
 - The same principle applies to clothing, footwear and other finished textile articles: items explicitly of wool use the protein-fibre N content from Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, Table 24 (as for silk), items with a leather component use the same N content as hides and skins, and items of cotton or unspecified synthetic/artificial fibre (predominantly polyester, which – like cotton – has no nitrogen in its polymer backbone) default to ~0.
 - Roundwood, fuel wood, chips, sawdust and wood residues (HS 4401 and 4403) are given the N content of stem wood (1.2 g/kg for conifers and 1.4 g/kg for broadleaves, Table 45 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->), the same as domestic industrial round wood, while processed wood products use 0.2% (Table 22).
 - Live plants, cut flowers and Christmas trees are given an assumed 0.3 % N, as for fresh vegetables.
 
 #### Interpretations and comparisons
 
-- The flow is about 21–31 kt N per year since 1995, with peaks of 42–46 kt N in 2014, 2015 and 2017 that come from imports of nitric acid (1.6–20.5 kt N per year), a raw material for the fertilizer industry.
+- The flow is about 18–28 kt N per year since 1995, with peaks of 38–41 kt N in 2014, 2015 and 2017 that come from imports of nitric acid (1.6–20.5 kt N per year), a raw material for the fertilizer industry.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

@@ -24,12 +24,13 @@ nav_order: 13
 
 - Each commodity code is assigned a commodity type and an N content in the trade mapping sheet of N_parameters.xlsx, and quantities are multiplied by the N content.
 - Within the plastics and synthetic-textile trade categories, N content is assigned by base polymer rather than a single blended factor: nitrogen-containing polymers (polyamide/nylon, polyurethane, melamine and urea formaldehyde resins, polyacrylonitrile) use the N contents given in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, Table 23, while ordinary commodity plastics and fibres with no nitrogen in their polymer backbone (polyethylene, polypropylene, PVC, polystyrene, polyester, viscose/rayon, cotton) are assigned ~0.
+- Resins without nitrogen (phenolic resins, silicones, polysulfides and polysulfones, petroleum and coumarone-indene resins) are assigned 0; only other amino resins (HS 3909.39) use 30% N (Table 23).
 - The same principle applies to clothing, footwear and other finished textile articles: items explicitly of wool use the protein-fibre N content from Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, Table 24 (as for silk), items with a leather component use the same N content as hides and skins, and items of cotton or unspecified synthetic/artificial fibre (predominantly polyester, which – like cotton – has no nitrogen in its polymer backbone) default to ~0.
 - Roundwood, fuel wood, chips, sawdust and wood residues (HS 4401 and 4403) are given the N content of stem wood (1.2 g/kg for conifers and 1.4 g/kg for broadleaves, Table 45 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->), the same as domestic industrial round wood, while processed wood products use 0.2% (Table 22).
 
 #### Interpretations and comparisons
 
-- The flow is about 7–10 kt N per year until 2013, 11–12 kt N in 2014–2017 and 20–33 kt N from 2018.
+- The flow is about 7–10 kt N per year until 2013, 11–12 kt N in 2014–2017 and 19–32 kt N from 2018.
 - The significant increase from 2018 is due to export of nitric acid, which started that year. Nitric acid is an intermediary in fertilizer production but not counted as fertilizer, so it shows up in this flow.
 - The rise from 2013 comes from roundwood exports, which grew from about 0.5 to 3–4 million tonnes per year after several Norwegian pulp and paper mills closed.
 - In 2024 roundwood, chips and wood residues (6.4 kt N) and nitric acid (7.7 kt N) are the largest items, followed by processed wood products (2.7 kt N), hides and leather (1.0 kt N), wool (0.8 kt N) and detergents (0.75 kt N).

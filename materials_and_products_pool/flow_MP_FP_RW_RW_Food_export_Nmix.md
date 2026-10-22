@@ -22,11 +22,12 @@ nav_order: 9
 #### Assumptions
 
 - Each commodity code is assigned a commodity type and an N content in the trade mapping sheet of N_parameters.xlsx, and quantities are multiplied by the N content.
+- Klippfisk (salted and dried fish) and tørrfisk (dried fish) have their own N contents, 10.3% and 12.6%, from the protein content in the Norwegian food composition table ([Matvaretabellen](https://www.matvaretabellen.no/klippfisk-saltet-og-torket/): 64.3 and 78.5 g protein per 100 g; N = protein/6.25). Other fish products, including salted but not dried fish, use 2.8% N.
 
 #### Interpretations and comparisons
 
-- Fish and fish products (fresh, frozen and processed, including farmed salmon) make up over 95% of the flow, 66 of 69 kt N in 2024.
-- The flow rises from 22 kt N in 1990 to about 70 kt N by 2010 and has been roughly stable since, as the growth in farmed fish has been offset by lower wild catches (see HY.AC-MP.FP-Coastal fish and seafood-Nmix and HY.CW-MP.FP-Fish (wild catch)-Nmix).
+- Fish and fish products (fresh, frozen and processed, including farmed salmon) make up about 97% of the flow, 73 of 75 kt N in 2024, of which klippfisk is 8.2 kt N and tørrfisk 0.4 kt N.
+- The flow rises from 26 kt N in 1990 to 75–81 kt N from 2010 and has been roughly stable since, as the growth in farmed fish has been offset by lower wild catches (see HY.AC-MP.FP-Coastal fish and seafood-Nmix and HY.CW-MP.FP-Fish (wild catch)-Nmix).
 - Exports of meat and of cheese are each below 0.5 kt N.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
