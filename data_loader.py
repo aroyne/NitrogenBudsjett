@@ -198,7 +198,8 @@ def load_all_data(selected_pools):
         'fs_unfccc_emissions_raw': ({'fs'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_n2o_hs_fs', {}),
         'fs_firewood_raw': ({'fs'}, 'data_files/09702_20251120-133716.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'VedTonn'}),
         'faostat_forestry': ({'fs'}, 'data_files/FAOSTAT_data_en_2-20-2026.csv', 'csv_forestry', {}),
-        'fuel_for_industry': ({'ef'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_fuel_industry', {}),
+        'fuel_wood_heat_plants': ({'fs'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_fuel_heat_plants', {}),
+        'fuel_for_industry': ({'ef'},'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_fuel_industry', {}),
         'fuel_for_transport': ({'ef'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_fuel_transport', {}),
         'fuel_for_heating': ({'ef'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_fuel_heating', {}),
         'n2o_ec_data': ({'ef'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_n2o_ec', {}),
@@ -408,6 +409,18 @@ def load_all_data(selected_pools):
                 (['1.A.5  Other', 'Other fossil fuels'], 'other_fossil_fuels_NCV', 'other_fossil_fuels_N_frac'),
             ]
             preloaded[key] = _read_crt_fuel_series(filepath, 'Table1.A(a)s4', row_specs)
+
+        elif method == 'crt_fuel_heat_plants':
+            # UNFCCC CRT Table1.A(a)s1, "1.A.1.a Public electricity and heat
+            # production", Biomass. This is wood fuel (bark, chips, energy
+            # wood): it matches "Bark, flis og tre" in SSB table 04730 (fuel
+            # for district heating) from 2014, while all waste incinerated,
+            # including its biogenic part, is reported as "Other fossil fuels"
+            # (equal to 04730 "Avfall") and enters EF via PR.SO-EF.EC.
+            row_specs = [
+                (['1.A.1.a. Public electricity and heat production', 'Biomass'], 'firewood_NCV', 'heat_plant_wood_N_frac'),
+            ]
+            preloaded[key] = _read_crt_fuel_series(filepath, 'Table1.A(a)s1', row_specs)
 
         elif method == 'crt_fuel_transport':
             # UNFCCC CRT Table1.A(a)s3. Domestic aviation's value sits

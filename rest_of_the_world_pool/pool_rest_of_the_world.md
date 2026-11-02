@@ -23,7 +23,7 @@ Nitrogen flows into and out of RW. Use the slider or press **Play** to step thro
 
 ## Interactive Mass Balance Overview (1990-2024)
 
-Hover over the chart to inspect specific streams, or click legend items to toggle visibility.
+Hover over the chart to inspect specific flows, or click legend items to toggle visibility.
 
 <iframe src="../output_files/plots/balance_RW.html" width="100%" height="600px" frameborder="0" scrolling="no"></iframe>
 

@@ -116,7 +116,7 @@ PAGES = [{'folder': 'energy_and_fuels_pool',
   'balance': 'EF',
   'intro': '# Pool: 1. Energy and fuels (EF)\n'
            '\n'
-           'This pool is divided into four operational sub-pools. Explore them using the side menu or links below:\n'
+           'This pool is divided into four sub-pools. Explore them using the side menu or links below:\n'
            '\n'
            '* [Energy conversion (EF.EC)](subpool_energy_conversion.html)\n'
            '* [Manufacturing industries and construction (EF.IC)](subpool_industry.html)\n'
@@ -436,7 +436,7 @@ PAGES = [{'folder': 'energy_and_fuels_pool',
   'balance': 'AG',
   'intro': '# Pool: 3. Agriculture (AG)\n'
            '\n'
-           'This pool is divided into two operational sub-pools. Explore them using the side menu or links below:\n'
+           'This pool is divided into two sub-pools. Explore them using the side menu or links below:\n'
            '\n'
            '* [Manure Management (AG.MM)](subpool_manure_management.html)\n'
            '* [Soil Management (AG.SM)](subpool_soil_management.html)\n'
@@ -478,15 +478,21 @@ PAGES = [{'folder': 'energy_and_fuels_pool',
   'parent': 'Forests (FS.FO)',
   'kind': 'flow'},
  {'folder': 'forests_and_semi_natural_pool',
+  'file': 'flow_FS_FO_EF_EC_Fuel_wood_for_co_fired_power_plants_Nmix.md',
+  'title': 'Fuel Wood for Heat Plants',
+  'nav_order': 4,
+  'parent': 'Forests (FS.FO)',
+  'kind': 'flow'},
+ {'folder': 'forests_and_semi_natural_pool',
   'file': 'flow_FS_FO_HY_SW_Leaching_Nmix.md',
   'title': 'Forest Leaching',
-  'nav_order': 4,
+  'nav_order': 5,
   'parent': 'Forests (FS.FO)',
   'kind': 'flow'},
  {'folder': 'forests_and_semi_natural_pool',
   'file': 'flow_FS_FO_MP_OP_Industrial_round_wood_Nmix.md',
   'title': 'Industrial Round Wood',
-  'nav_order': 5,
+  'nav_order': 6,
   'parent': 'Forests (FS.FO)',
   'kind': 'flow'},
  {'folder': 'forests_and_semi_natural_pool',
@@ -528,7 +534,7 @@ PAGES = [{'folder': 'energy_and_fuels_pool',
   'balance': 'FS',
   'intro': '# Pool: 4. Forests and semi-natural vegetation (FS)\n'
            '\n'
-           'This pool is divided into two operational sub-pools. Explore them using the side menu or links below:\n'
+           'This pool is divided into two sub-pools. Explore them using the side menu or links below:\n'
            '\n'
            '* [Forests (FS.FO)](subpool_forests.html)\n'
            '* [Other Land (FS.OL)](subpool_other_land.html)\n'
@@ -668,7 +674,7 @@ PAGES = [{'folder': 'energy_and_fuels_pool',
   'balance': 'PR',
   'intro': '# Pool: 5. Processing of residues (PR)\n'
            '\n'
-           'This pool is divided into two operational sub-pools. Explore them using the side menu or links below:\n'
+           'This pool is divided into two sub-pools. Explore them using the side menu or links below:\n'
            '\n'
            '* [Solid Waste (PR.SO)](subpool_solid_waste.html)\n'
            '* [Wastewater (PR.WW)](subpool_wastewater.html)\n'

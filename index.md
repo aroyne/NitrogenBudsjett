@@ -16,16 +16,15 @@ Work in Progress
 ---
 
 ### Project Overview
-Welcome to the interactive data and documentation portal for the Norwegian national nitrogen budget. This platform visualizes and centralizes the outputs from our Monte Carlo uncertainty analysis simulations.
+Welcome to the interactive data and documentation portal for the Norwegian national nitrogen budget. This NNB is built using the guidelines from (Winiwarter et al., 2025)<!--cite:winiwarter_inms_2025-->. Where flows are omitted or added to better fit the Norwegian nitrogen system, this is commented. This platform visualizes the results and associated uncertainties for each individual flow in the NNB, as well as the balances for each pool and sub-pool.
 
-Use the navigation menu on the left side to explore the individual nitrogen pools (e.g., Forests and Semi-natural Vegetation, Agriculture, Atmosphere, Hydrosphere, Rest of the World) and access detailed statistical time-series graphs, methodological explanations, and parameterizations for each specific flow.
+Use the navigation menu on the left side to explore the individual nitrogen pools and sub-pools and access detailed statistical time-series graphs, methodological explanations, and parameterizations for each specific flow.
 
 <!-- MANUAL:INDEX_TEXT:START -->
-### Central values and uncertainty intervals
-- **Central value.** Every flow is first computed once with all parameters and data sets at their stated values. This deterministic run gives the central value (best estimate): the line in the time-series plots, the values in the balance plots and Sankey diagrams, and the value exported to the reporting template.
+### Data and uncertainties
+- **Central value.** Every flow is first computed once with all parameters and data sets at their most probable values. This deterministic run gives the central value (best estimate): the line in the time-series plots, the values in the balance plots and Sankey diagrams, and the value exported to the reporting template.
 - **Uncertainty interval.** The uncertainty is estimated with a Monte Carlo analysis of 999 further runs. In each run, every uncertain parameter (N contents, conversion factors, shares) and an uncertainty factor for every data set are drawn once, from a fixed seed, and used for all years and all flows that use them. The shaded band is the 2.5–97.5 percentile range of these runs.
 - **Distributions.** The bounds given for each parameter and data set are read as a 95 % interval. Symmetric bounds up to ±40 % use a normal distribution, wider or asymmetric bounds and minimum–maximum ranges from the literature use a triangular distribution, and uncertainty factors (for example −50/+100 % from the emission inventories) use a lognormal distribution.
-- **Central value and band.** With skewed distributions the central value is not in the middle of the band. For a few flows whose best estimate lies at a bound (for example an N content of zero for petrol), the central value can lie at or just outside the edge of the band.
 - **Balances.** Pool balances and their intervals are computed within each run, so flows that share parameters or are derived from each other keep their correlation.
 - **Residual flows.** Flows computed as a difference of other flows (ammonia synthesis, inflow to coastal waters, consumer goods, recycling) are set to zero in the runs where the difference is negative; how often this happens is recorded.
 - **Trends.** Data sets of registered data and surveys get a new uncertainty factor for each year, so their uncertainty also affects trends. Other data sets (inventories, modelled statistics and assumptions) and all parameters are drawn once per run and used for all years, so most of their uncertainty cancels out in trends over time.
@@ -39,8 +38,7 @@ The diagram below shows the nitrogen flows between the pools of the Norwegian ni
 
 ---
 
-For flows connected to the hydrosphere, and for land-relateds emissions and nitrogen deposition, we only consider the Norwegian mainland. For emissions to air reported through the UNFCCC framework we also include emissions from Norwegian economic activity on Svalbard (these are minor and mainly related to coal extraction, which has now been discontinued). We also include emissions and N flows that originate in petroleum extraction on the Norwegian continental shelf.
-This NNB is built using the guidelines from (Winiwarter et al., 2025)<!--cite:winiwarter_inms_2025-->. Where flows are omitted or added to better fit the Norwegian nitrogen system, this is commented.
+For flows connected to the hydrosphere, and for land-related emissions and nitrogen deposition, we only consider the Norwegian mainland. For emissions to air reported through the UNFCCC framework we also include emissions from Norwegian economic activity on Svalbard (these are minor and mainly related to coal extraction, which has now been discontinued). We also include emissions and N flows that originate in petroleum extraction on the Norwegian continental shelf.
 
 ### References
 

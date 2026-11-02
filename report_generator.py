@@ -55,7 +55,7 @@ def get_balance_image_markdown(pool_code, plot_files, plot_dir, relative_depth="
             return (
                 f"\n---\n\n"
                 f"## Interactive Mass Balance Overview (1990-2024)\n\n"
-                f"Hover over the chart to inspect specific streams, or click legend items to toggle visibility.\n\n"
+                f"Hover over the chart to inspect specific flows, or click legend items to toggle visibility.\n\n"
                 f'<iframe src="{relative_depth}{plot_dir}/{balance_file}" '
                 f'width="100%" height="600px" frameborder="0" scrolling="no"></iframe>\n'            )
     return ""
@@ -134,7 +134,7 @@ def get_sankey_markdown(pool_code, plot_files, plot_dir, relative_depth="", targ
     return (
         f"\n---\n\n"
         f"## Interactive Flow Diagram\n\n"
-        f"Nitrogen flows into and out of {pool_code}{' and between its subpools' if has_subpools else ''}. Use the slider or press "
+        f"Nitrogen flows into and out of {pool_code}{' and between its sub-pools' if has_subpools else ''}. Use the slider or press "
         f"**Play** to step through the years; the scale is the same for every year. Hover a flow to see the "
         f"individual flows it contains, with their 95 % uncertainty intervals.\n\n"
         f'<iframe id="nnb-sankey" src="{relative_depth}{plot_dir}/{sankey_file}" '
@@ -228,7 +228,7 @@ def _uncertainty_tables(pages):
         periods = sorted(df['period'].unique())
         keep = keep.reindex(columns=periods).sort_values(periods[-1], ascending=False, na_position='last')
         lines = ["", "### Uncertainty", "",
-                 f"Sources with at least {UNCERTAINTY_MIN_SHARE:.0%} of the variance of this flow in one of the periods, "
+                 f"Sources that contribute at least {UNCERTAINTY_MIN_SHARE:.0%} of the variance of this flow in one of the periods, "
                  "from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, "
                  "and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. "
                  "Shares are averages over the years of the period. They are indicative where the flow is a residual close "
@@ -570,9 +570,11 @@ def build_landing_page(output_filename, current_date_str, bib_filename, target_f
         f.write("or any other application is **strongly discouraged** at this stage.\n\n")
         f.write("---\n\n### Project Overview\n")
         f.write("Welcome to the interactive data and documentation portal for the Norwegian national nitrogen budget. ")
-        f.write("This platform visualizes and centralizes the outputs from our Monte Carlo uncertainty analysis simulations.\n\n")
-        f.write("Use the navigation menu on the left side to explore the individual nitrogen pools ")
-        f.write("(e.g., Forests and Semi-natural Vegetation, Agriculture, Atmosphere, Hydrosphere, Rest of the World) ")
+        f.write("This NNB is built using the guidelines from \\citep{winiwarter_inms_2025}. Where flows are omitted or added to better fit "
+                "the Norwegian nitrogen system, this is commented. ")
+        f.write("This platform visualizes the results and associated uncertainties for each individual flow in the NNB, "
+                "as well as the balances for each pool and sub-pool.\n\n")
+        f.write("Use the navigation menu on the left side to explore the individual nitrogen pools and sub-pools ")
         f.write("and access detailed statistical time-series graphs, methodological explanations, and parameterizations for each specific flow.\n\n")
         f.write(_wrap_manual_block(manual_text if manual_text is not None else '', 'INDEX_TEXT') + "\n")
         
@@ -598,13 +600,11 @@ def build_landing_page(output_filename, current_date_str, bib_filename, target_f
                     "version of this report.\n\n")
             f.write("---\n\n")
             
-        f.write("For flows connected to the hydrosphere, and for land-relateds emissions and nitrogen deposition, "
+        f.write("For flows connected to the hydrosphere, and for land-related emissions and nitrogen deposition, "
                 "we only consider the Norwegian mainland. For emissions to air reported through the UNFCCC framework we "
                 "also include emissions from Norwegian economic activity on Svalbard (these are minor and mainly related to coal extraction, "
                 "which has now been discontinued). We also include emissions and N flows that originate in petroleum extraction on the Norwegian "
-                "continental shelf.\n"
-                "This NNB is built using the guidelines from \\citep{winiwarter_inms_2025}. Where flows are omitted or added to better fit "
-                "the Norwegian nitrogen system, this is commented. ")
+                "continental shelf.\n")
         append_bibtex_references(f, bib_filename)
         
         

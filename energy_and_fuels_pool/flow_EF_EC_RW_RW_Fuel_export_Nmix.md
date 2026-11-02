@@ -30,12 +30,11 @@ nav_order: 7
 
 - Crude oil dominates the flow, accounting for over 99% of its N content. The flow is 70–85 kt N per year in 2012–2024, after a peak of about 145 kt N around 2000 when crude oil exports were highest.
 - The uncertainty of the flow lies mainly in the N content of crude oil, which varies between fields.
-- Hohmann-Marriott (2025)<!--cite:hohmann-marriott_nitrogen_2025--> used 0.4% N in crude oil, from a few crude oil samples in a laboratory study of produced water (Dudek et al. 2017), about four times the value used here from the assays of Norway's export blends, and their export estimate is correspondingly higher.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-22.
+Sources that contribute at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-22.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

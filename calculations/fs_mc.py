@@ -27,6 +27,7 @@ def execute_calculations_fs(preloaded_data, current_params, dataset_noise):
     _add_land_leaching_mc(results, preloaded_data, current_params, dataset_noise, 'FS.FO-HY.SW-Leaching-Nmix', 'FO_leaching_bg_fraction', 10)
     _add_industrial_round_wood_mc(results, preloaded_data, current_params, dataset_noise)
     _add_fuel_wood_for_households_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_fuel_wood_for_heat_plants_mc(results, preloaded_data, current_params, dataset_noise)
     _add_land_leaching_mc(results, preloaded_data, current_params, dataset_noise, 'FS.OL-HY.SW-Leaching-Nmix', 'OL_leaching_bg_fraction', 8)
     _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise)
     _add_utmark_grazing_emissions_mc(results, preloaded_data, current_params, dataset_noise)
@@ -238,7 +239,37 @@ def _add_fuel_wood_for_households_mc(results, preloaded_data, current_params, da
     report_missing_years(flow_code, missing_years, results)
 
 
-    
+def _add_fuel_wood_for_heat_plants_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    Wood fuel burned in heat and power plants (CRT 1.A.1.a biomass). The fuel
+    is energy wood, bark, branches and tops and wood chips. Energy wood
+    ("rundvirke til flis", SSB table 14641) and bark are not part of the
+    industrial roundwood under bark in FS.FO-MP.OP, so the flow is counted
+    in full from the forest.
+    """
+    flow_code = 'FS.FO-EF.EC-Fuel wood for co-fired power plants-Nmix'
+    collected_years = set()
+
+    # 'fuel_wood_heat_plants' <- NOR-CRT-2026 submission folder (data_loader.py
+    # DATA_MAP): Table1.A(a)s1, 1.A.1.a Biomass, consumption in TJ
+    df = preloaded_data['fuel_wood_heat_plants']
+    NCV = float(current_params.get('firewood_NCV'))
+    N_content = float(current_params.get('heat_plant_wood_N_frac'))
+
+    for year, tj in zip(df.year, df.TJ):
+        year = int(year)
+        collected_years.add(year)
+        value = tj / NCV * N_content * dataset_noise.factor('UNFCCC_fuel', year)
+        results.append({
+            'flow_name': flow_code, 'year': year, 'value': value,
+            'comment': 'ok', 'data_sources': 'UNFCCC CRT'
+        })
+
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+
+
+
 def _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise):
     """
     Feed taken up by livestock grazing on utmark. Hegrenes & Asheim (2006,

@@ -30,16 +30,16 @@ nav_order: 4
 - Other fossil fuels, i.e. waste fuels such as waste oil, tyres and plastics: assumed 25 TJ/kt and 0.4% N, between the values for waste oil, tyres and mixed waste (uncertain).
 - The uncertainty ranges are from IPCC 2006 Table 1.2 for the NCVs and from Table 15 for the N contents where Table 15 gives a range. The range for the NCV of other fossil fuels (between municipal waste and waste oil) and the ranges for N contents for which Table 15 gives only an average (kerosene, gas/diesel oil, heavy distillates and other fossil fuels) are our assumptions.
 - Biomass is not included: firewood burned in households enters EF.OE via FS.FO-EF.OE-Fuel wood for households (SSB table 09702), which matches the biomass reported in the CRT, so including it here as well would count it twice. Gaseous fuels are not included.
+- Biomass used in the commercial/institutional sector (1.A.4.a, about 2,500 TJ in 2024) and in agriculture, forestry and fishing (1.A.4.c, about 1,100 TJ in 2024, almost none before 2023) is not covered by the fuel wood flow and is therefore not included in the budget; with the N contents of stem wood and whole trees it corresponds to roughly 0.3–0.9 kt N.
 
 #### Interpretations and comparisons
 
 - Since biomass enters via the fuel wood flow, this flow only covers fossil fuels and is small: about 0.7 kt N in 1990 and 0.2 kt N in 2024, mainly from liquid fuels.
-- Biomass used in the commercial/institutional sector (1.A.4.a, about 3,600 TJ in 2024, roughly 0.9 kt N) is not covered by the fuel wood flow and is therefore not included in the budget.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources with at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-22.
+Sources that contribute at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-22.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
