@@ -15,6 +15,7 @@ from calculations.utils import (
     EXPECTED_YEARS,
     report_missing_years,
     load_crltap_emissions_to_N,
+    crltap_1a1a_part,
     process_generic_trade_flow
 )
 from calculations.shared_flow_calculations import find_feedstock_fuel
@@ -51,7 +52,7 @@ def execute_calculations_ef(preloaded_data, current_params, dataset_noise, curre
     # EC has no NH3 variant: no NH3 combustion emissions are modeled for energy
     # industries (see energy_and_fuels_pool/flow_EF_EC_AT_AT_Emissions_*.md - only
     # NOx and N2O flows exist for EC). This is intentional, not a missing function.
-    _add_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'EF.EC-AT.AT-Emissions-NOx', CRLTAP_EC_SECTORS, 'NOx')
+    _add_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'EF.EC-AT.AT-Emissions-NOx', CRLTAP_EC_SECTORS, 'NOx', add_1a1a_non_waste=True)
     _add_n2o_emissions_mc(results, preloaded_data, dataset_noise, 'EF.EC-AT.AT-Emissions-N2O', 'value_EC')
     _add_fuel_export_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise)
 
@@ -133,12 +134,15 @@ def _add_fuel_used_as_feedstock_mc(results, preloaded_data, current_params, data
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
 
 
-def _add_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, flow_code, sectors, pollutant):
+def _add_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, flow_code, sectors, pollutant, add_1a1a_non_waste=False):
     """
     Shared implementation for CRLTAP-derived NH3/NOx combustion emissions of an EF
     subsector. `sectors` is one of the CRLTAP_{EC,IC,TR,OE}_SECTORS lists above;
     `pollutant` is 'NH3' or 'NOx'. Reads preloaded_data['ag_crltap_raw_lines'] <-
     data_files/webdabData1868031.txt (CRLTAP Inventory Submissions).
+    add_1a1a_non_waste adds the part of 1A1a that is not waste incineration
+    (heat and power plants burning wood, oil and gas); the waste part is in
+    PR.SO.
     """
     collected_years = set()
 
@@ -151,6 +155,9 @@ def _add_crltap_emissions_mc(results, preloaded_data, current_params, dataset_no
         conv,
         dataset_noise
     )
+    if add_1a1a_non_waste:
+        for year, value in crltap_1a1a_part(preloaded_data, pollutant, conv, dataset_noise, waste=False).items():
+            sums[year] = sums.get(year, 0.0) + value
 
     for year, value in sums.items():
         year = int(year)

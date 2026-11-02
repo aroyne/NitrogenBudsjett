@@ -13,12 +13,12 @@ nav_order: 4
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 #### Flow description
 
-- **AG.SM-AT.AT-Emissions-NH3** is ammonia from agricultural soils: the soil categories 3Da1–3Df in Table 30 of Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> (mineral fertilizer, manure spreading, sewage sludge, other organic fertilizers, grazing animals and crop residues), and field burning of agricultural residues (3F), which the guidance names as an NH3 source in its text but does not list in Table 30.
+- **AG.SM-AT.AT-Emissions-NH3** is ammonia from agricultural soils: the soil categories 3Da1–3Df in Table 30 of Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> (mineral fertilizer, manure spreading, sewage sludge, other organic fertilizers, grazing animals and crop residues), and field burning of agricultural residues (3F), which the guidance names as an NH<sub>3</sub> source in its text but does not list in Table 30.
 
 #### Data sources
 
 - Emissions reported by Norway to CLRTAP (CLRTAP inventory submissions, EMEP 2025<!--cite:emep_officially_2025-->), as advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
-- The emissions are calculated in the national inventory with the same manure model as the greenhouse gas inventory: N in manure, mineral fertilizer and other N sources multiplied by NH3 and NOx emission factors for each animal category, storage system, spreading method and fertilizer type. The methods are documented in the [Informative Inventory Report 2026, Norway](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/informative-inventory-report-iir-2026-norway-air-pollutant-emissions-1990-2024/).
+- The emissions are calculated in the national inventory with the same manure model as the greenhouse gas inventory: N in manure, mineral fertilizer and other N sources multiplied by NH<sub>3</sub> and NO<sub>x</sub> emission factors for each animal category, storage system, spreading method and fertilizer type. The methods are documented in the [Informative Inventory Report 2026, Norway](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/informative-inventory-report-iir-2026-norway-air-pollutant-emissions-1990-2024/).
 - The LULUCF codes 4B1, 4B2, 4C1 and 4C2 in Table 30 are not reported in the CLRTAP inventory, and 3Dd (off-farm storage and transport) is reported as zero.
 - The inventory counts all manure deposited by grazing animals as input to managed soils, including the share deposited on utmark (unmanaged land), which this model does not count as input to AG.SM (see AG.MM-AG.SM-Manure application-Nmix).
 
@@ -35,13 +35,13 @@ nav_order: 4
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-22.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-10-22). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| NH3, Animal manure applied to soils (NFR 3Da2a) | Inventory with published uncertainty | ±36 %, normal | 88% | 90% | 0.73 | 0.76 | none |
-| NH3, Urine and dung deposited by grazing animals (NFR 3Da3) | Inventory with published uncertainty | −58/+138 %, lognormal | 6% | 7% | 0.07 | 0.08 | [Other Land Emissions (NH3)](../forests_and_semi_natural_pool/flow_FS_OL_AT_AT_Emissions_NH3.html) |
-| NH3, Inorganic N-fertilizers (includes also urea application) (NFR 3Da1) | Inventory with published uncertainty | −33.3/+50 %, lognormal | 5% | 3% | 0.15 | 0.13 | none |
+| NH<sub>3</sub>, Animal manure applied to soils (NFR 3Da2a) | Inventory with published uncertainty | ±36 %, normal | 88% | 90% | 0.73 | 0.76 | none |
+| NH<sub>3</sub>, Urine and dung deposited by grazing animals (NFR 3Da3) | Inventory with published uncertainty | −58/+138 %, lognormal | 6% | 7% | 0.07 | 0.08 | [Other Land Emissions (NH<sub>3</sub>)](../forests_and_semi_natural_pool/flow_FS_OL_AT_AT_Emissions_NH3.html) |
+| NH<sub>3</sub>, Inorganic N-fertilizers (includes also urea application) (NFR 3Da1) | Inventory with published uncertainty | −33.3/+50 %, lognormal | 5% | 3% | 0.15 | 0.13 | none |
 
 ### References
 

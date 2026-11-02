@@ -21,8 +21,8 @@ Hover over the chart to inspect specific flows, or click legend items to toggle 
 ### Flows that are zero or neglected:
 
 * **FS.FO-AT.AT-Emissions-NOx** is neglected because no values are reported in the CRLTAP/WebDab categories 4A1 and 4A2 (forest soils).
-* **FS.FO-EF.IC-Fuel wood for industry-Nmix** is ignored because wood is typically not harvested specifically to be used for fuel in industry in Norway. The use of wood waste in the producing industry is reported as self-produced bioenergy in the SSB statistic, but this is a flow that goes from MP.OP to EF.IC.
-* Because the N-flow in forest fertilization is not large, we have chosen to ignore the associated N2O emissions that were included in the Swedish NBB (Moldan et al., 2025)<!--cite:moldan_where_2025-->.
+* **FS.FO-EF.IC-Fuel wood for industry-Nmix** is ignored. Biomass burned in industry (bark, wood residues and black liquor) is reported as self-produced bioenergy in SSB table 08205 and enters EF.IC via MP.OP-EF.IC-Industrial waste fuels. Table 08205 is within −3,500 to +1,500 TJ of the biomass in CRT 1.A.2, so no purchased wood fuel can be identified beyond it.
+* Because the N-flow in forest fertilization is not large, we have chosen to ignore the associated N<sub>2</sub>O emissions that were included in the Swedish NBB (Moldan et al., 2025)<!--cite:moldan_where_2025-->.
 
 <!-- MANUAL:POOL_TEXT:END -->
 

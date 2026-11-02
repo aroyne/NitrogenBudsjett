@@ -13,13 +13,13 @@ nav_order: 1
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 #### Flow description
 
-- **AG.MM-AG.SM-Manure application-Nmix** is the manure N applied to agricultural soils: managed manure N net of losses during animal housing and manure storage (tracked separately as AG.MM's own NH3/N2O/NOx emission flows), plus the share of manure deposited directly by grazing animals that lands on agricultural grazing land (innmark) rather than unmanaged land (utmark).
+- **AG.MM-AG.SM-Manure application-Nmix** is the manure N applied to agricultural soils: managed manure N net of losses during animal housing and manure storage (tracked separately as AG.MM's own NH<sub>3</sub>/N<sub>2</sub>O/NO<sub>x</sub> emission flows), plus the share of manure deposited directly by grazing animals that lands on agricultural grazing land (innmark) rather than unmanaged land (utmark).
 - The utmark share goes to FS.OL as AG.MM-FS.OL-Manure from grazing on unmanaged land-Nmix.
 
 #### Data sources
 
 - The UNFCCC Common Reporting Tables (CRT), Table 3.D: the row "Animal manure applied to soils" – the IPCC 2006 Guidelines' FAM term (Volume 4, Chapter 11, Equation 11.4; De Klein et al. (2006)<!--cite:deklein_chapter11_2006-->) – and the row "Urine and dung deposited by grazing animals" (PRP).
-- Norway's inventory calculates the N excreted per animal category from animal numbers and national N excretion rates, distributes the manure between grazing and the different housing and storage systems using SSB's surveys of manure use in agriculture, and deducts the N lost as NH3, N2O, NOx and N2 during housing and storage. The method is documented in Norwegian Environment Agency (2020)<!--cite:miljodirektoratet_manure_2020--> and in the [Miljødirektoratet, NID 2026](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/).
+- Norway's inventory calculates the N excreted per animal category from animal numbers and national N excretion rates, distributes the manure between grazing and the different housing and storage systems using SSB's surveys of manure use in agriculture, and deducts the N lost as NH<sub>3</sub>, N<sub>2</sub>O, NO<sub>x</sub> and N<sub>2</sub> during housing and storage. The method is documented in Norwegian Environment Agency (2020)<!--cite:miljodirektoratet_manure_2020--> and in the [Miljødirektoratet, NID 2026](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/).
 
 #### Assumptions
 
@@ -37,7 +37,7 @@ nav_order: 1
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-22.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-10-22). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
@@ -45,6 +45,6 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* De Klein, C., Novoa, R. S. A., Ogle, S., Smith, K. A., Rochette, P., Wirth, T. C., McConkey, B. G., Mosier, A., & Rypdal, K. (2006). Chapter 11. N2O Emissions from Managed Soils, and CO2 Emissions from Lime and Urea Application. *2006 IPCC Guidelines for National Greenhouse Gas Inventories, Volume 4: Agriculture, Forestry and Other Land Use*. [https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/4_Volume4/V4_11_Ch11_N2O&CO2.pdf](https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/4_Volume4/V4_11_Ch11_N2O&CO2.pdf)
+* De Klein, C., Novoa, R. S. A., Ogle, S., Smith, K. A., Rochette, P., Wirth, T. C., McConkey, B. G., Mosier, A., & Rypdal, K. (2006). Chapter 11. N<sub>2</sub>O Emissions from Managed Soils, and CO<sub>2</sub> Emissions from Lime and Urea Application. *2006 IPCC Guidelines for National Greenhouse Gas Inventories, Volume 4: Agriculture, Forestry and Other Land Use*. [https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/4_Volume4/V4_11_Ch11_N2O&CO2.pdf](https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/4_Volume4/V4_11_Ch11_N2O&CO2.pdf)
 * Eurostat (2025). *Glossary: Gross nitrogen balance*. [https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Glossary:Gross_nitrogen_balance](https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Glossary:Gross_nitrogen_balance)
 * Norwegian Environment Agency (2020). *Calculation of atmospheric nitrogen emissions from manure in Norwegian agriculture: Technical description of the revised model*. [https://www.miljodirektoratet.no/globalassets/publikasjoner/m1848/m1848.pdf](https://www.miljodirektoratet.no/globalassets/publikasjoner/m1848/m1848.pdf)

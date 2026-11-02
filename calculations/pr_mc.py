@@ -17,6 +17,7 @@ from calculations.utils import (
     EXPECTED_YEARS,
     report_missing_years,
     load_crltap_emissions_to_N,
+    crltap_1a1a_part,
     process_generic_trade_flow,
 )
 
@@ -24,9 +25,11 @@ from calculations.utils import (
 # al. (2025) Table 48 ("solid waste": 1A1a public electricity/heat from waste
 # incineration, 5A biological treatment/solid waste disposal on land, 5C1a-vi
 # incineration variants, 5E other waste) and Table 31 ("biofuel production
-# and composting": 5B1 composting, 5B2 anaerobic digestion/biogas).
+# and composting": 5B1 composting, 5B2 anaerobic digestion/biogas). 1A1a is
+# not listed: only its waste incineration part is added (crltap_1a1a_part),
+# the rest is in EF.EC.
 PR_SO_CRLTAP_SECTORS = [
-    '1A1a', '5A', '5B1', '5B2', '5C1a', '5C1bi',
+    '5A', '5B1', '5B2', '5C1a', '5C1bi',
     '5C1bii', '5C1biii', '5C1biv', '5C1bv', '5C1bvi', '5E'
 ]
 # CRLTAP category codes for PR.WW's NH3/NOx emissions, per Schäppi et al.
@@ -650,6 +653,8 @@ def _add_so_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
         conv_to_N=conv,
         dataset_noise=dataset_noise
     )
+    for year, value in crltap_1a1a_part(preloaded_data, 'NOx', conv, dataset_noise, waste=True).items():
+        sums[year] = sums.get(year, 0.0) + value
 
     for year, value in sums.items():
         if year not in EXPECTED_YEARS:
@@ -684,6 +689,8 @@ def _add_so_NH3_emissions_mc(results, preloaded_data, current_params, dataset_no
         conv_to_N=conv,
         dataset_noise=dataset_noise
     )
+    for year, value in crltap_1a1a_part(preloaded_data, 'NH3', conv, dataset_noise, waste=True).items():
+        sums[year] = sums.get(year, 0.0) + value
 
     for year, value in sums.items():
         if year not in EXPECTED_YEARS:

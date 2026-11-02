@@ -228,14 +228,9 @@ def _uncertainty_tables(pages):
         periods = sorted(df['period'].unique())
         keep = keep.reindex(columns=periods).sort_values(periods[-1], ascending=False, na_position='last')
         lines = ["", "### Uncertainty", "",
-                 f"Sources that contribute at least {UNCERTAINTY_MIN_SHARE:.0%} of the variance of this flow in one of the periods, "
-                 "from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, "
-                 "and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. "
-                 "Shares are averages over the years of the period. They are indicative where the flow is a residual close "
-                 "to zero or a source has a strongly skewed distribution. "
-                 "Elasticity: relative change in the flow per relative change in the source; a negative value means "
-                 "the flow decreases when the source increases. "
-                 f"Computed {when}.", "",
+                 f"Sources that contribute at least {UNCERTAINTY_MIN_SHARE:.0%} of the variance of this flow in one of the periods "
+                 f"(computed {when}). How the table is computed is explained under "
+                 "[Data and uncertainties](../index.html#data-and-uncertainties) on the front page.", "",
                  "| Source | Type | Uncertainty (95 %) | "
                  + " | ".join(f"Share of variance {p.replace('-', '–')}" for p in periods) + " | "
                  + " | ".join(f"Elasticity {p.replace('-', '–')}" for p in periods)
@@ -554,6 +549,56 @@ def fix_all_citations_in_folder(paths, bib_filename):
 # SPESIFIKKE FUNKSJONER FOR HVER ENKELT POOL
 # ==============================================================================
 
+FORMULA_RE = re.compile(r"(?<![\w.\-#=])(N2O|N2|NOx|NHx|NH3|NH4|NO2|NO3|CO2|CH4)(?!\w)")
+# Flow codes may contain a formula inside the name ("AT.AT-MP.OP-Ammonia
+# synthesis N2 fixation-N2"), so whole codes are skipped.
+FLOW_CODE_PATTERN = r"[A-Z]{2}\.[A-Z]{2}-[A-Z]{2}\.[A-Z]{2}-[^\n*|`]*?-(?:Nmix|N2O|N2|NOx|NH3|OXN|RDN)(?!\w)"
+SKIP_SEGMENT_RE = re.compile(r"(" + FLOW_CODE_PATTERN + r"|https?://[^\s)\]]+|`[^`]*`|<!--.*?-->|<[^>]+>|\]\([^)]*\))")
+
+
+def subscript_formulas(text):
+    """
+    Writes chemical formulas in running text with subscripts (N2O ->
+    N<sub>2</sub>O). Flow codes (EF.EC-AT.AT-Emissions-N2O), file names,
+    link targets, code spans, HTML comments and tags are left as they are,
+    and so are the frontmatter and the page heading, which repeat the page
+    title.
+    """
+    def sub(m):
+        f = m.group(1)
+        return re.sub(r"(\d+|x$)", r"<sub>\1</sub>", f)
+
+    lines = text.split('\n')
+    in_frontmatter = lines[0].strip() == '---'
+    out = []
+    for i, line in enumerate(lines):
+        if in_frontmatter:
+            out.append(line)
+            if i > 0 and line.strip() == '---':
+                in_frontmatter = False
+            continue
+        if line.startswith('# ') or line.lstrip().startswith(('<iframe', '<script')):
+            out.append(line)
+            continue
+        parts = SKIP_SEGMENT_RE.split(line)
+        out.append(''.join(p if SKIP_SEGMENT_RE.fullmatch(p) else FORMULA_RE.sub(sub, p) for p in parts))
+    return '\n'.join(out)
+
+
+def subscript_formulas_in_pages(paths):
+    """Applies subscript_formulas to every generated .md page in paths."""
+    for path in paths:
+        files = [path] if path.endswith('.md') else [
+            os.path.join(path, f) for f in os.listdir(path) if f.endswith('.md')]
+        for file_path in files:
+            with open(file_path, encoding='utf-8') as f:
+                text = f.read()
+            new_text = subscript_formulas(text)
+            if new_text != text:
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    f.write(new_text)
+
+
 def build_landing_page(output_filename, current_date_str, bib_filename, target_format="html"):
     """Genererer hovedlandingssiden (index.md) med kritisk advarsel og oppdaterte Sankey-lenker.
     The text between the page's MANUAL:INDEX_TEXT markers is kept from the
@@ -570,8 +615,10 @@ def build_landing_page(output_filename, current_date_str, bib_filename, target_f
         f.write("or any other application is **strongly discouraged** at this stage.\n\n")
         f.write("---\n\n### Project Overview\n")
         f.write("Welcome to the interactive data and documentation portal for the Norwegian national nitrogen budget. ")
-        f.write("This NNB is built using the guidelines from \\citep{winiwarter_inms_2025}. Where flows are omitted or added to better fit "
-                "the Norwegian nitrogen system, this is commented. ")
+        f.write("This NNB follows the methodology of the guidelines \\citep{winiwarter_inms_2025} and their detailed annexes "
+                "\\citep{schappi_annexes_2025}, including the division into pools and sub-pools and the naming of flows. "
+                "Where flows are omitted or added to better fit the Norwegian nitrogen system, this is commented. "
+                "The data come mainly from official statistics (Statistics Norway and other national agencies), Norway's emission inventories to the UNFCCC and CLRTAP and international databases such as FAOSTAT, combined with N contents and other parameters from the literature. ")
         f.write("This platform visualizes the results and associated uncertainties for each individual flow in the NNB, "
                 "as well as the balances for each pool and sub-pool.\n\n")
         f.write("Use the navigation menu on the left side to explore the individual nitrogen pools and sub-pools ")
@@ -634,6 +681,7 @@ def generate_github_pages_report(plot_dir='output_files/plots', output_filename=
     # Resolve citations and rebuild References on the generated pages only.
     print("[RAPPORT] Konverterer LaTeX-siteringer til ren tekst...")
     fix_all_citations_in_folder(POOL_FOLDERS + [output_filename], bib_filename)
+    subscript_formulas_in_pages(POOL_FOLDERS + [output_filename])
 
     print("[RAPPORT] Portalbygging fullført suksessfullt!")
 

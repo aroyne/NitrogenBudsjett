@@ -13,7 +13,7 @@ nav_order: 3
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 #### Flow description
 
-- **EF.IC-AT.AT-Emissions-NOx** is NOx from fuel combustion in industry, using the categories given in Table 12 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
+- **EF.IC-AT.AT-Emissions-NOx** is NO<sub>x</sub> from fuel combustion in industry, using the categories given in Table 12 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
 
 #### Data sources
 
@@ -22,18 +22,18 @@ nav_order: 3
 
 #### Interpretations and comparisons
 
-- NOx emissions from industry and construction fell from about 5.5–6.4 kt N/year in the 1990s to about 2.4 kt N in 2024.
+- NO<sub>x</sub> emissions from industry and construction fell from about 5.5–6.4 kt N/year in the 1990s to about 2.4 kt N in 2024.
 - The largest source is mobile machinery in construction and industry (1A2gvii, 2.4–3.3 kt N/year in the 1990s, 1.2 kt N in 2024), where the decline follows the gradual replacement of machinery under the EU emission standards for non-road mobile machinery.
 - Emissions from non-metallic minerals (1A2f, e.g. cement kilns) and pulp and paper (1A2d) have also fallen substantially, while emissions from iron and steel (1A2a) increased after 2010.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-22.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-10-22). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| NOx, Mobile Combustion in manufacturing the IIR) (NFR 1A2gvii) | Inventory with published uncertainty | −36.3/+57.1 %, lognormal | 97% | 97% | 0.50 | 0.48 | none |
+| NO<sub>x</sub>, Mobile Combustion in manufacturing the IIR) (NFR 1A2gvii) | Inventory with published uncertainty | −36.3/+57.1 %, lognormal | 97% | 97% | 0.50 | 0.48 | none |
 
 ### References
 

@@ -33,7 +33,7 @@ nav_order: 7
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-22.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-10-22). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
@@ -43,7 +43,7 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 | Facility reports of N to water (Norwegian Environment Agency) (iris - vikan - deponi for ordinært avfall (iris salten iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 3% | 0.02 | 0.04 | none |
 | Facility reports of N to water (Norwegian Environment Agency) (franzefoss gjenvinning - eide avfallsdeponi (franzefoss gjenvinning as)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 3% | 0.04 | 0.05 | none |
 | Facility reports of N to water (Norwegian Environment Agency) (ulsethsanden deponi - rockwool industrideponi (as rockwool)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 3% | 0.06 | 0.04 | none |
-| Extrapolation (landfill N:CH4 index) | Gap filling: extrapolation | ±50–50 %, lognormal, grows with distance to known year | 94% | – | 1.00 | – | [Wastewater from Landfills](../processing_of_residues_pool/flow_PR_SO_PR_WW_Wastewater_from_landfills_Nmix.html) |
+| Extrapolation (landfill N:CH<sub>4</sub> index) | Gap filling: extrapolation | ±50–50 %, lognormal, grows with distance to known year | 94% | – | 1.00 | – | [Wastewater from Landfills](../processing_of_residues_pool/flow_PR_SO_PR_WW_Wastewater_from_landfills_Nmix.html) |
 
 ### References
 

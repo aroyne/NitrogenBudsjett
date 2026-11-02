@@ -13,7 +13,7 @@ nav_order: 2
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 #### Flow description
 
-- **EF.TR-AT.AT-Emissions-NH3** is ammonia from fuel combustion in domestic transport, using the categories given in Table 13 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, with the addition of domestic aviation cruise (1A3aii(ii)), included for consistency with the EF.TR fuel input and N2O flows.
+- **EF.TR-AT.AT-Emissions-NH3** is ammonia from fuel combustion in domestic transport, using the categories given in Table 13 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, with the addition of domestic aviation cruise (1A3aii(ii)), included for consistency with the EF.TR fuel input and N<sub>2</sub>O flows.
 
 #### Data sources
 
@@ -24,20 +24,20 @@ nav_order: 2
 #### Interpretations and comparisons
 
 - Passenger cars (NFR 1A3bi) account for 90–95% of the flow and determine its shape: emissions rise steadily from 0.15 kt N/year in 1990 to a peak of 1.6 kt N in 2002, and then decline steadily to 0.26 kt N in 2024.
-- Ammonia from road transport is formed almost exclusively in three-way catalytic converters on petrol cars, where NO is over-reduced to NH3 under slightly fuel-rich operating conditions ([EMEP/EEA Guidebook 2023, ch. 1.A.3.b.i–iv](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023/part-b-sectoral-guidance-chapters/1-energy/1-a-combustion/1-a-3-b-i)).
+- Ammonia from road transport is formed almost exclusively in three-way catalytic converters on petrol cars, where NO is over-reduced to NH<sub>3</sub> under slightly fuel-rich operating conditions ([EMEP/EEA Guidebook 2023, ch. 1.A.3.b.i–iv](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023/part-b-sectoral-guidance-chapters/1-energy/1-a-combustion/1-a-3-b-i)).
 - Catalytic converters became mandatory on all new passenger cars in Norway from 1989 ([Store norske leksikon: Katalysator – bil](https://snl.no/katalysator_-_bil)), so the rise during the 1990s reflects the gradual turnover of the car fleet towards catalyst-equipped vehicles.
-- The subsequent decline has several overlapping causes: (i) newer catalyst generations (Euro 3 and later) with more precise air–fuel control emit considerably less NH3 per km than the early catalyst cars, which were scrapped during the 2000s; (ii) new car sales shifted from petrol to diesel, particularly after the CO2-based registration tax was introduced in 2007 (the diesel share of new cars rose from 48% in 2006 to 76% in 2011; [NHH, 2017](https://nhh.no/nhh-bulletin/artikkelarkiv/2017/februar/engangsavgiften-gir-renere-bilpark/); [Dokument 8:138 S (2012–2013)](https://www.stortinget.no/no/Saker-og-publikasjoner/Publikasjoner/Representantforslag/2012-2013/dok8-201213-138/)), and diesel cars without SCR emit very little NH3; and (iii) from around 2012, battery electric vehicles replaced a rapidly growing share of new petrol cars ([SSB: Bilparken](https://www.ssb.no/transport-og-reiseliv/landtransport/statistikk/bilparken)).
+- The subsequent decline has several overlapping causes: (i) newer catalyst generations (Euro 3 and later) with more precise air–fuel control emit considerably less NH<sub>3</sub> per km than the early catalyst cars, which were scrapped during the 2000s; (ii) new car sales shifted from petrol to diesel, particularly after the CO<sub>2</sub>-based registration tax was introduced in 2007 (the diesel share of new cars rose from 48% in 2006 to 76% in 2011; [NHH, 2017](https://nhh.no/nhh-bulletin/artikkelarkiv/2017/februar/engangsavgiften-gir-renere-bilpark/); [Dokument 8:138 S (2012–2013)](https://www.stortinget.no/no/Saker-og-publikasjoner/Publikasjoner/Representantforslag/2012-2013/dok8-201213-138/)), and diesel cars without SCR emit very little NH<sub>3</sub>; and (iii) from around 2012, battery electric vehicles replaced a rapidly growing share of new petrol cars ([SSB: Bilparken](https://www.ssb.no/transport-og-reiseliv/landtransport/statistikk/bilparken)).
 - The smoothness of the curve reflects that the emissions are modelled from the vehicle fleet, not measured.
-- In contrast, emissions from light commercial vehicles (1A3bii) have increased again since 2015, and emissions from heavy-duty vehicles (1A3biii) have grown from 0.006 kt N/year in 2002 to 0.031 kt N in 2024. This is most likely ammonia slip from urea-based selective catalytic reduction (SCR) used to meet Euro VI and Euro 6 NOx limits ([EMEP/EEA Guidebook 2023, ch. 1.A.3.b.i–iv](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023/part-b-sectoral-guidance-chapters/1-energy/1-a-combustion/1-a-3-b-i)). Although still small, light commercial and heavy-duty vehicles together now emit about 0.06 kt N/year, close to half of the passenger-car level in 1990.
+- In contrast, emissions from light commercial vehicles (1A3bii) have increased again since 2015, and emissions from heavy-duty vehicles (1A3biii) have grown from 0.006 kt N/year in 2002 to 0.031 kt N in 2024. This is most likely ammonia slip from urea-based selective catalytic reduction (SCR) used to meet Euro VI and Euro 6 NO<sub>x</sub> limits ([EMEP/EEA Guidebook 2023, ch. 1.A.3.b.i–iv](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023/part-b-sectoral-guidance-chapters/1-energy/1-a-combustion/1-a-3-b-i)). Although still small, light commercial and heavy-duty vehicles together now emit about 0.06 kt N/year, close to half of the passenger-car level in 1990.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-22.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-10-22). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| NH3, road transport exhaust (NFR 1A3bi–iv) | Inventory with published uncertainty | −33.3/+50 %, lognormal | 100% | 100% | 1.00 | 1.00 | none |
+| NH<sub>3</sub>, road transport exhaust (NFR 1A3bi–iv) | Inventory with published uncertainty | −33.3/+50 %, lognormal | 100% | 100% | 1.00 | 1.00 | none |
 
 ### References
 

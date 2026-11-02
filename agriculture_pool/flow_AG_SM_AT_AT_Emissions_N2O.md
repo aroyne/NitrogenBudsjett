@@ -13,17 +13,17 @@ nav_order: 3
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 #### Flow description
 
-- **AG.SM-AT.AT-Emissions-N2O** is direct N2O from mineral fertilizer, manure, sewage sludge, grazing animals, crop residues, mineralisation and cultivated organic soils, and indirect N2O from N that volatilises or leaches.
+- **AG.SM-AT.AT-Emissions-N2O** is direct N<sub>2</sub>O from mineral fertilizer, manure, sewage sludge, grazing animals, crop residues, mineralisation and cultivated organic soils, and indirect N<sub>2</sub>O from N that volatilises or leaches.
 
 #### Data sources
 
-- N2O from "3.D. Agricultural soils" in the UNFCCC Common Reporting Tables (CRT), Table 3, of the national greenhouse gas inventory, calculated as the N applied by each source multiplied by IPCC emission factors ([Miljødirektoratet, NID 2026](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)).
+- N<sub>2</sub>O from "3.D. Agricultural soils" in the UNFCCC Common Reporting Tables (CRT), Table 3, of the national greenhouse gas inventory, calculated as the N applied by each source multiplied by IPCC emission factors ([Miljødirektoratet, NID 2026](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)).
 - The inventory counts all manure deposited by grazing animals as input to managed soils, including the share deposited on utmark (unmanaged land), which this model does not count as input to AG.SM (see AG.MM-AG.SM-Manure application-Nmix).
 
 #### Assumptions
 
 - The utmark share (26–33% of grazing manure, see AG.MM-AG.SM-Manure application-Nmix) of the losses from grazing manure is therefore removed from this flow; it is counted in FS.OL-AT.AT-Emissions-N2O.
-- The removed N2O is the utmark share of the direct N2O from grazing manure (3.D.1.c) plus the indirect N2O from its volatilisation and leaching, calculated with the fractions and implied emission factors in CRT Table 3.D (about 0.1 kt N per year).
+- The removed N<sub>2</sub>O is the utmark share of the direct N<sub>2</sub>O from grazing manure (3.D.1.c) plus the indirect N<sub>2</sub>O from its volatilisation and leaching, calculated with the fractions and implied emission factors in CRT Table 3.D (about 0.1 kt N per year).
 
 #### Interpretations and comparisons
 
@@ -33,8 +33,8 @@ nav_order: 3
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-22.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-10-22). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| N2O from agricultural soils (Norway's GHG inventory, CRT 3.D) | Inventory with published uncertainty | −66.7/+200 %, lognormal | 100% | 100% | 1.00 | 1.00 | [Other Land Emissions (N2O)](../forests_and_semi_natural_pool/flow_FS_OL_AT_AT_Emissions_N2O.html) |
+| N<sub>2</sub>O from agricultural soils (Norway's GHG inventory, CRT 3.D) | Inventory with published uncertainty | −66.7/+200 %, lognormal | 100% | 100% | 1.00 | 1.00 | [Other Land Emissions (N<sub>2</sub>O)](../forests_and_semi_natural_pool/flow_FS_OL_AT_AT_Emissions_N2O.html) |

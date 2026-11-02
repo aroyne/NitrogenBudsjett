@@ -13,7 +13,7 @@ nav_order: 1
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 #### Flow description
 
-- **HY.SW-AT.AT-Emissions-N2** is N2 from denitrification in lakes and rivers.
+- **HY.SW-AT.AT-Emissions-N2** is N<sub>2</sub> from denitrification in lakes and rivers.
 
 #### Data sources
 
@@ -21,7 +21,7 @@ nav_order: 1
 
 #### Assumptions
 
-- All N retained in surface water is assumed lost to denitrification, with 1% as N2O (lognormal, 95% interval 0.05–20%) and the rest as N2.
+- All N retained in surface water is assumed lost to denitrification, with 1% as N<sub>2</sub>O (lognormal, 95% interval 0.05–20%) and the rest as N<sub>2</sub>.
 - For years prior to 2013, retention is calculated as **HY.SW-HY.CW-Inflow to coastal waters-Nmix** (based on bias-corrected TEOTIL2 results for those years, see that flow) multiplied by the ratio between retention and the diffuse inputs to the coast in TEOTIL3 (0.12 on average for 2013–2023, calculated from the data each time the model runs).
 - The diffuse inputs are TEOTIL3's total to the coast minus aquaculture and wastewater, which are discharged directly to the sea and hardly pass lakes and rivers; retention in TEOTIL3 is about 6.5% of all inputs including these sources, but 12% of the diffuse inputs that reach the coast.
 - TEOTIL3 has not been updated for 2024 at the time of writing; the 2024 value is held at the 2023 value.
@@ -33,14 +33,14 @@ nav_order: 1
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-22.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-10-22). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| TEOTIL, retention in lakes and rivers | Modelled statistics | ±40 %, normal | 43% | 83% | 1.00 | 1.00 | [Surface water N2O emissions](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2O.html) |
-| Share of retained N in surface water emitted as N2O | Parameter | 0.005–0.2, lognormal | 8% | 15% | −0.01 | −0.01 | [Surface water N2O emissions](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2O.html) |
-| Splice TEOTIL3 retention ratio applied before 2013 | Splice between data sources | ±10 %, normal | 3% | – | 1.00 | – | [Surface water N2O emissions](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2O.html) |
-| Extrapolation (surface water retention:2013) | Gap filling: extrapolation | ±50–50 %, lognormal, grows with distance to known year | 44% | – | 1.00 | – | [Surface water N2O emissions](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2O.html) |
+| TEOTIL, retention in lakes and rivers | Modelled statistics | ±40 %, normal | 43% | 83% | 1.00 | 1.00 | [Surface water N<sub>2</sub>O emissions](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2O.html) |
+| Share of retained N in surface water emitted as N<sub>2</sub>O | Parameter | 0.005–0.2, lognormal | 8% | 15% | −0.01 | −0.01 | [Surface water N<sub>2</sub>O emissions](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2O.html) |
+| Splice TEOTIL3 retention ratio applied before 2013 | Splice between data sources | ±10 %, normal | 3% | – | 1.00 | – | [Surface water N<sub>2</sub>O emissions](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2O.html) |
+| Extrapolation (surface water retention:2013) | Gap filling: extrapolation | ±50–50 %, lognormal, grows with distance to known year | 44% | – | 1.00 | – | [Surface water N<sub>2</sub>O emissions](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2O.html) |
 
 ### References
 

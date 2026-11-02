@@ -99,6 +99,20 @@ def _crt_cell(sheet, label_path, column):
         return None
 
 
+def _crt_1a1a_waste(wb):
+    """Waste incineration within CRT 1.A.1.a Public electricity and heat
+    production. The CRT reports all incinerated waste, including its biogenic
+    part, as "Other fossil fuels" (equal to "Avfall" in SSB table 04730).
+    Returns (waste share of the 1.A.1.a fuel use in TJ, N2O from waste in kt
+    N2O, Table1.A(a)s1 column J)."""
+    sheet = wb['Table1.A(a)s1']
+    label = '1.A.1.a. Public electricity and heat production'
+    total_tj = _crt_cell(sheet, [label], 3)
+    waste_tj = _crt_cell(sheet, [label, 'Other fossil fuels'], 3) or 0.0
+    waste_n2o = _crt_cell(sheet, [label, 'Other fossil fuels'], 10) or 0.0
+    return waste_tj / total_tj, waste_n2o
+
+
 def _read_crt_fuel_series(crt_folder, sheet_name, row_specs):
     """
     Reads TJ fuel consumption (column C, "Consumption, TJ") from a UNFCCC CRT
@@ -198,10 +212,12 @@ def load_all_data(selected_pools):
         'fs_unfccc_emissions_raw': ({'fs'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_n2o_hs_fs', {}),
         'fs_firewood_raw': ({'fs'}, 'data_files/09702_20251120-133716.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'VedTonn'}),
         'faostat_forestry': ({'fs'}, 'data_files/FAOSTAT_data_en_2-20-2026.csv', 'csv_forestry', {}),
+        'fuel_wood_other_sectors': ({'fs'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_fuel_wood_other_sectors', {}),
         'fuel_wood_heat_plants': ({'fs'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_fuel_heat_plants', {}),
         'fuel_for_industry': ({'ef'},'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_fuel_industry', {}),
         'fuel_for_transport': ({'ef'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_fuel_transport', {}),
         'fuel_for_heating': ({'ef'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_fuel_heating', {}),
+        'crt_1a1a_waste_share': ({'ef','pr'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_1a1a_waste_share', {}),
         'n2o_ec_data': ({'ef'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_n2o_ec', {}),
         'n2o_so_raw': ({'pr'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_n2o_so', {}),
         'n2o_ww_raw': ({'pr'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_n2o_ww', {}),
@@ -422,6 +438,17 @@ def load_all_data(selected_pools):
             ]
             preloaded[key] = _read_crt_fuel_series(filepath, 'Table1.A(a)s1', row_specs)
 
+        elif method == 'crt_fuel_wood_other_sectors':
+            # UNFCCC CRT Table1.A(a)s4, Biomass in 1.A.4.a Commercial/
+            # institutional and 1.A.4.c Agriculture/forestry/fishing (wood
+            # pellets and chips). Residential biomass (1.A.4.b) is firewood,
+            # read from SSB table 09702 instead.
+            row_specs = [
+                (['1.A.4.a.  Commercial/institutional', 'Biomass'], 'firewood_NCV', 'heat_plant_wood_N_frac'),
+                (['1.A.4.c.  Agriculture/forestry/fishing', 'Biomass'], 'firewood_NCV', 'heat_plant_wood_N_frac'),
+            ]
+            preloaded[key] = _read_crt_fuel_series(filepath, 'Table1.A(a)s4', row_specs)
+
         elif method == 'crt_fuel_transport':
             # UNFCCC CRT Table1.A(a)s3. Domestic aviation's value sits
             # directly on its own header row (already a pre-aggregated
@@ -451,7 +478,10 @@ def load_all_data(selected_pools):
                     # 1.B.2 samlet, som i Schäppi et al. (2025) Table 11. N2O her kommer
                     # i praksis bare fra 1.B.2.c Venting and flaring (a/b/d er NA/IE/NO).
                     _crt_cell(sheet, ['1.B.2. Oil and natural gas'], 5),
-                ) if v is not None) * 0.6364
+                ) if v is not None)
+                # N2O from waste incineration in 1.A.1.a belongs to PR.SO
+                # (Schäppi et al. 2025, chapter 1.4.1.2), see crt_n2o_so.
+                ec = (ec - _crt_1a1a_waste(wb)[1]) * 0.6364
                 ic = (_crt_cell(sheet, ['1.A.2. Manufacturing industries and construction'], 5) or 0.0) * 0.6364
                 tr = (_crt_cell(sheet, ['1.A.3. Transport'], 5) or 0.0) * 0.6364
                 oe = sum(v for v in (
@@ -468,13 +498,26 @@ def load_all_data(selected_pools):
             # open burning of waste", column E (N2O, kt) - converted to N
             # further downstream (pr_mc.py applies N2O_to_N_factor from
             # N_parameters.xlsx). Solid waste disposal (5.A) reports no N2O.
+            # Waste incinerated with energy recovery is reported under 1.A.1.a;
+            # its N2O is added here and removed from EF.EC in crt_n2o_ec.
             rows = []
             for year, wb in _crt_iter_workbooks(filepath):
                 v = (_crt_cell(wb['Table5'], ['5.B. Biological treatment of solid waste'], 5)
-                     + _crt_cell(wb['Table5'], ['5.C. Incineration and open burning of waste'], 5))
+                     + _crt_cell(wb['Table5'], ['5.C. Incineration and open burning of waste'], 5)
+                     + _crt_1a1a_waste(wb)[1])
                 rows.append({'year': year, 'value': v})
                 wb.close()
             preloaded[key] = pd.DataFrame(rows).sort_values('year').reset_index(drop=True)
+
+        elif method == 'crt_1a1a_waste_share':
+            # Share of waste in the fuel use of CRT 1.A.1.a, used to split the
+            # 1A1a NOx and NH3 in the CLRTAP inventory between waste
+            # incineration (PR.SO) and other heat and power plants (EF.EC).
+            shares = {}
+            for year, wb in _crt_iter_workbooks(filepath):
+                shares[year] = _crt_1a1a_waste(wb)[0]
+                wb.close()
+            preloaded[key] = shares
 
         elif method == 'crt_landfill_ch4':
             # UNFCCC CRT Table5, "5.A. Solid waste disposal", column D (CH4,

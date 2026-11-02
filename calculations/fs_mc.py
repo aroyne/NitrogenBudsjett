@@ -210,7 +210,7 @@ def _add_industrial_round_wood_mc(results, preloaded_data, current_params, datas
 def _add_fuel_wood_for_households_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'FS.FO-EF.OE-Fuel wood for households-Nmix'
     collected_years = set()
-    data_sources = 'SSB'
+    data_sources = 'SSB; UNFCCC CRT'
     dataset_key = '09702'
 
     # 'fs_firewood_raw' <- data_files/09702_20251120-133716.xlsx: SSB table 09702,
@@ -220,6 +220,18 @@ def _add_fuel_wood_for_households_mc(results, preloaded_data, current_params, da
     # not the whole-tree value (which includes foliage and branches).
     N_content = float(current_params.get("household_fuelwood_N_frac"))
 
+    # Wood pellets and chips burned in commercial/institutional buildings and
+    # in agriculture, forestry and fishing are added here, as Schäppi et al.
+    # (2025, chapter 4.4.4) suggest one flow to EF.OE when households dominate.
+    # 'fuel_wood_other_sectors' <- NOR-CRT-2026 submission folder (data_loader.py
+    # DATA_MAP): Table1.A(a)s4, 1.A.4.a and 1.A.4.c Biomass, consumption in TJ
+    df_other = preloaded_data['fuel_wood_other_sectors']
+    NCV = float(current_params.get('firewood_NCV'))
+    N_other = float(current_params.get('heat_plant_wood_N_frac'))
+    other_sectors = {}
+    for year, tj in zip(df_other.year, df_other.TJ):
+        other_sectors[int(year)] = other_sectors.get(int(year), 0.0) + tj / NCV * N_other * dataset_noise.factor('UNFCCC_fuel', int(year))
+
     # rows 3-37 = years 1990-2024
     for r in range(3, 38):
         year = int(df_ved.iloc[r, 0]) 
@@ -228,7 +240,7 @@ def _add_fuel_wood_for_households_mc(results, preloaded_data, current_params, da
         raw_val = float(df_ved.iloc[r, 1])
         perturbed_raw = raw_val * dataset_noise.factor(dataset_key, year)
         
-        value = perturbed_raw * N_content 
+        value = perturbed_raw * N_content + other_sectors[year]
         
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value, 

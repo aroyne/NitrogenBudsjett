@@ -13,13 +13,13 @@ nav_order: 3
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 #### Flow description
 
-- **AG.MM-AT.AT-Emissions-NH3** is ammonia from manure management (housing and storage), the categories 3B1a–3B4h in Table 29 of Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, and category 3I (other agriculture), which in Norway is NH3 from ammonia treatment of straw used for feed.
-- NH3 from spreading manure and from grazing is counted in AG.SM-AT.AT-Emissions-NH3.
+- **AG.MM-AT.AT-Emissions-NH3** is ammonia from manure management (housing and storage), the categories 3B1a–3B4h in Table 29 of Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, and category 3I (other agriculture), which in Norway is NH<sub>3</sub> from ammonia treatment of straw used for feed.
+- NH<sub>3</sub> from spreading manure and from grazing is counted in AG.SM-AT.AT-Emissions-NH3.
 
 #### Data sources
 
 - Emissions reported by Norway to CLRTAP (CLRTAP inventory submissions, EMEP 2025<!--cite:emep_officially_2025-->), as advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
-- The emissions are calculated in the national inventory with the same manure model as the greenhouse gas inventory: N in manure, mineral fertilizer and other N sources multiplied by NH3 and NOx emission factors for each animal category, storage system, spreading method and fertilizer type. The methods are documented in the [Informative Inventory Report 2026, Norway](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/informative-inventory-report-iir-2026-norway-air-pollutant-emissions-1990-2024/).
+- The emissions are calculated in the national inventory with the same manure model as the greenhouse gas inventory: N in manure, mineral fertilizer and other N sources multiplied by NH<sub>3</sub> and NO<sub>x</sub> emission factors for each animal category, storage system, spreading method and fertilizer type. The methods are documented in the [Informative Inventory Report 2026, Norway](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/informative-inventory-report-iir-2026-norway-air-pollutant-emissions-1990-2024/).
 
 #### Assumptions
 
@@ -36,12 +36,12 @@ nav_order: 3
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-22.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-10-22). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| NH3, manure management, all animal categories (NFR 3B) | Inventory with published uncertainty | ±25 %, normal | 82% | 99% | 0.86 | 0.97 | none |
-| NH3, Agriculture other (please specify in the IIR) (NFR 3I) | Inventory with published uncertainty | −50/+100 %, lognormal | 18% | 1% | 0.14 | 0.03 | none |
+| NH<sub>3</sub>, manure management, all animal categories (NFR 3B) | Inventory with published uncertainty | ±25 %, normal | 82% | 99% | 0.86 | 0.97 | none |
+| NH<sub>3</sub>, Agriculture other (please specify in the IIR) (NFR 3I) | Inventory with published uncertainty | −50/+100 %, lognormal | 18% | 1% | 0.14 | 0.03 | none |
 
 ### References
 

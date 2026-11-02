@@ -13,9 +13,9 @@ nav_order: 2
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 #### Flow description
 
-- **EF.EC-AT.AT-Emissions-NOx** is NOx from energy industries and fugitive emissions in the oil and gas sector, using the categories given in Table 11 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
-- Public electricity and heat production (1A1a, about 0.35–0.7 kt N/year, mainly waste incineration and district heating) is not included here but counted in the processing of residues pool (PR.SO-AT.AT), as recommended in chapter 1.4.1.2 of Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, to avoid double counting.
-- NH3 emissions from these categories are reported as zero or not occurring, which is why there is no EF.EC NH3 flow.
+- **EF.EC-AT.AT-Emissions-NOx** is NO<sub>x</sub> from energy industries and fugitive emissions in the oil and gas sector, using the categories given in Table 11 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
+- Public electricity and heat production (1A1a, 0.35–0.7 kt N/year) is split between waste incineration and other heat and power plants by the waste share of the 1.A.1.a fuel use in the CRT (17–50 %, about 50 % in 2024). The waste part is counted in PR.SO-AT.AT, as recommended in chapter 1.4.1.2 of Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, and the rest (plants burning wood, oil and gas) is included here. The inventory does not split 1A1a NO<sub>x</sub> by fuel, so the split assumes the same NO<sub>x</sub> per TJ for waste and other fuels.
+- NH<sub>3</sub> emissions from these categories are reported as zero or not occurring, and NH<sub>3</sub> from 1A1a is below 0.001 kt N/year, which is why there is no EF.EC NH<sub>3</sub> flow.
 
 #### Data sources
 
@@ -24,17 +24,17 @@ nav_order: 2
 
 #### Interpretations and comparisons
 
-- Oil and gas extraction (1A1c, mainly gas turbines on offshore installations) dominates the flow: its NOx emissions rose from 7.6 kt N/year in 1990 to about 14.6 kt N in 2005–2015 with increasing petroleum production and have since fallen to 10.0 kt N in 2024.
+- Oil and gas extraction (1A1c, mainly gas turbines on offshore installations) dominates the flow: its NO<sub>x</sub> emissions rose from 7.6 kt N/year in 1990 to about 14.6 kt N in 2005–2015 with increasing petroleum production and have since fallen to 10.0 kt N in 2024.
 - Refineries (1A1b) and fugitive emissions including flaring (1B2) contribute up to 0.3–0.6 kt N/year each.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-22.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-10-22). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| NOx, Manufacture of solid fuels and other energy industries (NFR 1A1c) | Inventory with published uncertainty | ±20 %, normal | 99% | 100% | 0.89 | 0.97 | none |
+| NO<sub>x</sub>, Manufacture of solid fuels and other energy industries (NFR 1A1c) | Inventory with published uncertainty | ±20 %, normal | 99% | 100% | 0.89 | 0.97 | none |
 
 ### References
 

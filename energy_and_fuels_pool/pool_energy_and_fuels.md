@@ -33,6 +33,6 @@ Hover over the chart to inspect specific flows, or click legend items to toggle 
 <iframe src="../output_files/plots/balance_EF.html" width="100%" height="600px" frameborder="0" scrolling="no"></iframe>
 
 <!-- MANUAL:POOL_TEXT:START -->
-In the guidelines, there are N2 flows assigned to and from EF sectors associated with nitrogen conversions in the combustion process. We have chosen to ignore these here because they can only be found by mass balance but by doing so, they may hide other imbalances that could be significant.
+In the guidelines, there are N<sub>2</sub> flows assigned to and from EF sectors associated with nitrogen conversions in the combustion process. We have chosen to ignore these here because they can only be found by mass balance but by doing so, they may hide other imbalances that could be significant.
 
 <!-- MANUAL:POOL_TEXT:END -->

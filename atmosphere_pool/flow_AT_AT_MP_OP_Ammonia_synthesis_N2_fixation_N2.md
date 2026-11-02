@@ -13,7 +13,7 @@ nav_order: 15
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 #### Flow description
 
-- **AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2** is N2 fixed from the air in industrial ammonia synthesis (Haber–Bosch) in Norway.
+- **AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2** is N<sub>2</sub> fixed from the air in industrial ammonia synthesis (Haber–Bosch) in Norway.
 
 #### Data sources
 
@@ -25,7 +25,7 @@ nav_order: 15
 - The flow is found through mass balance: domestic fertilizer N production, minus imported ammonia (not domestically fixed), plus exported ammonia (domestically fixed before leaving the country).
 - Domestic fertilizer N production is derived from the fertilizer balance of the MP.OP sub-pool in every year: export + agricultural use − import + non-agricultural use (MP.OP-HS.HS-Mineral fertilizer-Nmix, 2% of total use), so that all mineral fertilizer leaving MP.OP is accounted for by domestic production. Up to 2001 this matches FAOSTAT's reported production within 1%, except 1992 (13% lower than reported) and 1993 (9% lower).
 - The combined value is smoothed with a centred 3-year moving average, since actual ammonia production is a continuous industrial process and presumably much steadier than the underlying trade statistics suggest on their own – annual trade figures are sensitive to shipment timing around year-end and to inventory/stock effects, which can otherwise dominate the apparent year-to-year change.
-- The result is floored at zero, since a negative N2-fixation flow has no physical meaning. The central run is never negative; in the Monte Carlo simulation at most 2.5% of the iterations (in 1998) are set to zero.
+- The result is floored at zero, since a negative N<sub>2</sub>-fixation flow has no physical meaning. The central run is never negative; in the Monte Carlo simulation at most 2.5% of the iterations (in 1998) are set to zero.
 
 #### Interpretations and comparisons
 
@@ -35,7 +35,7 @@ nav_order: 15
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods, from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. They are indicative where the flow is a residual close to zero or a source has a strongly skewed distribution. Elasticity: relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases. Computed 2026-10-22.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-10-22). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
