@@ -35,12 +35,12 @@ nav_order: 5
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-10-22). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
 | N content of wood waste fuels in industry | Parameter | 0.0019–0.0055, triangular | 69% | 74% | 1.00 | 1.00 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
-| Net calorific value of wood fuels | Parameter | 12.3–20.9, triangular | 21% | 22% | −0.91 | −0.91 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| Net calorific value of wood fuels | Parameter | 12.3–20.9, triangular | 21% | 22% | −0.91 | −0.91 | [Fuel Wood for Heat Plants](../forests_and_semi_natural_pool/flow_FS_FO_EF_EC_Fuel_wood_for_co_fired_power_plants_Nmix.html), [Fuel Wood for Households](../forests_and_semi_natural_pool/flow_FS_FO_EF_OE_Fuel_wood_for_households_Nmix.html), [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
 | Energy use in manufacturing (SSB 08205) | Survey or self-reported data | ±10 %, normal, drawn per year | 3% | 3% | 1.00 | 1.00 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
 | Splice SSB energy balance 11561 to 08205, industrial waste fuels | Splice between data sources | ±15 %, normal | 7% | – | 1.00 | – | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
 

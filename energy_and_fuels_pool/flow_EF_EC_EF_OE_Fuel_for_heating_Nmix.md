@@ -38,7 +38,7 @@ nav_order: 4
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-10-22). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
@@ -46,7 +46,7 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 | Net calorific value of other fossil fuels | Parameter | 10–40, triangular | <1% | 29% | −0.01 | −0.33 | [Fuel for industry](../energy_and_fuels_pool/flow_EF_EC_EF_IC_Fuel_for_industry_Nmix.html) |
 | N content of other fossil fuels | Parameter | ±50 %, triangular | <1% | 24% | 0.01 | 0.36 | [Fuel for industry](../energy_and_fuels_pool/flow_EF_EC_EF_IC_Fuel_for_industry_Nmix.html) |
 | N content of jet kerosene | Parameter | ±50 %, triangular | 46% | 4% | 0.42 | 0.15 | [Fuel for industry](../energy_and_fuels_pool/flow_EF_EC_EF_IC_Fuel_for_industry_Nmix.html), [Fuel for transport](../energy_and_fuels_pool/flow_EF_EC_EF_TR_Fuel_for_transport_Nmix.html) |
-| Fuel consumption (Norway's GHG inventory, CRT 1.A) | Registered data | ±5 %, normal, drawn per year | 2% | 2% | 1.00 | 1.00 | [Fuel for industry](../energy_and_fuels_pool/flow_EF_EC_EF_IC_Fuel_for_industry_Nmix.html), [Fuel for transport](../energy_and_fuels_pool/flow_EF_EC_EF_TR_Fuel_for_transport_Nmix.html) |
+| Fuel consumption (Norway's GHG inventory, CRT 1.A) | Registered data | ±5 %, normal, drawn per year | 2% | 2% | 1.00 | 1.00 | [Fuel for industry](../energy_and_fuels_pool/flow_EF_EC_EF_IC_Fuel_for_industry_Nmix.html), [Fuel for transport](../energy_and_fuels_pool/flow_EF_EC_EF_TR_Fuel_for_transport_Nmix.html), [Fuel Wood for Heat Plants](../forests_and_semi_natural_pool/flow_FS_FO_EF_EC_Fuel_wood_for_co_fired_power_plants_Nmix.html), [Fuel Wood for Households](../forests_and_semi_natural_pool/flow_FS_FO_EF_OE_Fuel_wood_for_households_Nmix.html) |
 | N content of coal | Parameter | 0.005–0.025, triangular | 35% | <1% | 0.28 | 0.01 | [Fuel for industry](../energy_and_fuels_pool/flow_EF_EC_EF_IC_Fuel_for_industry_Nmix.html), [Fuel used as feedstock](../energy_and_fuels_pool/flow_EF_EC_MP_OP_Fuel_used_as_feedstock_Nmix.html), [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
 | Net calorific value of coal | Parameter | 19.9–30.5, triangular | 3% | <1% | −0.25 | −0.01 | [Fuel for industry](../energy_and_fuels_pool/flow_EF_EC_EF_IC_Fuel_for_industry_Nmix.html), [Fuel used as feedstock](../energy_and_fuels_pool/flow_EF_EC_MP_OP_Fuel_used_as_feedstock_Nmix.html), [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
 

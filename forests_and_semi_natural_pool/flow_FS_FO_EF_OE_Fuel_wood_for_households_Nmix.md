@@ -37,11 +37,11 @@ nav_order: 3
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-10-22). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| N content of fuel wood burned in households | Parameter | 0.0007–0.0043, triangular | 98% | 98% | 1.00 | 1.00 | none |
+| N content of fuel wood burned in households | Parameter | 0.0007–0.0043, triangular | 98% | 97% | 0.99 | 0.83 | none |
 
 ### References
 

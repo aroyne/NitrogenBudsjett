@@ -31,6 +31,20 @@ nav_order: 4
 
 #### Interpretations and comparisons
 
-- The flow rises from about 0.2 kt N in 1990 to 1.3–1.7 kt N in 2010–2020 and about 2.2 kt N in 2021–2024, following the expansion of wood-fired district heating.
+- The flow rises from about 0.2 kt N in 1990 to 1.1–1.8 kt N per year in 2010–2020 and 2.1–2.4 kt N in 2021–2024, following the expansion of wood-fired district heating.
 - Before 2010 the CRT biomass in 1.A.1.a is larger than "Bark, flis og tre" in table 04730 (1990: 1 060 against 103 TJ), probably plants outside the district heating statistics.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
+
+### Uncertainty
+
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+
+| Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
+|---|---|---|---|---|---|---|---|
+| N content of wood fuel for heat plants | Parameter | 0.0014–0.004, triangular | 74% | 74% | 1.00 | 1.00 | [Fuel Wood for Households](../forests_and_semi_natural_pool/flow_FS_FO_EF_OE_Fuel_wood_for_households_Nmix.html) |
+| Net calorific value of wood fuels | Parameter | 12.3–20.9, triangular | 25% | 25% | −0.91 | −0.91 | [Fuel Wood for Households](../forests_and_semi_natural_pool/flow_FS_FO_EF_OE_Fuel_wood_for_households_Nmix.html), [Industrial Waste Fuels](../materials_and_products_pool/flow_MP_OP_EF_IC_Industrial_waste_fuels_Nmix.html), [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+
+### References
+
+* Garg, A., Kazunari, K., & Pulles, T. (2006). Chapter 1. Introduction. *IPCC Guidelines for National Greenhouse Gas Inventories*. [https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_1_Ch1_Introduction.pdf](https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_1_Ch1_Introduction.pdf)
+* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)
