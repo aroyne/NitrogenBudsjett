@@ -6,7 +6,7 @@ nav_order: 1
 
 # Nitrogen Budget for Norway
 
-**Last Updated:** November 02, 2026
+**Last Updated:** November 04, 2026
 
 {: .label .label-red }
 Work in Progress
@@ -26,7 +26,7 @@ Use the navigation menu on the left side to explore the individual nitrogen pool
 - **Uncertainty interval.** The uncertainty is estimated with a Monte Carlo analysis of 999 further runs from a fixed seed. Each uncertain parameter (N contents, conversion factors, shares) is drawn once per run and used for all years and all flows that use it. Each data set gets an uncertainty factor that is drawn once per run (inventories, modelled statistics and assumptions) or anew for each year (registered data and surveys). The shaded band is the 2.5–97.5 percentile range of these runs.
 - **Distributions.** The bounds given for each parameter and data set are read as a 95 % interval, except minimum–maximum ranges from the literature, which are read as the limits of a triangular distribution. Symmetric bounds up to ±40 % use a normal distribution, wider or asymmetric bounds a triangular distribution, and uncertainty factors (for example −50/+100 % from the emission inventories) a lognormal distribution.
 - **Residual flows.** Flows computed as a difference of other flows (ammonia synthesis, inflow to coastal waters, consumer goods, recycling) are set to zero in the runs where the difference is negative; how often this happens is recorded.
-- **Uncertainty tables.** Each flow page lists the sources that contribute at least 2 % of the variance of the flow in 1990–1994 or 2020–2024. They come from a first-order sensitivity analysis around the central run: each source is raised by 10 % on its own, and the change in the flow is scaled with the source's uncertainty in the Monte Carlo. Shares are averages over the years of the period. The shares are a linear approximation and are less reliable when the flow is a small difference between larger flows (for example Consumer goods), or when a source has a very skewed distribution. Elasticity is the relative change in the flow per relative change in the source; a negative value means the flow decreases when the source increases.
+- **Uncertainty tables.** Each flow page lists the sources (parameters, data sets and gap filling) that account for at least 2 % of the uncertainty of the flow, measured as its variance, in 1990–1994 or 2020–2024. A source matters if it is itself uncertain and if the flow is sensitive to it. The sensitivity is given as the elasticity: the percentage change in the flow when the source changes by 1 % (negative if the flow decreases when the source increases). The share of the variance is the elasticity squared times the source's own relative variance, divided by the total for the flow, averaged over the years of the period. This is a linear approximation, computed by changing one source at a time around the central run, and is less reliable when the flow is a small difference between larger flows (for example Consumer goods) or when a source has a very skewed distribution.
 <!-- MANUAL:INDEX_TEXT:END -->
 
 ### Interactive National Nitrogen Flow Map
@@ -37,7 +37,7 @@ The diagram below shows the nitrogen flows between the pools of the Norwegian ni
 
 ---
 
-For flows connected to the hydrosphere, and for land-related emissions and nitrogen deposition, we only consider the Norwegian mainland. For emissions to air reported through the UNFCCC framework we also include emissions from Norwegian economic activity on Svalbard (these are minor and mainly related to coal extraction, which has now been discontinued). We also include emissions and N flows that originate in petroleum extraction on the Norwegian continental shelf.
+For flows connected to the hydrosphere, and for land-related emissions and nitrogen deposition, we only consider the Norwegian mainland. For emissions to air reported through the UNFCCC framework we also include emissions from Norwegian economic activity on Svalbard (these are minor and mainly related to coal extraction, which has now been discontinued). We also include emissions and N flows that originate in petroleum extraction on the Norwegian continental shelf. The wild catch is an exception: the catch statistics cover all catch by Norwegian vessels, wherever it is taken. In 2018–2024, 58–74 % was taken in the Norwegian economic zone; the rest came from the zones of other countries, international waters in the North-East Atlantic and, at 8–14 %, Antarctic krill from the Southern Ocean. Coastal water (HY.CW) is therefore treated as a boundary node, like the rest of the world (see [Coastal Water (HY.CW)](hydrosphere_pool/subpool_coastal_water.html)).
 
 ### References
 

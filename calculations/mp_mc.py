@@ -7,7 +7,6 @@ use, other producing industry (MP.OP) emissions and waste streams, and the
 MP.OP-HS.HS consumer goods mass balance.
 """
 import pandas as pd
-import numpy as np
 
 from calculations.utils import (
     EXPECTED_YEARS,
@@ -22,6 +21,7 @@ from calculations.shared_flow_calculations import (
     find_aquaculture_production,
     get_aquafeed_budget,
     get_aquafeed_import_fraction,
+    find_direct_landings_not_in_exports,
     find_feedstock_fuel,
     find_food_industry_waste,
     find_industrial_round_wood,
@@ -44,32 +44,6 @@ MP_OP_CRLTAP_SECTORS = [
     '2D3a', '2D3b', '2D3c', '2D3d', '2D3e', '2D3f', '2D3g', '2D3h', '2D3i',
     '2G', '2H1', '2H2', '2H3',
 ]
-
-
-def protein_per_group(current_params, mapping_sheet, group_index):
-    """
-    Look up the protein content (as a fraction) for each food item code in
-    `group_index`, via `mapping_sheet` ('protein_map_new' or 'protein_map_old'
-    in N_parameters.xlsx), which maps each SSB food-item code to one of the
-    named food groups in the 'protein_food_items' table. Codes with no mapped
-    food group get 0.0 (e.g. non-food items mixed into the same SSB table).
-    """
-    mapping = current_params.get_table(mapping_sheet)
-    mapping = mapping.set_index('code').reindex(group_index)
-
-    protein_fractions = []
-    for idx, row in mapping.iterrows():
-        food_group = str(row['food_group']).strip()
-
-        if pd.notna(row['food_group']):
-            f_id = f"food_protein_{food_group}"
-            protein_pct = float(current_params.get(f_id))
-        else:
-            protein_pct = 0.0
-
-        protein_fractions.append(protein_pct / 100.0)  # percent -> fraction
-
-    return pd.Series(protein_fractions, index=group_index)
 
 
 def _industry_n_to_water(preloaded_data, category, connected, dataset_noise, fertilizer_industry=None):
@@ -321,7 +295,7 @@ def _add_farm_animal_feed_mc(results, preloaded_data, current_params, dataset_no
             dom_frac = float(current_params.get(param_key_dom_frac))
 
         value_kt_N_hist = value_tonn * 1e-3 * N_cont_before_2000 * dom_frac
-        value_kt_N_hist_noisy = value_kt_N_hist * dataset_noise.factor('Totalkalkylen', year, sub='concentrate')
+        value_kt_N_hist_noisy = value_kt_N_hist * dataset_noise.factor('Totalkalkylen_concentrate', year)
 
         if year in EXPECTED_YEARS and year not in final_yearly_values:
             final_yearly_values[year] = {
@@ -407,10 +381,19 @@ def _add_food_industry_wastewater_mc(results, preloaded_data, current_params, da
 
 
 def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    Food to consumers (households, restaurants, canteens and institutions)
+    and pets. Human food is the protein in the food supply at wholesale level
+    (Helsedirektoratet, Utviklingen i norsk kosthold), which covers all food
+    that leaves the food industry and wholesale for the domestic market,
+    including food eaten outside the home and food later wasted in retail,
+    food service and households, but not cross-border shopping. Protein per
+    person per day times population, divided by the Jones factor. Years
+    between the published years are linearly interpolated.
+    """
     flow_code = 'MP.FP-HS.HS-Food products-Nmix'
     collected_years = set()
-    year_values = {}
-    
+
     dog_N_per_year = float(current_params.get('dog_feed_N_per_year'))
     cat_N_per_year = float(current_params.get('cat_feed_N_per_year'))
     dog_slope      = float(current_params.get('dog_number_trend_slope'))
@@ -418,25 +401,15 @@ def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise
     cat_slope      = float(current_params.get('cat_number_trend_slope'))
     cat_intercept  = float(current_params.get('cat_number_trend_intercept'))
     Jones          = float(current_params.get('Jones_factor'))
-    
 
-    # 'ssb_13695' <- 13695_20260916-120402.xlsx (data_loader.py DATA_MAP): SSB
-    # table 13695, food/drink intake per person per day by nutrient content
-    # (2018 onward). SSB republished 2018-2023 alongside adding 2024-2025 in
-    # this export (store-sample weighting adjustment, ~7-8% lower across the
-    # board) - not a data error, see the file's own footnote.
     # 'ssb_06913' <- 06913_20251113-124117.xlsx (data_loader.py DATA_MAP,
     # 'excel_population' method): SSB table 06913, population by year
-    # 'ssb_10249' <- 10249_20260129-155747.xlsx (data_loader.py DATA_MAP): SSB
-    # table 10249, food/drink amounts consumed per person per year (1999-2012,
-    # with 2010-2011 genuinely missing from the source sheet)
-    # 'ssb_06376' <- 06376_20260129-155937.xlsx (data_loader.py DATA_MAP): SSB
-    # table 06376, food/drink amounts consumed per person per year, reported
-    # as multi-year intervals (1984-1998)
-    df_13695 = preloaded_data.get('ssb_13695')
-    df_pop = preloaded_data.get('ssb_06913')
-    df_10249 = preloaded_data.get('ssb_10249')
-    df_06376 = preloaded_data.get('ssb_06376')
+    df_pop = preloaded_data['ssb_06913']
+    # 'helsedir_engros_protein' <- helsedir_engros_protein.csv (data_loader.py
+    # DATA_MAP): protein in the food supply at wholesale level, g per person
+    # per day, compiled from the Utviklingen i norsk kosthold reports
+    protein = preloaded_data['helsedir_engros_protein']['protein_g_per_person_day']
+    known = sorted(protein.index)
 
     # Pet food N: linear trend lines for dog/cat population fitted to
     # historical counts, combined with per-animal N intake from feed.
@@ -445,185 +418,33 @@ def _add_food_products_mc(results, preloaded_data, current_params, dataset_noise
         n_cats = cat_slope * y + cat_intercept
         return (n_dogs * dog_N_per_year + n_cats * cat_N_per_year) * 1e-6
 
-    # 2018-2023 (table 13695) ---
-    for col in range(1, df_13695.shape[1]):
-        year_val = df_13695.iloc[3, col]
-        if pd.isna(year_val):
+    for year in sorted(EXPECTED_YEARS):
+        if not known[0] <= year <= known[-1]:
             continue
-        year = int(float(year_val))
-        
-        # g/day/person -> kt/year/person
-        v_protein_pers = float(df_13695.iloc[6, col]) * 1e-9 * 365
-        pop = float(df_pop.loc[year, 'Befolkning 1. januar']) * dataset_noise.factor('06913', year)
-        
-        v_human_N = (v_protein_pers * pop) / Jones
-        total_N = (v_human_N * dataset_noise.factor('13695', year)) + pet_N_year(year)
-        
-        year_values[year] = {
-            'value': total_N,
-            'comment': 'ok',
-            'data_sources': 'SSB'
-        }
-
-    # 1998-2008 and 2012 (table 10249) ---
-    mengde_10249 = df_10249.set_index(0).iloc[4:, 0::2].dropna(how='all')
-    mengde_10249 = mengde_10249.astype(str).map(lambda s: s.replace(',','.') if pd.notna(s) else s)
-    mengde_10249 = mengde_10249.apply(pd.to_numeric, errors='coerce')
-
-    # Protein and nitrogen per person, from food-item amounts x protein content.
-    protein_map_10249 = protein_per_group(current_params, 'protein_map_new', mengde_10249.index)
-    total_protein_pers_10249 = mengde_10249.mul(protein_map_10249, axis=0).sum(axis=0)
-    total_N_pers_10249 = total_protein_pers_10249 / Jones * 1e-6
-    
-    for col_idx, v_N_pers in total_N_pers_10249.items():
-        year_val = df_10249.iloc[2, col_idx]
-        
-        if pd.isna(year_val) and col_idx > 0:
-            year_val = df_10249.iloc[2, col_idx - 1]
-            
-        if pd.isna(year_val):
-            continue
-            
-        year = int(float(year_val))
-        # SSB pooled the household budget surveys of 1997-2009 three years at
-        # a time and labels each period with its last year (e.g. 2000 =
-        # 1998-2000), so the value is placed in the middle year. The first
-        # period (1997-1999) overlaps table 06376's 1996-1998 period and is
-        # left out.
-        if year <= 2009:
-            year -= 1
-            if year < 1999:
-                continue
-
-        pop = float(df_pop.loc[year, 'Befolkning 1. januar']) * dataset_noise.factor('06913', year)
-
-        v_human_N = v_N_pers * pop
-        total_N = (v_human_N * dataset_noise.factor('10249', year)) + pet_N_year(year)
-        
-        year_values[year] = {
-            'value': total_N,
-            'comment': 'ok',
-            'data_sources': 'SSB'
-        }
-        
-    # 1984-1998 (table 06376) ---
-    # Row 4 onward: skip the text/interval-label rows above the food amounts.
-    mengde_06376 = df_06376.set_index(0).iloc[4:, 0::2]
-    mengde_06376 = mengde_06376.astype(str).map(lambda s: s.replace(',','.') if pd.notna(s) else s)
-    mengde_06376 = mengde_06376.apply(pd.to_numeric, errors='coerce')
-
-    # Protein and nitrogen per person, from food-item amounts x protein content.
-    protein_map_06376 = protein_per_group(current_params, 'protein_map_old', mengde_06376.index)
-    total_protein_pers_06376 = mengde_06376.mul(protein_map_06376, axis=0).sum(axis=0)
-    total_N_pers_06376 = total_protein_pers_06376 / Jones * 1e-6  # kgN -> ktN
-
-    # This sheet reports amounts as multi-year interval averages (e.g.
-    # "1983-1985") rather than single years, so map each column index to its
-    # actual interval label from row 3.
-    intervall_mapping = {}
-    for col_idx in total_N_pers_06376.index:
-        val_interval = df_06376.iloc[3, col_idx]
-
-        if pd.isna(val_interval) and col_idx > 0:
-            val_interval = df_06376.iloc[3, col_idx - 1]
-
-        if pd.notna(val_interval):
-            intervall_mapping[col_idx] = str(val_interval).strip()
-
-    # Assign each individual year to (or interpolate between) the interval(s)
-    # covering it.
-    for year in range(1984, 1999):
-        pop = float(df_pop.loc[year, 'Befolkning 1. januar']) * dataset_noise.factor('06913', year)
-        comment = 'ok'
-        
-        idx_83_85 = next((k for k, v in intervall_mapping.items() if '1983-1985' in v), None)
-        idx_89_91 = next((k for k, v in intervall_mapping.items() if '1989-1991' in v), None)
-        idx_96_98 = next((k for k, v in intervall_mapping.items() if '1996-1998' in v), None)
-        
-        if year < 1986:
-            v_human_pers = total_N_pers_06376[idx_83_85]
-            src = 'SSB'
-        elif year < 1989:
-            v_human_pers = ((total_N_pers_06376[idx_83_85] + total_N_pers_06376[idx_89_91]) / 2.0
-                            * dataset_noise.fill('interpolation', f'{flow_code}:1985-1989', year, [1985, 1989]))
-            src = 'Filled (mean of the 1983-1985 and 1989-1991 surveys): SSB'
-        elif year < 1992:
-            v_human_pers = total_N_pers_06376[idx_89_91]
-            src = 'SSB'
-        elif year < 1996:
-            v_human_pers = ((total_N_pers_06376[idx_89_91] + total_N_pers_06376[idx_96_98]) / 2.0
-                            * dataset_noise.fill('interpolation', f'{flow_code}:1991-1996', year, [1991, 1996]))
-            src = 'Filled (mean of the 1989-1991 and 1996-1998 surveys): SSB'
+        if year in protein.index:
+            g_per_day = protein[year]
+            fill = 1.0
+            src = 'Helsedirektoratet (Utviklingen i norsk kosthold)'
         else:
-            v_human_pers = total_N_pers_06376[idx_96_98]
-            src = 'SSB'
-            
-        v_human_N = v_human_pers * pop
-        total_N = (v_human_N * dataset_noise.factor('06376', year)) + pet_N_year(year)
-        
-        year_values[year] = {
-            'value': total_N,
-            'comment': comment,
-            'data_sources': src
-        }
-        
-    # Years without survey data between 1984 and the last year (2009-2011
-    # within table 10249's range, and 2013-2017 between 10249 and 13695) are
-    # bridged with a single linear trend fitted across all available years.
-    gap_years = [y for y in range(min(year_values), max(year_values)) if y not in year_values]
-    valid_years = sorted(year_values)
-    y_arr = np.array(valid_years)
-    v_arr = np.array([year_values[k]['value'] for k in y_arr])
+            before = max(y for y in known if y < year)
+            after = min(y for y in known if y > year)
+            g_per_day = protein[before] + (protein[after] - protein[before]) * (year - before) / (after - before)
+            fill = dataset_noise.fill('interpolation', f'{flow_code}:{before}-{after}', year, [before, after])
+            src = f'Filled (linear interpolation between {before} and {after}): Helsedirektoratet (Utviklingen i norsk kosthold)'
 
-    m, b = np.polyfit(y_arr, v_arr, 1)
-
-    for year in gap_years:
-        v_trend = m * year + b
-        year_values[year] = {
-            'value': v_trend * fill_noise(dataset_noise, flow_code, year, valid_years),
-            'comment': 'ok',
-            'data_sources': 'Filled (linear trend across the survey years): SSB'
-        }
-
-    # Food wasted downstream of the food industry, before it reaches
-    # households: wholesale, retail, food service, catering and institutions
-    # (Stensgård et al. 2023). The food statistics above count food bought by
-    # households (grocery sales and household purchases), so food that leaves
-    # MP.FP but is wasted before it is bought is not in them; food wasted in
-    # households after it is bought is already included and is not added.
-    # The report gives 2021 tonnage and the 2015-to-2021 change in kg per
-    # capita for each sector (2015 is the baseline year of Norway's food
-    # waste reduction agreement, "Bransjeavtalen"). The 2015 per-capita rate
-    # is backed out from the 2021 rate and the change, then linearly
-    # interpolated between the two years; outside 2015-2021 the nearest
-    # endpoint's rate is held constant.
-    food_waste_sectors = current_params.get_table('food_waste_sectors')
-    food_waste_N_frac = float(current_params.get('food_waste_N_frac'))
-    pop_2021 = float(df_pop.loc[2021, 'Befolkning 1. januar'])
-    percap_2021 = food_waste_sectors['tonnes_2021'] / pop_2021
-    percap_2015 = percap_2021 / (1 + food_waste_sectors['change_2015_2021'])
-
-    for year in year_values:
         pop = float(df_pop.loc[year, 'Befolkning 1. januar']) * dataset_noise.factor('06913', year)
-        frac = min(1.0, max(0.0, (year - 2015) / (2021 - 2015)))
-        food_waste_t_per_capita = (percap_2015 + frac * (percap_2021 - percap_2015)).sum()
-        year_values[year]['value'] += food_waste_t_per_capita * pop * food_waste_N_frac / 1000.0 * dataset_noise.factor('Stensgard_2023', year)
+        human_N = (g_per_day * 1e-9 * 365 * pop / Jones
+                   * dataset_noise.factor('Helsedirektoratet_engros', year) * fill)
+        collected_years.add(year)
+        results.append({
+            'flow_name': flow_code, 'year': year, 'value': human_N + pet_N_year(year),
+            'comment': 'ok', 'data_sources': src
+        })
 
-    for year in sorted(year_values.keys()):
-        if year in EXPECTED_YEARS:
-            collected_years.add(year)
-            results.append({
-                'flow_name': flow_code,
-                'year': year,
-                'value': year_values[year]['value'],
-                'comment': year_values[year]['comment'],
-                'data_sources': year_values[year]['data_sources']
-            })
-            
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)
-    
-    
+
+
 def _add_fp_untreated_wastewater_mc(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'MP.FP-HY.SW-Untreated wastewater-Nmix'
     collected_years = set()
@@ -742,6 +563,16 @@ def _add_food_export_mc(results, preloaded_data, current_params, current_trade_f
         dataset_noise=dataset_noise,
         data_sources='SSB tab 08801'
     )
+
+    # Catch landed directly abroad by Norwegian vessels that is not in the
+    # export statistics (before 2010, partly from 2024, and all krill). It is
+    # in the catch flows into MP.FP and leaves the country directly.
+    landings = find_direct_landings_not_in_exports(preloaded_data, current_params, dataset_noise)
+    for row in results:
+        if row['flow_name'] == flow_code and row['year'] in landings:
+            kt_N, source = landings[row['year']]
+            row['value'] += kt_N
+            row['data_sources'] = f"{row['data_sources']}; {source}"
     
     
 def _add_feed_export_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise):

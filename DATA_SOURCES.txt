@@ -170,6 +170,21 @@ fiske_1990_2000.xlsx
 Historical wild catch compilation (pelagic fish, bottom fish, crustaceans, seaweed), 1990-2000, used to extend the modern Fiskeridirektoratet series backward
 values read from Fiskeridirektoratet: Økonomiske og biologiske nøkkeltal frå dei norske fiskeria, Table 1
 
+helsedir_engros_protein.csv
+Helsedirektoratet, Utviklingen i norsk kosthold: protein (g per person per day) in the food supply at wholesale level (matforsyningsstatistikken, prepared by NIBIO), cross-border shopping not included. Compiled by hand from Tabell 7 in the 2017, 2023, 2024 and 2025 reports and Tabell 2.49 in the 2022 report (newest report used where years overlap)
+https://www.helsedirektoratet.no/rapporter/utviklingen-i-norsk-kosthold-2025/energi-og-naeringsstoffer
+compiled 04.11.2026
+
+jaktstatistikk_storvilt.csv
+SSB hunting statistics, whole country, per hunting season (labelled by the start year): calculated total carcass weight in tonnes of moose (table 10817), red deer (10818) and wild reindeer (10820), and number of moose (06036), red deer (06037) and roe deer (03947) shot
+https://www.ssb.no/jord-skog-jakt-og-fiskeri/jakt
+downloaded 04.11.2026 with data_files/ssb_jaktstatistikk.py
+
+landinger_norske_fartoy_etter_landingsnasjon.csv
+Fiskeridirektoratet table F.06.002: catch by Norwegian vessels by landing nation (round weight, tonnes), all species and Antarctic krill, 2000-2025, with the matching SSB 08801 country code
+https://statistikkbanken.fiskeridir.no/PxWeb/pxweb/no/Fiskeridirektoratet/Fiskeridirektoratet__F_Fiskeri__F_06_Fangst/
+downloaded 04.11.2026 with data_files/fiskeridir_landinger_utland.py
+
 grovfor_før_2000.xlsx
 Historical hay and silage crop yield, pre-2000
 data from Jordbruksstatistikk 2000 (SSB), Table 2.1

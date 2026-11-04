@@ -20,7 +20,8 @@ from calculations.shared_flow_calculations import (
     find_treated_wastewater_discharge,
     find_teotil2_bias_corrected,
     get_aquafeed_budget,
-    teotil3_table
+    teotil3_table,
+    wild_fish_catch_kt
 )
 
 def execute_calculations_hy(preloaded_data, current_params, dataset_noise):
@@ -292,57 +293,15 @@ def _add_surface_water_emissions(results, preloaded_data, current_params, datase
 def _add_wild_fish_catch(results, preloaded_data, current_params, dataset_noise):
     flow_code = 'HY.CW-MP.FP-Fish (wild catch)-Nmix'
     collected_years = set()
-    
+
     fish_N_frac = float(current_params.get("fish_N_frac"))
-    key_fisk = 'Fiskeridirektoratet'
 
-    # 'hy_art_raw' <- art.xlsx (data_loader.py DATA_MAP): Fiskeridirektoratet
-    # catch statistics by species ("Fangst fordelt på art"), 2000-2024
-    df_art = preloaded_data.get('hy_art_raw')
-
-    for col in range(2, df_art.shape[1]):
-        val_at_cell = str(df_art.iloc[0, col]).strip()
-        if val_at_cell.lower() in ['year', 'år', 'årstall', 'nan', '']:
-            continue
-
-        year = int(float(val_at_cell))
+    for year, catch_kt in sorted(wild_fish_catch_kt(preloaded_data).items()):
         if year in EXPECTED_YEARS:
             collected_years.add(year)
-            val = 0.0
-            # 'Delsum' subtotal rows for pelagic fish, cod-family fish, other
-            # bottom/deep-water fish, and skates/sharks - i.e. all "true fish"
-            # categories, excluding shellfish and seaweed (see the shellfish
-            # and macroalgae flow above).
-            for r_idx in [15, 20, 26, 38]:
-                if not pd.isna(df_art.iloc[r_idx, col]):
-                    val += float(df_art.iloc[r_idx, col])
-
-            val_kt_N = (val / 1000.0) * fish_N_frac * dataset_noise.factor(key_fisk, year, sub='landings')
+            val_kt_N = catch_kt * fish_N_frac * dataset_noise.factor('Fiskeridirektoratet', year, sub='landings')
             results.append({
                 'flow_name': flow_code, 'year': year, 'value': val_kt_N,
-                'comment': 'ok', 'data_sources': 'Fiskeridirektoratet'
-            })
-
-    # Historical data (1990-1999): hy_art_raw already has complete data for
-    # year 2000 onward, so this loop stops one year short to avoid double-
-    # counting 2000.
-    # 'hy_fiske_old_raw' <- fiske_1990_2000.xlsx (data_loader.py DATA_MAP):
-    # historical wild catch compilation (pelagic fish, bottom fish,
-    # crustaceans, seaweed), 1990-2000, used to extend the modern
-    # Fiskeridirektoratet series backward
-    df_fiske_old = preloaded_data.get('hy_fiske_old_raw')
-
-    for r in range(1, 11):
-        val_at_col0 = str(df_fiske_old.iloc[r, 0]).strip()
-        year = int(float(val_at_col0))
-
-        if year in EXPECTED_YEARS:
-            collected_years.add(year)
-            # Column 1: pelagic fish (1000 tons); column 2: bottom fish (1000 tons)
-            val = (float(df_fiske_old.iloc[r, 1]) + float(df_fiske_old.iloc[r, 2])) * fish_N_frac * dataset_noise.factor(key_fisk, year, sub='landings')
-
-            results.append({
-                'flow_name': flow_code, 'year': year, 'value': val,
                 'comment': 'ok', 'data_sources': 'Fiskeridirektoratet'
             })
 

@@ -113,8 +113,7 @@ def _sources(bp, sampler, wide, seen):
 
     tables = {g: bp.get_table(g).set_index(idc) for g, idc, _, _ in STANDARD_SHEETS}
     prefix_of = {g: prefix for g, _, _, prefix in STANDARD_SHEETS}
-    extra = {'animal_products': ('prod_', 'item', 'N content of animal product'),
-             'protein_food_items': ('food_protein_', 'food_group', 'Protein content of food group')}
+    extra = {'animal_products': ('prod_', 'item', 'N content of animal product')}
     for pid in sorted(seen['param']):
         group = next((g for g in tables if pid in wide.draws[g]), None)
         if group is None:

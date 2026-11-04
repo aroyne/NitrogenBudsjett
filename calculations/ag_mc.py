@@ -66,6 +66,7 @@ def execute_calculations_ag(preloaded_data, current_params, dataset_noise, curre
     _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.MM-AT.AT-Emissions-NH3', AG_MM_CRLTAP_SECTORS, 'NH3')
     _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.MM-AT.AT-Emissions-NOx', AG_MM_CRLTAP_SECTORS, 'NOx')
     _add_ag_n2o_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'AG.MM-AT.AT-Emissions-N2O', 1, 'UNFCCC_N2O_agri_manure')
+    _add_straw_ammonia_mc(results, preloaded_data, current_params, dataset_noise)
     _add_live_animal_export_mc(results, preloaded_data, current_params, dataset_noise)
     _add_N2_emissions_soil_management_mc(results, preloaded_data, current_params, dataset_noise)
 
@@ -365,6 +366,37 @@ def _add_ag_crltap_emissions_mc(results, preloaded_data, current_params, dataset
             'value': float(value),
             'comment': comment,
             'data_sources': data_sources
+        })
+
+    missing_years = EXPECTED_YEARS - collected_years
+    report_missing_years(flow_code, missing_years, results)
+
+
+def _add_straw_ammonia_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    Ammonia used to treat straw for feed. The inventory's NH3 emission from
+    straw treatment (NFR 3I, counted in AG.MM-AT.AT-Emissions-NH3) is the
+    ammonia used times the share that is not bound in the straw
+    (straw_ammonia_emitted_fraction, IIR 2025 section 5.7.2), so the ammonia
+    used is the emission divided by that share. The rest stays in the straw
+    and is eaten by the animals. Reads preloaded_data['ag_crltap_raw_lines']
+    <- data_files/webdabData1868031.txt (CRLTAP Inventory Submissions).
+    """
+    flow_code = 'MP.OP-AG.MM-Ammonia for straw treatment-NH3'
+    collected_years = set()
+    emitted_frac = float(current_params.get('straw_ammonia_emitted_fraction'))
+
+    emissions = load_crltap_emissions_to_N(
+        raw_lines=preloaded_data['ag_crltap_raw_lines'], categories=['3I'], pollutant='NH3',
+        conv_to_N=float(current_params.get('NH3_to_N_factor')), dataset_noise=dataset_noise
+    )
+    for year, value in emissions.items():
+        if year not in EXPECTED_YEARS:
+            continue
+        collected_years.add(year)
+        results.append({
+            'flow_name': flow_code, 'year': year, 'value': float(value / emitted_frac),
+            'comment': 'ok', 'data_sources': 'CRLTAP Inventory Submissions (3I); IIR 2025'
         })
 
     missing_years = EXPECTED_YEARS - collected_years

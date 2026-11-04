@@ -54,6 +54,124 @@ def find_aquaculture_production(df_aqua_modern, df_aqua_old, current_params, dat
     return aquaculture_production
 
 
+def wild_fish_catch_kt(preloaded_data):
+    """
+    Wild fish catch by Norwegian vessels (live weight, kt per year), all
+    "true fish" categories, excluding shellfish, krill and seaweed. Used for
+    HY.CW-MP.FP-Fish (wild catch)-Nmix and to extend the direct landings
+    abroad back to 1990 (find_direct_landings_not_in_exports).
+    """
+    catch = {}
+    # 'hy_art_raw' <- art.xlsx (data_loader.py DATA_MAP): Fiskeridirektoratet
+    # catch statistics by species ("Fangst fordelt på art"), 2000-2024
+    df_art = preloaded_data['hy_art_raw']
+    for col in range(2, df_art.shape[1]):
+        val_at_cell = str(df_art.iloc[0, col]).strip()
+        if val_at_cell.lower() in ['year', 'år', 'årstall', 'nan', '']:
+            continue
+        year = int(float(val_at_cell))
+        # 'Delsum' subtotal rows for pelagic fish, cod-family fish, other
+        # bottom/deep-water fish, and skates/sharks - i.e. all "true fish"
+        # categories, excluding shellfish and seaweed.
+        tonnes = sum(float(df_art.iloc[r, col]) for r in [15, 20, 26, 38]
+                     if not pd.isna(df_art.iloc[r, col]))
+        catch[year] = tonnes / 1000.0
+
+    # 'hy_fiske_old_raw' <- fiske_1990_2000.xlsx (data_loader.py DATA_MAP):
+    # historical wild catch compilation (pelagic fish, bottom fish,
+    # crustaceans, seaweed), 1990-2000. art.xlsx has complete data from 2000,
+    # so only the years before are taken from here.
+    df_old = preloaded_data['hy_fiske_old_raw']
+    for r in range(1, 11):
+        year = int(float(str(df_old.iloc[r, 0]).strip()))
+        # Column 1: pelagic fish (1000 tons); column 2: bottom fish (1000 tons)
+        catch[year] = float(df_old.iloc[r, 1]) + float(df_old.iloc[r, 2])
+    return catch
+
+
+# Catch landed directly abroad by Norwegian vessels is part of SSB's export
+# statistics (table 08801) from 2010, with data from Fiskeridirektoratet up to
+# and including 2023 and from customs declarations from 2024 (SSB, Utenrikshandel
+# med varer, "Om statistikken"). Comparing the landings in each country with
+# the exports of whole fish to the same country shows them fully included in
+# 2010-2023, missing before 2010 and only partly included in 2024.
+DIRECT_LANDINGS_FIRST_EXPORT_YEAR = 2010
+DIRECT_LANDINGS_LAST_FDIR_YEAR = 2023
+
+
+def find_direct_landings_not_in_exports(preloaded_data, current_params, dataset_noise):
+    """
+    N in catch that Norwegian vessels land directly abroad but that is not in
+    the export statistics, kt N per year. It is part of the catch flows into
+    MP.FP (HY.CW-MP.FP-Fish (wild catch)-Nmix and -Shellfish-Nmix) and leaves
+    Norway directly, so it is added to MP.FP-RW.RW-Food export-Nmix.
+
+    - Antarctic krill: all of it, every year. It is landed in Uruguay and not
+      in the export statistics.
+    - Other fish, 2000-2009: all landings abroad.
+    - Other fish, 2010-2023: nothing (included in the exports).
+    - Other fish, from 2024: per landing country, the landings minus the
+      exports of whole fish (HS 0302/0303) to that country above what was
+      exported there in 2023 beyond the 2023 landings, i.e. the other exports
+      to the country are assumed unchanged from 2023.
+    - Other fish, 1990-1999 (no landing data by nation): the 2000-2009 ratio
+      of landings abroad to the total catch of fish, times the catch.
+
+    Returns {year: (kt N, description of how the year was derived)}.
+    """
+    fish_N_frac = float(current_params.get('fish_N_frac'))
+    first_export, last_fdir = DIRECT_LANDINGS_FIRST_EXPORT_YEAR, DIRECT_LANDINGS_LAST_FDIR_YEAR
+
+    # 'fdir_landings_by_nation' <- landinger_norske_fartoy_etter_landingsnasjon.csv
+    # (data_loader.py DATA_MAP): Fiskeridirektoratet F.06.002, catch by
+    # Norwegian vessels by landing nation, tonnes, all species and krill
+    df = preloaded_data['fdir_landings_by_nation']
+    abroad = df[df['iso2'] != 'NO'].copy()
+    abroad['other_kt'] = (abroad['total_t'] - abroad['krill_t']) / 1000.0
+    krill_kt = abroad.groupby('year')['krill_t'].sum() / 1000.0
+    other_kt = abroad.groupby('year')['other_kt'].sum()
+
+    # 'whole_fish_export_by_country' <- Tab_08801_1988_2024.csv (data_loader.py,
+    # trade section): SSB 08801 exports of HS 0302/0303 by year and country, kg
+    exports = preloaded_data['whole_fish_export_by_country'] / 1e6
+    landed = abroad.set_index(['year', 'iso2'])['other_kt']
+
+    def not_in_exports(year):
+        if year < first_export:
+            return other_kt[year], 'Fiskeridirektoratet F.06.002 (all direct landings abroad)'
+        if year <= last_fdir:
+            return 0.0, 'Fiskeridirektoratet F.06.002 (krill only; other direct landings are in SSB 08801)'
+        missing = 0.0
+        for iso2, kt in landed[year].items():
+            other_exports = exports.get((last_fdir, iso2), 0.0) - landed.get((last_fdir, iso2), 0.0)
+            in_exports = max(0.0, exports.get((year, iso2), 0.0) - other_exports)
+            missing += max(0.0, kt - in_exports)
+        return missing, ('Fiskeridirektoratet F.06.002 and SSB 08801 (direct landings abroad '
+                         f'minus exports to the landing country above the {last_fdir} level)')
+
+    data_years = [y for y in sorted(other_kt.index) if y in EXPECTED_YEARS]
+    result = {}
+    for year in data_years:
+        kt, source = not_in_exports(year)
+        kt_N = (kt + krill_kt.get(year, 0.0)) * fish_N_frac
+        result[year] = (kt_N * dataset_noise.factor('Fiskeridirektoratet', year, sub='landings'), source)
+
+    # 1990-1999: ratio extrapolation from the years where all landings
+    # abroad are missing from the exports.
+    catch = wild_fish_catch_kt(preloaded_data)
+    ratio_years = [y for y in data_years if y < first_export]
+    ratio = sum(other_kt[y] for y in ratio_years) / sum(catch[y] for y in ratio_years)
+    flow_code = 'MP.FP-RW.RW-Food export-Nmix'
+    for year in sorted(y for y in EXPECTED_YEARS if y < data_years[0] and y in catch):
+        kt_N = ratio * catch[year] * fish_N_frac
+        fill = dataset_noise.fill('extrapolation', f'{flow_code}:direct landings <{data_years[0]}',
+                                  year, ratio_years)
+        result[year] = (kt_N * dataset_noise.factor('Fiskeridirektoratet', year, sub='landings') * fill,
+                        f'Filled (ratio to wild catch, from {ratio_years[0]}-{ratio_years[-1]}): '
+                        'Fiskeridirektoratet F.06.002')
+    return result
+
+
 def find_recovered_lost_fish_N(df_losses, aquaculture_production, current_params, dataset_noise):
     """
     N in farmed salmon/trout that die in the pens or are discarded at
@@ -1157,6 +1275,80 @@ UTMARK_GRAZING_SHARE_PARAMS = {
 }
 
 
+def utmark_grazing_uptake(preloaded_data, current_params, dataset_noise):
+    """
+    N in feed taken up by livestock grazing on utmark. Hegrenes & Asheim (2006,
+    Table 1.2, after Garmo & Skurdal 1998) estimate 303 mill. FEm taken up on
+    utmark in 1996 by all grazing animals, 70% by sheep, 27% by cattle, 2% by
+    goats and 1% by horses (fu_<animal>_1996). Dividing each group's share by
+    the number of animals on utmark in 1996 gives FEm per animal, which is
+    applied to every year's number of animals and converted to N via 150 g
+    protein per FEm (protein_cont_grazing) and the Jones factor.
+
+    Animal numbers are from SSB table 12660 (all animals with production
+    subsidy for at least 8 weeks on utmark up to 2008 and 5 weeks from 2009;
+    sheep include lambs; goats and horses are reported together), 1995-2025.
+    For 1990-1994 sheep are extrapolated back from 1995 with the change in
+    the number of winter-fed sheep (SSB table 03710); cattle, goats and
+    horses are held at the 1995 level.
+
+    Reindeer graze on utmark all year but are not covered by the estimate
+    above; their uptake is set equal to their N excretion in the national
+    inventory (CRT Table3.B(b), all deposited during grazing), since only a
+    small part of the N is retained in the animals.
+
+    Used for FS.OL-AG.MM-Grazing-Nmix (fs_mc.py) and to cap the manure on
+    utmark (utmark_grazing). Returns {year: (kt N, data_sources)}.
+    """
+    data_sources = 'SSB table 12660'
+    Jones = float(current_params.get("Jones_factor"))
+    protein_cont = float(current_params.get("protein_cont_grazing")) * 1e-9  # g protein/FEm -> kt protein/FEm
+
+    fem_1996 = {
+        'sauer': float(current_params.get("fu_sheep_1996")) * 1e6,
+        'storfe': float(current_params.get("fu_cattle_1996")) * 1e6,
+        'geit_og_hest': (float(current_params.get("fu_goat_1996")) + float(current_params.get("fu_horse_1996"))) * 1e6,
+    }
+
+    # 'ssb_utmark_animals_12660' <- data_files/12660_husdyr_utmarksbeite.csv
+    animals = preloaded_data['ssb_utmark_animals_12660']
+    fem_per_animal = {group: fem_1996[group] / animals.loc[1996, group] for group in fem_1996}
+
+    # Sheep in 1990-1994 follow the number of winter-fed sheep:
+    # 'ssb_sheep_numbers' <- data_files/03710_20260128-152225.xlsx (SSB table
+    # 03710). Cattle, goats and horses are held at the 1995 level, since no
+    # national series for them on utmark exists before 1995 (the organised
+    # grazing statistics grew in the early 1990s as more farmers joined
+    # grazing associations, so they do not show the number of animals).
+    df_sheep = preloaded_data['ssb_sheep_numbers'].dropna(subset=['År'])
+    sheep_index = dict(zip(df_sheep['År'].astype(int), df_sheep['Husdyr (sau)'].astype(float)))
+
+    # 'ag_prp_by_category_crt' <- UNFCCC CRT submission, Table3.B(b), N
+    # deposited during grazing per animal category (kg N/yr)
+    reindeer_kt = {year: cats['3.B.4.h.ii.'] * 1e-6
+                   for year, cats in preloaded_data['ag_prp_by_category_crt'].items()}
+
+    first_year = int(animals.index.min())
+    result = {}
+    for year in range(1990, 2026):
+        if year >= first_year:
+            n = {group: animals.loc[year, group] * dataset_noise.factor('12660', year) for group in fem_1996}
+            src = data_sources
+        else:
+            # Fill ids shared with utmark_grazing for cattle, so the same
+            # cattle numbers are used for grazing and for manure on utmark.
+            fill = {'storfe': dataset_noise.fill('carry', 'cattle on unmanaged land', year, [first_year]),
+                    'geit_og_hest': dataset_noise.fill('carry', 'goats and horses on unmanaged land', year, [first_year]),
+                    'sauer': dataset_noise.fill('extrapolation', 'sheep on unmanaged land', year, [first_year])}
+            n = {group: animals.loc[first_year, group] * dataset_noise.factor('12660', first_year) * fill[group] for group in fem_1996}
+            n['sauer'] *= sheep_index[year] / sheep_index[first_year]
+            src = 'Filled (held at 1995; sheep extrapolated with SSB table 03710): SSB table 12660'
+        fem = sum(n[group] * fem_per_animal[group] for group in fem_1996)
+        value = fem * protein_cont / Jones + reindeer_kt.get(year, 0.0) * dataset_noise.factor('UNFCCC_manure_applied', year)
+        result[year] = (value, src)
+    return result
+
+
 def utmark_grazing(preloaded_data, current_params, dataset_noise):
     """
     Manure deposited by grazing animals on utmark (unmanaged land) and the
@@ -1179,6 +1371,11 @@ def utmark_grazing(preloaded_data, current_params, dataset_noise):
     leaching) use the inventory's own fractions and emission factors for
     grazing manure in CRT Table3.D.
 
+    The manure on utmark is at most the feed N taken up on utmark
+    (utmark_grazing_uptake) minus the share retained in growth, milk and
+    wool (grazing_N_retention). Where the cap applies, the rest of the PRP
+    goes to innmark, so the total stays equal to the inventory's PRP.
+
     Returns {year: {'utmark_frac', 'manure', 'leaching', 'n2o'}}.
     """
     # 'ag_manure_prp_crt'/'ag_prp_loss_params_crt'/'ag_prp_by_category_crt'
@@ -1197,6 +1394,8 @@ def utmark_grazing(preloaded_data, current_params, dataset_noise):
     utmark_animals = preloaded_data['ssb_utmark_animals_12660']
     weeks_cattle = float(current_params.get("utmark_grazing_weeks_cattle"))
     first_count_year = int(utmark_animals.index.min())
+    uptake = utmark_grazing_uptake(preloaded_data, current_params, dataset_noise)
+    retention = float(current_params.get("grazing_N_retention"))
 
     result = {}
     for year, prp_t in prp_values.items():
@@ -1206,11 +1405,16 @@ def utmark_grazing(preloaded_data, current_params, dataset_noise):
                         / sum(pop for pop, _ in excr.values()))  # kg N/head/yr
         n_cattle = utmark_animals.loc[max(year, first_count_year), 'storfe']
         if year < first_count_year:
-            n_cattle *= dataset_noise.fill('carry', 'utmark cattle', year, [first_count_year])
+            n_cattle *= dataset_noise.fill('carry', 'cattle on unmanaged land', year, [first_count_year])
         cattle_prp = sum(cats[c] for c in CATTLE_PRP_CATEGORIES)
         cattle_utmark = min(n_cattle * nex_per_head * weeks_cattle / 52.0, cattle_prp)  # kg N
         utmark_kg = sum(cats[c] * shares[c] for c in shares) + cattle_utmark
         utmark_frac = utmark_kg / (sum(cats[c] for c in shares) + cattle_prp)
+        # The AG.MM-FS.OL flow is manure * the 'UNFCCC_manure_applied' factor
+        # (ag_mc.py), so the cap is set on that value.
+        manure_factor = dataset_noise.factor('UNFCCC_manure_applied', year)
+        cap_frac = (1.0 - retention) * uptake[year][0] / (prp_t * 1.0e-3 * manure_factor)
+        utmark_frac = min(utmark_frac, cap_frac)
         prm = loss_params[year]
         manure = prp_t * utmark_frac * 1.0e-3  # t N -> kt N
         leaching = manure * prm['frac_leach']

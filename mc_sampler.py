@@ -253,7 +253,7 @@ class MCSampler:
 
     self.draws maps group -> {key: (nsim,) array}. Groups: the sheet names in
     STANDARD_SHEETS, 'dataset_uncertainties', 'crltap_uncertainties',
-    'trade_parameters', 'animal_products' and 'protein_food_items'.
+    'trade_parameters' and 'animal_products'.
     """
 
     def __init__(self, base_params, trade_params, nsim, seed=DEFAULT_SEED):
@@ -330,17 +330,6 @@ class MCSampler:
             add(group, f"prod_{item_id}", val,
                 _draw_row(seed, group, item_id, n_random, val, row))
 
-        # protein_food_items: 'uncertainty' is +/- percent (95% interval), lognormal.
-        group = 'protein_food_items'
-        df = base_params.get_table(group)
-        ids = df['food_group'].astype(str).str.strip()
-        _check_unique(group, ids)
-        for item_id, (_, row) in zip(ids, df.iterrows()):
-            val = float(row['protein_content'])
-            u = row['uncertainty']
-            rnd = draw_values(item_rng(seed, group, item_id), n_random, val, u, u, 'perc', 'log-normal')
-            add(group, f"food_protein_{item_id}", val, rnd)
-
     def iteration(self, i):
         """
         Returns (param_overrides, dataset_noise, trade_factors) for iteration
@@ -348,7 +337,7 @@ class MCSampler:
         param_overrides goes to NParameters.override_global_params.
         """
         param_overrides = {}
-        for group in [g for g, *_ in STANDARD_SHEETS] + ['animal_products', 'protein_food_items']:
+        for group in [g for g, *_ in STANDARD_SHEETS] + ['animal_products']:
             for key, arr in self.draws[group].items():
                 param_overrides[key] = float(arr[i])
         noise = {k: float(a[i]) for k, a in self.draws['dataset_uncertainties'].items()}

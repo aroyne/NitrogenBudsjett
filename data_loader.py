@@ -27,7 +27,19 @@ warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl.workshe
 # that are left out as reporting errors (AnleggNummer, year):
 # - Biomar fôrfabrikk, Myre, 2022: 574 t N to the municipal network, against
 #   0.065 t in 2023 and 3.9 t in 2024; most likely reported in kg as tonnes.
-REJECTED_EMISSION_REPORTS = {('1868.0003.01', 2022)}
+# - Single years 5-10 times higher than every other year of the same
+#   facility: Sildeslakteriet på Uthaug 2013 (374 t, against 6-47 t in
+#   2014-2024), Nortura Steinkjer 2017 (204 t, 2-46 t other years), Norsk
+#   Protein Stranda 2004 (168 t, 0-39 t), Findus Tønsberg 2001 (66 t, 1-41 t)
+#   and Nor Tekstilservice 2010 (306 t, 0 t in 2011-2014).
+REJECTED_EMISSION_REPORTS = {
+    ('1868.0003.01', 2022),
+    ('5057.0057.01', 2013),
+    ('5006.0033.01', 2017),
+    ('1525.0006.01', 2004),
+    ('3905.0059.01', 2001),
+    ('5027.0001.01', 2010),
+}
 
 # SSB table 06913: population on 1 January, one row per year (1951-2025).
 POPULATION_FILE = 'data_files/06913_20251113-124117.xlsx'
@@ -188,12 +200,23 @@ def load_all_data(selected_pools):
         'fao_live_animals_all': ({'ag', 'rw'}, 'data_files/FAOSTAT_data_en_9-24-2026-3.csv', 'csv_live_animals', {}),
         'teotil2_national': ({'hy','fs','hs'}, 'data_files/teotil2_nasjonale_totaler.csv', 'csv', {}),
         'hy_teotil3': ({'hy','fs','hs'}, 'data_files/teotil3_n_summary.xlsx', 'openpyxl_teotil', {}),
-        'hy_art_raw': ({'hy'}, 'data_files/art.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Sheet 1'}),
-        'hy_fiske_old_raw': ({'hy'}, 'data_files/fiske_1990_2000.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Ark1'}),
+        'hy_art_raw': ({'hy', 'mp'}, 'data_files/art.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Sheet 1'}),
+        'hy_fiske_old_raw': ({'hy', 'mp'}, 'data_files/fiske_1990_2000.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Ark1'}),
+        # Fiskeridirektoratet F.06.002, catch by Norwegian vessels by landing
+        # nation (all species and Antarctic krill), 2000-2025, downloaded by
+        # data_files/fiskeridir_landinger_utland.py
+        'fdir_landings_by_nation': ({'mp'}, 'data_files/landinger_norske_fartoy_etter_landingsnasjon.csv', 'csv', {}),
         'avlop_sewage': ({'hy', 'pr'}, 'data_files/05280_20251113-113329.xlsx', 'openpyxl_sewage', {}),
         'ag_gnb': ({'ag','mp'}, 'data_files/aei_pr_gnb__custom_18744910_spreadsheet.xlsx', 'openpyxl_gnb', {}),
         # SSB 12660, livestock on utmarksbeite (all animals with production subsidy for
         # utmark grazing), national totals 1995-2025, downloaded from the SSB API
+        # SSB hunting statistics (tables 10817, 10818, 10820, 06036, 06037,
+        # 03947): carcass weight and number of big game shot per season,
+        # downloaded by data_files/ssb_jaktstatistikk.py
+        # Helsedirektoratet, Utviklingen i norsk kosthold: protein in the food
+        # supply at wholesale level, g per person per day (compiled by hand)
+        'helsedir_engros_protein': ({'mp'}, 'data_files/helsedir_engros_protein.csv', 'csv', {'index_col': 'year'}),
+        'ssb_hunting': ({'fs'}, 'data_files/jaktstatistikk_storvilt.csv', 'csv', {'index_col': 'year'}),
         'ssb_utmark_animals_12660': ({'fs','ag'}, 'data_files/12660_husdyr_utmarksbeite.csv', 'csv', {'index_col': 'year'}),
         # SSB 05982, "Jordbruksareal i drift" (daa), 1969-2025 with 1990-1998 missing,
         # downloaded from the SSB API
@@ -243,12 +266,9 @@ def load_all_data(selected_pools):
         'ssb_05282': ({'hs','mp','pr'}, 'data_files/05282_20260211-091021.xlsx', 'openpyxl_single_sheet', {'sheet_name': '05282'}),
         'ssb_05543_raw': ({'mp'}, 'data_files/05543_20251217-111610.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Areal'}),
         'ssb_06913': ({'mp', 'hs', 'pr'}, POPULATION_FILE, 'excel_population', {}),
-        'ssb_06376': ({'mp'}, 'data_files/06376_20260129-155937.xlsx', 'excel_ssb_generic', {'sheet': '06376'}),
-        'ssb_10249': ({'mp'}, 'data_files/10249_20260129-155747.xlsx', 'excel_ssb_generic', {'sheet': '10249'}),
         'ssb_waste_10513': ({'pr', 'mp'}, 'data_files/10513_20260916-120243.xlsx', 'openpyxl_single_sheet', {'sheet_name': '10513'}),
         'ssb_10514': ({'hs','mp','pr'}, 'data_files/10514_20260916-101643.xlsx', 'openpyxl_single_sheet', {'sheet_name': '10514'}),
         'ssb_waste_12359': ({'pr'}, 'data_files/12359_20251211-153434.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Mengde'}),
-        'ssb_13695': ({'mp'}, 'data_files/13695_20260916-120402.xlsx', 'excel_ssb_generic', {'sheet': '13695'}),
         'ssb_bio_08205': ({'mp'}, 'data_files/08205_20251104-141305.xlsx', 'excel_ssb_generic', {'sheet': 'Energibruk'}),
         # SSB 11561, "12.1 Industri og bergverk" x "Faste biobrensler" (GWh), 1990-2025,
         # downloaded from the SSB API; extends table 08205's self-produced bioenergy back to 1990
@@ -288,6 +308,14 @@ def load_all_data(selected_pools):
             left_on='HS_code_str', right_on='varenr_str', how='inner'
         )
         preloaded['compressed_trade_volume'] = df_prepared_all.groupby(['year', 'impeks', 'type', 'konv'])['amount'].sum().reset_index()
+        # Exports of whole fresh and frozen fish (HS 0302 and 0303) by
+        # country, kg: compared with the catch Norwegian vessels land directly
+        # in each country (shared_flow_calculations.find_direct_landings_not_in_exports).
+        hs = df_trade_raw['HS_code_str']
+        is_fish_export = (df_trade_raw['impeks'].astype(str).str.strip().isin(['2', '2.0'])
+                          & (hs.str.startswith('0302') | hs.str.startswith('0303')))
+        preloaded['whole_fish_export_by_country'] = (
+            df_trade_raw[is_fish_export].groupby(['year', 'country'])['amount'].sum())
 
     # =========================================================================
     # 3. GENERIC LOADING, DRIVEN BY THE MAP ABOVE

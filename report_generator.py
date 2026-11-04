@@ -651,7 +651,8 @@ def build_landing_page(output_filename, current_date_str, bib_filename, target_f
                 "we only consider the Norwegian mainland. For emissions to air reported through the UNFCCC framework we "
                 "also include emissions from Norwegian economic activity on Svalbard (these are minor and mainly related to coal extraction, "
                 "which has now been discontinued). We also include emissions and N flows that originate in petroleum extraction on the Norwegian "
-                "continental shelf.\n")
+                "continental shelf."
+                " The wild catch is an exception: the catch statistics cover all catch by Norwegian vessels, wherever it is taken. In 2018–2024, 58–74 % was taken in the Norwegian economic zone; the rest came from the zones of other countries, international waters in the North-East Atlantic and, at 8–14 %, Antarctic krill from the Southern Ocean. Coastal water (HY.CW) is therefore treated as a boundary node, like the rest of the world (see [Coastal Water (HY.CW)](hydrosphere_pool/subpool_coastal_water.html)).\n")
         append_bibtex_references(f, bib_filename)
         
         

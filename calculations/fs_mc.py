@@ -7,13 +7,15 @@ grazing on utmark, and the NH3, NOx and N2O from manure deposited by grazing
 animals on utmark. Other FS.OL emissions (N2, and NOx/N2O from the soils
 themselves) are neglected, see forests_and_semi_natural_pool/subpool_other_land.md.
 """
+import pandas as pd
+
 from calculations.utils import (
     EXPECTED_YEARS,
     report_missing_years,
     add_flat_carryforward_year,
     load_crltap_emissions_to_N
 )
-from calculations.shared_flow_calculations import find_industrial_round_wood, find_teotil2_bias_corrected, utmark_grazing
+from calculations.shared_flow_calculations import find_industrial_round_wood, find_teotil2_bias_corrected, utmark_grazing, utmark_grazing_uptake
 
 def execute_calculations_fs(preloaded_data, current_params, dataset_noise):
     """
@@ -30,6 +32,7 @@ def execute_calculations_fs(preloaded_data, current_params, dataset_noise):
     _add_fuel_wood_for_heat_plants_mc(results, preloaded_data, current_params, dataset_noise)
     _add_land_leaching_mc(results, preloaded_data, current_params, dataset_noise, 'FS.OL-HY.SW-Leaching-Nmix', 'OL_leaching_bg_fraction', 8)
     _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise)
+    _add_game_meat_mc(results, preloaded_data, current_params, dataset_noise)
     _add_utmark_grazing_emissions_mc(results, preloaded_data, current_params, dataset_noise)
 
     return results
@@ -282,79 +285,88 @@ def _add_fuel_wood_for_heat_plants_mc(results, preloaded_data, current_params, d
 
 
 
+def _add_game_meat_mc(results, preloaded_data, current_params, dataset_noise):
+    """
+    N in meat from big game shot in ordinary hunting, eaten in households.
+    Moose, red deer and roe deer are counted from forest (FS.FO), wild
+    reindeer from other land (FS.OL). Small game is left out (a few hundred
+    tonnes of meat per year, well below 0.01 kt N).
+
+    'ssb_hunting' <- jaktstatistikk_storvilt.csv (data_loader.py DATA_MAP,
+    downloaded by data_files/ssb_jaktstatistikk.py): SSB calculated total
+    carcass weight of moose and red deer (tables 10817, 10818, from the
+    1998-1999 season) and wild reindeer (10820, from 1986-1987), and the
+    number of moose, red deer and roe deer shot (06036, 06037, 03947). Each
+    season is assigned to the year it starts.
+
+    Before 1998 moose and red deer are the number shot times the average
+    carcass weight per animal shot in 1998-2002. Roe deer are the number shot
+    times roe_deer_carcass_weight; the 2016 season, which is missing in
+    table 03947, is interpolated, and the 2023 and 2024 seasons, which are
+    not yet in the table, are held at the 2022 level.
+    """
+    df = preloaded_data['ssb_hunting']
+    n_frac = float(current_params.get('game_meat_N_frac'))
+    roe_weight_t = float(current_params.get('roe_deer_carcass_weight')) / 1000.0
+    key = 'SSB_jaktstatistikk'
+
+    first_carcass = int(df['elg_slaktevekt_t'].first_valid_index())
+    calib = list(range(first_carcass, first_carcass + 5))
+    weight_per_animal = {sp: df.loc[calib, f'{sp}_slaktevekt_t'].sum() / df.loc[calib, f'{sp}_felt'].sum()
+                         for sp in ('elg', 'hjort')}
+    last_roe = int(df['radyr_felt'].last_valid_index())
+
+    forest, other = {}, {}
+    for year in sorted(EXPECTED_YEARS):
+        if year not in df.index:
+            continue
+        sources = []
+        tonnes = 0.0
+        for sp in ('elg', 'hjort'):
+            if year >= first_carcass:
+                tonnes += df.loc[year, f'{sp}_slaktevekt_t']
+            else:
+                fill = dataset_noise.fill('extrapolation', f'game meat {sp} <{first_carcass}', year, calib)
+                tonnes += df.loc[year, f'{sp}_felt'] * weight_per_animal[sp] * fill
+                sources.append(f'Filled (number shot times carcass weight per animal, from {calib[0]}-{calib[-1]})')
+        if pd.notna(df.loc[year, 'radyr_felt']):
+            tonnes += df.loc[year, 'radyr_felt'] * roe_weight_t
+        elif year < last_roe:
+            # A season missing inside the series (2016): linear interpolation
+            # between the neighbouring seasons.
+            roe = df['radyr_felt'].dropna()
+            before = max(y for y in roe.index if y < year)
+            after = min(y for y in roe.index if y > year)
+            n_roe = roe[before] + (roe[after] - roe[before]) * (year - before) / (after - before)
+            fill = dataset_noise.fill('interpolation', f'game meat roe deer {before}-{after}', year, [before, after])
+            tonnes += n_roe * roe_weight_t * fill
+            sources.append(f'Filled (roe deer interpolated between {before} and {after})')
+        else:
+            fill = dataset_noise.fill('carry', f'game meat roe deer {last_roe}+', year, [last_roe])
+            tonnes += df.loc[last_roe, 'radyr_felt'] * roe_weight_t * fill
+            sources.append(f'Filled (roe deer held at {last_roe})')
+        factor = dataset_noise.factor(key, year)
+        src = '; '.join(sorted(set(sources)) + ['SSB hunting statistics'])
+        forest[year] = (tonnes * 1e-3 * n_frac * factor, src)
+        if pd.notna(df.loc[year, 'villrein_slaktevekt_t']):
+            other[year] = (df.loc[year, 'villrein_slaktevekt_t'] * 1e-3 * n_frac * factor, 'SSB hunting statistics')
+
+    for flow_code, values in (('FS.FO-HS.HS-Game meat-Nmix', forest), ('FS.OL-HS.HS-Game meat-Nmix', other)):
+        for year, (value, src) in values.items():
+            results.append({'flow_name': flow_code, 'year': year, 'value': float(value),
+                            'comment': 'ok', 'data_sources': src})
+        report_missing_years(flow_code, EXPECTED_YEARS - set(values), results)
+
+
 def _add_ol_grazing_mc(results, preloaded_data, current_params, dataset_noise):
-    """
-    Feed taken up by livestock grazing on utmark. Hegrenes & Asheim (2006,
-    Table 1.2, after Garmo & Skurdal 1998) estimate 303 mill. FEm taken up on
-    utmark in 1996 by all grazing animals, 70% by sheep, 27% by cattle, 2% by
-    goats and 1% by horses (fu_<animal>_1996). Dividing each group's share by
-    the number of animals on utmark in 1996 gives FEm per animal, which is
-    applied to every year's number of animals and converted to N via 150 g
-    protein per FEm (protein_cont_grazing) and the Jones factor.
-
-    Animal numbers are from SSB table 12660 (all animals with production
-    subsidy for at least 8 weeks on utmark up to 2008 and 5 weeks from 2009;
-    sheep include lambs; goats and horses are reported together), 1995-2025.
-    For 1990-1994 sheep are extrapolated back from 1995 with the change in
-    the number of winter-fed sheep (SSB table 03710); cattle, goats and
-    horses are held at the 1995 level.
-
-    Reindeer graze on utmark all year but are not covered by the estimate
-    above; their uptake is set equal to their N excretion in the national
-    inventory (CRT Table3.B(b), all deposited during grazing), since only a
-    small part of the N is retained in the animals.
-    """
+    """Feed taken up by livestock grazing on utmark; see utmark_grazing_uptake
+    in shared_flow_calculations.py."""
     flow_code = 'FS.OL-AG.MM-Grazing-Nmix'
     collected_years = set()
-    data_sources = 'SSB table 12660'
-    Jones = float(current_params.get("Jones_factor"))
-    protein_cont = float(current_params.get("protein_cont_grazing")) * 1e-9  # g protein/FEm -> kt protein/FEm
-
-    fem_1996 = {
-        'sauer': float(current_params.get("fu_sheep_1996")) * 1e6,
-        'storfe': float(current_params.get("fu_cattle_1996")) * 1e6,
-        'geit_og_hest': (float(current_params.get("fu_goat_1996")) + float(current_params.get("fu_horse_1996"))) * 1e6,
-    }
-
-    # 'ssb_utmark_animals_12660' <- data_files/12660_husdyr_utmarksbeite.csv
-    animals = preloaded_data['ssb_utmark_animals_12660']
-    fem_per_animal = {group: fem_1996[group] / animals.loc[1996, group] for group in fem_1996}
-
-    # Sheep in 1990-1994 follow the number of winter-fed sheep:
-    # 'ssb_sheep_numbers' <- data_files/03710_20260128-152225.xlsx (SSB table
-    # 03710). Cattle, goats and horses are held at the 1995 level, since no
-    # national series for them on utmark exists before 1995 (the organised
-    # grazing statistics grew in the early 1990s as more farmers joined
-    # grazing associations, so they do not show the number of animals).
-    df_sheep = preloaded_data['ssb_sheep_numbers'].dropna(subset=['År'])
-    sheep_index = dict(zip(df_sheep['År'].astype(int), df_sheep['Husdyr (sau)'].astype(float)))
-
-    # 'ag_prp_by_category_crt' <- UNFCCC CRT submission, Table3.B(b), N
-    # deposited during grazing per animal category (kg N/yr)
-    reindeer_kt = {year: cats['3.B.4.h.ii.'] * 1e-6
-                   for year, cats in preloaded_data['ag_prp_by_category_crt'].items()}
-
-    first_year = int(animals.index.min())
-    for year in range(1990, 2026):
-        if year >= first_year:
-            n = {group: animals.loc[year, group] * dataset_noise.factor('12660', year) for group in fem_1996}
-            src = data_sources
-        else:
-            # Fill ids shared with utmark_grazing for cattle, so the same
-            # cattle numbers are used for grazing and for manure on utmark.
-            fill = {'storfe': dataset_noise.fill('carry', 'utmark cattle', year, [first_year]),
-                    'geit_og_hest': dataset_noise.fill('carry', 'utmark goats and horses', year, [first_year]),
-                    'sauer': dataset_noise.fill('extrapolation', 'utmark sheep', year, [first_year])}
-            n = {group: animals.loc[first_year, group] * dataset_noise.factor('12660', first_year) * fill[group] for group in fem_1996}
-            n['sauer'] *= sheep_index[year] / sheep_index[first_year]
-            src = 'Filled (held at 1995; sheep extrapolated with SSB table 03710): SSB table 12660'
-        fem = sum(n[group] * fem_per_animal[group] for group in fem_1996)
+    for year, (value, src) in utmark_grazing_uptake(preloaded_data, current_params, dataset_noise).items():
         collected_years.add(year)
-        results.append({
-            'flow_name': flow_code, 'year': year,
-            'value': fem * protein_cont / Jones + reindeer_kt.get(year, 0.0) * dataset_noise.factor('UNFCCC_manure_applied', year),
-            'comment': 'ok', 'data_sources': src
-        })
+        results.append({'flow_name': flow_code, 'year': year, 'value': value,
+                        'comment': 'ok', 'data_sources': src})
 
     missing_years = EXPECTED_YEARS - collected_years
     report_missing_years(flow_code, missing_years, results)

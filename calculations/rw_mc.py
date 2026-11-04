@@ -114,7 +114,6 @@ def _add_animal_feed_import_mc(results, preloaded_data, current_params, dataset_
     global_dom_frac_fallback = float(current_params.get(param_key_dom_frac))
     
     key_kraft = 'Kraftforstatistikk'
-    key_total = 'Totalkalkylen'
 
     # Newer years (Landbruksdirektoratet), 2000 onward.
     N_cont_sum = 0
@@ -163,7 +162,7 @@ def _add_animal_feed_import_mc(results, preloaded_data, current_params, dataset_
             collected_years.add(year)
             
             base_feed_tonn = float(row['value'])                
-            feed_tonn = base_feed_tonn * dataset_noise.factor(key_total, year, sub='concentrate')
+            feed_tonn = base_feed_tonn * dataset_noise.factor('Totalkalkylen_concentrate', year)
             
             # 'dom_frac' (domestically produced fraction) is reported directly
             # for 1985-1994; later years fall back to the cross-year average.
