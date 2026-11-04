@@ -301,13 +301,16 @@ FODDER_CROPS = ['AG.SM-AG.MM-Fodder crops-Nmix']  # includes innmark grazing, se
 FARM_ANIMAL_FEED = ['MP.FP-AG.MM-Farm animal feed-Nmix']
 FEED_IMPORT = ['RW.RW-AG.MM-Animal feed import-Nmix']  # terrestrial livestock feed only, not aquafeed
 FOOD_IMPORT = ['RW.RW-MP.FP-Food import-Nmix']  # soybeans are not part of it; they enter as feed via soy meal
+# Ammonia used to treat straw for feed: newly fixed N from outside agriculture,
+# counted as an input like mineral fertilizer (about half of it is emitted as NH3).
+STRAW_AMMONIA = ['MP.OP-AG.MM-Ammonia for straw treatment-NH3']
 
 FOOD_CROP_PRODUCTS = ['AG.SM-MP.FP-Food crop products-Nmix']
 INDUSTRIAL_CROP_PRODUCTS = ['AG.SM-MP.OP-Crop products for industrial use-Nmix']
 ANIMAL_PRODUCTS = ['AG.MM-MP.FP-Animal products-Nmix']
 NON_EDIBLE_ANIMAL_PRODUCTS = ['AG.MM-MP.OP-Non-edible animal products-Nmix']
 
-FOOD_PRODUCTS_CONSUMED = ['MP.FP-HS.HS-Food products-Nmix']  # national consumption, SSB-based
+FOOD_PRODUCTS_CONSUMED = ['MP.FP-HS.HS-Food products-Nmix']  # national consumption, wholesale-level food supply
 FOOD_EXPORT_TOTAL = ['MP.FP-RW.RW-Food export-Nmix']  # includes fish - see food_export_excluding_fish()
 
 # Wild catch and aquaculture feed, used only by the fish/aquaculture-included
@@ -384,8 +387,7 @@ def food_import_non_fish_share(years=ANALYSIS_YEARS):
 # investigation, not for the NUE ratios themselves.
 MM_IN_FULL = FODDER_CROPS + GRAZING_UTMARK + FARM_ANIMAL_FEED + FEED_IMPORT + [
     'RW.RW-AG.MM-Live animal import-Nmix',
-    'MP.OP-AG.MM-Ammonia for straw treatment-NH3',
-]
+] + STRAW_AMMONIA
 MM_OUT_FULL = MANURE_APPLICATION + [
     'AG.MM-AT.AT-Emissions-N2O', 'AG.MM-AT.AT-Emissions-NH3', 'AG.MM-AT.AT-Emissions-NOx',
     'AG.MM-HY.SW-Leaching-Nmix',
@@ -410,7 +412,7 @@ SM_OUT_FULL = FODDER_CROPS + [
 def q1a_ag_whole_nue(df, years=ANALYSIS_YEARS):
     """AG as a whole, external flows only (AG.SM<->AG.MM internal transfers
     excluded to avoid double counting)."""
-    inp = sum_flows(df, FERTILIZER_SM + DEPOSITION_SM + GRAZING_UTMARK + BNF_SM + FEED_IMPORT, years)
+    inp = sum_flows(df, FERTILIZER_SM + DEPOSITION_SM + GRAZING_UTMARK + BNF_SM + FEED_IMPORT + STRAW_AMMONIA, years)
     out = sum_flows(df, FOOD_CROP_PRODUCTS + INDUSTRIAL_CROP_PRODUCTS + ANIMAL_PRODUCTS + NON_EDIBLE_ANIMAL_PRODUCTS, years)
     return 100 * out / inp
 
@@ -419,7 +421,7 @@ def q1b_ag_mm_nue(df, years=ANALYSIS_YEARS):
     """AG.MM alone. Feed counted in full as input since the subsystem is
     viewed in isolation here; manure deliberately excluded (it comes from the
     animals, not into them)."""
-    inp = sum_flows(df, FODDER_CROPS + FARM_ANIMAL_FEED + FEED_IMPORT + GRAZING_UTMARK, years)
+    inp = sum_flows(df, FODDER_CROPS + FARM_ANIMAL_FEED + FEED_IMPORT + GRAZING_UTMARK + STRAW_AMMONIA, years)
     out = sum_flows(df, ANIMAL_PRODUCTS + NON_EDIBLE_ANIMAL_PRODUCTS, years)
     return 100 * out / inp
 
@@ -474,7 +476,7 @@ def q2_corrected_ag_whole_nue(df, years=ANALYSIS_YEARS):
     sm_nue_frac = q1c_ag_sm_nue(df, years) / 100.0
     sm_n_cost = 1.0 / sm_nue_frac  # Bleken & Bakken style N-cost = input/output
 
-    inp_excl_feed = sum_flows(df, FERTILIZER_SM + DEPOSITION_SM + GRAZING_UTMARK + BNF_SM, years)
+    inp_excl_feed = sum_flows(df, FERTILIZER_SM + DEPOSITION_SM + GRAZING_UTMARK + BNF_SM + STRAW_AMMONIA, years)
     feed_import = flow_series(df, FEED_IMPORT[0], years)
     corrected_inp = inp_excl_feed + feed_import * sm_n_cost
 
@@ -537,7 +539,7 @@ def q3_food_system_nue(df, years=ANALYSIS_YEARS):
     """N_food = domestic consumption + non-fish food export, i.e. all food
     the system produced whether it was eaten domestically or exported (fish
     export excluded - see food_export_excluding_fish())."""
-    denom = (sum_flows(df, FERTILIZER_SM + BNF_SM + DEPOSITION_SM + FEED_IMPORT, years)
+    denom = (sum_flows(df, FERTILIZER_SM + BNF_SM + DEPOSITION_SM + FEED_IMPORT + STRAW_AMMONIA, years)
              + sum_flows(df, FOOD_IMPORT, years) * food_import_non_fish_share(years))
     n_food = flow_series(df, FOOD_PRODUCTS_CONSUMED[0], years) + food_export_excluding_fish(years)
     return 100 * n_food / denom
@@ -553,7 +555,7 @@ def q3_food_system_nue_incl_fish(df, years=ANALYSIS_YEARS):
     food_export_excluding_fish()."""
     denom = sum_flows(
         df,
-        FERTILIZER_SM + BNF_SM + DEPOSITION_SM + FEED_IMPORT + FOOD_IMPORT
+        FERTILIZER_SM + BNF_SM + DEPOSITION_SM + FEED_IMPORT + STRAW_AMMONIA + FOOD_IMPORT
         + WILD_CATCH + AQUACULTURE_FEED,
         years,
     )
