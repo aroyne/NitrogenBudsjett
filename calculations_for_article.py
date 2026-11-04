@@ -384,6 +384,7 @@ def food_import_non_fish_share(years=ANALYSIS_YEARS):
 # investigation, not for the NUE ratios themselves.
 MM_IN_FULL = FODDER_CROPS + GRAZING_UTMARK + FARM_ANIMAL_FEED + FEED_IMPORT + [
     'RW.RW-AG.MM-Live animal import-Nmix',
+    'MP.OP-AG.MM-Ammonia for straw treatment-NH3',
 ]
 MM_OUT_FULL = MANURE_APPLICATION + [
     'AG.MM-AT.AT-Emissions-N2O', 'AG.MM-AT.AT-Emissions-NH3', 'AG.MM-AT.AT-Emissions-NOx',
@@ -670,6 +671,7 @@ def nox_emissions_per_capita(df, years=ANALYSIS_YEARS):
 # (utils_stat.process_and_export_mc_results), since they cancel within EF.
 EF_IN_FULL = [
     'FS.FO-EF.OE-Fuel wood for households-Nmix',
+    'FS.FO-EF.EC-Fuel wood for co-fired power plants-Nmix',
     'MP.OP-EF.IC-Industrial waste fuels-Nmix',
     'PR.SO-EF.EC-Waste to energy-Nmix',
     'RW.RW-EF.EC-Fuel import-Nmix',
@@ -953,6 +955,8 @@ def pool_balance(df, prefix, years=ANALYSIS_YEARS):
 HS_IN_FULL = [
     'AT.AT-HS.HS-Deposition-OXN', 'AT.AT-HS.HS-Deposition-RDN',
     'MP.FP-HS.HS-Food products-Nmix',
+    'FS.FO-HS.HS-Game meat-Nmix',
+    'FS.OL-HS.HS-Game meat-Nmix',
     'MP.OP-HS.HS-Consumer goods-Nmix',
     'MP.OP-HS.HS-Mineral fertilizer-Nmix',
     'PR.SO-HS.HS-Biologically treated organic waste-Nmix',

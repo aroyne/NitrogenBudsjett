@@ -425,18 +425,24 @@ def household_waste_shares_table():
     return "\n".join(out)
 
 
-def check_ag_balances(df):
-    """The generic pool_balance and the explicit AG.MM/AG.SM flow lists in
-    calculations_for_article.py must give the same balance."""
-    for prefix, explicit in (('AG.MM', cfa.ag_mm_balance), ('AG.SM', cfa.ag_sm_balance)):
-        diff = (cfa.pool_balance(df, prefix) - explicit(df)).abs().max()
-        if diff > 1e-9:
-            raise ValueError(f"pool_balance('{prefix}') differs from the explicit flow list by up to {diff:.3g} kt N")
+def check_balances(df):
+    """The explicit inflow/outflow lists in calculations_for_article.py
+    (*_IN_FULL/*_OUT_FULL) must contain every flow the model has across the
+    subpool boundary, so that a new flow is not left out of the balances."""
+    lists = {'AG.MM': (cfa.MM_IN_FULL, cfa.MM_OUT_FULL), 'AG.SM': (cfa.SM_IN_FULL, cfa.SM_OUT_FULL),
+             'MP.FP': (cfa.MP_FP_IN_FULL, cfa.MP_FP_OUT_FULL), 'HS': (cfa.HS_IN_FULL, cfa.HS_OUT_FULL),
+             'EF': (cfa.EF_IN_FULL, cfa.EF_OUT_FULL), 'PR.SO': (cfa.PR_SO_IN_FULL, cfa.PR_SO_OUT_FULL),
+             'PR.WW': (cfa.PR_WW_IN_FULL, cfa.PR_WW_OUT_FULL)}
+    for prefix, (inflows, outflows) in lists.items():
+        model_in, model_out = set(cfa._pool_flows(df, prefix, 'in')), set(cfa._pool_flows(df, prefix, 'out'))
+        if model_in != set(inflows) or model_out != set(outflows):
+            raise ValueError(f"{prefix}: explicit flow lists differ from the model's flows: "
+                             f"{sorted(model_in ^ set(inflows))} {sorted(model_out ^ set(outflows))}")
 
 
 def main():
     df = cfa.load_stats()
-    check_ag_balances(df)
+    check_balances(df)
     sims = cfa.load_raw_simulations(all_flows=True)
     head = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'], capture_output=True, text=True).stdout.strip()
     stats_time = datetime.datetime.fromtimestamp(os.path.getmtime(cfa.STATS_FILE)).strftime('%Y-%m-%d %H:%M')
