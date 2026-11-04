@@ -111,7 +111,9 @@ def find_direct_landings_not_in_exports(preloaded_data, current_params, dataset_
     - Other fish, 2000-2009: all landings abroad.
     - Other fish, 2010-2023: nothing (included in the exports).
     - Other fish, from 2024: per landing country, the landings minus the
-      exports of whole fish (HS 0302/0303) to that country above what was
+      exports of whole fish and industrial fish (HS 0302/0303 and 0511.9111;
+      the direct landings are recorded as industrial fish from 2024) to that
+      country above what was
       exported there in 2023 beyond the 2023 landings, i.e. the other exports
       to the country are assumed unchanged from 2023.
     - Other fish, 1990-1999 (no landing data by nation): the 2000-2009 ratio

@@ -308,12 +308,14 @@ def load_all_data(selected_pools):
             left_on='HS_code_str', right_on='varenr_str', how='inner'
         )
         preloaded['compressed_trade_volume'] = df_prepared_all.groupby(['year', 'impeks', 'type', 'konv'])['amount'].sum().reset_index()
-        # Exports of whole fresh and frozen fish (HS 0302 and 0303) by
+        # Exports of whole fresh and frozen fish (HS 0302 and 0303) and of
+        # industrial fish not fit for human consumption (HS 0511.9111) by
         # country, kg: compared with the catch Norwegian vessels land directly
         # in each country (shared_flow_calculations.find_direct_landings_not_in_exports).
+        # The direct landings are recorded as industrial fish from 2024.
         hs = df_trade_raw['HS_code_str']
         is_fish_export = (df_trade_raw['impeks'].astype(str).str.strip().isin(['2', '2.0'])
-                          & (hs.str.startswith('0302') | hs.str.startswith('0303')))
+                          & (hs.str.startswith('0302') | hs.str.startswith('0303') | hs.str.startswith('05119111')))
         preloaded['whole_fish_export_by_country'] = (
             df_trade_raw[is_fish_export].groupby(['year', 'country'])['amount'].sum())
 
