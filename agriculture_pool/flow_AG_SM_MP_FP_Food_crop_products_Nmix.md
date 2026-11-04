@@ -26,7 +26,7 @@ nav_order: 7
 - The flow is "Nutrient removal by harvest of crops" minus "industrial crops"; fodder crops and grazing are reported separately in the balance and are not included.
 - For 2017–2019 and 2024 the cereal N is the cereal harvest times the N per tonne of cereal harvest in the balance (interpolated between 2016 and 2020, or the 2023 value for 2024), and the other crops are interpolated between 2016 and 2020 or held at the 2023 value.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is 16–32 kt N per year and follows the size of the cereal harvest, since cereals make up about 88% of the N.
 - Most of the cereal is used for animal feed and returns to AG.MM via MP.FP-AG.MM-Farm animal feed-Nmix.
@@ -35,7 +35,7 @@ nav_order: 7
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

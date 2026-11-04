@@ -26,4 +26,16 @@ It is expected that there should be a surplus for all years because landfilled w
 
 * **PR.SO-EF.IC-Biofuels-Nmix**, **PR.SO-EF.TR-Biofuels-Nmix** and **PR.SO-EF.OE-Biofuels-Nmix** are neglected because diesel and biogas contain very little nitrogen. We assume the N in waste to be processed is lost as emissions or retained in digestates from the biofuel production process. 
 * The guidelines recommends assigning separate flows for compost and biofuel digestate used on the AG and HS pools. However, the SSB statistics for treatment and use of organic waste does not separate between different treatment methods when it comes to end use. We have therefore decided to combine these flows to one called “biologically treated waste” to agriculture, and one to HS. 
+
+### Flows added or changed compared with Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->:
+
+* **PR.SO-EF.EC-Waste to energy-Nmix** is not in the guidelines, where waste incineration belongs to PR.SO (see above).
+* **PR.SO-MP.OP-Recycling-Nmix** is a flow from HS (HS.HS-MP.OP) in the guidelines. We let all waste to recycling go from PR.SO, since the SSB waste statistics report recycling for waste of all origins together.
+* **PR.SO-RW.RW-Export for recycling-Nmix** and **PR.SO-RW.RW-Export for reuse-Nmix** are not in the guidelines, which only have **PR.SO-RW.RW-Solid waste export-Nmix**. We keep waste exported for recycling and used textiles exported for reuse as separate flows.
+* **PR.SO-HY.SW-Leaching-Nmix** goes to groundwater (HY.GW) in Schäppi et al. (2025). We do not include the groundwater subpool (see the [hydrosphere pool page](../hydrosphere_pool/pool_hydrosphere.html)), so the flow goes to surface water (HY.SW).
+
 <!-- MANUAL:POOL_TEXT:END -->
+
+### References
+
+* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)

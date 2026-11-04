@@ -13,52 +13,44 @@ nav_order: 3
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 #### Flow description
 
-- **MP.FP-HS.HS-Food products-Nmix** is food products consumed by private households and pets.
-- The food statistics count food bought by households, so food that leaves MP.FP but is wasted before it is bought is not in them, while food wasted in households after it is bought is already included. We therefore add food waste in wholesale, retail, food service, catering and education/care institutions; household food waste is not added.
-- Food waste occurring upstream of MP.FP (agriculture, seafood landing) or internally within the food industry is excluded, since both are already covered by other flows.
-- Food eaten outside the home (restaurants, canteens, institutions) and cross-border shopping are not covered by the food statistics and are therefore missing from this flow, except for the waste from food service, catering and institutions.
-- Horses are accounted for under the agriculture pool.
+- **MP.FP-HS.HS-Food products-Nmix** is food products to consumers – households, restaurants, canteens and institutions – and pet food.
+- The flow includes food that is later wasted in retail, food service and households. Food waste upstream of MP.FP (agriculture, seafood landing) or within the food industry is not included, since it is covered by other flows.
+- Cross-border shopping is not included.
+- Horse feed is accounted for under the agriculture pool.
 
 #### Data sources
 
-- From 2018, SSB's diet statistics ([Kosthald](https://www.ssb.no/kosthald), [table 13695](https://www.ssb.no/statbank/table/13695): Næringsinnhald per dag frå selde mat- og drikkevarer), which are based on the edible amount of food and drink sold in a sample of Norwegian grocery stores, weighted up to all grocery stores, and given in terms of protein content. According to SSB, the statistics do not include food bought at kiosks, petrol stations, cafés, restaurants, canteens or institutions or through cross-border shopping, and food wasted after it is sold is not deducted. In April 2026 SSB republished 2018–2023 with adjusted weights, which lowered the series by about 7–8%.
-- For 1984–2012, the household budget survey ([Forbruksundersøkelsen](https://www.ssb.no/inntekt-og-forbruk/forbruk/statistikk/forbruksundersokelsen); tables [10249](https://www.ssb.no/statbank/table/10249) “Forbrukte mengder av mat- og drikkevarer per person per år, etter varegruppe (kg/liter)” 1999–2012 and [06376](https://www.ssb.no/statbank/table/06376), the same for 1958–1959 to 1996–1998), which records the quantities of food bought by households; for 1997–2009 SSB pooled three survey years and labels each period with its last year. The older series gives values for 3-year averages.
-- Protein contents of food categories from Matvaretabellen (Mattilsynet, 2006)<!--cite:mattilsynet_matvaretabellen_2006-->, as this reflects common foods found in Norwegian retail.
+- Protein in the food supply at wholesale level ("engrosnivå", matforsyningsstatistikken) per person per day, from Helsedirektoratet's annual report Utviklingen i norsk kosthold ([2025 edition, Table 7](https://www.helsedirektoratet.no/rapporter/utviklingen-i-norsk-kosthold-2025/energi-og-naeringsstoffer); earlier years from the 2017, 2022, 2023 and 2024 editions). The food supply is calculated by NIBIO from statistics of production, import, export and sales of food, and gives the edible amount of food available to the whole population. Values are published for 1980, 1990, 2000, 2005 and every year from 2010.
 - Population on 1 January from SSB ([table 06913](https://www.ssb.no/statbank/table/06913)).
 - Nitrogen intake per cat and dog per year from Table 19 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, and the number of cats and dogs from available statistics from a variety of sources.
-- Food waste per sector: 2021 tonnage and the 2015-to-2021 change per capita reported by Stensgård et al. (2023)<!--cite:stensgard_kartleggingsrapport_2023--> (Norway's food waste reduction agreement, "Bransjeavtalen", uses 2015 as its baseline year).
-- Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> advises using FAO statistics on food availability for human food consumption, but this only gives data back to 2009. The values in this statistic give a bit more than 40 kt N per year.
 
 #### Assumptions
 
-- Protein per person per day is multiplied by 365 and by the population, and divided by the Jones factor 6.25. Before 2018 the amounts of the food categories are multiplied by their protein contents.
-- The 3-year averages of the older series are assigned to each individual year, and each value is placed in the middle year of its period.
-- Years without survey data (1986–1988, 1992–1995, 2009–2011 and 2013–2017) are filled with the mean of the neighbouring survey periods or with a linear trend.
-- For pet food, we have assumed (based on available statistics) that cats and dogs consume >90% of pet food. The number of cats and dogs between 1985 and 2025 is taken from trend lines (about 0.58 million dogs and 0.76 million cats in 2024), with 4.73 and 3.04 kg N per animal per year.
-- Food waste in wholesale, retail, food service, catering and institutions is linearly interpolated between 2015 and 2021 and held constant outside that range. The waste is converted to N using the mean N content of Norway's total food supply basket across 2010–2023 (FAOSTAT Food Balance Sheets "Food" quantity by item, weighted by N content per Table 21 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->).
+- Protein per person per day is multiplied by 365 and by the population, and divided by the Jones factor 6.25.
+- Years between the published years are linearly interpolated (1984–1989, 1991–1999, 2001–2004 and 2006–2009).
+- We have assumed (based on available statistics) that cats and dogs consume >90% of pet food. The number of cats and dogs is taken from linear trend lines fitted to counts for 1999, 2001, 2004, 2022 and 2023 (from veterinary, industry and news sources) and extended to 1985–1998 and 2024 (about 580 000 dogs and 760 000 cats in 2024), with 4.73 and 3.04 kg N per animal per year.
 
-#### Interpretations and comparisons
+#### Interpretations
 
-- The flow rises from about 26 kt N in 1990 to 29–31 kt N in 2019–2024.
-- In 2024 it consists of about 24 kt N in food bought by households, 5 kt N in pet food and 1.2 kt N in food wasted in wholesale, retail, food service, catering and institutions.
-- The increase is driven by population growth (4.2 million in 1990, 5.6 million in 2024) and the growing number of pets.
-- N in food per person decreases from about 5.1 to 4.3 kg N per year (about 73 g protein per person per day in 2024), but part of this change may come from the change of data source in 2018.
+- The flow rises from about 26 kt N in 1990 to 37–38 kt N in 2022–2024, of which pet food is about 5 kt N in 2024.
+- The increase is driven by population growth (4.2 million in 1990, 5.6 million in 2024), a rise in protein per person from 94 to 100–106 g per day, and the growing number of pets.
+- SSB's diet statistics based on food sold in grocery stores ([Kosthald](https://www.ssb.no/kosthald), [table 13695](https://www.ssb.no/statbank/table/13695)) give about 73 g protein per person per day in 2024, about 28 g less than the wholesale level. The difference is food eaten outside the home, food bought at kiosks and petrol stations, and waste in wholesale and retail, which the grocery sales do not cover.
+- Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> advises using FAO statistics on food availability for human food consumption (FAO Food Balance Sheets, from 2010), which give a bit more than 40 kt N per year. The food balance sheets give meat as carcass weight and fish as live-weight equivalents, including bones, heads and other parts that are removed in processing, while the wholesale-level food supply used here gives the edible amount.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| Food consumption from 2018 (SSB 13695) | Survey or self-reported data | ±20 %, normal, drawn per year | – | 78% | – | 0.79 | none |
-| Protein-to-N conversion factor (Jones factor) | Parameter | ±10 %, normal | 15% | 17% | −0.75 | −0.72 | [Live Animal Export](../agriculture_pool/flow_AG_MM_RW_RW_Live_animal_export_Nmix.html), [Fodder Crops Production](../agriculture_pool/flow_AG_SM_AG_MM_Fodder_crops_Nmix.html), [Grazing on Unmanaged Land](../forests_and_semi_natural_pool/flow_FS_OL_AG_MM_Grazing_Nmix.html), [Seeds and Planting Material](../materials_and_products_pool/flow_MP_FP_AG_SM_Seeds_and_planting_material__Nmix.html) and 1 more |
-| N in pet food per dog per year | Parameter | ±30 %, normal | 1% | 2% | 0.06 | 0.09 | none |
-| Household consumption survey 1983–1998 (SSB 06376) | Survey or self-reported data | ±20 %, normal | 73% | – | 0.83 | – | none |
-| Interpolation (1991-1996) | Gap filling: interpolation | ±7–9 %, lognormal, grows with distance to known year | 7% | – | 0.82 | – | none |
+| Food supply at wholesale level (Helsedirektoratet) | Modelled statistics | ±10 %, normal | 38% | 50% | 0.88 | 0.87 | none |
+| Protein-to-N conversion factor (Jones factor) | Parameter | ±10 %, normal | 32% | 42% | −0.80 | −0.79 | [Manure Application](../agriculture_pool/flow_AG_MM_AG_SM_Manure_application_Nmix.html), [Manure from Grazing on Unmanaged Land](../agriculture_pool/flow_AG_MM_FS_OL_Manure_from_grazing_on_unmanaged_land_Nmix.html), [Live Animal Export](../agriculture_pool/flow_AG_MM_RW_RW_Live_animal_export_Nmix.html), [Fodder Crops Production](../agriculture_pool/flow_AG_SM_AG_MM_Fodder_crops_Nmix.html) and 10 more |
+| N in pet food per dog per year | Parameter | ±30 %, normal | 2% | 3% | 0.06 | 0.07 | none |
+| Annual N intake per cat from pet food | Parameter | ±30 %, normal | 2% | 2% | 0.06 | 0.06 | none |
+| Population (SSB 06913) | Registered data | ±2 %, normal, drawn per year | 2% | 2% | 0.88 | 0.87 | [Municipal Wastewater](../humans_and_settlements_pool/flow_HS_HS_PR_WW_Municipal_wastewater_Nmix.html) |
+| Interpolation (1990-2000) | Gap filling: interpolation | ±7–13 %, lognormal, grows with distance to known year | 25% | – | 0.88 | – | none |
 
 ### References
 
-* Mattilsynet (2006). *Matvaretabellen*. [https://www.matvaretabellen.no](https://www.matvaretabellen.no)
 * Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)
-* Stensgård, A., Berntsen, I. C., Hohle, S. M., & Callewaert, P. (2023). *Kartleggingsrapport for matbransjen og forbrukerleddet*.

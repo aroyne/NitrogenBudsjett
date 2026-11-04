@@ -23,9 +23,9 @@ nav_order: 3
 
 #### Assumptions
 
-- The ammonia used for straw treatment is an N input to agriculture, but we have not found data on the amounts used, so it is not included as an input.
+- The ammonia used for straw treatment is counted as an input to AG.MM in MP.OP-AG.MM-Ammonia for straw treatment-NH3: the 3I emission divided by the share of the ammonia that is emitted (54%, Norway's Informative Inventory Report 2025, section 5.7.2).
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 9.4–11.8 kt N per year: 10.3 kt N in 1990 and 9.9 kt N in 2024.
 - Straw treatment (3I) contributed 1.2 kt N in 1990 but only 0.3 kt N in 2024, while manure management rose from about 9 to 9.6 kt N.
@@ -36,12 +36,12 @@ nav_order: 3
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
 | NH<sub>3</sub>, manure management, all animal categories (NFR 3B) | Inventory with published uncertainty | ±25 %, normal | 82% | 99% | 0.86 | 0.97 | none |
-| NH<sub>3</sub>, Agriculture other (please specify in the IIR) (NFR 3I) | Inventory with published uncertainty | −50/+100 %, lognormal | 18% | 1% | 0.14 | 0.03 | none |
+| NH<sub>3</sub>, Agriculture other (please specify in the IIR) (NFR 3I) | Inventory with published uncertainty | −50/+100 %, lognormal | 18% | 1% | 0.14 | 0.03 | [Ammonia for Straw Treatment](../materials_and_products_pool/flow_MP_OP_AG_MM_Ammonia_for_straw_treatment_NH3.html) |
 
 ### References
 

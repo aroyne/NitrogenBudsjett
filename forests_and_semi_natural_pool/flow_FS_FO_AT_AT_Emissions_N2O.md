@@ -27,7 +27,7 @@ nav_order: 2
 
 - The inventory values are used directly, converted from N<sub>2</sub>O to N.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is small and nearly constant, about 0.37–0.38 kt N per year, since the area of drained organic forest soil changes little.
 - The 0.47 kt N of fertilizer on forest in the inventory is the same as MP.OP-FS.FO-Mineral fertilizer-Nmix in this model in 2024.
@@ -35,7 +35,7 @@ nav_order: 2
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

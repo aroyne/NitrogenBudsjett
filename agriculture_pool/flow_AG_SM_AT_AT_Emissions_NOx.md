@@ -20,13 +20,12 @@ nav_order: 5
 - Emissions reported by Norway to CLRTAP (CLRTAP inventory submissions, EMEP 2025<!--cite:emep_officially_2025-->), as advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
 - The emissions are calculated in the national inventory with the same manure model as the greenhouse gas inventory: N in manure, mineral fertilizer and other N sources multiplied by NH<sub>3</sub> and NO<sub>x</sub> emission factors for each animal category, storage system, spreading method and fertilizer type. The methods are documented in the [Informative Inventory Report 2026, Norway](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/informative-inventory-report-iir-2026-norway-air-pollutant-emissions-1990-2024/).
 - The LULUCF codes 4B1, 4B2, 4C1 and 4C2 in Table 30 are not reported in the CLRTAP inventory.
-- The inventory counts all manure deposited by grazing animals as input to managed soils, including the share deposited on utmark (unmanaged land), which this model does not count as input to AG.SM (see AG.MM-AG.SM-Manure application-Nmix).
 
 #### Assumptions
 
-- The utmark share (26–33% of grazing manure, see AG.MM-AG.SM-Manure application-Nmix) of the emissions from grazing animals (3Da3) is therefore removed from this flow; it is counted in FS.OL-AT.AT-Emissions-NOx.
+- The inventory counts all manure deposited by grazing animals as input to managed soils, including the share deposited on unmanaged land (utmark), which this model does not count as input to AG.SM (see AG.MM-AG.SM-Manure application-Nmix). The unmanaged-land share (26–30% of grazing manure, see AG.MM-AG.SM-Manure application-Nmix) of the emissions from grazing animals (3Da3) is therefore removed from this flow; it is counted in FS.OL-AT.AT-Emissions-NOx.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 2.0–2.5 kt N per year.
 - Field burning contributed 0.3 kt N in 1990 and less than 0.05 kt N in 2024.
@@ -35,12 +34,12 @@ nav_order: 5
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
 | NO<sub>x</sub>, Inorganic N-fertilizers (includes also urea application) (NFR 3Da1) | Inventory with published uncertainty | −64.3/+180.1 %, lognormal | 92% | 89% | 0.57 | 0.56 | none |
-| NO<sub>x</sub>, Animal manure applied to soils (NFR 3Da2a) | Inventory with published uncertainty | −50.4/+101.8 %, lognormal | 7% | 10% | 0.25 | 0.32 | none |
+| NO<sub>x</sub>, Animal manure applied to soils (NFR 3Da2a) | Inventory with published uncertainty | −50.4/+101.8 %, lognormal | 7% | 10% | 0.25 | 0.31 | none |
 
 ### References
 

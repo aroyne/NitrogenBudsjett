@@ -21,7 +21,7 @@ nav_order: 3
 - The reported emissions are not measured but calculated in the national inventory, mainly as activity data (fuel consumption by fuel type and source category, from the national energy statistics) multiplied by emission factors, following the [EMEP/EEA Guidebook 2023](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023); for some large point sources, plant-specific reported emissions are used. The methods are documented in the [Informative Inventory Report 2026, Norway](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/informative-inventory-report-iir-2026-norway-air-pollutant-emissions-1990-2024/).
 - The inventory's NO<sub>x</sub> emission factors for ships are based on detailed calculations for selected years (1993, 1998, 2004 and 2007) with linear interpolation in between ([SSB, 2010](https://www.ssb.no/natur-og-miljo/artikler-og-publikasjoner/nye-no-x-faktorer-gir-lavere-utslipp-fra-skip)).
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - Total NO<sub>x</sub> from transport stays roughly flat at 27–33 kt N/year until 2013 and then declines steadily to 12.5 kt N in 2024.
 - The late decline does not reflect a delayed effect of catalytic converters, but the sum of four sources with different trajectories:
@@ -33,7 +33,7 @@ nav_order: 3
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

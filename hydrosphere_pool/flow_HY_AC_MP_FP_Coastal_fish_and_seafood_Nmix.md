@@ -28,18 +28,18 @@ nav_order: 3
 - Only dead fish and slaughterhouse discards are included. Numbers are converted to biomass with an average weight of 0.7 kg per lost fish (range 0.5–1.9 kg), the estimate used by Torrissen et al. (2016)<!--cite:torrisen_naeringsutslipp_2016--> (based on Iversen et al., 2015).
 - Before 2007, lost-fish N is estimated from the 2007–2011 average ratio of lost-fish N to harvested N.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow rises from about 1 kt N in 1984 to 48 kt N in 2024, following the growth of salmon and trout farming.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| N content of fish and seafood | Parameter | ±10 %, normal | 74% | 77% | 1.00 | 1.00 | [Excretia](../hydrosphere_pool/flow_HY_AC_HY_CW_Excretia_Nmix.html), [Waste feed](../hydrosphere_pool/flow_HY_AC_HY_CW_Waste_feed_Nmix.html), [Wild fish catch](../hydrosphere_pool/flow_HY_CW_MP_FP_Fish_(wild_catch)_Nmix.html), [Shellfish](../hydrosphere_pool/flow_HY_CW_MP_FP_Shellfish_Nmix.html) and 2 more |
+| N content of fish and seafood | Parameter | ±10 %, normal | 74% | 77% | 1.00 | 1.00 | [Excretia](../hydrosphere_pool/flow_HY_AC_HY_CW_Excretia_Nmix.html), [Waste feed](../hydrosphere_pool/flow_HY_AC_HY_CW_Waste_feed_Nmix.html), [Wild fish catch](../hydrosphere_pool/flow_HY_CW_MP_FP_Fish_(wild_catch)_Nmix.html), [Shellfish](../hydrosphere_pool/flow_HY_CW_MP_FP_Shellfish_Nmix.html) and 3 more |
 | Fisheries and aquaculture statistics (Directorate of Fisheries) (aquaculture) | Registered data | ±5 %, normal, drawn per year | 17% | 18% | 0.97 | 0.97 | [Excretia](../hydrosphere_pool/flow_HY_AC_HY_CW_Excretia_Nmix.html), [Waste feed](../hydrosphere_pool/flow_HY_AC_HY_CW_Waste_feed_Nmix.html), [Feed to Coastal Aquaculture](../materials_and_products_pool/flow_MP_FP_HY_AC_Feed_to_coastal_aquaculture_Nmix.html), [Aquaculture Feed Import](../rest_of_the_world_pool/flow_RW_RW_HY_AC_Aquaculture_feed_import_Nmix.html) |
 | Average weight of dead and discarded farmed fish | Parameter | 0.5–1.9, triangular | 7% | 6% | 0.03 | 0.03 | [Excretia](../hydrosphere_pool/flow_HY_AC_HY_CW_Excretia_Nmix.html) |
 

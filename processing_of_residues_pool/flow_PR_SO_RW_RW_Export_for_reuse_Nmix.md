@@ -23,14 +23,14 @@ nav_order: 11
 
 - The quantities are multiplied by an N content per commodity type from the trade mapping sheet of N_parameters.xlsx.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow rises from 0.01 kt N in 1990 to about 0.3 kt N per year since 2015.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

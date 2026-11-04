@@ -23,18 +23,18 @@ nav_order: 2
 
 - Typical live weights per animal type from various sources (animal_weights sheet of N_parameters.xlsx), an average of 16% protein in the whole animal (range 14–22%) and the standard Jones factor 6.25 for nitrogen to protein.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is negligible, below 0.05 kt N per year; Norway imports very few live animals.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
 | Average live weight of horses | Parameter | ±30 %, normal | 36% | 50% | 0.75 | 0.98 | [Live Animal Export](../agriculture_pool/flow_AG_MM_RW_RW_Live_animal_export_Nmix.html) |
 | Protein content of live animals | Parameter | 0.14–0.22, triangular | 48% | 39% | 1.00 | 1.00 | [Live Animal Export](../agriculture_pool/flow_AG_MM_RW_RW_Live_animal_export_Nmix.html) |
 | FAOSTAT crops and livestock products (live animals) | Registered data | ±10 %, normal, drawn per year | 7% | 6% | 1.00 | 1.00 | [Live Animal Export](../agriculture_pool/flow_AG_MM_RW_RW_Live_animal_export_Nmix.html) |
-| Protein-to-N conversion factor (Jones factor) | Parameter | ±10 %, normal | 6% | 5% | −0.91 | −0.91 | [Live Animal Export](../agriculture_pool/flow_AG_MM_RW_RW_Live_animal_export_Nmix.html), [Fodder Crops Production](../agriculture_pool/flow_AG_SM_AG_MM_Fodder_crops_Nmix.html), [Grazing on Unmanaged Land](../forests_and_semi_natural_pool/flow_FS_OL_AG_MM_Grazing_Nmix.html), [Seeds and Planting Material](../materials_and_products_pool/flow_MP_FP_AG_SM_Seeds_and_planting_material__Nmix.html) and 1 more |
+| Protein-to-N conversion factor (Jones factor) | Parameter | ±10 %, normal | 6% | 5% | −0.91 | −0.91 | [Manure Application](../agriculture_pool/flow_AG_MM_AG_SM_Manure_application_Nmix.html), [Manure from Grazing on Unmanaged Land](../agriculture_pool/flow_AG_MM_FS_OL_Manure_from_grazing_on_unmanaged_land_Nmix.html), [Live Animal Export](../agriculture_pool/flow_AG_MM_RW_RW_Live_animal_export_Nmix.html), [Fodder Crops Production](../agriculture_pool/flow_AG_SM_AG_MM_Fodder_crops_Nmix.html) and 10 more |

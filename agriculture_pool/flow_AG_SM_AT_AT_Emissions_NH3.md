@@ -20,26 +20,25 @@ nav_order: 4
 - Emissions reported by Norway to CLRTAP (CLRTAP inventory submissions, EMEP 2025<!--cite:emep_officially_2025-->), as advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
 - The emissions are calculated in the national inventory with the same manure model as the greenhouse gas inventory: N in manure, mineral fertilizer and other N sources multiplied by NH<sub>3</sub> and NO<sub>x</sub> emission factors for each animal category, storage system, spreading method and fertilizer type. The methods are documented in the [Informative Inventory Report 2026, Norway](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/informative-inventory-report-iir-2026-norway-air-pollutant-emissions-1990-2024/).
 - The LULUCF codes 4B1, 4B2, 4C1 and 4C2 in Table 30 are not reported in the CLRTAP inventory, and 3Dd (off-farm storage and transport) is reported as zero.
-- The inventory counts all manure deposited by grazing animals as input to managed soils, including the share deposited on utmark (unmanaged land), which this model does not count as input to AG.SM (see AG.MM-AG.SM-Manure application-Nmix).
 
 #### Assumptions
 
-- The utmark share (26–33% of grazing manure, see AG.MM-AG.SM-Manure application-Nmix) of the emissions from grazing animals (3Da3) is therefore removed from this flow; it is counted in FS.OL-AT.AT-Emissions-NH3.
+- The inventory counts all manure deposited by grazing animals as input to managed soils, including the share deposited on unmanaged land (utmark), which this model does not count as input to AG.SM (see AG.MM-AG.SM-Manure application-Nmix). The unmanaged-land share (26–30% of grazing manure, see AG.MM-AG.SM-Manure application-Nmix) of the emissions from grazing animals (3Da3) is therefore removed from this flow; it is counted in FS.OL-AT.AT-Emissions-NH3.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is 13–15 kt N per year, falling slowly from about 15.2 kt N in 1990 to 12.8 kt N in 2024.
 - Field burning contributed 0.8 kt N in 1990 and less than 0.1 kt N in 2024.
-- Manure spreading (3Da2a) is the largest source (10 kt N in 2024), followed by grazing animals on innmark (1.0 kt N) and mineral fertilizer (1.4 kt N, down from 2.1 kt N in 1990).
+- Manure spreading (3Da2a) is the largest source (10 kt N in 2024), followed by grazing animals on agricultural land (1.0 kt N) and mineral fertilizer (1.4 kt N, down from 2.1 kt N in 1990).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| NH<sub>3</sub>, Animal manure applied to soils (NFR 3Da2a) | Inventory with published uncertainty | ±36 %, normal | 88% | 90% | 0.73 | 0.76 | none |
+| NH<sub>3</sub>, Animal manure applied to soils (NFR 3Da2a) | Inventory with published uncertainty | ±36 %, normal | 88% | 89% | 0.73 | 0.76 | none |
 | NH<sub>3</sub>, Urine and dung deposited by grazing animals (NFR 3Da3) | Inventory with published uncertainty | −58/+138 %, lognormal | 6% | 7% | 0.07 | 0.08 | [Other Land Emissions (NH<sub>3</sub>)](../forests_and_semi_natural_pool/flow_FS_OL_AT_AT_Emissions_NH3.html) |
 | NH<sub>3</sub>, Inorganic N-fertilizers (includes also urea application) (NFR 3Da1) | Inventory with published uncertainty | −33.3/+50 %, lognormal | 5% | 3% | 0.15 | 0.13 | none |
 

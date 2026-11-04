@@ -30,7 +30,7 @@ nav_order: 5
 - The uncertainty ranges are from IPCC 2006 Table 1.2 for the NCVs and from Table 15 for the N contents where Table 15 gives a range. The ranges for N contents for which Table 15 gives only an average (jet kerosene and gas/diesel oil) are our assumption.
 - Gasoline is not included since its N content is 0 in Table 15, and natural gas (LNG in ferries) is not included either.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 0.4–1.0 kt N per year, rising from 0.4 kt N in 1990 to a peak of about 1.0 kt N in 2007–2008 and about 0.8 kt N in 2024.
 - Domestic aviation (jet kerosene, 0.1% N) and diesel in road transport and navigation are the largest contributions; biofuels contribute about 0.09 kt N in 2024.
@@ -38,7 +38,7 @@ nav_order: 5
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

@@ -28,7 +28,7 @@ nav_order: 5
 - Forest is assigned a fraction 0.59 of the scaled value, which is the share of wood in wood + upland in TEOTIL3 over 2013–2023 (0.56–0.60). The other land flow (**FS.OL-HY.SW-Leaching-Nmix**) gets the remaining 0.41.
 - TEOTIL3 has not been updated for 2024 at the time of writing; the 2024 value is held at the 2023 value.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 27–42 kt N per year without a clear trend.
 - TEOTIL calculates the diffuse loss from land as runoff times area-specific N concentrations, so the year-to-year variation mainly follows precipitation and runoff: low values in dry years (for example 2010) and high values in wet years (for example 2020).
@@ -36,7 +36,7 @@ nav_order: 5
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

@@ -25,14 +25,15 @@ nav_order: 9
 - The quantities are multiplied by an N content per commodity type from the trade mapping sheet of N_parameters.xlsx.
 - Vegetables are assigned N content by product form. Fresh, chilled, frozen and preserved vegetables, potatoes and tomatoes use the fresh-weight N contents in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, Table 21 (0.2–0.3 %). Dried peas and beans use the N content of pulses (3.6 %, Table 21), tomato paste 0.7 % (USDA FoodData Central), and other dried vegetables and potato flakes an estimated 1.6 %.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow rises from about 16 kt N in 1990 to 25–32 kt N per year since 2010.
+- Foreign vessels landed 170–375 kt live weight of fish per year in Norway in 2005–2024 (Fiskeridirektoratet table F.06.001). These landings are not part of HY.CW-MP.FP-Fish (wild catch)-Nmix, which only covers Norwegian vessels, so they are not counted twice. Landings by British, Faroese and Danish vessels are of the same size as the imports of fresh and frozen fish from those countries. Russian vessels landed 80–145 kt per year, while imports of fish from Russia were only 12–26 kt; most Russian fish landed in Norway goes on to the EU or China ([Regjeringen](https://www.regjeringen.no/no/aktuelt/fiskerisamarbeid_stabilitet/id2926113/)), and goods in transit are not included in the trade statistics.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

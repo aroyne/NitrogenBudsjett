@@ -24,14 +24,14 @@ nav_order: 3
 
 - Imported fertilizer is counted as used in agriculture, and MP.OP-AG.SM-Mineral fertilizer-Nmix is FAOSTAT's agricultural use minus this import.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow varies between about 6 and 51 kt N per year and has been 39–51 kt N since 2018, so a growing share of the fertilizer used in Norwegian agriculture is imported.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

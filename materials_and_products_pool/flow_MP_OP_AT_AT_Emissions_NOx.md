@@ -21,7 +21,7 @@ nav_order: 4
 - Emissions reported by Norway to CLRTAP (CLRTAP inventory submissions, EMEP 2025<!--cite:emep_officially_2025-->), as advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
 - For industrial processes the inventory emissions are largely based on emissions reported by the individual plants to Miljødirektoratet, supplemented by production data multiplied by emission factors from the [EMEP/EEA Guidebook 2023](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023). The methods are documented in the [Informative Inventory Report 2026, Norway](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/informative-inventory-report-iir-2026-norway-air-pollutant-emissions-1990-2024/).
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow falls from about 4.2 kt N in 1990 to 2.5 kt N in 2024.
 - Ferroalloy production (2C2) is the largest source (2.8–3.0 kt N until 2005, 1.9 kt N in 2024), followed by aluminium production (2C3, about 0.3 kt N).
@@ -30,7 +30,7 @@ nav_order: 4
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

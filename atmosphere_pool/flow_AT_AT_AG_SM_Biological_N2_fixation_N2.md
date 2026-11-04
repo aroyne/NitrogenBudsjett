@@ -27,7 +27,7 @@ nav_order: 1
 
 - A constant value of 12 kt N per year (range 8–16 kt N), the middle of the range given by Bechmann et al. (2023); the lower end of the range corresponds to the estimate of Bleken & Bakken (1997).
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is constant at 12 kt N per year, since there are no annual data on clover in Norwegian grassland.
 - The rate of 80 kg N/ha used by Bleken & Bakken (1997) agrees relatively well with the later Norwegian studies.
@@ -36,7 +36,7 @@ nav_order: 1
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

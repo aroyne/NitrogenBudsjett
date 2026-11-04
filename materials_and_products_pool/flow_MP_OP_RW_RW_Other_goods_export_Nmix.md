@@ -28,7 +28,7 @@ nav_order: 13
 - The same principle applies to clothing, footwear and other finished textile articles: items explicitly of wool use the protein-fibre N content from Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, Table 24 (as for silk), items with a leather component use the same N content as hides and skins, and items of cotton or unspecified synthetic/artificial fibre (predominantly polyester, which – like cotton – has no nitrogen in its polymer backbone) default to ~0.
 - Roundwood, fuel wood, chips, sawdust and wood residues (HS 4401 and 4403) are given the N content of stem wood (1.2 g/kg for conifers and 1.4 g/kg for broadleaves, Table 45 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->), the same as domestic industrial round wood, while processed wood products use 0.2% (Table 22).
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 7–10 kt N per year until 2013, 11–12 kt N in 2014–2017 and 19–32 kt N from 2018.
 - The significant increase from 2018 is due to export of nitric acid, which started that year. Nitric acid is an intermediary in fertilizer production but not counted as fertilizer, so it shows up in this flow.
@@ -38,7 +38,7 @@ nav_order: 13
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

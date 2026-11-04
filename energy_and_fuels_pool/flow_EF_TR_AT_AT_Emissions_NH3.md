@@ -21,7 +21,7 @@ nav_order: 2
 - The reported emissions are not measured but calculated in the national inventory, mainly as activity data (fuel consumption by fuel type and source category, from the national energy statistics) multiplied by emission factors, following the [EMEP/EEA Guidebook 2023](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023); for some large point sources, plant-specific reported emissions are used. The methods are documented in the [Informative Inventory Report 2026, Norway](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/informative-inventory-report-iir-2026-norway-air-pollutant-emissions-1990-2024/).
 - Road transport emissions in the inventory are modelled from vehicle-km by vehicle and emission class multiplied by emission factors, rather than measured, so they follow the gradual fleet turnover ([Informative Inventory Report 2026, Norway](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/informative-inventory-report-iir-2026-norway-air-pollutant-emissions-1990-2024/)).
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - Passenger cars (NFR 1A3bi) account for 90–95% of the flow and determine its shape: emissions rise steadily from 0.15 kt N/year in 1990 to a peak of 1.6 kt N in 2002, and then decline steadily to 0.26 kt N in 2024.
 - Ammonia from road transport is formed almost exclusively in three-way catalytic converters on petrol cars, where NO is over-reduced to NH<sub>3</sub> under slightly fuel-rich operating conditions ([EMEP/EEA Guidebook 2023, ch. 1.A.3.b.i–iv](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023/part-b-sectoral-guidance-chapters/1-energy/1-a-combustion/1-a-3-b-i)).
@@ -33,7 +33,7 @@ nav_order: 2
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

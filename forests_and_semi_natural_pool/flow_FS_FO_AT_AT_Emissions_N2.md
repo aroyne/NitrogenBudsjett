@@ -25,7 +25,7 @@ nav_order: 1
 
 - The flow is the N<sub>2</sub>O from forest land multiplied by the mean N<sub>2</sub>:N<sub>2</sub>O ratio of 19.5.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 7.1–7.7 kt N per year and follows the N<sub>2</sub>O flow.
 - Since both the N<sub>2</sub>O emissions and the ratio are very uncertain, the 95% interval is wide.
@@ -34,7 +34,7 @@ nav_order: 1
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

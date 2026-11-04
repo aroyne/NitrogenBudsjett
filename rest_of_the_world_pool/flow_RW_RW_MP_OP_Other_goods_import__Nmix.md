@@ -30,14 +30,14 @@ nav_order: 11
 - Roundwood, fuel wood, chips, sawdust and wood residues (HS 4401 and 4403) are given the N content of stem wood (1.2 g/kg for conifers and 1.4 g/kg for broadleaves, Table 45 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->), the same as domestic industrial round wood, while processed wood products use 0.2% (Table 22).
 - Live plants, cut flowers and Christmas trees are given an assumed 0.3 % N, as for fresh vegetables.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 18–28 kt N per year since 1995, with peaks of 38–41 kt N in 2014, 2015 and 2017 that come from imports of nitric acid (1.6–20.5 kt N per year), a raw material for the fertilizer industry.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

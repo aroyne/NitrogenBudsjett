@@ -24,7 +24,7 @@ nav_order: 2
 
 - The quantities are multiplied by a protein content (cereals 12%, oilseeds 19.6%, peas 22.5%, grass and root/vegetable seed assumed 12%) and divided by a protein-to-N factor (5.83 for cereals, 6.25 for the others).
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is stable at 1.1–1.3 kt N per year.
 - Cereal seed (about 54,000 t in 2024) accounts for over 90% of the N, and grass seed for most of the rest.
@@ -32,7 +32,7 @@ nav_order: 2
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

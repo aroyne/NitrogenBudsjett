@@ -14,8 +14,7 @@ nav_order: 9
 #### Flow description
 
 - **MP.OP-HY.SW-Untreated wastewater-Nmix** is N discharged to water from other producing industry facilities that are not reported to be connected to municipal wastewater treatment.
-- In OP we include industries that process petroleum products that could arguably also have been designated as a separate flow in the EF pool.
-- The database does not distinguish between emissions to surface and coastal waters, so even though several large industries discharge their wastewater to the coast, we assign this entire flow to SW in order to avoid double counting.
+- The database does not distinguish between emissions to surface and coastal waters, so even though several large industries discharge their wastewater to the coast, we assign this entire flow to SW to avoid double counting.
 
 #### Data sources
 
@@ -25,12 +24,13 @@ nav_order: 9
 
 #### Assumptions
 
+- The report from Nor Tekstilservice for 2010 (306 t N, against 0 t N in 2011–2014; its first reported year) is left out as a reporting error.
 - Each facility is assigned manually to FP or OP (industry_categories.xlsx), based on the information given in the statistic.
 - A year missing inside a facility's reporting period is filled by linear interpolation between its neighbouring reported years.
 - Facilities that are not connected to the municipal network, or whose connection is unknown, are counted in this flow.
 - Miljødirektoratet's data has not been updated for 2024 at the time of writing; the 2024 value is held at the 2023 value.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow falls from 3.5 kt N in 1990 (5.0 kt N in 1989) to 1.4 kt N in 2024.
 - The fertilizer and chemical industry dominates: in 1990 Herøya industrial park (1.5 kt N), Yara Glomfjord (0.86 kt N) and Hydro Rjukan (0.32 kt N) were the largest sources, and in 2023 Yara Porsgrunn and Yara Glomfjord together account for about 0.9 kt N.
@@ -39,7 +39,7 @@ nav_order: 9
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

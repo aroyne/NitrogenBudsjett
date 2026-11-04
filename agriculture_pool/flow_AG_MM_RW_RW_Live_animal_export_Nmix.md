@@ -25,7 +25,7 @@ nav_order: 8
 - Poultry numbers are converted from thousands to animals.
 - The number is multiplied by an average live weight per category (e.g. other cattle 420 kg, breeding pigs 198 kg, sheep 48.5 kg, goats 38.5 kg, horses 377 kg, laying hens 1.8 kg; animal_weights in N_parameters.xlsx), an average of 16% protein in the whole animal based on typical values in Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> and the standard Jones factor 6.25 for nitrogen to protein.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is very small, below 0.03 kt N per year.
 - Pigs and horses make up most of the exported animals.
@@ -33,14 +33,14 @@ nav_order: 8
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
 | Protein content of live animals | Parameter | 0.14–0.22, triangular | 50% | 49% | 1.00 | 1.00 | [Live Animal Import](../rest_of_the_world_pool/flow_RW_RW_AG_MM_Live_animal_import_Nmix.html) |
 | Average live weight of pigs | Parameter | ±30 %, normal | 8% | 33% | 0.30 | 0.70 | [Live Animal Import](../rest_of_the_world_pool/flow_RW_RW_AG_MM_Live_animal_import_Nmix.html) |
 | FAOSTAT crops and livestock products (live animals) | Registered data | ±10 %, normal, drawn per year | 7% | 7% | 1.00 | 1.00 | [Live Animal Import](../rest_of_the_world_pool/flow_RW_RW_AG_MM_Live_animal_import_Nmix.html) |
-| Protein-to-N conversion factor (Jones factor) | Parameter | ±10 %, normal | 6% | 6% | −0.91 | −0.91 | [Fodder Crops Production](../agriculture_pool/flow_AG_SM_AG_MM_Fodder_crops_Nmix.html), [Grazing on Unmanaged Land](../forests_and_semi_natural_pool/flow_FS_OL_AG_MM_Grazing_Nmix.html), [Seeds and Planting Material](../materials_and_products_pool/flow_MP_FP_AG_SM_Seeds_and_planting_material__Nmix.html), [Food Products to Consumers](../materials_and_products_pool/flow_MP_FP_HS_HS_Food_products_Nmix.html) and 1 more |
+| Protein-to-N conversion factor (Jones factor) | Parameter | ±10 %, normal | 6% | 6% | −0.91 | −0.91 | [Manure Application](../agriculture_pool/flow_AG_MM_AG_SM_Manure_application_Nmix.html), [Manure from Grazing on Unmanaged Land](../agriculture_pool/flow_AG_MM_FS_OL_Manure_from_grazing_on_unmanaged_land_Nmix.html), [Fodder Crops Production](../agriculture_pool/flow_AG_SM_AG_MM_Fodder_crops_Nmix.html), [N<sub>2</sub>O emissions from denitrification](../agriculture_pool/flow_AG_SM_AT_AT_Emissions_N2O.html) and 10 more |
 | Average live weight of horses | Parameter | ±30 %, normal | 29% | 5% | 0.65 | 0.28 | [Live Animal Import](../rest_of_the_world_pool/flow_RW_RW_AG_MM_Live_animal_import_Nmix.html) |
 
 ### References

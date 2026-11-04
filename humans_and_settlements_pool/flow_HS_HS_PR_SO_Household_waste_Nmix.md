@@ -32,7 +32,7 @@ nav_order: 4
 - The 1995–2011 values for services and construction are scaled by the ratio of their N in 2012 to that in 2011 (about 1.66).
 - 1990–1994: we assume a linear increase in waste per inhabitant between about 200 kg/person and 289 kg/person in 1995, and a constant N content per unit mass, and extrapolate from the 1995 value back to 1990.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow rises from about 10 kt N in 1990 to 26–32 kt N in 2005–2019, with a dip in 2009–2011, and is about 26 kt N in 2024.
 - Private households account for 40–45% of the N; the rest comes from services and construction, which have grown more than households over the period.
@@ -43,7 +43,7 @@ nav_order: 4
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

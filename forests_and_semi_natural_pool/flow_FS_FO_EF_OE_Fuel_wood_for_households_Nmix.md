@@ -28,7 +28,7 @@ nav_order: 3
 - Biomass in the other sectors is divided by a net calorific value of 15.6 TJ/kt (IPCC 2006 Table 1.2, wood) and multiplied by the same N content as wood fuel in heat plants, 0.3 % (range 0.14–0.4 %), since it is mainly pellets and chips (see FS.FO-EF.EC-Fuel wood for co-fired power plants-Nmix).
 - Fuel wood is mainly stem wood with bark, much of it birch, so the N content of broadleaf stems is used: 1.4 g/kg, with a range from 0.7 g/kg (stems minus one standard deviation) to 4.3 g/kg (whole broadleaf trees including branches and foliage).
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 1.7–2.7 kt N per year. It rises from about 1.7 kt N in 1990 to a peak of 2.7 kt N in 2010, a cold winter, falls to about 1.9 kt N in 2015–2020 and rises again to 2.2 kt N in 2022, when electricity prices were high, and 2.5 kt N in 2023–2024.
 - The other sectors add little before 2000 and about 0.2–0.3 kt N per year in 2010–2022. In 2023–2024 they add about 0.6–0.7 kt N, as biomass in commercial buildings doubled and biomass in agriculture, forestry and fishing, almost none before 2023, rose to about 1,100 TJ in 2024.
@@ -37,7 +37,7 @@ nav_order: 3
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

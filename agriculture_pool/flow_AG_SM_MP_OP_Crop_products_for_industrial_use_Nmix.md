@@ -25,14 +25,14 @@ nav_order: 8
 - For years with missing data, we have filled in the average of all other years.
 - Eurostat GNB has not yet published a 2024 figure at the time of writing; the 2024 value is a 3-year average of 2021–2023 (this flow is small and volatile with no clear trend).
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is small, 0.3–0.8 kt N per year, with large variation from year to year.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

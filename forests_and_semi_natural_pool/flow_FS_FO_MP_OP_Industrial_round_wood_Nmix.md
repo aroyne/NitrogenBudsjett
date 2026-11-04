@@ -26,14 +26,14 @@ nav_order: 6
 - Following the Swedish NBB (Jutterström et al., 2020)<!--cite:jutterstrom_swedish_2020-->, we use an average wood density of 0.45 t/m³ (range 0.32–0.48) for all wood categories.
 - Stem-only N contents of 1.2 g/kg for coniferous and 1.4 g/kg for non-coniferous trees (ranges 0.7–1.7 and 0.9–1.9 g/kg), since roundwood removals consist mainly of stem wood, not foliage, branches and roots. Fuel wood also uses the stem value for broadleaves (see FS.FO-EF.OE-Fuel wood for households-Nmix).
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 3.4–6.3 kt N per year. It falls from 5.7 kt N in 1990 to about 3.5–4.5 kt N around 1995–2010 and rises to 6.3 kt N in 2024, following the volume of timber harvested.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

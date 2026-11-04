@@ -24,14 +24,14 @@ nav_order: 6
 
 - 1.5 kg N/ha per year (range ±50%) times the forested area, assumed constant for the entire time period.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is constant at about 18 kt N per year; for comparison, the value for Sweden in 2015 was 39.5 kt N (Moldan et al., 2025)<!--cite:moldan_where_2025-->.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

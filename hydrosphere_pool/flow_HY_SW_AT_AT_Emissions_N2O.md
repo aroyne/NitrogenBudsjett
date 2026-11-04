@@ -25,14 +25,14 @@ nav_order: 2
 - For years prior to 2013, retention is calculated from **HY.SW-HY.CW-Inflow to coastal waters-Nmix** with the TEOTIL3 ratio between retention and diffuse inputs to the coast, as for the N<sub>2</sub> flow; for those years the inflow is based on bias-corrected TEOTIL2 results (see that flow).
 - TEOTIL3 has not been updated for 2024 at the time of writing; the 2024 value is held at the 2023 value.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 0.13–0.16 kt N per year, with a large uncertainty from the N<sub>2</sub>O share of denitrification.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

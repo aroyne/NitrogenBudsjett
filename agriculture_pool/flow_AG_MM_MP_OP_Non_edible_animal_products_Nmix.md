@@ -27,14 +27,14 @@ nav_order: 7
 
 - Before 2005, wool is estimated from the number of sheep with a linear regression between sheep numbers and wool delivered in 2005–2024.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 1.2–1.3 kt N per year until 2015 and falls to about 1.0 kt N in 2024.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

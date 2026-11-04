@@ -24,14 +24,14 @@ nav_order: 2
 - For each plant, the N discharged is converted to N removed with the plant's removal rate r as N discharged × r/(1 − r).
 - Where specific data on the nitrogen removal fraction were missing we assumed a default of 70%, and we extrapolated or interpolated between existing data where reported emission data were missing.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow rises from 0.1 kt N in 1995 to 1.5–1.6 kt N around 2000 and 3.6–5.2 kt N since 2012, as more plants have introduced nitrogen removal.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

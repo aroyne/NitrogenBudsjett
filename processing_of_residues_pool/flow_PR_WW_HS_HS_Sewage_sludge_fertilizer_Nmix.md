@@ -25,7 +25,7 @@ nav_order: 4
 - 1990–1992 are the mean of 1993–1995.
 - The dry matter is multiplied by an N content of 3% (range 2–4%), the middle of the NIBIO range.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 0.1–1.3 kt N per year and has increased as more sludge is delivered to soil producers.
 - For comparison, Tables 54 and 55 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> give 2.6–3.7% N in dry matter for dewatered, digested and composted sludge in the JRC models (Huygens et al., 2022) and a median of 4.9% in German analyses (Sichler et al., 2022).
@@ -33,7 +33,7 @@ nav_order: 4
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

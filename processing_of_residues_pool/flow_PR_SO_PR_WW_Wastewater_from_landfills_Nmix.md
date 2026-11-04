@@ -25,7 +25,7 @@ nav_order: 9
 - Each landfill is classified as connected or not connected to a municipal sewage network from publicly available information; where this was not possible, half of the emissions are assigned to each of PR.SO-HY.SW-Leaching-Nmix and PR.SO-PR.WW-Wastewater from landfills-Nmix.
 - 1990–2010 are the mean of 2011 onward scaled with methane from landfills.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 0.4–0.8 kt N per year since 2011.
 - The extrapolated values fall from about 1.3 kt N in 1990 to 0.8 kt N in 2010, following the decline in landfill methane.
@@ -33,7 +33,7 @@ nav_order: 9
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

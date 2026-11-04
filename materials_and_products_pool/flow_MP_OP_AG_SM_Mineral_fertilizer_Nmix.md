@@ -24,7 +24,7 @@ nav_order: 1
 
 - The flow is agricultural use minus imports, so all imported fertilizer is assumed to be used in agriculture (it enters AG.SM directly as RW.RW-AG.SM-Mineral fertilizer import-Nmix).
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - Agricultural use is fairly stable at 100–112 kt N per year, but the domestically produced part falls from about 80–90 kt N in the 1990s to about 55 kt N in 2018–2024, because imports have increased from 12–30 kt N to 39–51 kt N.
 - The value for 2022 is higher (72 kt N) because imports were lower that year.
@@ -32,7 +32,7 @@ nav_order: 1
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

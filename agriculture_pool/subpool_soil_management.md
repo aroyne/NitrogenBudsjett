@@ -20,9 +20,12 @@ Hover over the chart to inspect specific flows, or click legend items to toggle 
 <!-- MANUAL:POOL_TEXT:START -->
 ### Flows that are zero or neglected:
 
-* **AG.SM-HY.SW-Overland flow-Nmix**, **AG.SM-FS.OL-Overland flow-Nmix** and **AG.SM-FS.WL-Overland flow-Nmix** are neglected as suggested by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->: «In a first approximation it can be assumed that N losses to hydrosphere or forests and semi-natural vegetation occur mainly via leaching. If no country specific data is available on fractions for overland flow of N, the overland flows can be neglected for simplification purposes». is not included because all runoff and leaching is included in Leaching.
+* **AG.SM-HY.SW-Overland flow-Nmix**, **AG.SM-FS.OL-Overland flow-Nmix** and **AG.SM-FS.WL-Overland flow-Nmix** are neglected as suggested by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->: «In a first approximation it can be assumed that N losses to hydrosphere or forests and semi-natural vegetation occur mainly via leaching. If no country specific data is available on fractions for overland flow of N, the overland flows can be neglected for simplification purposes».
 * **AG.SM-PR.SO-Farm crops substrate-Nmix** is farm crops substrate for biofuels production and composting. According to data in SSB table 12359 «Biologisk behandling av avfall, etter materialtype (1 000 tonn) 2017 – 2023» for category «Landbruksavfall, etande”, these values are small enough to be neglected. Since we only have values given for a few years, we have chosen to neglect this flow.
-* **AG.SM-HY.SW-Overland flow-Nmix** is not included because all runoff and leaching is included in  **AG.SM-HY.SW-Leaching-Nmix**.
+
+### Flows added or changed compared with Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->:
+
+* **AG.SM-HY.SW-Leaching-Nmix** goes to groundwater (HY.GW) in Schäppi et al. (2025). We do not include the groundwater subpool (see the [hydrosphere pool page](../hydrosphere_pool/pool_hydrosphere.html)), so the flow goes to surface water (HY.SW). It also includes overland flow (see above).
 
 <!-- MANUAL:POOL_TEXT:END -->
 

@@ -21,7 +21,7 @@ nav_order: 1
 - N<sub>2</sub>O from fuel combustion is not measured but calculated in the inventory as fuel consumption (TJ, by fuel type and source category, from the national energy statistics) multiplied by emission factors (kg N<sub>2</sub>O per TJ), following the IPCC 2006 Guidelines ([IPCC 2006, Vol. 2, Ch. 3](https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_3_Ch3_Mobile_Combustion.pdf)); Norway uses a mix of IPCC default and country-specific emission factors, documented in the National Inventory Document ([Miljødirektoratet, NID 2026](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)). Activity data and implied emission factors are reported in CRT Table 1.A(a).
 - For road transport, the emission factors depend on vehicle type, fuel and emission control technology (Euro class), and are combined with vehicle-km in the road traffic model used for the inventory.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - Road transport (1.A.3.b) accounts for 66–79% of the flow throughout the period.
 - N<sub>2</sub>O from road transport increased from 0.12 kt N/year in 1990 to about 0.18 kt N in 1999–2004, mainly from petrol cars, because early three-way catalytic converters produce N<sub>2</sub>O as a by-product ([EMEP/EEA Guidebook 2023, ch. 1.A.3.b.i–iv](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023/part-b-sectoral-guidance-chapters/1-energy/1-a-combustion/1-a-3-b-i)).
@@ -34,7 +34,7 @@ nav_order: 1
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

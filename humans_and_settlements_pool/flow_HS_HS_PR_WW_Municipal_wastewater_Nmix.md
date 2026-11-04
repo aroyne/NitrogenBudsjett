@@ -24,7 +24,7 @@ nav_order: 5
 - The population is multiplied by 4.56 kg N per person per year (range ±10%), the default value for municipal wastewater in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)<!--cite:schappi_annexes_2025-->. This corresponds to 12.5 g N per person per day.
 - The discharges from private sewage systems are part of SSB's statistics on discharges from the wastewater sector used for PR.WW-HY.CW-Treated wastewater discharge-Nmix, so they are included here as input to PR.WW.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow rises from about 19 kt N in 1990 to 25 kt N in 2024, in proportion to the population.
 - It is about 95% of the N entering PR.WW. The outputs from PR.WW (discharges, N<sub>2</sub> removal, N<sub>2</sub>O and sewage sludge) are within ±6% of the inputs up to 2012 and 4–15% larger since, with the largest difference in 2014–2017 when N<sub>2</sub> removal at the treatment plants was highest.
@@ -32,7 +32,7 @@ nav_order: 5
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

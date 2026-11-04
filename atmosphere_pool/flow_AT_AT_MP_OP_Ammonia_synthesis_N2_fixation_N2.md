@@ -27,7 +27,7 @@ nav_order: 15
 - The combined value is smoothed with a centred 3-year moving average, since actual ammonia production is a continuous industrial process and presumably much steadier than the underlying trade statistics suggest on their own – annual trade figures are sensitive to shipment timing around year-end and to inventory/stock effects, which can otherwise dominate the apparent year-to-year change.
 - The result is floored at zero, since a negative N<sub>2</sub>-fixation flow has no physical meaning. The central run is never negative; in the Monte Carlo simulation at most 2.5% of the iterations (in 1998) are set to zero.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 130–410 kt N per year, by far the largest input of reactive N to Norway; it dips to 130–220 kt N in 1997–1999 and 230–280 kt N in 2005–2007, and has been 310–390 kt N since 2008.
 - The fixed N leaves Norway mainly as exported mineral fertilizer (MP.OP-RW.RW-Mineral fertilizer export-Nmix, 430–790 kt N per year), which also contains N from imported ammonia.
@@ -35,7 +35,7 @@ nav_order: 15
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

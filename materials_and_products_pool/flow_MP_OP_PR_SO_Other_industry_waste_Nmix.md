@@ -14,17 +14,16 @@ nav_order: 10
 #### Flow description
 
 - **MP.OP-PR.SO-Other industry waste-Nmix** is waste from mining, manufacturing (except wet organic waste, which is assigned to the food industry) and other or unspecified industries (annen eller uspesifisert næring).
-- The category “contaminated waste” is very irregularly reported (placed in different sectors in different years) and has therefore been excluded.
 
 #### Data sources
 
-- SSB's waste accounts ([Avfallsregnskapet](https://www.ssb.no/natur-og-miljo/avfall/statistikk/avfallsregnskapet)): table [05282](https://www.ssb.no/statbank/table/05282) “Avfallsregnskap for Norge (1 000 tonn), etter materialtype, statistikkvariabel, år og kilde” (1995–2011) and table [10514](https://www.ssb.no/statbank/table/10514) «Avfallsregnskap for Norge, etter kilde og materialtype (1 000 tonn)» (2012 onward) give the generated amount of waste by material type and source sector. The statistic does not separate between food and other industry waste.
+- SSB's waste accounts ([Avfallsregnskapet](https://www.ssb.no/natur-og-miljo/avfall/statistikk/avfallsregnskapet)): table [05282](https://www.ssb.no/statbank/table/05282) “Avfallsregnskap for Norge (1 000 tonn), etter materialtype, statistikkvariabel, år og kilde” (1995–2011) and table [10514](https://www.ssb.no/statbank/table/10514) «Avfallsregnskap for Norge, etter kilde og materialtype (1 000 tonn)» (2012 onward) give the generated amount of waste by material type and source sector. The statistic does not separate between food and other industry waste. The category “contaminated waste” is very irregularly reported (placed in different sectors in different years) and has therefore been excluded.
 - SSB combines several sources: a periodic survey of about 1,600 manufacturing companies, the companies' own reporting to Miljødirektoratet in the years between, statistics on hazardous waste and waste from construction, figures from the recycling industry, and, where data are missing, estimates based on turnover or number of employees.
 - SSB (1997)<!--cite:ssb_naturressurser_1997--> reports the change in industry waste between 1992 and 1995.
 
 #### Assumptions
 
-- We make the assumption that everything in the category “wet organic waste” is from the food industry, and all other waste is assigned to other producing industry.
+- We make the assumption that everything assigned to industry in the category “wet organic waste” is from the food industry, and all other waste is assigned to other producing industry.
 - This flow uses the materials paper, plastics, wood, textiles, other materials, hazardous waste and (from 2012) mixed waste from the source sectors "Bergverk og utvinning", "Industri" and "Annen eller uspesifisert næring", plus wet organic waste from "Bergverk og utvinning".
 - N contents are mainly from Table 50 in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)<!--cite:schappi_annexes_2025-->: paper 0.28%, wood 0.25%, textiles 1%, hazardous waste 0.1%; mixed waste (0.9%) and other materials (0.2%) are assumed values, and typical, assumed values are chosen if none are given.
 - Plastic is set to 0.4% N (95% interval 0.2–0.8%) instead of the 2.1% in Table 50: the N-bearing polymers (polyurethane, polyamide, cellulose nitrate, acrylic) make up 0.40–0.44% N of the plastics imported to Norway (HS 39, 1990–2024), domestic polymer production (PE, PP, PVC) contains no N, and amino resins are left out because they are used as glue in wood panels and end up as wood waste. Plastic waste cannot contain more N than the plastic that enters use; the upper bound allows for food residues and other contamination.
@@ -32,7 +31,7 @@ nav_order: 10
 - There is a change in categorization between the two tables, where the main difference is in the category “other waste” and “mixed waste”. To ensure continuity between the data series we chose a lower value for “other waste” than for “mixed waste”.
 - Values between 1990 and 1994 are extrapolated from 1995 given the change in industry waste reported between 1992 and 1995.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 6–7 kt N per year in the mid-1990s, 5–6 kt N in 2000–2011, 4.1–4.3 kt N in 2012–2015 and about 5 kt N in 2024.
 - In 2024 mixed waste accounts for about 60% of the N, hazardous waste for about 21%, wood for 6% and plastics for 3%.
@@ -41,7 +40,7 @@ nav_order: 10
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

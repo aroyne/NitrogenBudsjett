@@ -28,14 +28,14 @@ nav_order: 6
 - N content 1.5% (95% interval 0.5–2.5%, triangular distribution) for coal, the Table 15 value for bituminous coal and the same as for solid fuels burned for energy (EF.EC-EF.IC-Fuel for industry-Nmix), and 0.0375% for oil products (the Table 15 value for "other oil"), applied to the oil feedstock excluding LPG and ethane.
 - LPG and ethane make up 50–65% of the oil feedstock and are given zero N (Table 15: ethane 0, LPG not specified).
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - In 2024 the flow is about 1.1 kt N, of which about 0.8 kt comes from coal.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

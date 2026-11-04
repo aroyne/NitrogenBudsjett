@@ -26,7 +26,7 @@ nav_order: 1
 - Emissions are calculated with Equation 46 in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)<!--cite:schappi_annexes_2025--> (after Sutton et al., 2000): 17 g N per person per year for the total population, with additional factors of 11.7 g N for infants under 1 year and 14.6 g N for children aged 1–3, plus 3.4 mg N per cigarette.
 - Daily smokers are assumed to smoke 4015 cigarettes per year (11 per day), and occasional smokers 100 per year.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 0.1 kt N per year.
 - Smoking contributes about 0.016 kt N in 1990 and 0.005 kt N in 2024; the decline in smoking offsets most of the increase from population growth.
@@ -34,7 +34,7 @@ nav_order: 1
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

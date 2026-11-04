@@ -31,14 +31,14 @@ nav_order: 6
 - 1990–2011 are held at the 2012 value, although biological treatment was smaller in the 1990s.
 - This flow gets the share delivered to green areas and soil producers.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 0.6–1.2 kt N per year; about a third of the compost and digestate goes to green areas and soil producers.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

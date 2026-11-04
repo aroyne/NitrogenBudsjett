@@ -31,7 +31,7 @@ nav_order: 3
 - Biomass is not included: biomass burned in industry (mainly black liquor, bark and wood waste) enters EF.IC via MP.OP-EF.IC-Industrial waste fuels (own-produced bioenergy, SSB table 08205), which matches the biomass reported in the CRT, so including it here as well would count it twice.
 - Gaseous fuels are not included, since natural gas contains no fuel-bound reactive nitrogen.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow declines from about 4.5 kt N in 1990 to about 1.8 kt N in 2024.
 - In 2024, solid fuels (coal and coke) contribute about 1.1 kt, waste fuels about 0.7 kt and liquid fuels about 0.05 kt; in 1990, liquid fuels (mainly heavy fuel oil) contributed about 1.4 kt.
@@ -39,7 +39,7 @@ nav_order: 3
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

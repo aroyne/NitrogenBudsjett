@@ -24,7 +24,7 @@ nav_order: 6
 - The quantities are multiplied by an N content per commodity type from the trade mapping sheet of N_parameters.xlsx.
 - All fuel commodity codes except transport fuels are included.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 13–28 kt N per year, highest around 1996–2000 and lowest in 2010–2013 (13–15 kt N), and about 14–20 kt N per year since 2014.
 - Unlike the export side, coal products (coking coal, bituminous coal, anthracite) dominate here rather than crude oil, since Norway imports comparatively little crude oil but relies on imported coal for coking and industrial use.
@@ -32,7 +32,7 @@ nav_order: 6
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

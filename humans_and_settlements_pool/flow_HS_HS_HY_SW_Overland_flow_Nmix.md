@@ -28,7 +28,7 @@ nav_order: 3
 - TEOTIL3's urban loading is the input to surface water before retention, and is used directly; the retention in lakes and rivers is counted in HY.SW-AT.AT-Emissions-N2 and -N2O.
 - TEOTIL3 has not been updated for 2024 at the time of writing; the 2024 value is held at the 2023 value.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 6–8.5 kt N per year since 2013, with the highest value in 2020, a wet year.
 - The values for 1990–2012 are constant and do not show the growth of urban areas over the period.
@@ -36,7 +36,7 @@ nav_order: 3
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

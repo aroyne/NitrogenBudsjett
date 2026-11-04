@@ -27,8 +27,14 @@ We considered added a flow *PR.WW-PR.SO-Sewage sludge to biogas-Nmix* to account
 * **PR.WW-PR.SO-Sewage sludge incineration-Nmix** is sporadically reported in SSB table 05279, ranging between zero and a maximum of 4.5 % of the total amount of sewage sludge. Because the reporting is so sporadic and numbers are small we have chosen to ignore this flow. 
 Note on sewage sludge: SSB table 05279 reports significant amounts of sewage sludge as “other use” or “unknown use”. This has not been assigned to any flows and would account for some of the missing outflow. 
 
+### Flows added or changed compared with Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->:
+
+* **PR.WW-HS.HS-Sewage sludge fertilizer-Nmix** is not in the guidelines, where sewage sludge goes only to agriculture (AG.SM) and to incineration (PR.SO). It has been added because SSB table 05279 reports sludge used on green areas and delivered to soil producers.
+* **PR.WW-PR.SO-Sewage sludge landfill-Nmix** replaces **PR.WW-PR.SO-Sewage sludge incineration-Nmix** in the guidelines. In Norway, sewage sludge to PR.SO is landfilled or used as top cover on landfills; incineration is neglected (see above).
+
 <!-- MANUAL:POOL_TEXT:END -->
 
 ### References
 
 * EMEP (2025). *Officially reported emission data*. [https://www.ceip.at/webdab-emission-database/reported-emissiondata](https://www.ceip.at/webdab-emission-database/reported-emissiondata)
+* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)

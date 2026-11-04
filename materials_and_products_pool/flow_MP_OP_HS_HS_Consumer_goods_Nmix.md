@@ -35,9 +35,9 @@ nav_order: 7
     - MP.OP-HY.SW-Untreated wastewater-Nmix (excluding the fertilizer plants listed above)
     - MP.OP-RW.RW-Other goods export-Nmix (excluding nitric acid, dicyandiamide and ammonia, for the same reason as the import flow above – MP.OP-RW.RW-Other goods export-Nmix itself still reports the full total including them)
     - MP.OP-EF.IC-Industrial waste fuels-Nmix
-- The trade-based inflow and outflow (Other goods import/export) are adjusted to exclude nitric acid and dicyandiamide specifically: both are fertilizer-production intermediates (ammonium/calcium ammonium nitrate feedstock and a nitrification inhibitor, respectively) reported within the broader 'kjemikalier' (chemicals) trade category alongside genuine consumer-good inputs such as pharmaceuticals, polyamide and resin, which are kept. This distinction is about the fertilizer industry specifically, not industry in general: explosives, though also ammonium-nitrate-based, serve mining and civil engineering rather than fertilizer production and are deliberately left in the balance. A sharp rise in Norwegian nitric acid exports from 2018 onward, most plausibly linked to increased commercial nitric acid trade by domestic fertilizer producers, had been distorting the Consumer goods trend before this adjustment.
+- The trade-based inflow and outflow (Other goods import/export) are adjusted to exclude nitric acid and dicyandiamide specifically: both are fertilizer-production intermediates (ammonium/calcium ammonium nitrate feedstock and a nitrification inhibitor, respectively) reported within the broader 'kjemikalier' (chemicals) trade category alongside genuine consumer-good inputs such as pharmaceuticals, polyamide and resin, which are kept. This distinction is about the fertilizer industry specifically, not industry in general: explosives, though also ammonium-nitrate-based, serve mining and civil engineering rather than fertilizer production and are deliberately left in the balance.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - All errors in the inflows and outflows end up in this flow: a 10% error in Other goods import alone corresponds to about 2.4 kt N, or about 25% of the flow.
 - The flow rises from about 4–6 kt N per year in 1990–1994 to about 9 kt N around 2000, 10–13.5 kt N in 2004–2011 (7.4 kt N in 2009) and 13–16.5 kt N in 2012–2022, and falls to 9–10 kt N in 2023–2024 (about 1.8 kg N per person).
@@ -48,7 +48,7 @@ nav_order: 7
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

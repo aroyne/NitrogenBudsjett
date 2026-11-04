@@ -24,14 +24,14 @@ nav_order: 14
 
 - Most Norwegian lakes are oligotrophic, but N fixation in nutrient-poor boreal lakes is generally low, and we use 0.1 t N/km² (1 kg N/ha, the mesotrophic mean) as the median of a lognormal distribution with 2 t N/km² as the upper end of the 95% interval (95% interval 0.005–2 t N/km²).
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is constant at about 2 kt N per year, with a large uncertainty (95% interval about 0.1–37 kt N).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

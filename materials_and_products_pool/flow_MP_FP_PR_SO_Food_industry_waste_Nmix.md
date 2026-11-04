@@ -29,7 +29,7 @@ nav_order: 6
 - For 1990–1994 we extrapolate using the mean value for 1995–1999.
 - From 2012 the flow also includes the food industry's share of mixed waste from "Industri" in table 10514 (35%, from [SSB table 14457](https://www.ssb.no/statbank1/table/14457/): 36% in 2015 and 33% in 2022). Before 2012 this waste was spread across the material types in table 05282, partly as wet organic waste (counted here) and partly as other materials (counted in MP.OP-PR.SO-Other industry waste-Nmix). The scaling of 1995–2011 therefore uses wet organic waste only, so the flow steps up by about 0.6 kt N in 2012 while the sum with other industry waste does not change. SSB table 14457 also shows that 99–100% of the wet organic waste from manufacturing comes from the food industry.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 1.2–1.4 kt N per year until 2011, 1.7–2.2 kt N in 2012–2021 (including the food industry's share of mixed waste from 2012) and 2.8–3.2 kt N in 2022–2024.
 - The industry sector (mainly food and fish processing) is the largest source of wet organic waste.
@@ -37,7 +37,7 @@ nav_order: 6
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

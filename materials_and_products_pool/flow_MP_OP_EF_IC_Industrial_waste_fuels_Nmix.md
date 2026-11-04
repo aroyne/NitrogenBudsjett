@@ -27,7 +27,7 @@ nav_order: 5
 - The values are converted to TJ, divided by a net calorific value of 15.6 TJ/kt and multiplied by a mean N content of 4.0 kg/t (0.4% N), the average of the whole-tree values in Table 45 of Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> (3.4 g/kg for conifers and 4.3 g/kg for broadleaves), since industrial waste wood (bark, sawdust, black liquor) is closer in composition to whole-tree biomass than to clean stem wood.
 - The energy balance values for 1990–2002 are scaled to the level of table 08205 by the ratio of the two series over 2003–2007 (about 1.06), since the energy balance also includes purchased biofuels.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 3.4–4.1 kt N per year until 2011, falls to about 1.7 kt N in 2014–2015 and has been 2.3–2.7 kt N since.
 - The decline coincides with the closure of several pulp and paper mills, among them Norske Skog Follum (2012) and Södra Cell Tofte (2013).
@@ -35,7 +35,7 @@ nav_order: 5
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

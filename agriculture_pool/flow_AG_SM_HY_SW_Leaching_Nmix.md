@@ -19,14 +19,13 @@ nav_order: 6
 
 - "3.D.2.b. Nitrogen leaching and run-off" in the UNFCCC Common Reporting Tables (CRT), Table 3.D, of the national greenhouse gas inventory ([Miljødirektoratet, NID 2026](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)): the N applied to agricultural soils (mineral fertilizer, manure, sewage sludge, grazing animals, crop residues and mineralisation) multiplied by the fraction lost through leaching and runoff (FracLEACH).
 - Norway uses a country-specific FracLEACH of 22%, derived by Bioforsk in 2011 from the agricultural catchments in the national monitoring programme JOVA; the fraction ranged from 16% on grassland to 44% in intensive vegetable, potato and cereal production ([Bioforsk, 2011](https://partner.sciencenorway.no/agriculture-agriculture--fisheries-bioforsk/updated-estimate-for-nitrogen-losses-in-agriculture/1377328)).
-- The inventory counts all manure deposited by grazing animals as input to managed soils, including the share deposited on utmark (unmanaged land), which this model does not count as input to AG.SM (see AG.MM-AG.SM-Manure application-Nmix).
 
 #### Assumptions
 
-- The utmark share (26–33% of grazing manure, see AG.MM-AG.SM-Manure application-Nmix) of the losses from grazing manure is therefore removed from this flow; the leaching is part of the runoff from upland areas measured by TEOTIL3 (FS.OL-HY.SW-Leaching-Nmix).
-- The removed leaching is FracLEACH (from CRT Table 3.D) times the utmark share of the grazing manure, about 2 kt N per year.
+- The inventory counts all manure deposited by grazing animals as input to managed soils, including the share deposited on unmanaged land (utmark), which this model does not count as input to AG.SM (see AG.MM-AG.SM-Manure application-Nmix). The unmanaged-land share (26–30% of grazing manure, see AG.MM-AG.SM-Manure application-Nmix) of the losses from grazing manure is therefore removed from this flow; the leaching is part of the runoff from upland areas measured by TEOTIL3 (FS.OL-HY.SW-Leaching-Nmix).
+- The removed leaching is FracLEACH (from CRT Table 3.D) times the unmanaged-land share of the grazing manure, about 2 kt N per year.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is 38–45 kt N per year and follows the N applied to soils, falling slowly from about 45 kt N in 1990 to 40 kt N in 2024.
 - The flow is the N leaving the root zone, not the N reaching the sea; TEOTIL3 gives 43–51 kt N from agriculture including the agricultural background in 2013–2023, before retention in lakes and rivers. The data agree within the error range with what is reported in TEOTIL3 (Sample, 2024<!--cite:sample_kildefordelte_2024-->).
@@ -34,7 +33,7 @@ nav_order: 6
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

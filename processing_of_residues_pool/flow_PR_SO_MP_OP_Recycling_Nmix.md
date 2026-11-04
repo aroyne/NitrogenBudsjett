@@ -26,7 +26,7 @@ nav_order: 8
 
 - The waste delivered to material recycling by material is multiplied by an N content per material.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow rises from about 0.8 kt N in 1990 to 2.6 kt N in 2011, jumps to 4.2 kt N in 2012 with the change of table, and is 3.4–7.7 kt N since.
 - Table 10513 introduces a new, large "mixed waste" (blandet avfall) reporting category from 2012 with no equivalent in the earlier table 05281, which shows up as the jump from 2011 to 2012.
@@ -34,7 +34,7 @@ nav_order: 8
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

@@ -25,14 +25,14 @@ nav_order: 4
 
 - Motor and aviation gasoline 0% N, jet fuel 0.1% N; the HS codes are defined in the trade mapping sheet of N_parameters.xlsx.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - Since gasoline has no fuel-bound nitrogen, the flow is small (below 0.5 kt N per year) and consists of jet fuel exports.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

@@ -14,7 +14,7 @@ nav_order: 5
 #### Flow description
 
 - **MP.FP-HY.SW-Untreated wastewater-Nmix** is N discharged to water from food industry facilities that are not connected to the municipal sewage network.
-- The database does not distinguish between emissions to surface and coastal waters, so even though several large industries discharge their wastewater to the coast, we assign this entire flow to SW in order to avoid double counting.
+- The database does not distinguish between emissions to surface and coastal waters, so even though several large industries discharge their wastewater to the coast, we assign this entire flow to SW to avoid double counting.
 
 #### Data sources
 
@@ -24,13 +24,14 @@ nav_order: 5
 
 #### Assumptions
 
+- Two single facility-year reports, 5–10 times higher than all other years of the same facility, are left out as reporting errors: Sildeslakteriet på Uthaug 2013 (374 t N, against 6–47 t N in 2014–2024; its first reported year, so not filled) and Norsk Protein Stranda 2004 (168 t N, against 0–39 t N; filled by interpolation).
 - Each facility is assigned manually to FP or OP (industry_categories.xlsx), based on the information given in the statistic.
 - A year missing inside a facility's reporting period is filled by linear interpolation between its neighbouring reported years.
 - Facilities that are not connected to the municipal network, or whose connection is unknown, are counted in this flow.
 - We extrapolate back to 1990 using the mean value for 1994–1998.
 - Miljødirektoratet's data has not been updated for 2024 at the time of writing; the 2024 value is held at the 2023 value.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 0.3–0.5 kt N per year until 2012 and 0.6–0.9 kt N from 2013.
 - From 2013 a number of salmon slaughterhouses and fish processing plants report emissions, which explains much of the increase.
@@ -39,7 +40,7 @@ nav_order: 5
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

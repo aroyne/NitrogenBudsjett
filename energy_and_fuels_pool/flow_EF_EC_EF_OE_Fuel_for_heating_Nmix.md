@@ -31,14 +31,14 @@ nav_order: 4
 - The uncertainty ranges are from IPCC 2006 Table 1.2 for the NCVs and from Table 15 for the N contents where Table 15 gives a range. The range for the NCV of other fossil fuels (between municipal waste and waste oil) and the ranges for N contents for which Table 15 gives only an average (kerosene, gas/diesel oil, heavy distillates and other fossil fuels) are our assumptions.
 - Biomass is not included: firewood burned in households (SSB table 09702, which matches the residential biomass in the CRT) and wood pellets and chips burned in other sectors (CRT 1.A.4.a and 1.A.4.c) enter EF.OE via FS.FO-EF.OE-Fuel wood for households, so including them here as well would count them twice. Gaseous fuels are not included.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - Since biomass enters via the fuel wood flow, this flow only covers fossil fuels and is small: about 0.7 kt N in 1990 and 0.2 kt N in 2024, mainly from liquid fuels.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

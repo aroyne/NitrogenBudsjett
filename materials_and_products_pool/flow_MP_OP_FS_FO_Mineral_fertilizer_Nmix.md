@@ -24,7 +24,7 @@ nav_order: 6
 
 - The area is multiplied by a standard value of 15 kg N/daa (Dalen, 2017<!--cite:dalen_lonnsomt_2017-->), which is the usual practice in Norway: a single dose of about 150 kg N/ha about 10 years before harvest (Landbruksdirektoratet, 2021)<!--cite:landbruksdirektoratet_vurdering_2021-->.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is 0.4–1.0 kt N per year in the late 1980s and early 1990s and below 0.2 kt N in 2003–2015.
 - A state subsidy of up to 40% for forest fertilization as a climate measure was introduced in 2016, and subsidies were paid for 310,000 daa in 2016–2020 (Landbruksdirektoratet, 2021)<!--cite:landbruksdirektoratet_vurdering_2021-->; the flow rose to about 1.3 kt N in 2016–2017 (84,000–91,000 daa).
@@ -33,7 +33,7 @@ nav_order: 6
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

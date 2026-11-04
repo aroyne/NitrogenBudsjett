@@ -26,7 +26,7 @@ nav_order: 1
 - Feed N is the harvested N divided by an apparent whole-system retention that rises linearly from 26% in 1990 (Ytrestøyl et al., 2015<!--cite:ytrestoyl_utilisation_2015-->) to 35.75% in 2010 (Aas et al., 2022<!--cite:aas_utilization_2022-->) and is constant after. The rise is attributed to less feed waste, so the biological retention of eaten feed is held constant and the feed waste falls from about 29% of the feed in 1990 to the measured 3% (Wang et al., 2013<!--cite:wang_chemical_2013-->) in 2010; see the [methodological note](subpool_aquaculture.html) on the Aquaculture (HY.AC) subpool page.
 - Found through mass balance by assuming N that does not become fish or waste feed is excreted, using the same aquafeed budget as the other aquafeed flows (see the [methodological note](subpool_aquaculture.html) for details and sources).
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow rises from about 1.5 kt N in 1984 to 77 kt N in 2024, following production, and is the largest N input to Norwegian coastal waters from a single source after the inflow from land.
 - Our combined losses from aquaculture to coastal waters (excretion plus waste feed) are 6–18% higher than TEOTIL3 (Sample et al., 2024)<!--cite:sample_teotil3_2024--> for 2013–2023, and considerably higher than Miljødirektoratet's earlier estimates before 2005.
@@ -36,12 +36,12 @@ nav_order: 1
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
 | N retention in farmed salmon, from 2010 | Parameter | 0.33–0.39, normal | 52% | 52% | −1.47 | −1.46 | [Waste feed](../hydrosphere_pool/flow_HY_AC_HY_CW_Waste_feed_Nmix.html), [Feed to Coastal Aquaculture](../materials_and_products_pool/flow_MP_FP_HY_AC_Feed_to_coastal_aquaculture_Nmix.html), [Aquaculture Feed Import](../rest_of_the_world_pool/flow_RW_RW_HY_AC_Aquaculture_feed_import_Nmix.html) |
-| N content of fish and seafood | Parameter | ±10 %, normal | 36% | 36% | 1.00 | 1.00 | [Waste feed](../hydrosphere_pool/flow_HY_AC_HY_CW_Waste_feed_Nmix.html), [Aquaculture production](../hydrosphere_pool/flow_HY_AC_MP_FP_Coastal_fish_and_seafood_Nmix.html), [Wild fish catch](../hydrosphere_pool/flow_HY_CW_MP_FP_Fish_(wild_catch)_Nmix.html), [Shellfish](../hydrosphere_pool/flow_HY_CW_MP_FP_Shellfish_Nmix.html) and 2 more |
+| N content of fish and seafood | Parameter | ±10 %, normal | 36% | 36% | 1.00 | 1.00 | [Waste feed](../hydrosphere_pool/flow_HY_AC_HY_CW_Waste_feed_Nmix.html), [Aquaculture production](../hydrosphere_pool/flow_HY_AC_MP_FP_Coastal_fish_and_seafood_Nmix.html), [Wild fish catch](../hydrosphere_pool/flow_HY_CW_MP_FP_Fish_(wild_catch)_Nmix.html), [Shellfish](../hydrosphere_pool/flow_HY_CW_MP_FP_Shellfish_Nmix.html) and 3 more |
 | Fisheries and aquaculture statistics (Directorate of Fisheries) (aquaculture) | Registered data | ±5 %, normal, drawn per year | 9% | 9% | 1.02 | 1.02 | [Waste feed](../hydrosphere_pool/flow_HY_AC_HY_CW_Waste_feed_Nmix.html), [Aquaculture production](../hydrosphere_pool/flow_HY_AC_MP_FP_Coastal_fish_and_seafood_Nmix.html), [Feed to Coastal Aquaculture](../materials_and_products_pool/flow_MP_FP_HY_AC_Feed_to_coastal_aquaculture_Nmix.html), [Aquaculture Feed Import](../rest_of_the_world_pool/flow_RW_RW_HY_AC_Aquaculture_feed_import_Nmix.html) |
 
 ### References

@@ -31,7 +31,7 @@ nav_order: 5
 - Before 1995 the flow is the total waste (household and industry) multiplied by the share incinerated in historical SSB records, with the overall N content of the waste equal to the 1995 value, calibrated so that the same calculation gives the 1995 value.
 - The historical records give the share incinerated for 1985 and 1992–1995; for 1990–1991 it is interpolated linearly between 1985 and 1992.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow rises from about 5.5 kt N in 1990 to 24 kt N in 2011 and 27 kt N in 2012, is 22–26 kt N in 2013–2018 and 19–23 kt N in 2019–2024.
 - The rise until 2011 follows the expansion of waste incineration, which became the main treatment for residual waste after the ban on landfilling of biodegradable waste in 2009.
@@ -40,7 +40,7 @@ nav_order: 5
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

@@ -23,9 +23,8 @@ nav_order: 6
 #### Assumptions
 
 - Each product is multiplied by its N content (for example 2.5% for beef, 2.56% for pork, 3.0% for chicken, 2.6% for mutton).
-- Only individual products are used, not FAOSTAT's aggregates.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow rises from about 17 kt N in 1990 to 19 kt N in 2024.
 - Milk is the largest product but decreases from 10.6 to 7.9 kt N, while chicken meat increases from 0.6 to 3.3 kt N, pork from 2.1 to 3.3 kt N and eggs from 1.0 to 1.4 kt N.
@@ -34,7 +33,7 @@ nav_order: 6
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

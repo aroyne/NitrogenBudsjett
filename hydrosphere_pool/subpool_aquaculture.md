@@ -27,11 +27,16 @@ Hover over the chart to inspect specific flows, or click legend items to toggle 
 * **HY.AC-MP.FP-Freshwater fish and seafood-Nmix**, **HY.AC-HY.SW-Waste feed-Nmix** and **HY.AC-HY.SW-Excretia-Nmix** are set to zero...
 * **HY.AC-AT.AT-Emissions-NH3** is set to zero assuming negligible ammonia emissions from these coastal marine cages.
 
+### Flows added or changed compared with Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->:
+
+* **RW.RW-HY.AC-Aquaculture feed import-Nmix** is not in the guidelines, where all feed to aquaculture comes from MP.FP (**MP.FP-HY.AC-Feed to coastal aquaculture-Nmix**). We split out the imported part of the feed (see the note on the feed import share above), so that the MP.FP flow only contains the domestically supplied feed.
+
 <!-- MANUAL:POOL_TEXT:END -->
 
 ### References
 
 * Aas, T. S., Åsgård, T., & Ytrestøyl, T. (2022). Utilization of feed resources in the production of Atlantic salmon (Salmo salar) in Norway: An update for 2020. *Aquaculture Reports, 26*, 101316. [https://doi.org/10.1016/j.aqrep.2022.101316](https://doi.org/10.1016/j.aqrep.2022.101316)
 * Deutsch, L., Gräslund, S., Folke, C., Troell, M., Huitric, M., Kautsky, N., & Lebel, L. (2007). Feeding aquaculture growth through globalization: Exploitation of marine ecosystems for fishmeal. *Global Environmental Change, 17*(2), 238-249. [https://doi.org/10.1016/j.gloenvcha.2006.08.004](https://doi.org/10.1016/j.gloenvcha.2006.08.004)
+* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)
 * Wang, X., Andresen, K., Handå, A., Jensen, B., Reitan, K., & Olsen, Y. (2013). Chemical composition and release rate of waste discharge from an Atlantic salmon farm with an evaluation of IMTA feasibility. *Aquaculture Environment Interactions, 4*(2), 147-162. [https://doi.org/10.3354/aei00079](https://doi.org/10.3354/aei00079)
 * Ytrestøyl, T., Aas, T. S., & Åsgård, T. (2015). Utilisation of feed resources in production of Atlantic salmon (Salmo salar) in Norway. *Aquaculture, 448*, 365-374. [https://doi.org/10.1016/j.aquaculture.2015.06.023](https://doi.org/10.1016/j.aquaculture.2015.06.023)

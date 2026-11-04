@@ -24,14 +24,14 @@ nav_order: 5
 
 - Due to lack of available data, 1990–1996 are held at the 1997 value.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 16–20 kt N per year, falling from about 18.5 kt N in 1990–1997 to 16 kt N in 2002–2005 and rising again to about 20 kt N in 2024 with population growth.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

@@ -30,7 +30,7 @@ Hover over the chart to inspect specific flows, or click legend items to toggle 
 <!-- MANUAL:POOL_TEXT:START -->
 ### Flows that are zero or neglected:
 
-* **RW.RW-MP.FP-Sea fish (landings)-Nmix** is set to zero because all wild fish catch is accounted for under HY.
+* **RW.RW-MP.FP-Sea fish (landings)-Nmix** is set to zero because all wild fish catch is accounted for as a flow from coastal water (HY.CW-MP.FP-Fish (wild catch)-Nmix). HY.CW is treated as a boundary node like RW; see the page for [Coastal Water (HY.CW)](../hydrosphere_pool/subpool_coastal_water.html).
 * **RW.RW-AG.SM-Manure import-Nmix** is assumed small and neglected based on regional boundary assumptions for agricultural surpluses (Schulte-Uebbing et al., 2022)<!--cite:schulte-uebbing_planetary_2022-->.
 * **RW.RW-HY.SW-Import of surface water-Nmix** are assumed negligible due to Norwegian topography.
 

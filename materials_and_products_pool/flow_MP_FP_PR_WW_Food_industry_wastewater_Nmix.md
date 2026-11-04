@@ -22,19 +22,20 @@ nav_order: 7
 
 #### Assumptions
 
+- Two single facility-year reports, 5–10 times higher than all other years of the same facility, are left out as reporting errors: Nortura Steinkjer 2017 (204 t N, against 2–46 t N; filled by interpolation) and Findus Tønsberg 2001 (66 t N, against 1–41 t N; its first reported year, so not filled).
 - Each facility is assigned manually to FP or OP (industry_categories.xlsx), based on the information given in the statistic.
 - A year missing inside a facility's reporting period is filled by linear interpolation between its neighbouring reported years.
 - The 2022 report from Biomar's feed factory at Myre (574 t N, against 0.065 t in 2023 and 3.9 t in 2024) is left out as a reporting error, most likely kg reported as tonnes.
 - Miljødirektoratet's data has not been updated for 2024 at the time of writing; the 2024 value is held at the 2023 value.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is small, 0.03–0.3 kt N in most years.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

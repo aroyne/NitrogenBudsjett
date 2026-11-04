@@ -19,16 +19,16 @@ nav_order: 2
 
 - N<sub>2</sub>O from industrial processes in the UNFCCC Common Reporting Tables (CRT), Table 2(I), of the national greenhouse gas inventory. N<sub>2</sub>O from nitric acid production is reported by the plants; the methods are documented in the [National Inventory Document (Miljødirektoratet, NID 2026)](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/).
 
-#### Interpretations and comparisons
+#### Interpretations
 
-- Chemical industry (2.B, nitric acid production) accounts for over 90% of the flow. Emissions are substantial, at least before 2009.
+- The chemical industry (2.B, nitric acid production) accounts for over 90% of the flow. Emissions are substantial, at least before 2009.
 - Emissions were about 4.4 kt N/year in 1990, fell from 4.3 kt N in 2005 to about 1.1 kt N in 2010 after N<sub>2</sub>O-reducing catalysts were installed in the nitric acid plants, and have been 0.5–0.8 kt N since.
 - Category 2.G (mainly N<sub>2</sub>O used as anaesthetic and propellant) contributes about 0.06 kt N/year.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

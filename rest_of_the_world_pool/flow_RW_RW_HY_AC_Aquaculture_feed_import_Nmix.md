@@ -25,18 +25,18 @@ nav_order: 8
 - Total feed N for aquaculture is the harvested fish N divided by the apparent whole-system retention, with a feed-waste fraction estimated to fall from ~29% in 1990 to the measured 3% (Wang et al., 2013)<!--cite:wang_chemical_2013--> by 2010; see the [methodological note](../hydrosphere_pool/subpool_aquaculture.html) on the Aquaculture (HY.AC) subpool page for how this is derived from the apparent whole-fish retention trend.
 - The imported share combines the share of marine ingredients, the imported part of the marine ingredients (rising from almost none before 1985), and plant-based ingredients counted as fully imported. It rises from about 11% in the mid-1980s to 92% in 2020 (see the [methodological note](../hydrosphere_pool/subpool_aquaculture.html)).
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow rises from 0.4 kt N in 1985 to about 119 kt N in 2024, following the growth of aquaculture and the shift from domestic fish meal to imported plant-based ingredients.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| N content of fish and seafood | Parameter | ±10 %, normal | 15% | 52% | 1.00 | 1.00 | [Excretia](../hydrosphere_pool/flow_HY_AC_HY_CW_Excretia_Nmix.html), [Waste feed](../hydrosphere_pool/flow_HY_AC_HY_CW_Waste_feed_Nmix.html), [Aquaculture production](../hydrosphere_pool/flow_HY_AC_MP_FP_Coastal_fish_and_seafood_Nmix.html), [Wild fish catch](../hydrosphere_pool/flow_HY_CW_MP_FP_Fish_(wild_catch)_Nmix.html) and 2 more |
+| N content of fish and seafood | Parameter | ±10 %, normal | 15% | 52% | 1.00 | 1.00 | [Excretia](../hydrosphere_pool/flow_HY_AC_HY_CW_Excretia_Nmix.html), [Waste feed](../hydrosphere_pool/flow_HY_AC_HY_CW_Waste_feed_Nmix.html), [Aquaculture production](../hydrosphere_pool/flow_HY_AC_MP_FP_Coastal_fish_and_seafood_Nmix.html), [Wild fish catch](../hydrosphere_pool/flow_HY_CW_MP_FP_Fish_(wild_catch)_Nmix.html) and 3 more |
 | N retention in farmed salmon, from 2010 | Parameter | 0.33–0.39, normal | <1% | 29% | −0.16 | −0.91 | [Excretia](../hydrosphere_pool/flow_HY_AC_HY_CW_Excretia_Nmix.html), [Waste feed](../hydrosphere_pool/flow_HY_AC_HY_CW_Waste_feed_Nmix.html), [Feed to Coastal Aquaculture](../materials_and_products_pool/flow_MP_FP_HY_AC_Feed_to_coastal_aquaculture_Nmix.html) |
 | Fisheries and aquaculture statistics (Directorate of Fisheries) (aquaculture) | Registered data | ±5 %, normal, drawn per year | 4% | 13% | 1.00 | 1.00 | [Excretia](../hydrosphere_pool/flow_HY_AC_HY_CW_Excretia_Nmix.html), [Waste feed](../hydrosphere_pool/flow_HY_AC_HY_CW_Waste_feed_Nmix.html), [Aquaculture production](../hydrosphere_pool/flow_HY_AC_MP_FP_Coastal_fish_and_seafood_Nmix.html), [Feed to Coastal Aquaculture](../materials_and_products_pool/flow_MP_FP_HY_AC_Feed_to_coastal_aquaculture_Nmix.html) |
 | Imported share of fish feed | Parameter | 0.89–0.95, normal | 24% | 5% | 4.02 | 1.00 | [Feed to Coastal Aquaculture](../materials_and_products_pool/flow_MP_FP_HY_AC_Feed_to_coastal_aquaculture_Nmix.html) |

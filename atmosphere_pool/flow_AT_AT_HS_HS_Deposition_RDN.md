@@ -24,7 +24,7 @@ nav_order: 11
 - Each year gets the value of its five-year period, so the series changes in steps.
 - 2017–2021 is the 2012–2016 value scaled by the national change since 2015 in observed (kriging) deposition in Blake et al. (2023)<!--cite:blake_deposition_2023-->, −10% for oxidised and −17% for reduced N, and later years are held at the 2017–2021 value.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow falls from about 2.5 kt N in 1984–1987 to 1.3–1.4 kt N from 2017.
 - The steps follow the five-year periods of the NILU data; the decline reflects lower emissions in Europe, more for oxidised than for reduced N.
@@ -32,7 +32,7 @@ nav_order: 11
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

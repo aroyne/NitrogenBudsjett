@@ -25,7 +25,7 @@ nav_order: 12
 - The quantities are multiplied by an N content per commodity type from the trade mapping sheet of N_parameters.xlsx.
 - No export in these categories is reported before 2002, so all previous years are set to zero.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is below 1 kt N per year, with the highest value in 2012 (0.9 kt N).
 - The increase seen from 2022 to 2023 is in the category municipal waste.
@@ -33,7 +33,7 @@ nav_order: 12
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

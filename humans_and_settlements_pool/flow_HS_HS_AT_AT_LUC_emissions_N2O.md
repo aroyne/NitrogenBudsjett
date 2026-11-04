@@ -26,7 +26,7 @@ nav_order: 2
 
 - The inventory values are used directly, converted from N<sub>2</sub>O to N.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow rose from about 0.06 kt N in 1990 to 0.1 kt N around 2010 with the expansion of settlement areas, and has been about 0.1 kt N per year since.
 - Inorganic fertilizer used in settlements (MP.OP-HS.HS-Mineral fertilizer-Nmix, about 2 kt N) is reported under another category in the inventory (IE), most likely agricultural soils (3.D). Its N<sub>2</sub>O, below 0.05 kt N per year, may therefore be counted in AG.SM-AT.AT-Emissions-N2O instead of here.
@@ -35,7 +35,7 @@ nav_order: 2
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

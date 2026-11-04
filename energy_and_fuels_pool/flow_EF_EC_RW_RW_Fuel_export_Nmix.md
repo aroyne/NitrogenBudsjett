@@ -26,7 +26,7 @@ nav_order: 7
 - N contents: crude oil (HS 2709) 0.10% (lognormal with this median and 0.05% and 0.20% as the lower and upper end of the 95% interval, from Equinor's assays of 21 Norwegian crudes: 0.01–0.20% total nitrogen, about 0.12% weighted by production in 2020–2024 and 0.08% in the 1990s), residual fuel oil 0.45%, gas/diesel oil 0.0133%, kerosene 0.1%, other oils 0.0375%, bitumen 0.7%, coal and coke 1.0–1.85% and peat 0.2%; gasoline, naphtha and natural gas condensate are included with zero N (Table 15: gasoline 0, naphtha and NGL not specified).
 - The selection of HS codes and fuel types is defined in the trade mapping sheet of N_parameters.xlsx.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - Crude oil dominates the flow, accounting for over 99% of its N content. The flow is 70–85 kt N per year in 2012–2024, after a peak of about 145 kt N around 2000 when crude oil exports were highest.
 - The uncertainty of the flow lies mainly in the N content of crude oil, which varies between fields.
@@ -34,7 +34,7 @@ nav_order: 7
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

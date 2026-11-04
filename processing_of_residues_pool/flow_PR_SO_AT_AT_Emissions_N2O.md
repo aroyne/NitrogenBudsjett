@@ -20,14 +20,14 @@ nav_order: 2
 - N<sub>2</sub>O from "5.B. Biological treatment of solid waste" and "5.C. Incineration and open burning of waste" in the UNFCCC Common Reporting Tables (CRT), Table 5, of the national greenhouse gas inventory ([Miljødirektoratet, NID 2026](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)), calculated from the amounts of waste composted, digested and incinerated and emission factors.
 - N<sub>2</sub>O from waste incinerated with energy recovery, which the inventory reports under 1.A.1.a (the “other fossil fuels” row in CRT Table 1.A(a), which includes the biogenic part of waste), as recommended in chapter 1.4.1.2 of Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is small, about 0.01 kt N in 1990 and 0.03–0.056 kt N per year since 2000. Waste incineration with energy recovery accounts for 0.006–0.02 kt N per year; the rest is mainly biological treatment.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

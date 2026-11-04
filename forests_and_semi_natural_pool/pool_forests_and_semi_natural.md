@@ -30,9 +30,9 @@ Hover over the chart to inspect specific flows, or click legend items to toggle 
 <iframe src="../output_files/plots/balance_FS.html" width="100%" height="600px" frameborder="0" scrolling="no"></iframe>
 
 <!-- MANUAL:POOL_TEXT:START -->
-Because of limited data on OL and because data on leaching are combined for WL and OL, we have chosen to combine WL and OL into the OL subpool in this study.
+Because of limited data on Other Land (OL) and because data on leaching are combined for Wetlands (WL) and OL, we have chosen to combine WL and OL into the OL subpool in this study.
 
-We have considered including meat from hunting of wild animals in flows from this subpool, but chosen not to. According to Steinset (2021)<!--cite:steinset_verdi_2021-->, the amount of wild game caught in 2019 was around 6000 tonnes, which gives around 0.2 ktN and thus smaller than any of the included flows.
+Meat from hunting is included as FS.FO-HS.HS-Game meat-Nmix (moose, red deer and roe deer, 0.12–0.19 kt N per year) and FS.OL-HS.HS-Game meat-Nmix (wild reindeer, below 0.01 kt N per year), from SSB's hunting statistics. This agrees with Steinset (2021)<!--cite:steinset_verdi_2021-->, who gives around 6000 tonnes of game meat in 2019, or around 0.15–0.2 kt N.
 
 <!-- MANUAL:POOL_TEXT:END -->
 

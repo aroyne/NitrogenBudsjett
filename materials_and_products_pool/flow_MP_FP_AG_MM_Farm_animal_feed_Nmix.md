@@ -31,23 +31,22 @@ nav_order: 1
 - Soy meal crushed in Norway is counted as imported in both sources: in Landbruksdirektoratet's statistics from 2000, and in Table 6.10 in Bruholt & Longva (1994), which lists all soybean meal as imported (42 600 t in 1994).
 - The domestic shares in Table 6.10 include concentrate feed for fish farming (92 900 t in 1985, 331 200 t in 1994, 17% of the total in 1994), which cannot be separated out. Fish feed was largely herring meal, mostly domestic, so the domestic share for farm animals alone was probably somewhat lower than the share used.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow varies between 19 and 26 kt N without a clear trend.
 - Much of the year-to-year variation is consistent with the size of the Norwegian cereal harvest, which determines how much of the carbohydrate raw material can be sourced domestically: the flow is low in 2019 (18.6 kt N), after the drought in 2018, and in 2024 (20.4 kt N), after the poor harvest in 2023, and high in 2023 (23.8 kt N).
 - In 2024 the total N in concentrate feed (this flow plus RW.RW-AG.MM-Animal feed import-Nmix) is about 54 kt N, of which almost 40% is domestic.
-- Hohmann-Marriott (2025)<!--cite:hohmann-marriott_nitrogen_2025--> found the domestic supply of animal feed in 2010 to be around 35 kt N, based on FAO statistics of production, export and import of seed cake, which is a dominant ingredient in farm animal feed. This is less than we found when combining domestic and imported animal feed. *(Note: This estimate might be too low, as it leads to a surplus here and a deficit in the AG.MM pool).*
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| N content of carbohydrate feed ingredients | Parameter | ±10 %, normal | 8% | 75% | 0.90 | 0.92 | [Animal Feed Import](../rest_of_the_world_pool/flow_RW_RW_AG_MM_Animal_feed_import_Nmix.html) |
+| N content of carbohydrate feed ingredients | Parameter | ±10 %, normal | 45% | 75% | 0.90 | 0.92 | [Animal Feed Import](../rest_of_the_world_pool/flow_RW_RW_AG_MM_Animal_feed_import_Nmix.html) |
 | Concentrate feed sales (Norwegian Agriculture Agency) | Registered data | ±5 %, normal, drawn per year | – | 24% | – | 1.00 | [Animal Feed Import](../rest_of_the_world_pool/flow_RW_RW_AG_MM_Animal_feed_import_Nmix.html) |
-| Totalkalkylen for agriculture (NIBIO) (concentrate) | Modelled statistics | ±30 %, normal | 92% | – | 1.00 | – | [Animal Feed Import](../rest_of_the_world_pool/flow_RW_RW_AG_MM_Animal_feed_import_Nmix.html) |
+| Totalkalkylen for agriculture (NIBIO), purchased concentrate feed | Modelled statistics | ±10 %, normal | 55% | – | 1.00 | – | [Animal Feed Import](../rest_of_the_world_pool/flow_RW_RW_AG_MM_Animal_feed_import_Nmix.html) |
 
 ### References
 
@@ -56,5 +55,4 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 * Eidem, B. & Ruud, T. (2022). *Fôr- og husdyrbaserte verdikjeder i norsk matproduksjon – nåsituasjon og begreper*.
 * FAO (2021). Annex 1. Food composition tables. *FOOD BALANCE SHEETS. A handbook*. [https://www.fao.org/4/x9892e/X9892e05.htm](https://www.fao.org/4/x9892e/X9892e05.htm)
 * FAO (2023). CHAPTER 2: METHODS OF FOOD ANALYSIS. *Food energy - methods of analysis and conversion factors*. [https://www.fao.org/4/y5022e/y5022e03.htm](https://www.fao.org/4/y5022e/y5022e03.htm)
-* Hohmann-Marriott, M. F. (2025). A Nitrogen budget for Norway analysis of Nitrogen flows from societal and natural sources (1961–2020). *PLOS ONE, 20*(2), e0313598. [https://doi.org/10.1371/journal.pone.0313598](https://doi.org/10.1371/journal.pone.0313598)
 * Landbruksdirektoratet (2025). *Kraftforstatistikk - årlig råvareforbruk*. [https://www.landbruksdirektoratet.no/nb/statistikk-og-utviklingstrekk/utvikling-i-jordbruket/kraftforstatistikk](https://www.landbruksdirektoratet.no/nb/statistikk-og-utviklingstrekk/utvikling-i-jordbruket/kraftforstatistikk)

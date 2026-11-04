@@ -25,14 +25,14 @@ nav_order: 17
 - 2015 has no tables and is the mean of 2014 and 2016; 1984–1996 are the mean of 1997–2001.
 - The change of EMEP model domain and version in 2007 gives a break in the deposition in Norway from foreign emitters (see RW.RW-AT.AT-Atmospheric inflow), but not in the deposition of Norwegian emissions abroad, so this flow is not corrected.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 10–12 kt N per year up to 2016 and 13–14 kt N since, much less than for oxidised N since ammonia is mainly deposited close to the source.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

@@ -29,7 +29,7 @@ nav_order: 4
 - The whole flow is counted from FS.FO. Energy wood ("rundvirke til flis", 524 000 m³ in 2025, [SSB table 14641](https://www.ssb.no/statbank/table/14641)) and bark are not part of the industrial roundwood under bark in FS.FO-MP.OP, so they are not counted twice. Of the sawmill by-products from stem wood, sawdust goes to board production and animal bedding and pulp chips to paper; only dry by-products (planer shavings, about 4 % of the sawlog volume) go partly to energy ([Belbo et al., 2022, NIBIO Rapport 8(170), Table 1](https://nibio.brage.unit.no/nibio-xmlui/handle/11250/3050195)). This small part is counted both here and in FS.FO-MP.OP.
 - Imported wood fuel (about 200 000 m³ of energy wood in 2021, about 0.4 TWh, Belbo et al., 2022) enters MP.OP via Other goods import (HS 4401). The part burned in heat plants is therefore counted both as import and in this flow.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow rises from about 0.2 kt N in 1990 to 1.1–1.8 kt N per year in 2010–2020 and 2.1–2.4 kt N in 2021–2024, following the expansion of wood-fired district heating.
 - Before 2010 the CRT biomass in 1.A.1.a is larger than "Bark, flis og tre" in table 04730 (1990: 1 060 against 103 TJ), probably plants outside the district heating statistics.
@@ -37,7 +37,7 @@ nav_order: 4
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

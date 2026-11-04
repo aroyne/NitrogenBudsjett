@@ -26,7 +26,7 @@ nav_order: 4
 - The values for 1997–2006 (and hence 1984–1996) are scaled to the level of the later tables by the ratio of the means for 2007–2009 and 2004–2006, which is 0.59. Without this correction the flow would be about twice as high before 2007.
 - 2015 has no tables and is the mean of 2014 and 2016; 1984–1996 are the mean of 1997–2001.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 28–39 kt N per year with large year-to-year variation from the meteorology, and a weak decline after 2016.
 - Inflow plus the deposition of Norwegian emissions in Norway is 52–72% of the oxidised N deposition in the NILU data used for the deposition flows, which are based on measurements (see the [Atmospheric Nitrogen Deposition Overview](../atmosphere_pool/pool_atmosphere.html)); Blake et al. (2023)<!--cite:blake_deposition_2023--> also find EMEP model deposition well below the kriging estimates.
@@ -34,7 +34,7 @@ nav_order: 4
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

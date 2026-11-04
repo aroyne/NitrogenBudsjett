@@ -13,7 +13,7 @@ nav_order: 1
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 #### Flow description
 
-- **AG.SM-AG.MM-Fodder crops-Nmix** is the N in harvested grass and green fodder (slått) and in grazing on agricultural land (innmark), which the harvest statistics do not cover.
+- **AG.SM-AG.MM-Fodder crops-Nmix** is the N in harvested grass and green fodder (slått), and in grazing on agricultural land (innmark), which the harvest statistics do not cover.
 
 #### Data sources
 
@@ -21,7 +21,7 @@ nav_order: 1
 - SSB reports grass (eng til slått) as dry matter from 2021, calculated with dry matter percentages from Tine's feed samples for each year and region and with a new sampling and weighting method. For 1995–2020 the harvest is converted via dry matter to hay, and before 1995 it was converted to hay on an energy basis ([SSB, Potet- og grovfôravlingar](https://www.ssb.no/jord-skog-jakt-og-fiskeri/jordbruk/statistikk/potet-og-grovforavlingar)). Jordbruksstatistikk 1997 gives the 1995 and 1996 harvests on both bases, and the ratio between them is 0.732 and 0.734.
 - The green fodder and silage crops («Grønfôr- og silovekstar»: Italian and Westerwolds ryegrass, forage rape and kale, grain harvested green or for crimping, green fodder mixtures and, from 2000, root crops for fodder) are reported in fresh weight, and SSB has no dry matter percentages for them (SSB, pers. comm., 2026). In SSB's survey, farmers report these crops as silage volume (m³), number of round bales or tonnes of fresh fodder ([SSB](https://www.ssb.no/innrapportering/potet-og-grovforavlinger)).
 - Protein content of grass: 2025 analyses of 13 000 grass samples from all over Norway by Tine/NorFor (Bakken et al., 2026)<!--cite:bakken_nitrogen_2026-->. The protein content of grass and fodder is known to be highly variable. As shown in Figure 3 in Volden & Schei (2025)<!--cite:volden_bedre_2025-->, there has been a slight decrease in the measured protein content of the second harvest of grass silage during 1990–2024, but not the first harvest.
-- Grazing on innmark from Budsjettnemnda for jordbruket's Totalkalkylen "Eng, beite" series (Budsjettnemnda for jordbruket (2025)<!--cite:bfj_totalkalkylen_2025-->), 1000 FEm/year, calculated by BFJ as 200 FEm/daa on innmarksbeite plus 18 FEm/daa aftermath grazing on eng til slått, both scaled by the actual-vs-normal-year harvest ratio (Landbruksdirektoratet (2021)<!--cite:landbruksdirektoratet_forressurser_2021-->).
+- Grazing on agricultural land from Budsjettnemnda for jordbruket's Totalkalkylen "Eng, beite" series (Budsjettnemnda for jordbruket (2025)<!--cite:bfj_totalkalkylen_2025-->), 1000 FEm/year, calculated by BFJ as 200 FEm/daa on innmarksbeite plus 18 FEm/daa aftermath grazing on eng til slått, both scaled by the actual-vs-normal-year harvest ratio (Landbruksdirektoratet (2021)<!--cite:landbruksdirektoratet_forressurser_2021-->).
 
 #### Assumptions
 
@@ -31,26 +31,25 @@ nav_order: 1
 - After this conversion the change of method in 2021 gives a step of about +33% from 2020 to 2021. The step is also present in official statistics and is left uncorrected here. The two periods are perturbed with independent dataset noise (±20%, normal, drawn independently for each year) in the Monte Carlo simulation, so the uncertainty in the relative level before and after 2021 is reflected in the uncertainty of trends that span the break.
 - Green fodder: the SSB yields of 1 550–2 400 kg/daa are several times the normal yields of these crops, typically 400–700 FEm/daa (NIBIO, 2026)<!--cite:nibio_gjodslingshandbok_2026-->, or roughly 400–800 kg dry matter/daa assuming 0.9–1.0 FEm per kg dry matter (own calculation; grass silage harvested at heading has 0.87 FEm per kg dry matter ([Statens landbruksforvaltning, 2011](http://img7.custompublish.com/getfile.php/4299838.1897.zsnnizlkkwizmt/Omregningstabell+og+f%C3%B4rnormer+2011.pdf))). Read as dry matter, the SSB yields would correspond to about 1 400–2 600 FEm/daa, far above the highest normal yield of 850 FEm/daa. We have therefore converted the green fodder figures to dry matter.
 - The dry matter content varies between crops and harvest methods: directly harvested ryegrass, forage rape and green fodder mixtures contain 9–17% dry matter at harvest ([NLR](https://www.nlr.no/kunnskap/fagartikler/grovfor/sor/avlingspotensiale-i-seint-sadde-ettarige-forvekster)), round-bale silage is reckoned at 25% and direct-cut silage at 20–24% dry matter in the conversion table for stored fodder used for crop failure compensation ([Statens landbruksforvaltning, 2011](http://img7.custompublish.com/getfile.php/4299838.1897.zsnnizlkkwizmt/Omregningstabell+og+f%C3%B4rnormer+2011.pdf)), grain for crimping is threshed at 50–65% dry matter ([Agropub](https://www.agropub.no/fagartikler/krossensilering-av-korn-1)), and fodder root crops contain 9–18% dry matter ([Agropub](https://www.agropub.no/fagartikler/rotvekstar-til-for)). We use a dry matter fraction of 25%, the value used for round bales, with a range of 15–40% (PERT distribution). The conversion reduces the flow by about 19 kt N in 1990, when green fodder production was large, and by 2–4 kt N/year after 2010.
-- Grazing on innmark is converted to N using the same 150 g protein/FEm assumption as the corresponding utmark-grazing flow (FS.OL-AG.MM-Grazing-Nmix).
+- Grazing on agricultural land is converted to N using the same 150 g protein/FEm assumption as the corresponding unmanaged-land grazing flow (FS.OL-AG.MM-Grazing-Nmix).
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow varies between about 53 and 101 kt N per year.
 - The low value in 2018 (53 kt N) is the drought year.
 - The step from 79 kt N in 2020 to 101 kt N in 2021 follows SSB's change of method for eng til slått in 2021 and is not corrected.
 - Eurostat's Gross Nutrient Balance, which estimates N removed by harvest and grazing of fodder for Norway from the same SSB statistics, gives a similar level (63–85 kt N per year) but a smaller increase from 2020 to 2022.
-- Hohmann-Marriott (2025)<!--cite:hohmann-marriott_nitrogen_2025--> used similar data sources but arrived at a smaller N flow (40–45 kt N) using a protein content of 8% and N content in protein of 15% (Table S2).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
 | Protein content of fodder (dry matter) | Parameter | 0.13–0.2, triangular | 49% | 52% | 0.86 | 0.87 | none |
 | Fodder crop yields from 2021 (SSB 13648) | Survey or self-reported data | ±20 %, normal, drawn per year | – | 29% | – | 0.88 | none |
-| Protein-to-N conversion factor (Jones factor) | Parameter | ±10 %, normal | 10% | 10% | −0.91 | −0.91 | [Live Animal Export](../agriculture_pool/flow_AG_MM_RW_RW_Live_animal_export_Nmix.html), [Grazing on Unmanaged Land](../forests_and_semi_natural_pool/flow_FS_OL_AG_MM_Grazing_Nmix.html), [Seeds and Planting Material](../materials_and_products_pool/flow_MP_FP_AG_SM_Seeds_and_planting_material__Nmix.html), [Food Products to Consumers](../materials_and_products_pool/flow_MP_FP_HS_HS_Food_products_Nmix.html) and 1 more |
+| Protein-to-N conversion factor (Jones factor) | Parameter | ±10 %, normal | 10% | 10% | −0.91 | −0.91 | [Manure Application](../agriculture_pool/flow_AG_MM_AG_SM_Manure_application_Nmix.html), [Manure from Grazing on Unmanaged Land](../agriculture_pool/flow_AG_MM_FS_OL_Manure_from_grazing_on_unmanaged_land_Nmix.html), [Live Animal Export](../agriculture_pool/flow_AG_MM_RW_RW_Live_animal_export_Nmix.html), [N<sub>2</sub>O emissions from denitrification](../agriculture_pool/flow_AG_SM_AT_AT_Emissions_N2O.html) and 10 more |
 | Fodder crop yields before 2021 (SSB 05772) | Survey or self-reported data | ±20 %, normal, drawn per year | 33% | 7% | 0.86 | 0.83 | none |
 | Grazing in feed units (Budget Committee for Agriculture, Totalkalkylen) | Modelled statistics | ±30 %, normal | 2% | 2% | 0.14 | 0.13 | none |
 | Dry matter share of green fodder and silage yields | Parameter | 0.15–0.4, lognormal | 3% | <1% | 0.09 | 0.01 | none |
@@ -59,7 +58,6 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 * Bakken, L., Rognlien, A., Prestløkken, E., Volden, H., & Smedshaug, C. (2026). *Nitrogen i norsk jordbruk. Kunnskapsgrunnlag, svakheter og forbedringsmuligheter*.
 * Budsjettnemnda for jordbruket (2025). *Totalkalkylen for jordbruket - statistikk*. [https://www.nibio.no/tjenester/totalkalkylen-statistikk](https://www.nibio.no/tjenester/totalkalkylen-statistikk)
-* Hohmann-Marriott, M. F. (2025). A Nitrogen budget for Norway analysis of Nitrogen flows from societal and natural sources (1961–2020). *PLOS ONE, 20*(2), e0313598. [https://doi.org/10.1371/journal.pone.0313598](https://doi.org/10.1371/journal.pone.0313598)
 * Landbruksdirektoratet (2021). *Bruk av norske fôrressurser. Utredning av forbedring av virkemidler med sikte på økt produksjon og bruk av norsk fôr*. [https://www.landbruksdirektoratet.no/nb/filarkiv/rapporter/Utredning%20av%20forbedring%20av%20virkemidler%20med%20sikte%20på%20økt%20produksjon%20og%20bruk%20av%20norsk%20fôr.pdf](https://www.landbruksdirektoratet.no/nb/filarkiv/rapporter/Utredning%20av%20forbedring%20av%20virkemidler%20med%20sikte%20på%20økt%20produksjon%20og%20bruk%20av%20norsk%20fôr.pdf)
 * NIBIO (2026). *Gjødslingshåndbok*. [https://www.nibio.no/tema/jord/gjodslingshandbok](https://www.nibio.no/tema/jord/gjodslingshandbok)
 * Volden, H. & Schei, I. (2025). Bedre grovfôrkvalitet er viktig for å nå viktige mål. *Buskap, 2-2025*. [https://www.buskap.no/article/2025/03/Bedre%20grovfôrkvalitet%20er%20viktig%20for%20å%20nå%20viktige%20mål](https://www.buskap.no/article/2025/03/Bedre%20grovfôrkvalitet%20er%20viktig%20for%20å%20nå%20viktige%20mål)

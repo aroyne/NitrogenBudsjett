@@ -31,7 +31,7 @@ nav_order: 3
 - Since the TEOTIL3 source data are inputs to surface water before retention, the sum of the four scaled categories is multiplied by 0.88, the share of these inputs that reaches the coast in TEOTIL3 over the same years. The factors are calculated from the data each time the model runs.
 - TEOTIL3 has not been updated for 2024 at the time of writing; the 2024 value is held at the 2023 value.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 100–135 kt N per year without a clear trend; the year-to-year variation follows runoff, with the highest value in the wet year 2020.
 - Agriculture and natural background from forest and other land make up most of the flow.
@@ -39,7 +39,7 @@ nav_order: 3
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

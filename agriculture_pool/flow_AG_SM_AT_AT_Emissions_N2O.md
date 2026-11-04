@@ -18,14 +18,13 @@ nav_order: 3
 #### Data sources
 
 - N<sub>2</sub>O from "3.D. Agricultural soils" in the UNFCCC Common Reporting Tables (CRT), Table 3, of the national greenhouse gas inventory, calculated as the N applied by each source multiplied by IPCC emission factors ([Miljødirektoratet, NID 2026](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)).
-- The inventory counts all manure deposited by grazing animals as input to managed soils, including the share deposited on utmark (unmanaged land), which this model does not count as input to AG.SM (see AG.MM-AG.SM-Manure application-Nmix).
 
 #### Assumptions
 
-- The utmark share (26–33% of grazing manure, see AG.MM-AG.SM-Manure application-Nmix) of the losses from grazing manure is therefore removed from this flow; it is counted in FS.OL-AT.AT-Emissions-N2O.
-- The removed N<sub>2</sub>O is the utmark share of the direct N<sub>2</sub>O from grazing manure (3.D.1.c) plus the indirect N<sub>2</sub>O from its volatilisation and leaching, calculated with the fractions and implied emission factors in CRT Table 3.D (about 0.1 kt N per year).
+- The inventory counts all manure deposited by grazing animals as input to managed soils, including the share deposited on unmanaged land (utmark), which this model does not count as input to AG.SM (see AG.MM-AG.SM-Manure application-Nmix). The unmanaged-land share (26–30% of grazing manure, see AG.MM-AG.SM-Manure application-Nmix) of the losses from grazing manure is therefore removed from this flow; it is counted in FS.OL-AT.AT-Emissions-N2O.
+- The removed N<sub>2</sub>O is the unmanaged-land share of the direct N<sub>2</sub>O from grazing manure (3.D.1.c) plus the indirect N<sub>2</sub>O from its volatilisation and leaching, calculated with the fractions and implied emission factors in CRT Table 3.D (about 0.1 kt N per year).
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 3.4–3.9 kt N per year, with a slight decrease since 1990.
 - The uncertainty is large, mainly from the emission factors (a factor of 3 in Norway's greenhouse gas inventory).
@@ -33,7 +32,7 @@ nav_order: 3
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

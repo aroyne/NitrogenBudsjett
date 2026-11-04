@@ -34,4 +34,12 @@ Hover over the chart to inspect specific flows, or click legend items to toggle 
 * **HS.HS-PR.SO-Organic waste biofuel substrate-Nmix** and **HS.HS-PR.SO-Organic waste for composting-Nmix** are not given as separate flows; instead they are included in the flow **HS.HS-PR.SO-Household waste-Nmix** because official statistics do not clearly indicate what origin waste flows end up in different end uses.
 * **HS.HS-MP.OP-Recycling-Nmix** is not reported here because the flow of wastes from all origins to recycling is assigned to the PR.SO subpool to better reflect the Norwegian waste management and statistics structure.
 
+### Flows added or changed compared with Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->:
+
+* **HS.HS-HY.SW-Overland flow-Nmix** is not in the flow tables of the guidelines. Schäppi et al. (2025) mention overland flow from residential areas during rainfall but say it may be neglected. We include it because TEOTIL3 gives the runoff of N from built-up areas.
+
 <!-- MANUAL:POOL_TEXT:END -->
+
+### References
+
+* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)

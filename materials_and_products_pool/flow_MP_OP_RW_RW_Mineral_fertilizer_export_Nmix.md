@@ -21,7 +21,7 @@ nav_order: 12
 - For Norway, export quantities are official values for 1990–1992, values from an external organization for 1993–2001 and FAO estimates based on trade data from 2002.
 - SSB's trade statistics (table 08801) do not show Norway's fertilizer exports, which are confidential and reported under a combined commodity code, so FAOSTAT is used.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow rises from about 430 kt N in 1990 to 650–790 kt N per year after 2010, about seven times the agricultural use of mineral fertilizer in Norway.
 - The fertilizer is produced from ammonia made in Norway (AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2, about 345 kt N in 2024) and imported ammonia (RW.RW-MP.OP-Ammonia import -Nmix, about 500 kt N in 2024).
@@ -29,7 +29,7 @@ nav_order: 12
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

@@ -25,7 +25,7 @@ nav_order: 2
 - The loss rate is multiplied by the agricultural area.
 - The table has no values for 1990–1998, which are interpolated between 1989 and 1999.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 14–15 kt N per year and follows the agricultural area, which rose to about 1.04 million ha around 2000 and has since fallen to 0.98 million ha.
 - It does not reflect changes in fertilization or soil conditions.
@@ -34,7 +34,7 @@ nav_order: 2
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|

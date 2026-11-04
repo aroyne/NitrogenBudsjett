@@ -24,14 +24,14 @@ nav_order: 8
 
 - As advised by Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, we assume a default value of 2% of total mineral fertilizer for non-agricultural use (range 1–3%): agricultural use is multiplied by 0.02/0.98.
 
-#### Interpretations and comparisons
+#### Interpretations
 
 - The flow is about 2 kt N per year and follows agricultural use.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-02). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
