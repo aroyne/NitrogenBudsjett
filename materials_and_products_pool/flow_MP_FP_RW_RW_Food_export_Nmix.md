@@ -28,16 +28,16 @@ nav_order: 9
   - Antarctic krill, all years: it is landed in Uruguay and does not appear as export.
   - Other fish 2000–2009: all landings abroad, which are missing from the exports before 2010.
   - Other fish 2010–2023: nothing; the landings abroad are in the exports.
-  - Other fish 2024: per landing country, the landings minus the exports of whole fresh and frozen fish (HS 0302/0303) to that country, after subtracting the exports to that country in 2023 that were not landings (assumed unchanged from 2023).
+  - Other fish 2024: per landing country, the landings minus the exports of whole fresh and frozen fish (HS 0302/0303) and industrial fish not fit for human consumption (HS 0511.9111) to that country, after subtracting the exports to that country in 2023 that were not landings (assumed unchanged from 2023). From 2024 the direct landings are recorded as industrial fish, and almost all of them are in the exports (Iceland: 65.2 kt landed, 24.7 + 40.5 kt exported).
   - Other fish 1990–1999 (no data by landing country): the 2000–2009 ratio between landings abroad and the total wild fish catch, times the catch, with extra uncertainty for the extrapolation.
 - Klippfisk (salted and dried fish) and tørrfisk (dried fish) have their own N contents, 10.3% and 12.6%, from the protein content in the Norwegian food composition table ([Matvaretabellen](https://www.matvaretabellen.no/klippfisk-saltet-og-torket/): 64.3 and 78.5 g protein per 100 g; N = protein/6.25). Other fish products, including salted but not dried fish, use 2.8% N.
 
 #### Interpretations
 
-- Fish and fish products (fresh, frozen and processed, including farmed salmon) make up about 98% of the flow, 84 of 86 kt N in 2024 (73 kt N in the export statistics and 11 kt N added landings abroad), of which klippfisk is 8.2 kt N and tørrfisk 0.4 kt N.
+- Fish and fish products (fresh, frozen and processed, including farmed salmon) make up about 98% of the flow, 82 of 84 kt N in 2024 (73 kt N in the export statistics and 9 kt N added landings abroad, almost all krill), of which klippfisk is 8.2 kt N and tørrfisk 0.4 kt N.
 - The flow rises from 30 kt N in 1990 to 75–92 kt N from 2010 and has been roughly stable since. The increase from about 60 kt N in 2006 to 80 kt N in 2009 comes from exports of fresh fish (mainly farmed salmon, HS 0302, +170 kt from 2006 to 2009) and frozen fish (HS 0303, +440 kt). After 2010 the growth in farmed fish has been offset by lower wild catches (see HY.AC-MP.FP-Coastal fish and seafood-Nmix and HY.CW-MP.FP-Fish (wild catch)-Nmix).
 - Exports of meat and of cheese are each below 0.5 kt N.
-- The added landings abroad are 4.5–8.5 kt N per year in 1990–1999, 6–12 kt N in 2000–2009, 2.6–8 kt N (krill only) in 2010–2023 and 11.4 kt N in 2024 (8.9 kt N krill). Without them, this N would stay in MP.FP and add to its surplus.
+- The added landings abroad are 4.5–8.5 kt N per year in 1990–1999, 6–12 kt N in 2000–2009 and 2.6–9 kt N (almost only krill) in 2010–2024. Without them, this N would stay in MP.FP and add to its surplus.
 - The 6 kt of fish and crustacean meal exported to Uruguay in 2024 (about 0.6 kt N, in MP.FP-RW.RW-Feed export-Nmix) is probably krill meal, so up to 0.6 kt N of krill may be counted twice that year.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
@@ -48,6 +48,6 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
 | N content of traded goods: fish fresh frozen | N content of traded goods | ±20 %, normal | 67% | 90% | 0.60 | 0.78 | [Feed Export](../materials_and_products_pool/flow_MP_FP_RW_RW_Feed_export_Nmix.html), [Food Import](../rest_of_the_world_pool/flow_RW_RW_MP_FP_Food_import_Nmix.html) |
-| Traded quantities (SSB 08801) (kjøtt/fisk/meieri/egg) | Registered data | ±5 %, normal, drawn per year | 8% | 8% | 0.82 | 0.89 | [Food Import](../rest_of_the_world_pool/flow_RW_RW_MP_FP_Food_import_Nmix.html) |
+| Traded quantities (SSB 08801) (kjøtt/fisk/meieri/egg) | Registered data | ±5 %, normal, drawn per year | 8% | 8% | 0.82 | 0.90 | [Food Import](../rest_of_the_world_pool/flow_RW_RW_MP_FP_Food_import_Nmix.html) |
 | N content of traded goods: dried salted fish | N content of traded goods | ±20 %, normal | 4% | 1% | 0.14 | 0.10 | [Food Import](../rest_of_the_world_pool/flow_RW_RW_MP_FP_Food_import_Nmix.html) |
 | Extrapolation (direct landings <2000) | Gap filling: extrapolation | ±40–50 %, lognormal, grows with distance to known year | 19% | – | 0.16 | – | none |
