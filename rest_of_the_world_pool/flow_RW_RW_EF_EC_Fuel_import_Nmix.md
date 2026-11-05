@@ -32,7 +32,7 @@ nav_order: 6
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-05). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
@@ -43,3 +43,7 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 | N content of traded goods: anthracite | N content of traded goods | 0.002–0.035 (min–max), triangular | 5% | 5% | 0.09 | 0.09 | none |
 | Traded quantities (SSB 08801) (fuel) | Registered data | ±5 %, normal, drawn per year | 3% | 2% | 1.00 | 1.00 | [Fuel export](../energy_and_fuels_pool/flow_EF_EC_RW_RW_Fuel_export_Nmix.html) |
 | N content of traded goods: lignite | N content of traded goods | 0.004–0.025 (min–max), triangular | 49% | <1% | 0.34 | 0.00 | none |
+
+### References
+
+* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)

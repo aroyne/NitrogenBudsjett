@@ -36,13 +36,13 @@ nav_order: 3
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-05). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| TEOTIL, run-off from urban areas | Modelled statistics | −50/+100 %, lognormal | 49% | 99% | 1.00 | 1.00 | none |
-| Splice TEOTIL2 to TEOTIL3, urban areas | Splice between data sources | ±20 %, normal | 3% | – | 1.00 | – | [N<sub>2</sub> emissions from denitrification in surface waters](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2.html), [Surface water N<sub>2</sub>O emissions](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2O.html), [Inflow to coastal waters](../hydrosphere_pool/flow_HY_SW_HY_CW_Inflow_to_coastal_waters_Nmix.html) |
-| Held constant or averaged (TEOTIL2) | Gap filling: held constant or averaged | ±105–125 %, lognormal, grows with distance to known year | 48% | – | 1.00 | – | none |
+| TEOTIL, run-off from urban areas | Modelled statistics | −50/+100 %, lognormal | 74% | 99% | 1.00 | 1.00 | none |
+| Splice TEOTIL2 to TEOTIL3, urban areas | Splice between data sources | ±20 %, normal | 5% | – | 1.00 | – | [N<sub>2</sub> emissions from denitrification in surface waters](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2.html), [Surface water N<sub>2</sub>O emissions](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2O.html), [Inflow to coastal waters](../hydrosphere_pool/flow_HY_SW_HY_CW_Inflow_to_coastal_waters_Nmix.html) |
+| Extrapolation (settlement area) | Gap filling: extrapolation | ±50–50 %, lognormal, grows with distance to known year | 21% | – | 1.00 | – | none |
 
 ### References
 

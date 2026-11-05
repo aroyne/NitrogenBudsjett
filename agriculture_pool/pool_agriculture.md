@@ -33,8 +33,3 @@ Hover over the chart to inspect specific flows, or click legend items to toggle 
 Because biofuel production in Norway is typically done as part of the waste management sector, flows of agricultural wastes to biofuel production are directed to PR.SO and we do not include the subpool AG.BC.
 
 <!-- MANUAL:POOL_TEXT:END -->
-
-### References
-
-* Ahlstrøm, Ø. (2024). *Halmluting*. [https://snl.no/halmluting](https://snl.no/halmluting)
-* Winiwarter, W., Hayashi, K., Geupel, M., Gu, B., Zhang, X., Sutton, M. A., Schlegel, M., Baron, J., & van Grinsven, H. J. (2025). INMS Guidance Document on National Nitrogen Budgets. *UK Centre for Ecology & Hydrology*. [https://doi.org/10.5281/zenodo.15632929](https://doi.org/10.5281/zenodo.15632929)

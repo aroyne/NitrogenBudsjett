@@ -27,11 +27,13 @@ nav_order: 4
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-05). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| NO<sub>x</sub>, Public electricity and heat production (NFR 1A1a) | Inventory with published uncertainty | ±36.2 %, normal | 100% | 100% | 0.97 | 0.98 | [Energy conversion emissions (NO<sub>x</sub>)](../energy_and_fuels_pool/flow_EF_EC_AT_AT_Emissions_NOx.html) |
+| NO<sub>x</sub>, Cremation (NFR 5C1bv) | Inventory with published uncertainty | ±20.1 %, normal | 26% | 78% | 0.66 | 0.88 | none |
+| NO<sub>x</sub>, Municipal waste incineration (NFR 5C1a) | Inventory with published uncertainty | −53.9/+117 %, lognormal | 71% | 20% | 0.26 | 0.09 | none |
+| NO<sub>x</sub>, Other waste (please specify in IIR) (NFR 5E) | Inventory with published uncertainty | −60.5/+153 %, lognormal | 3% | 2% | 0.04 | 0.02 | none |
 
 ### References
 

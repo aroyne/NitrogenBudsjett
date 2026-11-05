@@ -33,7 +33,3 @@ Hover over the chart to inspect specific flows, or click legend items to toggle 
 Because of limited data on Other Land (OL) and because data on leaching are combined for Wetlands (WL) and OL, we have chosen to combine WL and OL into the OL subpool in this study.
 
 <!-- MANUAL:POOL_TEXT:END -->
-
-### References
-
-* Steinset, T. A. (2021). Verdi og mengde av viltkjøtt. *Bærekraftig skogbruk i Norge*. [https://www.skogbruk.nibio.no/verdi-og-mengde-av-viltkjott](https://www.skogbruk.nibio.no/verdi-og-mengde-av-viltkjott)

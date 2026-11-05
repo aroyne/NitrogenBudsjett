@@ -35,7 +35,3 @@ Hover over the chart to inspect specific flows, or click legend items to toggle 
 * **RW.RW-HY.SW-Import of surface water-Nmix** are assumed negligible due to Norwegian topography.
 
 <!-- MANUAL:POOL_TEXT:END -->
-
-### References
-
-* Schulte-Uebbing, L. F., Beusen, A. H. W., Bouwman, A. F., & de Vries, W. (2022). From planetary to regional boundaries for agricultural nitrogen pollution. *Nature, 610*(7932), 507-512. [https://doi.org/10.1038/s41586-022-05158-2](https://doi.org/10.1038/s41586-022-05158-2)

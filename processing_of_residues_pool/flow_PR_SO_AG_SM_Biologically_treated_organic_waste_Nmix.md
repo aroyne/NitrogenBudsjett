@@ -41,16 +41,17 @@ nav_order: 1
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-05). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| N content of wet organic waste | N content of waste | 0.004–0.0165, triangular | 32% | 80% | 0.85 | 0.92 | [Household and Settlement Waste](../humans_and_settlements_pool/flow_HS_HS_PR_SO_Household_waste_Nmix.html), [Food Industry Waste](../materials_and_products_pool/flow_MP_FP_PR_SO_Food_industry_waste_Nmix.html), [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html), [Other Industry Waste](../materials_and_products_pool/flow_MP_OP_PR_SO_Other_industry_waste_Nmix.html) and 3 more |
-| Waste treatment from 2012 (SSB 10513) (biological treatment) | Survey or self-reported data | ±20 %, normal, drawn per year | 4% | 8% | 1.00 | 1.00 | [Biologically treated organic waste to HS](../processing_of_residues_pool/flow_PR_SO_HS_HS_Biologically_treated_organic_waste_Nmix.html) |
-| Use of digestate and compost (SSB 12818) | Survey or self-reported data | ±20 %, normal, drawn per year | 3% | 7% | 1.00 | 1.00 | [Biologically treated organic waste to HS](../processing_of_residues_pool/flow_PR_SO_HS_HS_Biologically_treated_organic_waste_Nmix.html) |
+| N content of wet organic waste | N content of waste | 0.004–0.0165, triangular | 52% | 80% | 0.85 | 0.92 | [Household and Settlement Waste](../humans_and_settlements_pool/flow_HS_HS_PR_SO_Household_waste_Nmix.html), [Food Industry Waste](../materials_and_products_pool/flow_MP_FP_PR_SO_Food_industry_waste_Nmix.html), [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html), [Other Industry Waste](../materials_and_products_pool/flow_MP_OP_PR_SO_Other_industry_waste_Nmix.html) and 3 more |
+| Waste treatment from 2012 (SSB 10513) (biological treatment) | Survey or self-reported data | ±20 %, normal, drawn per year | – | 8% | – | 1.00 | [Biologically treated organic waste to HS](../processing_of_residues_pool/flow_PR_SO_HS_HS_Biologically_treated_organic_waste_Nmix.html) |
+| Use of digestate and compost (SSB 12818) | Survey or self-reported data | ±20 %, normal, drawn per year | 6% | 7% | 1.00 | 1.00 | [Biologically treated organic waste to HS](../processing_of_residues_pool/flow_PR_SO_HS_HS_Biologically_treated_organic_waste_Nmix.html) |
 | N loss in biogas treatment | Parameter | 0.06–0.3, triangular | <1% | 2% | −0.02 | −0.09 | [Biologically treated organic waste to HS](../processing_of_residues_pool/flow_PR_SO_HS_HS_Biologically_treated_organic_waste_Nmix.html) |
-| N loss in composting | N content of waste | 0.1–0.7, triangular | 11% | 2% | −0.34 | −0.09 | [Biologically treated organic waste to HS](../processing_of_residues_pool/flow_PR_SO_HS_HS_Biologically_treated_organic_waste_Nmix.html) |
-| Held constant or averaged (biologically treated waste:2012) | Gap filling: held constant or averaged | ±100–120 %, lognormal, grows with distance to known year | 48% | – | 1.00 | – | [Biologically treated organic waste to HS](../processing_of_residues_pool/flow_PR_SO_HS_HS_Biologically_treated_organic_waste_Nmix.html) |
+| N loss in composting | N content of waste | 0.1–0.7, triangular | 19% | 2% | −0.34 | −0.09 | [Biologically treated organic waste to HS](../processing_of_residues_pool/flow_PR_SO_HS_HS_Biologically_treated_organic_waste_Nmix.html) |
+| Waste treatment 1995–2011 (SSB 05281) (biological treatment) | Survey or self-reported data | ±30 %, normal, drawn per year | 14% | – | 1.00 | – | [Biologically treated organic waste to HS](../processing_of_residues_pool/flow_PR_SO_HS_HS_Biologically_treated_organic_waste_Nmix.html) |
+| Held constant or averaged (biologically treated waste:1995) | Gap filling: held constant or averaged | ±15–35 %, lognormal, grows with distance to known year | 7% | – | 1.00 | – | [Biologically treated organic waste to HS](../processing_of_residues_pool/flow_PR_SO_HS_HS_Biologically_treated_organic_waste_Nmix.html) |
 
 ### References
 

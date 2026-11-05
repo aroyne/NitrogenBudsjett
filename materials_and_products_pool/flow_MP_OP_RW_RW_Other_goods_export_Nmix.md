@@ -38,14 +38,15 @@ nav_order: 13
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-04). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-05). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| N content of traded goods: wood products | N content of traded goods | 0.001–0.0049, triangular | 97% | 54% | 0.49 | 0.11 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html), [Food Import](../rest_of_the_world_pool/flow_RW_RW_MP_FP_Food_import_Nmix.html), [Other Goods Import](../rest_of_the_world_pool/flow_RW_RW_MP_OP_Other_goods_import__Nmix.html) |
-| N content of traded goods: roundwood conifer | N content of traded goods | 0.0007–0.0017, triangular | 1% | 35% | 0.08 | 0.21 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html), [Other Goods Import](../rest_of_the_world_pool/flow_RW_RW_MP_OP_Other_goods_import__Nmix.html) |
-| Traded quantities (SSB 08801) (kjemikalier) | Registered data | ±5 %, normal, drawn per year | <1% | 3% | 0.07 | 0.52 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html), [Other Goods Import](../rest_of_the_world_pool/flow_RW_RW_MP_OP_Other_goods_import__Nmix.html) |
-| N content of traded goods: nitric acid | N content of traded goods | ±5 %, normal | – | 3% | – | 0.51 | [Other Goods Import](../rest_of_the_world_pool/flow_RW_RW_MP_OP_Other_goods_import__Nmix.html) |
+| N content of traded goods: wood products | N content of traded goods | 0.001–0.0049, triangular | 97% | 53% | 0.49 | 0.11 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html), [Food Import](../rest_of_the_world_pool/flow_RW_RW_MP_FP_Food_import_Nmix.html), [Other Goods Import](../rest_of_the_world_pool/flow_RW_RW_MP_OP_Other_goods_import__Nmix.html) |
+| N content of traded goods: roundwood conifer | N content of traded goods | 0.0007–0.0017, triangular | 1% | 34% | 0.08 | 0.20 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html), [Other Goods Import](../rest_of_the_world_pool/flow_RW_RW_MP_OP_Other_goods_import__Nmix.html) |
+| Traded quantities (SSB 08801) (kjemikalier) | Registered data | ±5 %, normal, drawn per year | <1% | 3% | 0.07 | 0.50 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html), [Other Goods Import](../rest_of_the_world_pool/flow_RW_RW_MP_OP_Other_goods_import__Nmix.html) |
+| N content of traded goods: nitric acid | N content of traded goods | ±5 %, normal | – | 3% | – | 0.49 | [Other Goods Import](../rest_of_the_world_pool/flow_RW_RW_MP_OP_Other_goods_import__Nmix.html) |
+| N content of traded goods: aqueous ammonia | N content of traded goods | 0.08–0.29 (min–max), triangular | <1% | 2% | 0.00 | 0.05 | [Ammonia Synthesis N<sub>2</sub> Fixation](../atmosphere_pool/flow_AT_AT_MP_OP_Ammonia_synthesis_N2_fixation_N2.html), [Ammonia Import](../rest_of_the_world_pool/flow_RW_RW_MP_OP_Ammonia_import__Nmix.html) |
 
 ### References
 
