@@ -23,7 +23,7 @@ nav_order: 4
 
 #### Assumptions
 
-- Motor and aviation gasoline 0% N, jet fuel 0.1% N; the HS codes are defined in the trade mapping sheet of N_parameters.xlsx.
+- Motor and aviation gasoline 0% N, jet fuel 0.1% N.
 
 #### Interpretations
 

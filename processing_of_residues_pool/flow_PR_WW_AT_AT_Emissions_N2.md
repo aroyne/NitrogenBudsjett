@@ -22,7 +22,7 @@ nav_order: 2
 #### Assumptions
 
 - For each plant, the N discharged is converted to N removed with the plant's removal rate r as N discharged × r/(1 − r).
-- Where specific data on the nitrogen removal fraction were missing we assumed a default of 70%, and we extrapolated or interpolated between existing data where reported emission data were missing.
+- Where specific data on the nitrogen removal fraction were missing, we assumed a default of 70%, and we extrapolated or interpolated between existing data where reported emission data were missing.
 
 #### Interpretations
 

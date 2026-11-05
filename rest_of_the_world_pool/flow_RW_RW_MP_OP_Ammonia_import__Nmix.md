@@ -21,7 +21,7 @@ nav_order: 10
 
 #### Assumptions
 
-- The quantities are multiplied by an N content per commodity type from the trade mapping sheet of N_parameters.xlsx.
+- Ammonia (HS 2814.10) has 82.35% N (stoichiometry). Ammonia in aqueous solution (HS 2814.20) is given an assumed 5% N.
 
 #### Interpretations
 

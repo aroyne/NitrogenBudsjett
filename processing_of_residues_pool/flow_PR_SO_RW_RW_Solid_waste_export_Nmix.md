@@ -22,7 +22,6 @@ nav_order: 12
 
 #### Assumptions
 
-- The quantities are multiplied by an N content per commodity type from the trade mapping sheet of N_parameters.xlsx.
 - No export in these categories is reported before 2002, so all previous years are set to zero.
 
 #### Interpretations

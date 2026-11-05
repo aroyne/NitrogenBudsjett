@@ -21,7 +21,7 @@ nav_order: 6
 
 #### Assumptions
 
-- The quantities are multiplied by an N content per commodity type from the trade mapping sheet of N_parameters.xlsx.
+- The quantities are multiplied by an N content per fuel type, the same as for EF.EC-RW.RW-Fuel export-Nmix: mostly the average values in Table 15 in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)<!--cite:schappi_annexes_2025-->, and for crude oil 0.10% from Equinor's crude oil assays.
 - All fuel commodity codes except transport fuels are included.
 
 #### Interpretations

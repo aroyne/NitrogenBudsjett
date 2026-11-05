@@ -21,7 +21,7 @@ nav_order: 12
 
 #### Assumptions
 
-- The quantities are multiplied by an N content per commodity type from the trade mapping sheet of N_parameters.xlsx.
+- The quantities are multiplied by an N content per waste type, mostly from Table 50 in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)<!--cite:schappi_annexes_2025-->: municipal waste and residual products from the chemical industry 0.9% (household and similar wastes), paper and cardboard 0.28%, textiles 1.0% and clinical waste 0.1%; sewage sludge 2.6% (lower end of Table 54), rubber 1.3% (Table 23) and plastics 0.4%, the share of N in imported plastics (SSB 08801, HS 39) from the N-containing polymers polyurethane, polyamide, polyacrylonitrile and cellulose nitrate (Table 23 in Schäppi et al. (2025) gives the N contents of these polymers; Table 50 gives 2.1% for plastic waste, more than the N that enters Norway in plastics).
 
 #### Interpretations
 

@@ -20,8 +20,8 @@ Hover over the chart to inspect specific flows, or click legend items to toggle 
 <!-- MANUAL:POOL_TEXT:START -->
 ### Flows that are zero or neglected:
 
-* **FS.OL-AT.AT-Emissions-NOx** from the soils themselves is neglected because no values are reported in the CRLTAP/WebDab categories 4F1 and 4F2 (wetlands / other land NO<sub>x</sub>). The NO<sub>x</sub> from manure deposited by grazing animals on unmanaged land is included in this flow (see below).
-* Following Swedish NBB (Jutterström et al., 2020)<!--cite:jutterstrom_swedish_2020-->, we also consider denitrification in the OL pool to be negligible and therefore neglect **FS.OL-AT.AT-Emissions-N2**. **FS.OL-AT.AT-Emissions-N2O** only includes N<sub>2</sub>O from manure deposited by grazing animals on unmanaged land.
+* NO<sub>x</sub> from the soils of other land is neglected because no values are reported in the CRLTAP/WebDab categories 4F1 and 4F2 (wetlands / other land).
+* Following Swedish NBB (Jutterström et al., 2020)<!--cite:jutterstrom_swedish_2020-->, we also consider denitrification in the OL pool to be negligible and therefore neglect **FS.OL-AT.AT-Emissions-N2**.
 
 ### Manure from grazing on unmanaged land
 

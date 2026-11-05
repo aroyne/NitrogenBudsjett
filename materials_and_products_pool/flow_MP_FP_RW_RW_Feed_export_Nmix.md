@@ -21,7 +21,7 @@ nav_order: 8
 
 #### Assumptions
 
-- Each commodity code is assigned a commodity type and an N content in the trade mapping sheet of N_parameters.xlsx, and quantities are multiplied by the N content.
+- Each commodity code is assigned an N content, mostly from Tables 21 and 25 in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)<!--cite:schappi_annexes_2025-->, and quantities are multiplied by it.
 - Fish meal (HS 2301 20) and meat meal (HS 2301 10) have 10.7% N (Fish Meal and Meat Meal in Table 21 of Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->).
 
 #### Interpretations

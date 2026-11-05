@@ -21,7 +21,7 @@ nav_order: 11
 
 #### Assumptions
 
-- The quantities are multiplied by an N content per commodity type from the trade mapping sheet of N_parameters.xlsx.
+- Used clothing and other used textile articles (HS 6309) are given the N content of textile waste, 1.0% (Table 50 in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)<!--cite:schappi_annexes_2025-->).
 
 #### Interpretations
 

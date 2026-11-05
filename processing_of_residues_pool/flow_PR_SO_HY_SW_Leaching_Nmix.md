@@ -17,7 +17,7 @@ nav_order: 7
 
 #### Data sources
 
-- Landfills with discharge permits report their annual emissions of total nitrogen to water to Miljødirektoratet, published in [Norske utslipp](https://www.norskeutslipp.no) (Miljødirektoratet, 2026<!--cite:miljodirektoratet_norske_2026-->; Utslipp_deponi.xlsx); the values are measured or calculated by the landfill operators. Reported data only cover a single landfill in 2009–2010 and are not representative.
+- Landfills with discharge permits report their annual emissions of total nitrogen to water to Miljødirektoratet, published in [Norske utslipp](https://www.norskeutslipp.no) (Miljødirektoratet, 2026<!--cite:miljodirektoratet_norske_2026-->); the values are measured or calculated by the landfill operators. The reports start in 2011 (88 landfills); in 2009 and 2010 only one landfill reported, so these two years are not used.
 - Methane from landfills in the national inventory (CRT Table 5, 5.A), which is calculated with a first-order decay model of the waste landfilled in earlier years and so follows the decomposition that also produces leachate. Methane from landfills fell from 82.5 kt in 1990 to 51.6 kt in 2010 and 28.6 kt in 2024.
 
 #### Assumptions

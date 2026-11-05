@@ -21,7 +21,7 @@ nav_order: 2
 
 #### Assumptions
 
-- Typical live weights per animal type from various sources (animal_weights sheet of N_parameters.xlsx), an average of 16% protein in the whole animal (range 14–22%) and the standard Jones factor 6.25 for nitrogen to protein.
+- Typical live weights per animal type, mostly from IPCC (2006), Vol. 4, Ch. 10, Tables 10A-5 to 10A-9 (Western Europe or developed countries), an average of 16% protein in the whole animal (range 14–22%) and the standard Jones factor 6.25 for nitrogen to protein.
 
 #### Interpretations
 

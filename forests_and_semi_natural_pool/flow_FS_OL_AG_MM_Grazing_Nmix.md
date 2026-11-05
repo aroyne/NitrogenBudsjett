@@ -21,7 +21,6 @@ nav_order: 1
 - Hegrenes & Asheim (2006)<!--cite:hegrenes_verdi_2006-->, Table 1.2, after Garmo & Skurdal (1998), estimate that livestock took up 303 mill. FEm on unmanaged land in 1996: 70% by sheep, 27% by cattle, 2% by goats and 1% by horses.
 - The number of winter-fed sheep from SSB ([table 03710](https://www.ssb.no/statbank/table/03710)).
 - For reindeer, the N in urine and dung deposited by reindeer on pasture (category 3.B.4.h.ii) in the UNFCCC Common Reporting Tables (CRT), Table 3.B(b), of the national greenhouse gas inventory.
-- The statistics on organised grazing (Organisert beitebruk) are not used, since they grew in the early 1990s as more farmers joined grazing associations and so do not show the number of animals on unmanaged land.
 
 #### Assumptions
 

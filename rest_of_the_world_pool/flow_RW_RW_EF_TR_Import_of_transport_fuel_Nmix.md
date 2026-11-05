@@ -21,7 +21,7 @@ nav_order: 7
 
 #### Assumptions
 
-- The quantities are multiplied by an N content per commodity type from the trade mapping sheet of N_parameters.xlsx.
+- The quantities are multiplied by an N content per fuel type from Table 15 in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)<!--cite:schappi_annexes_2025-->: motor and aviation gasoline 0% and jet fuel 0.1%.
 - Only the commodity codes for transport fuels are included.
 
 #### Interpretations

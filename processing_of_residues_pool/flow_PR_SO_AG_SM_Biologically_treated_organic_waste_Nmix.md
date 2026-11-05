@@ -24,7 +24,7 @@ nav_order: 1
 
 #### Assumptions
 
-- N in: the waste delivered to biogas production and composting multiplied by the N content per waste type.
+- N in the waste delivered to biogas production and composting multiplied by the N content per waste type.
 - N out: part of the N is lost as NH<sub>3</sub>, N<sub>2</sub>O and N<sub>2</sub> during treatment; we assume a loss of 10% in biogas production (digestate_loss_fraction) and 30% in composting (compost_N_loss).
 - The N is calculated from the N delivered to treatment, not from the mass of the products, since most of the mass lost during treatment is water and carbon (in 2018, 515 kt of waste was delivered and 286 kt of products were disposed of).
 - Before 2018 the 2018 shares by use are used.

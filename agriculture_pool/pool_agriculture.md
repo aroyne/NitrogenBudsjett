@@ -32,8 +32,6 @@ Hover over the chart to inspect specific flows, or click legend items to toggle 
 <!-- MANUAL:POOL_TEXT:START -->
 Because biofuel production in Norway is typically done as part of the waste management sector, flows of agricultural wastes to biofuel production are directed to PR.SO and we do not include the subpool AG.BC.
 
-Bleken and Bakken (1997) included the use of NH<sub>3</sub> for straw treatment ("halmluting") as a separate flow of around 3 kt N/year. This flow has no natural placement in the NNB framework of Winiwarter et al. (2025)<!--cite:winiwarter_inms_2025-->, and it is unclear whether it would belong to AG.MM or AG.SM in our framework. Since the use of treated straw has decreased significantly since the late 1990s (Ahlstrøm, 2024)<!--cite:ahlstrom_halmluting_2024-->, we have chosen not to include this flow in our NNB.
-
 <!-- MANUAL:POOL_TEXT:END -->
 
 ### References

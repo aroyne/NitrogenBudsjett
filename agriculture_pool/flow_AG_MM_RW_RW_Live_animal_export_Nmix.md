@@ -23,7 +23,7 @@ nav_order: 8
 #### Assumptions
 
 - Poultry numbers are converted from thousands to animals.
-- The number is multiplied by an average live weight per category (e.g. other cattle 420 kg, breeding pigs 198 kg, sheep 48.5 kg, goats 38.5 kg, horses 377 kg, laying hens 1.8 kg; animal_weights in N_parameters.xlsx), an average of 16% protein in the whole animal based on typical values in Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> and the standard Jones factor 6.25 for nitrogen to protein.
+- The number is multiplied by an average live weight per category (e.g. other cattle 420 kg, breeding pigs 198 kg, sheep 48.5 kg, goats 38.5 kg, horses 377 kg, laying hens 1.8 kg; mostly from IPCC (2006), Vol. 4, Ch. 10, Tables 10A-5 to 10A-9), an average of 16% protein in the whole animal based on typical values in Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> and the standard Jones factor 6.25 for nitrogen to protein.
 
 #### Interpretations
 

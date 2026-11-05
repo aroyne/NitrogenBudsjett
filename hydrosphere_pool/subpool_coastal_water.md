@@ -27,7 +27,7 @@ The wild catch comes from large sea areas, not only from Norwegian coastal water
 * **HY.CW-AT.AT-Emissions-N2** is neglected as we do not use mass balance on this subpool.
 * **HY.CW-AT.AT-Emissions-N2O** and **HY.CW-AT.AT-Emissions-NOx** are neglected as we lack a clearly defined area for coastal waters.
 * **HY.CW-PR.SO-Biomass for energy production-Nmix** is neglected because organic material from the processing of caught or farmed fish is assigned to the MP.FS subpool...
-* **Recreational fishing** is not included in the official guidelines, and we have also chosen to neglect it here...
+* **Recreational fishing** is not included in the official guidelines, and we have also chosen to neglect it here.
 
 ### Flows added or changed compared with Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->:
 
