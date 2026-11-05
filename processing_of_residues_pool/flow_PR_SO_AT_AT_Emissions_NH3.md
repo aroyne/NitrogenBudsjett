@@ -13,8 +13,8 @@ nav_order: 3
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 #### Flow description
 
-- **PR.SO-AT.AT-Emissions-NH3** is ammonia from waste treatment, using the categories given in Tables 48 and 31 of Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->: the waste incineration part of 1A1a (public electricity and heat production), 5A (solid waste disposal), 5B1 composting, 5B2 anaerobic digestion, 5C (incineration) and 5E (other waste).
-- 1A1a is split between waste incineration (counted here) and other heat and power plants (counted in EF.EC-AT.AT) by the waste share of the 1.A.1.a fuel use in the CRT (17–50 %, about 50 % in 2024), as recommended in chapter 1.4.1.2 of Schäppi et al. (2025). NH<sub>3</sub> from 1A1a is reported only from 2021 and is below 0.001 kt N/year.
+- **PR.SO-AT.AT-Emissions-NH3** is ammonia from waste treatment, using the categories given in Tables 48 and 31 of Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->: 5A (solid waste disposal), 5B1 composting, 5B2 anaerobic digestion, 5C (incineration) and 5E (other waste).
+- Table 48 also lists 1A1a (public electricity and heat production) for waste incineration with energy recovery. Since the incinerated waste is delivered to EF.EC (PR.SO-EF.EC-Waste to energy-Nmix), all of 1A1a is counted in EF.EC-AT.AT.
 
 #### Data sources
 

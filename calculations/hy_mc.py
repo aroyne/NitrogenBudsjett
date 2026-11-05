@@ -68,6 +68,7 @@ def _add_inflow_to_coastal_waters(results, preloaded_data, current_params, datas
     ww_discharge_dict = find_treated_wastewater_discharge(
         df_05280=preloaded_data.get('hy_ssb_05280_raw'),
         df_utslipp=preloaded_data.get('hy_utslipp_avlop_raw'),
+        population=preloaded_data['ssb_06913']['Befolkning 1. januar'],
         dataset_noise=dataset_noise
     )
 

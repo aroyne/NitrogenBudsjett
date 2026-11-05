@@ -1115,12 +1115,12 @@ def find_recycling(preloaded_data, current_params, current_trade_factors, datase
             for year, val in year_values.items()}
 
 
-def find_treated_wastewater_discharge(df_05280, df_utslipp, dataset_noise):
+def find_treated_wastewater_discharge(df_05280, df_utslipp, population, dataset_noise):
     """
     Computes N discharged from treated municipal wastewater (used by
     hy_mc.py's _add_inflow_to_coastal_waters), combining SSB table 05280
     (2002-2023) with an older historical series (1997-2001), with 1990-1996
-    held flat at the 1997 value.
+    scaled from 1997 with the population (SSB table 06913).
     """
     ww_discharge = {}
 
@@ -1149,9 +1149,10 @@ def find_treated_wastewater_discharge(df_05280, df_utslipp, dataset_noise):
         if year == 1997:
             value_1997 = val_kt_N
 
-    # --- PART 3: 1990-1996, held flat at the 1997 value ---
+    # --- PART 3: 1990-1996, the 1997 value scaled with the population ---
     for year in range(1990, 1997):
-        ww_discharge[year] = value_1997 * dataset_noise.fill('carry', 'treated wastewater:1997', year, [1997])
+        ww_discharge[year] = (value_1997 * population[year] / population[1997]
+                              * dataset_noise.fill('extrapolation', 'treated wastewater:1997', year, [1997]))
 
     return ww_discharge
 

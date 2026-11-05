@@ -17,7 +17,7 @@ nav_order: 7
 
 #### Data sources
 
-- Landfills with discharge permits report their annual emissions of total nitrogen to water to Miljødirektoratet, published in [Norske utslipp](https://www.norskeutslipp.no) (Miljødirektoratet, 2026<!--cite:miljodirektoratet_norske_2026-->); the values are measured or calculated by the landfill operators. The reports start in 2011 (88 landfills); in 2009 and 2010 only one landfill reported, so these two years are not used.
+- Landfills with discharge permits report their annual emissions of total nitrogen to water to Miljødirektoratet, published in [Norske utslipp](https://www.norskeutslipp.no) (Miljødirektoratet, 2026<!--cite:miljodirektoratet_norske_2026-->); the values are measured or calculated by the landfill operators. The reports start in 2011 (88 landfills); in 2009 and 2010 only one landfill reported, so these two years are not used. Five single reports are left out as outliers, since they are 20–360 times the landfill's own median and several hundred tonnes N in years when all landfills together report about 1 kt N: Stormyra (2015, 927 t), Glør (2011, 644 t), Røyken (2018, 425 t), Enger (2017, 131 t) and Norske Skog Skogn, Valum (2021, 125 t).
 - Methane from landfills in the national inventory (CRT Table 5, 5.A), which is calculated with a first-order decay model of the waste landfilled in earlier years and so follows the decomposition that also produces leachate. Methane from landfills fell from 82.5 kt in 1990 to 51.6 kt in 2010 and 28.6 kt in 2024.
 
 #### Assumptions

@@ -15,7 +15,6 @@ from calculations.utils import (
     EXPECTED_YEARS,
     report_missing_years,
     load_crltap_emissions_to_N,
-    crltap_1a1a_part,
     process_generic_trade_flow
 )
 from calculations.shared_flow_calculations import find_feedstock_fuel
@@ -23,11 +22,10 @@ from calculations.shared_flow_calculations import find_feedstock_fuel
 # CRLTAP category codes per EF subsector, used to select which rows of the
 # CRLTAP inventory (webdabData1868031.txt, loaded as 'ag_crltap_raw_lines') to
 # sum for each subsector's NH3/NOx emissions.
-# 1A1a (public electricity and heat, incl. waste incineration with energy recovery) is
-# deliberately left out here: it is counted under PR.SO (PR_SO_CRLTAP_SECTORS in
-# pr_mc.py), cf. Schäppi et al. (2025) ch. 1.4.1.2, and including it in both pools
-# double-counted it.
-CRLTAP_EC_SECTORS = ['1A1b', '1A1c', '1B1a', '1B1b', '1B1c', '1B2ai', '1B2aiv', '1B2av', '1B2b', '1B2c', '1B2d']
+# 1A1a (public electricity and heat) is counted here in full, including waste
+# incineration with energy recovery, since that waste is delivered to EF.EC
+# (PR.SO-EF.EC-Waste to energy-Nmix).
+CRLTAP_EC_SECTORS = ['1A1a', '1A1b', '1A1c', '1B1a', '1B1b', '1B1c', '1B2ai', '1B2aiv', '1B2av', '1B2b', '1B2c', '1B2d']
 CRLTAP_IC_SECTORS = ['1A2a', '1A2b', '1A2c', '1A2d', '1A2e', '1A2f', '1A2gvii', '1A2gviii']
 # 1A3aii(ii) (domestic aviation cruise) is a memo item in CLRTAP and not in Schäppi et al.
 # (2025) Table 13, but is included here because it is a domestic emission and the EF.TR
@@ -52,7 +50,7 @@ def execute_calculations_ef(preloaded_data, current_params, dataset_noise, curre
     # EC has no NH3 variant: no NH3 combustion emissions are modeled for energy
     # industries (see energy_and_fuels_pool/flow_EF_EC_AT_AT_Emissions_*.md - only
     # NOx and N2O flows exist for EC). This is intentional, not a missing function.
-    _add_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'EF.EC-AT.AT-Emissions-NOx', CRLTAP_EC_SECTORS, 'NOx', add_1a1a_non_waste=True)
+    _add_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, 'EF.EC-AT.AT-Emissions-NOx', CRLTAP_EC_SECTORS, 'NOx')
     _add_n2o_emissions_mc(results, preloaded_data, dataset_noise, 'EF.EC-AT.AT-Emissions-N2O', 'value_EC')
     _add_fuel_export_mc(results, preloaded_data, current_params, current_trade_factors, dataset_noise)
 
@@ -134,15 +132,12 @@ def _add_fuel_used_as_feedstock_mc(results, preloaded_data, current_params, data
     report_missing_years(flow_code, EXPECTED_YEARS - collected_years, results)
 
 
-def _add_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, flow_code, sectors, pollutant, add_1a1a_non_waste=False):
+def _add_crltap_emissions_mc(results, preloaded_data, current_params, dataset_noise, flow_code, sectors, pollutant):
     """
     Shared implementation for CRLTAP-derived NH3/NOx combustion emissions of an EF
     subsector. `sectors` is one of the CRLTAP_{EC,IC,TR,OE}_SECTORS lists above;
     `pollutant` is 'NH3' or 'NOx'. Reads preloaded_data['ag_crltap_raw_lines'] <-
     data_files/webdabData1868031.txt (CRLTAP Inventory Submissions).
-    add_1a1a_non_waste adds the part of 1A1a that is not waste incineration
-    (heat and power plants burning wood, oil and gas); the waste part is in
-    PR.SO.
     """
     collected_years = set()
 
@@ -155,9 +150,6 @@ def _add_crltap_emissions_mc(results, preloaded_data, current_params, dataset_no
         conv,
         dataset_noise
     )
-    if add_1a1a_non_waste:
-        for year, value in crltap_1a1a_part(preloaded_data, pollutant, conv, dataset_noise, waste=False).items():
-            sums[year] = sums.get(year, 0.0) + value
 
     for year, value in sums.items():
         year = int(year)

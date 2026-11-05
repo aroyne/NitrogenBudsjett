@@ -13,8 +13,8 @@ nav_order: 4
 <!-- MANUAL:FLOW_DESCRIPTION:START -->
 #### Flow description
 
-- **PR.SO-AT.AT-Emissions-NOx** is NO<sub>x</sub> from waste treatment, using the categories given in Tables 48 and 31 of Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->: the waste incineration part of 1A1a (public electricity and heat production), 5A (solid waste disposal), 5B1 composting, 5B2 anaerobic digestion, 5C (incineration) and 5E (other waste).
-- 1A1a is split between waste incineration (counted here) and other heat and power plants (counted in EF.EC-AT.AT) by the waste share of the 1.A.1.a fuel use in the CRT (17–50 %, about 50 % in 2024), as recommended in chapter 1.4.1.2 of Schäppi et al. (2025). The inventory does not split 1A1a by fuel, so the split assumes the same emissions per TJ for waste and other fuels.
+- **PR.SO-AT.AT-Emissions-NOx** is NO<sub>x</sub> from waste treatment, using the categories given in Tables 48 and 31 of Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->: 5A (solid waste disposal), 5B1 composting, 5B2 anaerobic digestion, 5C (incineration) and 5E (other waste).
+- Table 48 also lists 1A1a (public electricity and heat production) for waste incineration with energy recovery. Since the incinerated waste is delivered to EF.EC (PR.SO-EF.EC-Waste to energy-Nmix), all of 1A1a is counted in EF.EC-AT.AT.
 
 #### Data sources
 
@@ -22,7 +22,7 @@ nav_order: 4
 
 #### Interpretations
 
-- The flow is about 0.1–0.35 kt N per year and has increased with waste incineration, from about 0.17 kt N in 1990 to 0.34 kt N in 2023–2024. The low value in 2010 (0.10 kt N) comes from the low waste share of 1.A.1.a that year, when the use of other fuels in heat and power plants was high.
+- The flow is very small, about 0.005 kt N per year, since NO<sub>x</sub> from waste incineration with energy recovery is counted in EF.EC-AT.AT-Emissions-NOx (0.1–0.34 kt N per year).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

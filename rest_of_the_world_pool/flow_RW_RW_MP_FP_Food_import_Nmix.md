@@ -23,6 +23,7 @@ nav_order: 9
 #### Assumptions
 
 - The quantities are multiplied by an N content per commodity type, mostly from Table 21 in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)<!--cite:schappi_annexes_2025--> (N contents of food products); fish products from the Norwegian food composition table (Matvaretabellen) and a few product groups from USDA FoodData Central or assumed.
+- Protein concentrates (HS 2106.10) are counted as feed, not food. Before 2008 the code was not split by use, and in 2005–2007 imports rose to 20–86 kt per year, mainly from Brazil and Uruguay; from 2008, when the code was split, almost all of it (102 kt in 2008) was declared as feed (soy protein concentrate for fish feed). The N in imported fish feed ingredients is counted in RW.RW-HY.AC-Aquaculture feed import-Nmix.
 - Vegetables are assigned N content by product form. Fresh, chilled, frozen and preserved vegetables, potatoes and tomatoes use the fresh-weight N contents in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, Table 21 (0.2–0.3 %). Dried peas and beans use the N content of pulses (3.6 %, Table 21), tomato paste 0.7 % (USDA FoodData Central), and other dried vegetables and potato flakes an estimated 1.6 %.
 
 #### Interpretations

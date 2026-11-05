@@ -26,7 +26,7 @@ nav_order: 1
 
 - Dividing each group's share of the 1996 feed uptake by the number of animals in 1996 gives about 95 FEm per sheep or lamb, 336 FEm per head of cattle and 105 FEm per goat or horse per grazing season; these are applied to all years.
 - The FEm are converted to N with 150 g protein per FEm (as for grazing on agricultural land in AG.SM-AG.MM-Fodder crops-Nmix) and the standard Jones factor (1/6.25).
-- Reindeer graze only on unmanaged land and are rarely given supplementary feed, so their feed uptake is set equal to the N they deposit as urine and dung (0.9–1.4 kt N per year); the N retained in growth is neglected.
+- Reindeer graze only on unmanaged land and are rarely given supplementary feed, so their feed uptake is set equal to the N they deposit as urine and dung (0.9–1.4 kt N per year); the N retained in growth is neglected. This N leaves with the slaughtered animals: 1.3–1.8 kt of reindeer meat per year in 2020–2024 ([Totalregnskapet for reindriften](https://regjeringen.no/contentassets/90f3807328bf4ad09b5dfbf10abdee21/totalregnskapet-for-reindriften-regnskap-2023-og-budsjett-2024.pdf)), about 0.04–0.05 kt N with 3% N, or 3–5% of the uptake.
 - For 1990–1994, sheep are extrapolated back from 1995 with the change in the number of winter-fed sheep, and cattle, goats and horses are held at the 1995 level.
 
 #### Interpretations

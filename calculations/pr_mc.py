@@ -17,17 +17,16 @@ from calculations.utils import (
     EXPECTED_YEARS,
     report_missing_years,
     load_crltap_emissions_to_N,
-    crltap_1a1a_part,
     process_generic_trade_flow,
 )
 
 # CRLTAP category codes for PR.SO's NH3/NOx emissions, combining Schäppi et
-# al. (2025) Table 48 ("solid waste": 1A1a public electricity/heat from waste
-# incineration, 5A biological treatment/solid waste disposal on land, 5C1a-vi
+# al. (2025) Table 48 ("solid waste": 5A solid waste disposal on land, 5C1a-vi
 # incineration variants, 5E other waste) and Table 31 ("biofuel production
-# and composting": 5B1 composting, 5B2 anaerobic digestion/biogas). 1A1a is
-# not listed: only its waste incineration part is added (crltap_1a1a_part),
-# the rest is in EF.EC.
+# and composting": 5B1 composting, 5B2 anaerobic digestion/biogas). Table 48
+# also lists 1A1a for waste incineration with energy recovery; here all of
+# 1A1a is counted in EF.EC, since the incinerated waste is delivered there
+# (PR.SO-EF.EC-Waste to energy-Nmix).
 PR_SO_CRLTAP_SECTORS = [
     '5A', '5B1', '5B2', '5C1a', '5C1bi',
     '5C1bii', '5C1biii', '5C1biv', '5C1bv', '5C1bvi', '5E'
@@ -241,7 +240,11 @@ def _biologically_treated_N(preloaded_data, current_params, dataset_noise):
     2. N out: N in to biogas times (1 - digestate_loss_fraction) plus N in to
        composting times (1 - compost_N_loss); the losses are NH3, N2O and N2
        during treatment.
-    3. Use: the products (compost and digestate) delivered to each use, as a
+    3. 1995-2011: the waste delivered to composting in SSB table 05281
+       (wet organic and wood waste; other biological treatment is included in
+       composting there, park and garden waste probably in wood waste) times
+       the N out per tonne in 2012. 1990-1994 are held at the 1995 value.
+    4. Use: the products (compost and digestate) delivered to each use, as a
        share of all products disposed of (SSB table 12818, from 2018); before
        2018 the 2018 shares are used.
 
@@ -252,9 +255,12 @@ def _biologically_treated_N(preloaded_data, current_params, dataset_noise):
     DATA_MAP): SSB table 12818, biological waste by disposal (2018-2024,
     1000 t); row 4 = all disposed of, 5 = agricultural land, 6 = green areas,
     7 = delivered to soil producers.
+    'ssb_waste_05281' <- 05281_20260121-140338.xlsx (data_loader.py
+    DATA_MAP): SSB table 05281, waste accounts 1995-2011; row 2 = years
+    (from col 3), rows 37 and 39 = wood and wet organic waste delivered to
+    composting.
 
-    Returns (N_out, shares): N_out {year: kt N} for 1990-2024 (1990-2011 held
-    at the 2012 value) and shares {year: {'agriculture', 'green_and_soil'}}.
+    Returns (N_out, shares): N_out {year: kt N} for 1990-2024 and shares {year: {'agriculture', 'green_and_soil'}}.
     """
     wet_N = float(current_params.waste_N_frac('wet_organic'))
     park_N = float(current_params.waste_N_frac('park_garden'))
@@ -264,6 +270,7 @@ def _biologically_treated_N(preloaded_data, current_params, dataset_noise):
 
     df_10513 = preloaded_data['ssb_waste_10513']
     N_out = {}
+    tonnes_2012 = None
     for col in range(1, df_10513.shape[1], 9):
         cell_year = str(df_10513.iloc[3, col]).strip()
         if not cell_year.replace('.0', '').isdigit():
@@ -275,10 +282,20 @@ def _biologically_treated_N(preloaded_data, current_params, dataset_noise):
                     + float(df_10513.iloc[7, col + offset]) * park_N   # park and garden
                     + float(df_10513.iloc[8, col + offset]) * wood_N)  # wood waste
 
-        N_out[year] = (n_in(2) * (1 - biogas_loss) + n_in(3) * (1 - compost_loss)) * dataset_noise.factor('10513', year, sub='biological treatment')
+        raw = n_in(2) * (1 - biogas_loss) + n_in(3) * (1 - compost_loss)
+        if year == 2012:
+            raw_2012 = raw
+            tonnes_2012 = sum(float(df_10513.iloc[r, col + c]) for r in (6, 7, 8) for c in (2, 3))
+        N_out[year] = raw * dataset_noise.factor('10513', year, sub='biological treatment')
 
-    for year in range(1990, 2012):
-        N_out[year] = N_out[2012] * dataset_noise.fill('carry', 'biologically treated waste:2012', year, [2012])
+    df_05281 = preloaded_data['ssb_waste_05281']
+    N_out_per_tonne = raw_2012 / tonnes_2012
+    for col in range(3, 20):
+        year = int(float(df_05281.iloc[2, col]))
+        tonnes = float(df_05281.iloc[37, col]) + float(df_05281.iloc[39, col])
+        N_out[year] = tonnes * N_out_per_tonne * dataset_noise.factor('05281', year, sub='biological treatment')
+    for year in range(1990, 1995):
+        N_out[year] = N_out[1995] * dataset_noise.fill('carry', 'biologically treated waste:1995', year, [1995])
 
     df_12818 = preloaded_data['ssb_waste_12818']
     shares = {}
@@ -308,8 +325,10 @@ def _add_biologically_treated_flow_mc(results, preloaded_data, current_params, d
 
     for year in range(1990, 2025):
         collected_years.add(year)
-        if year < 2012:
-            source = 'Filled (held at 2012): SSB tables 10513 and 12818'
+        if year < 1995:
+            source = 'Filled (held at 1995): SSB tables 05281, 10513 and 12818'
+        elif year < 2012:
+            source = 'SSB table 05281 scaled to the N per tonne of table 10513 in 2012; use shares filled (held at 2018) from table 12818'
         elif year < 2018:
             source = 'SSB table 10513; use shares filled (held at 2018) from table 12818'
         else:
@@ -653,8 +672,6 @@ def _add_so_NOx_emissions_mc(results, preloaded_data, current_params, dataset_no
         conv_to_N=conv,
         dataset_noise=dataset_noise
     )
-    for year, value in crltap_1a1a_part(preloaded_data, 'NOx', conv, dataset_noise, waste=True).items():
-        sums[year] = sums.get(year, 0.0) + value
 
     for year, value in sums.items():
         if year not in EXPECTED_YEARS:
@@ -689,8 +706,6 @@ def _add_so_NH3_emissions_mc(results, preloaded_data, current_params, dataset_no
         conv_to_N=conv,
         dataset_noise=dataset_noise
     )
-    for year, value in crltap_1a1a_part(preloaded_data, 'NH3', conv, dataset_noise, waste=True).items():
-        sums[year] = sums.get(year, 0.0) + value
 
     for year, value in sums.items():
         if year not in EXPECTED_YEARS:
@@ -1238,47 +1253,47 @@ def _add_ww_N2_emissions_mc(results, preloaded_data, current_params, dataset_noi
             return [("Lillehammer", 'mean', None), ("VEAS", 'mean', None),
                     ("Nordre Follo", 'mean', None), ("Gardermoen", 'mean', None)]
         if year == 2002:  # Nordre Follo's own 2002 figure is missing; borrow 2003's
-            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', None),
+            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', 'rensegrad VEAS'),
                     ("Nordre Follo", 1, None), ("Gardermoen", 'actual', None),
                     ("Bekkelaget", 'actual', 'rensegrad Bekkelaget')]
         if year == 2003:  # NRVA handled separately below (see comment there)
-            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', None),
+            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', 'rensegrad VEAS'),
                     ("Nordre Follo", 'actual', None), ("Gardermoen", 'actual', None),
                     ("Bekkelaget", 'actual', 'rensegrad Bekkelaget')]
         if year in (2004, 2005):
-            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', None),
+            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', 'rensegrad VEAS'),
                     ("Nordre Follo", 'mean', None), ("Gardermoen", 'actual', None),
                     ("Bekkelaget", 'actual', 'rensegrad Bekkelaget'), ("NRVA", 'actual', None)]
         if year == 2006:
-            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', None),
+            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', 'rensegrad VEAS'),
                     ("Nordre Follo", 'mean', None), ("Gardermoen", 'actual', None),
                     ("Bekkelaget", 'actual', 'rensegrad Bekkelaget'), ("NRVA", 'mean', None)]
         if year in (2007, 2008) or 2009 <= year <= 2011 or 2013 <= year <= 2015:
-            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', None),
+            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', 'rensegrad VEAS'),
                     ("Nordre Follo", 'actual', None), ("Gardermoen", 'actual', None),
                     ("Bekkelaget", 'actual', 'rensegrad Bekkelaget'), ("NRVA", 'actual', None)]
         if year == 2012:  # Nordre Follo has no reported figure this year; use the mean instead
-            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', None),
+            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', 'rensegrad VEAS'),
                     ("Nordre Follo", 'mean', None), ("Gardermoen", 'actual', None),
                     ("Bekkelaget", 'actual', 'rensegrad Bekkelaget'), ("NRVA", 'actual', None)]
         if year == 2016:  # no rensegrad column reported for any plant this year
-            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', None),
+            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', 'rensegrad VEAS'),
                     ("Nordre Follo", 'actual', None), ("Gardermoen", 'actual', None),
                     ("Bekkelaget", 'actual', None), ("NRVA", 'actual', None)]
         if year in (2017, 2018):
-            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', None),
+            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', 'rensegrad VEAS'),
                     ("Nordre Follo", 'actual', None), ("Gardermoen", 'actual', None),
                     ("Bekkelaget", 'actual', None), ("NRVA", 'actual', 'rensegrad NRVA')]
         if year in (2019, 2020) or year in (2022, 2023, 2024):
-            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', None),
+            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', 'rensegrad VEAS'),
                     ("Nordre Follo", 'actual', None), ("Gardermoen", 'actual', None),
                     ("Bekkelaget", 'actual', 'rensegrad Bekkelaget'), ("NRVA", 'actual', 'rensegrad NRVA')]
         if year == 2021:  # no rensegrad column reported for NRVA this year
-            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', None),
+            return [("Lillehammer", 'actual', None), ("VEAS", 'actual', 'rensegrad VEAS'),
                     ("Nordre Follo", 'actual', None), ("Gardermoen", 'actual', None),
                     ("Bekkelaget", 'actual', 'rensegrad Bekkelaget'), ("NRVA", 'actual', None)]
         # 2025 onward: as above, plus Hokksund
-        return [("Lillehammer", 'actual', None), ("VEAS", 'actual', None),
+        return [("Lillehammer", 'actual', None), ("VEAS", 'actual', 'rensegrad VEAS'),
                 ("Nordre Follo", 'actual', None), ("Gardermoen", 'actual', None),
                 ("Bekkelaget", 'actual', 'rensegrad Bekkelaget'), ("NRVA", 'actual', 'rensegrad NRVA'),
                 ("Hokksund", 'actual', None)]
@@ -1379,14 +1394,20 @@ def _add_treated_ww_discharge_mc(results, preloaded_data, current_params, datase
         if year == 1997:
             value_1997 = perturbed_tonnage
 
-    # 3. Extrapolate backward: 1990 to 1996 (constant, based on the perturbed 1997 value)
-    data_sources_ext = 'Filled (held at 1997): historical wastewater statistics'
+    # 3. Extrapolate backward: 1990 to 1996, the 1997 value scaled with the
+    # population. N removal in treatment plants was small in this period, so
+    # the discharge is assumed to follow the population.
+    # 'ssb_06913' <- 06913_20251113-124117.xlsx (data_loader.py DATA_MAP):
+    # SSB population on 1 January.
+    population = preloaded_data['ssb_06913']['Befolkning 1. januar']
+    data_sources_ext = 'Filled (1997 scaled with population, 1997): historical wastewater statistics'
     for year in range(1990, 1997):  
         collected_years.add(year)
         results.append({
             'flow_name': flow_code,
             'year': year,
-            'value': value_1997 * dataset_noise.fill('carry', 'treated wastewater:1997', year, [1997]), 
+            'value': (value_1997 * population[year] / population[1997]
+                      * dataset_noise.fill('extrapolation', 'treated wastewater:1997', year, [1997])), 
             'comment': 'ok',
             'data_sources': data_sources_ext
         })    

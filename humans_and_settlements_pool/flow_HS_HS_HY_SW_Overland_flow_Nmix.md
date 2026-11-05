@@ -24,14 +24,14 @@ nav_order: 3
 #### Assumptions
 
 - The TEOTIL2 values are bias-corrected to TEOTIL3 by multiplying with the ratio between the TEOTIL3 and TEOTIL2 means over the years both models cover (2013–2022). This is the method NIVA uses to extend TEOTIL3 back to 1990 in the annual reports Sample (2025)<!--cite:sample_kildefordelte_2025-->, but applied here to the categories the model uses, and without the published 1990–1995 values. The factor for urban areas is 19.4, because TEOTIL2 estimates much lower urban loading than TEOTIL3.
-- Since TEOTIL2's urban value is constant, the resulting series for 1990–2012 is constant at the TEOTIL3 average level and carries no information about the trend before 2013. An additional uncertainty is applied to these years that grows with the distance to 2013 (from ±15 % in 2012 to about ±125 % in 1990).
+- Since TEOTIL2's urban value is constant, it carries no information about the trend before 2013. The bias-corrected level is therefore scaled with the settlement area in the greenhouse gas inventory (CRT Table 4.E, 690 kha in 2013) relative to 2013, since TEOTIL3 calculates urban loading from the urban area. An additional uncertainty is applied to these years that grows with the distance to 2013 (from ±15 % in 2012 to ±50 % from 2005 and earlier).
 - TEOTIL3's urban loading is the input to surface water before retention, and is used directly; the retention in lakes and rivers is counted in HY.SW-AT.AT-Emissions-N2 and -N2O.
 - TEOTIL3 has not been updated for 2024 at the time of writing; the 2024 value is held at the 2023 value.
 
 #### Interpretations
 
 - The flow is about 6–8.5 kt N per year since 2013, with the highest value in 2020, a wet year.
-- The values for 1990–2012 are constant and do not show the growth of urban areas over the period.
+- The values for 1990–2012 rise from 5.9 kt N in 1990 to 6.8 kt N in 2012 with the growth of settlement area. They follow the area only, not the year-to-year variation in runoff.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

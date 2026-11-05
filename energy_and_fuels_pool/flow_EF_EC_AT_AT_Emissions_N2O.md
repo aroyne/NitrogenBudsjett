@@ -14,7 +14,7 @@ nav_order: 1
 #### Flow description
 
 - **EF.EC-AT.AT-Emissions-N2O** is N<sub>2</sub>O from energy industries (1.A.1) and from fugitive emissions in the oil and gas sector (1.B.2), using the categories given in Table 11 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
-- N<sub>2</sub>O from waste incinerated in heat and power plants (the “other fossil fuels” row of 1.A.1.a in CRT Table 1.A(a)) is not included here but counted in PR.SO-AT.AT-Emissions-N2O, as recommended in chapter 1.4.1.2 of Schäppi et al. (2025).
+- N<sub>2</sub>O from waste incinerated in heat and power plants (the “other fossil fuels” row of 1.A.1.a in CRT Table 1.A(a)) is included, since the incinerated waste is delivered to EF.EC (PR.SO-EF.EC-Waste to energy-Nmix). Schäppi et al. (2025, chapter 1.4.1.2) count it under PR.SO.
 
 #### Data sources
 
@@ -25,7 +25,7 @@ nav_order: 1
 #### Interpretations
 
 - The emission factors differ strongly between fuels: in the 2024 CRT, the implied N<sub>2</sub>O factors for 1.A.1 are about 0.1 kg/TJ for natural gas, about 2 kg/TJ for waste (“other fossil fuels”, which in the CRT includes the biogenic part of waste) and about 3.7 kg/TJ for wood fuel (“biomass”). The time series therefore reflects the use of waste and biomass as energy sources more than total energy use.
-- Emissions from energy industries (1.A.1) increased from 0.025 kt N/year in 1990 to about 0.064 kt N in 2024, and almost all of the growth after 2008 comes from public electricity and heat production (1.A.1.a), mainly heat plants, where emissions rose from 0.017 kt N/year in 2008 to 0.050 kt N in 2023 as waste incineration and biomass-fired district heating expanded. Without waste incineration, the flow is 0.03 kt N in 1990 and 0.045–0.05 kt N per year since 2010.
+- Emissions from energy industries (1.A.1) increased from 0.025 kt N/year in 1990 to about 0.064 kt N in 2024, and almost all of the growth after 2008 comes from public electricity and heat production (1.A.1.a), mainly heat plants, where emissions rose from 0.017 kt N/year in 2008 to 0.050 kt N in 2023 as waste incineration and biomass-fired district heating expanded. Waste incineration accounts for 0.006–0.02 kt N per year of the flow.
 - Emissions from oil and gas extraction (1.A.1.c), which use mainly natural gas in turbines, contribute less N<sub>2</sub>O (0.015 kt N/year in 2023), and emissions from petroleum refining (1.A.1.b) have been small since 2000.
 - N<sub>2</sub>O from fugitive emissions in the oil and gas sector (1.B.2, in practice only 1.B.2.c Venting and flaring) was 0.011 kt N/year in 1990 (about 30% of the flow), varied mostly around 0.006–0.013 kt N with a short peak of 0.014 kt N in 2007–2008, and has since declined to 0.003 kt N in 2024 (about 4% of the flow); the other 1.B.2 subcategories are reported as not applicable, not occurring or included elsewhere.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

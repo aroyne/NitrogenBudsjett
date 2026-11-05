@@ -21,7 +21,7 @@ nav_order: 10
 
 #### Assumptions
 
-- Ammonia (HS 2814.10) has 82.35% N (stoichiometry). Ammonia in aqueous solution (HS 2814.20) is given an assumed 5% N.
+- Ammonia (HS 2814.10) has 82.35% N (stoichiometry). Ammonia in aqueous solution (HS 2814.20) is given 20% N (commercial ammonia solution is about 24–25% NH<sub>3</sub>; range 8–29% N).
 
 #### Interpretations
 

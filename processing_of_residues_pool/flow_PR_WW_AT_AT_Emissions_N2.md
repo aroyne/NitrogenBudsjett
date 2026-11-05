@@ -22,11 +22,12 @@ nav_order: 2
 #### Assumptions
 
 - For each plant, the N discharged is converted to N removed with the plant's removal rate r as N discharged × r/(1 − r).
-- Where specific data on the nitrogen removal fraction were missing, we assumed a default of 70%, and we extrapolated or interpolated between existing data where reported emission data were missing.
+- The plants' own reported removal rates are used where they exist: VEAS from 2009, Bekkelaget from 2002 and NRVA from 2017. Where specific data on the nitrogen removal fraction were missing, we assumed a default of 70%, and we extrapolated or interpolated between existing data where reported emission data were missing.
 
 #### Interpretations
 
-- The flow rises from 0.1 kt N in 1995 to 1.5–1.6 kt N around 2000 and 3.6–5.2 kt N since 2012, as more plants have introduced nitrogen removal.
+- The flow rises from 0.1 kt N in 1995 to 1.5–1.6 kt N around 2000, 3.3–3.6 kt N in 2009–2018 and 3.9–4.6 kt N since 2019, as more plants have introduced nitrogen removal and the removal rates have improved.
+- VEAS discharged more N in 2014–2017 (1.2–1.4 kt N against about 0.9 kt N before) because its removal rate fell to 54–60%, while the N entering the plant was about the same. With the reported removal rate this gives less N removed, not more.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

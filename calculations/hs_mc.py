@@ -187,17 +187,22 @@ def _add_overland_flow_urban_mc(results, preloaded_data, current_params, dataset
 
     # 1990-2012: TEOTIL2 urban, bias-corrected to the TEOTIL3 urban level
     # (see find_teotil2_bias_corrected). TEOTIL2 uses the same urban value in
-    # every year, so the series carries no information about the trend and
-    # is treated as held flat at the first TEOTIL3 year.
+    # every year, so the series carries no information about the trend. It is
+    # scaled with the settlement area in the greenhouse gas inventory (CRT
+    # 4.E) relative to 2013, since TEOTIL3 computes urban runoff from the
+    # urban area.
+    # 'crt_settlement_area' <- NOR-CRT-2026 folder (data_loader.py DATA_MAP):
+    # CRT Table4.E, total settlement area (kha) per year
+    area = preloaded_data['crt_settlement_area']
     teotil2 = find_teotil2_bias_corrected(preloaded_data, dataset_noise)
     for year, raw_val in teotil2['urban'].items():
         year = int(year)
         collected_years.add(year)
-        value = (raw_val * dataset_noise.factor(dataset_key, year)
-                 * dataset_noise.fill('carry', f'{flow_code}:TEOTIL2', year, [2013]))
+        value = (raw_val * area[year] / area[2013] * dataset_noise.factor(dataset_key, year)
+                 * dataset_noise.fill('extrapolation', f'{flow_code}:settlement area', year, [2013]))
         results.append({
             'flow_name': flow_code, 'year': year, 'value': value,
-            'comment': 'ok', 'data_sources': 'Filled (held flat at the TEOTIL3 level; TEOTIL2 urban is constant): NIVA TEOTIL2, bias-corrected to TEOTIL3'
+            'comment': 'ok', 'data_sources': 'Filled (TEOTIL3 level in 2013 scaled with settlement area, CRT 4.E): NIVA TEOTIL2, bias-corrected to TEOTIL3'
         })
 
     # 2013 onward: TEOTIL3. The TEOTIL2 series above stops the year before

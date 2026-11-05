@@ -22,11 +22,11 @@ nav_order: 5
 
 #### Assumptions
 
-- Due to lack of available data, 1990–1996 are held at the 1997 value.
+- Due to lack of available data, 1990–1996 are the 1997 value scaled with the population (SSB table 06913). Nitrogen removal in treatment plants was small in this period (PR.WW-AT.AT-Emissions-N2 is below 0.1 kt N until 1996), so the discharge is assumed to follow the population.
 
 #### Interpretations
 
-- The flow is about 16–20 kt N per year, falling from about 18.5 kt N in 1990–1997 to 16 kt N in 2002–2005 and rising again to about 20 kt N in 2024 with population growth.
+- The flow is about 16–20 kt N per year, rising from about 17.8 kt N in 1990 to 18.5 kt N in 1997, falling to 16 kt N in 2002–2005 and rising again to about 20 kt N in 2024 with population growth.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

@@ -41,6 +41,17 @@ REJECTED_EMISSION_REPORTS = {
     ('5027.0001.01', 2010),
 }
 
+# Landfill reports to Norske utslipp (Utslipp_deponi.xlsx) that are not
+# used: single years 20-360 times the landfill's own median, several hundred
+# tonnes N in years when all landfills together report about 1 kt N.
+REJECTED_LANDFILL_REPORTS = {
+    ('Stormyra deponi - mna - overhalla (Midtre namdal avfallsselskap iks)', 2015),
+    ('Glør roverudmyra deponi kategori 2, ordinært avfall (Renovasjonsselskapet glør iks)', 2011),
+    ('Røyken grovfyllplass - deponi (Røyken grovfyllplass as)', 2018),
+    ('Enger avfallsdeponi (Modum kommune teknisk og miljø)', 2017),
+    ('Norske skog skogn, deponi valum - industrideponi (Norske skog skogn as)', 2021),
+}
+
 # SSB table 06913: population on 1 January, one row per year (1951-2025).
 POPULATION_FILE = 'data_files/06913_20251113-124117.xlsx'
 
@@ -109,20 +120,6 @@ def _crt_cell(sheet, label_path, column):
         return float(sheet.cell(row=row, column=column).value)
     except (TypeError, ValueError):
         return None
-
-
-def _crt_1a1a_waste(wb):
-    """Waste incineration within CRT 1.A.1.a Public electricity and heat
-    production. The CRT reports all incinerated waste, including its biogenic
-    part, as "Other fossil fuels" (equal to "Avfall" in SSB table 04730).
-    Returns (waste share of the 1.A.1.a fuel use in TJ, N2O from waste in kt
-    N2O, Table1.A(a)s1 column J)."""
-    sheet = wb['Table1.A(a)s1']
-    label = '1.A.1.a. Public electricity and heat production'
-    total_tj = _crt_cell(sheet, [label], 3)
-    waste_tj = _crt_cell(sheet, [label, 'Other fossil fuels'], 3) or 0.0
-    waste_n2o = _crt_cell(sheet, [label, 'Other fossil fuels'], 10) or 0.0
-    return waste_tj / total_tj, waste_n2o
 
 
 def _read_crt_fuel_series(crt_folder, sheet_name, row_specs):
@@ -240,7 +237,6 @@ def load_all_data(selected_pools):
         'fuel_for_industry': ({'ef'},'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_fuel_industry', {}),
         'fuel_for_transport': ({'ef'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_fuel_transport', {}),
         'fuel_for_heating': ({'ef'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_fuel_heating', {}),
-        'crt_1a1a_waste_share': ({'ef','pr'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_1a1a_waste_share', {}),
         'n2o_ec_data': ({'ef'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_n2o_ec', {}),
         'n2o_so_raw': ({'pr'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_n2o_so', {}),
         'n2o_ww_raw': ({'pr'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_n2o_ww', {}),
@@ -265,7 +261,7 @@ def load_all_data(selected_pools):
         'ssb_waste_05281': ({'pr', 'mp'}, 'data_files/05281_20260121-140338.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Avfall'}),
         'ssb_05282': ({'hs','mp','pr'}, 'data_files/05282_20260211-091021.xlsx', 'openpyxl_single_sheet', {'sheet_name': '05282'}),
         'ssb_05543_raw': ({'mp'}, 'data_files/05543_20251217-111610.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Areal'}),
-        'ssb_06913': ({'mp', 'hs', 'pr'}, POPULATION_FILE, 'excel_population', {}),
+        'ssb_06913': ({'mp', 'hs', 'pr', 'hy'}, POPULATION_FILE, 'excel_population', {}),
         'ssb_waste_10513': ({'pr', 'mp'}, 'data_files/10513_20260916-120243.xlsx', 'openpyxl_single_sheet', {'sheet_name': '10513'}),
         'ssb_10514': ({'hs','mp','pr'}, 'data_files/10514_20260916-101643.xlsx', 'openpyxl_single_sheet', {'sheet_name': '10514'}),
         'ssb_waste_12359': ({'pr'}, 'data_files/12359_20251211-153434.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Mengde'}),
@@ -278,8 +274,9 @@ def load_all_data(selected_pools):
         'waste_historical_fractions': ({'pr', 'mp'}, 'data_files/kommunalt_avfall_1985_1995.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'forbrenning og gjenvinning'}),
         'biogass_tall': ({'pr'}, 'data_files/biogass_tall.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'biorest'}),
         'ssb_waste_12818': ({'pr'}, 'data_files/12818_20260526-110921.xlsx', 'openpyxl_single_sheet', {'sheet_name': '12818'}),
+        'crt_settlement_area': ({'hs'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_settlement_area', {}),
         'landfill_ch4_crt': ({'pr'}, 'data_files/NOR-CRT-2026-V1.0-20260311-135213_awaiting_submission', 'crt_landfill_ch4', {}),
-        'deponi_utslipp': ({'pr'}, 'data_files/Utslipp_deponi.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Utslipp'}),
+        'deponi_utslipp': ({'pr'}, 'data_files/Utslipp_deponi.xlsx', 'landfill_emissions', {'sheet_name': 'Utslipp'}),
         'deponi_tilkobling': ({'pr'}, 'data_files/Utslipp_deponi.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'tilkobling'}),
         'biogass_manure': ({'pr'}, 'data_files/Biogass.xlsx', 'openpyxl_single_sheet', {'sheet_name': 'Tabell'}),
         'sewage_sludge_modern': ({'pr'}, 'data_files/05279_20260121-103739.xlsx', 'openpyxl_single_sheet_df', {'sheet_name': 'Slam'}),
@@ -509,9 +506,7 @@ def load_all_data(selected_pools):
                     # i praksis bare fra 1.B.2.c Venting and flaring (a/b/d er NA/IE/NO).
                     _crt_cell(sheet, ['1.B.2. Oil and natural gas'], 5),
                 ) if v is not None)
-                # N2O from waste incineration in 1.A.1.a belongs to PR.SO
-                # (Schäppi et al. 2025, chapter 1.4.1.2), see crt_n2o_so.
-                ec = (ec - _crt_1a1a_waste(wb)[1]) * 0.6364
+                ec = ec * 0.6364
                 ic = (_crt_cell(sheet, ['1.A.2. Manufacturing industries and construction'], 5) or 0.0) * 0.6364
                 tr = (_crt_cell(sheet, ['1.A.3. Transport'], 5) or 0.0) * 0.6364
                 oe = sum(v for v in (
@@ -528,26 +523,25 @@ def load_all_data(selected_pools):
             # open burning of waste", column E (N2O, kt) - converted to N
             # further downstream (pr_mc.py applies N2O_to_N_factor from
             # N_parameters.xlsx). Solid waste disposal (5.A) reports no N2O.
-            # Waste incinerated with energy recovery is reported under 1.A.1.a;
-            # its N2O is added here and removed from EF.EC in crt_n2o_ec.
+            # Waste incinerated with energy recovery is reported under 1.A.1.a
+            # and counted in EF.EC (crt_n2o_ec).
             rows = []
             for year, wb in _crt_iter_workbooks(filepath):
                 v = (_crt_cell(wb['Table5'], ['5.B. Biological treatment of solid waste'], 5)
-                     + _crt_cell(wb['Table5'], ['5.C. Incineration and open burning of waste'], 5)
-                     + _crt_1a1a_waste(wb)[1])
+                     + _crt_cell(wb['Table5'], ['5.C. Incineration and open burning of waste'], 5))
                 rows.append({'year': year, 'value': v})
                 wb.close()
             preloaded[key] = pd.DataFrame(rows).sort_values('year').reset_index(drop=True)
 
-        elif method == 'crt_1a1a_waste_share':
-            # Share of waste in the fuel use of CRT 1.A.1.a, used to split the
-            # 1A1a NOx and NH3 in the CLRTAP inventory between waste
-            # incineration (PR.SO) and other heat and power plants (EF.EC).
-            shares = {}
+        elif method == 'crt_settlement_area':
+            # UNFCCC CRT Table4.E, "4.E. Total settlements", column D: total
+            # settlement area (kha) per year, used to scale urban runoff back
+            # in time from the first TEOTIL3 year.
+            area = {}
             for year, wb in _crt_iter_workbooks(filepath):
-                shares[year] = _crt_1a1a_waste(wb)[0]
+                area[year] = _crt_cell(wb['Table4.E'], ['4.E.  Total settlements'], 4)
                 wb.close()
-            preloaded[key] = shares
+            preloaded[key] = area
 
         elif method == 'crt_landfill_ch4':
             # UNFCCC CRT Table5, "5.A. Solid waste disposal", column D (CH4,
@@ -649,6 +643,13 @@ def load_all_data(selected_pools):
         elif method == 'openpyxl_single_sheet':
             wb = openpyxl.load_workbook(filepath, data_only=True)
             preloaded[key] = pd.DataFrame(list(wb[kwargs['sheet_name']].values))
+
+        elif method == 'landfill_emissions':
+            wb = openpyxl.load_workbook(filepath, data_only=True)
+            df = pd.DataFrame(list(wb[kwargs['sheet_name']].values))
+            rejected = [(str(name).strip(), year) in REJECTED_LANDFILL_REPORTS for name, year in zip(df[0], df[3])]
+            assert sum(rejected) == len(REJECTED_LANDFILL_REPORTS)
+            preloaded[key] = df[[not r for r in rejected]].reset_index(drop=True)
 
         elif method == 'openpyxl_single_sheet_df':
             wb = openpyxl.load_workbook(filepath, data_only=True)

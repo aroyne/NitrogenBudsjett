@@ -19,6 +19,7 @@ nav_order: 6
 #### Data sources
 
 - SSB's waste accounts ([table 10513](https://www.ssb.no/statbank/table/10513)) give the wet organic waste, park and garden waste and wood waste delivered to biogas production and to composting; the table starts in 2012.
+- For 1995–2011, the waste delivered to composting in SSB's earlier waste accounts ([table 05281](https://www.ssb.no/statbank/table/05281)), where other biological treatment (biogas) is included in composting.
 - SSB's statistics on biological treatment ([table 12818](https://www.ssb.no/statbank/table/12818)) give how much compost and digestate is delivered to each use from 2018.
 - N contents per waste type from Table 50 in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)<!--cite:schappi_annexes_2025-->: wet organic 0.9%, park and garden and wood 0.25%.
 
@@ -28,7 +29,8 @@ nav_order: 6
 - N out: part of the N is lost as NH<sub>3</sub>, N<sub>2</sub>O and N<sub>2</sub> during treatment; we assume a loss of 10% in biogas production (digestate_loss_fraction) and 30% in composting (compost_N_loss).
 - The N is calculated from the N delivered to treatment, not from the mass of the products, since most of the mass lost during treatment is water and carbon (in 2018, 515 kt of waste was delivered and 286 kt of products were disposed of).
 - Before 2018 the 2018 shares by use are used.
-- 1990–2011 are held at the 2012 value, although biological treatment was smaller in the 1990s.
+- 1995–2011: the wet organic and wood waste delivered to composting in table 05281 (park and garden waste is probably included in wood waste there) times the N out per tonne in 2012. The amounts in the two tables agree well at the break (400 kt in 2011 and 438 kt in 2012).
+- 1990–1994 are held at the 1995 value, which is small (57 kt of waste delivered).
 - This flow gets the share delivered to green areas and soil producers.
 
 #### Interpretations

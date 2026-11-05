@@ -210,18 +210,6 @@ def load_crltap_emissions_to_N(raw_lines, categories, pollutant, conv_to_N, data
 
     return {year: raw_sum * conv_to_N for year, raw_sum in yearly_raw_sums.items()}
 
-def crltap_1a1a_part(preloaded_data, pollutant, conv_to_N, dataset_noise, waste):
-    """
-    Part of the CLRTAP emissions from NFR 1A1a (public electricity and heat
-    production) that comes from waste incineration (waste=True, counted in
-    PR.SO) or from other fuels (waste=False, counted in EF.EC). The inventory
-    does not split 1A1a by fuel, so it is split by the waste share of the
-    1.A.1.a fuel use in the CRT (preloaded_data['crt_1a1a_waste_share']).
-    """
-    shares = preloaded_data['crt_1a1a_waste_share']
-    sums = load_crltap_emissions_to_N(preloaded_data['ag_crltap_raw_lines'], ['1A1a'], pollutant, conv_to_N, dataset_noise)
-    return {year: value * (shares[year] if waste else 1.0 - shares[year]) for year, value in sums.items()}
-
 def read_trade_data(trade_file):
     """Reads SSB table 08801 raw foreign trade statistics (year, direction,
     HS code, country, value/amount columns) into a fixed-column DataFrame."""

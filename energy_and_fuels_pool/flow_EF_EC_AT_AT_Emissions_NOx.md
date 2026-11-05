@@ -14,7 +14,7 @@ nav_order: 2
 #### Flow description
 
 - **EF.EC-AT.AT-Emissions-NOx** is NO<sub>x</sub> from energy industries and fugitive emissions in the oil and gas sector, using the categories given in Table 11 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
-- Public electricity and heat production (1A1a, 0.35–0.7 kt N/year) is split between waste incineration and other heat and power plants by the waste share of the 1.A.1.a fuel use in the CRT (17–50 %, about 50 % in 2024). The waste part is counted in PR.SO-AT.AT, as recommended in chapter 1.4.1.2 of Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, and the rest (plants burning wood, oil and gas) is included here. The inventory does not split 1A1a NO<sub>x</sub> by fuel, so the split assumes the same NO<sub>x</sub> per TJ for waste and other fuels.
+- Public electricity and heat production (1A1a, 0.35–0.7 kt N/year) is included in full, also waste incineration with energy recovery. Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> (chapter 1.4.1.2 and Table 48) count the waste part under PR.SO, but here the incinerated waste is delivered to EF.EC (PR.SO-EF.EC-Waste to energy-Nmix), so its emissions are counted here too. The waste part, estimated with the waste share of the 1.A.1.a fuel use in the CRT (17–50 %, about 50 % in 2024), is 0.1–0.34 kt N/year.
 - NH<sub>3</sub> emissions from these categories are reported as zero or not occurring, and NH<sub>3</sub> from 1A1a is below 0.001 kt N/year, which is why there is no EF.EC NH<sub>3</sub> flow.
 
 #### Data sources
