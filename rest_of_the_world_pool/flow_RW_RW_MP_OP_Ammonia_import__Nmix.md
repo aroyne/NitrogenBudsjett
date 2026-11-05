@@ -25,7 +25,7 @@ nav_order: 10
 
 #### Interpretations
 
-- The flow is about 170–490 kt N per year, one of the largest N flows in the model; the ammonia is used in fertilizer production at Herøya and most of the N leaves Norway again as exported mineral fertilizer.
+- The flow is about 110–540 kt N per year, one of the largest N flows in the model; the ammonia is used in fertilizer production at Herøya and most of the N leaves Norway again as exported mineral fertilizer.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

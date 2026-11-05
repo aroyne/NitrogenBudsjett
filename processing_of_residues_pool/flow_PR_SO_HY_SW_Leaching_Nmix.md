@@ -27,8 +27,8 @@ nav_order: 7
 
 #### Interpretations
 
-- The flow is about 0.2–1.3 kt N per year since 2011, with no clear trend.
-- The extrapolated values fall from about 1.0 kt N in 1990 to 0.65 kt N in 2010, following the decline in landfill methane.
+- The flow is about 0.2–0.6 kt N per year since 2011, falling from 0.5–0.6 kt N in 2011–2013 to 0.3–0.4 kt N since 2015.
+- The extrapolated values fall from about 0.86 kt N in 1990 to 0.53 kt N in 2010, following the decline in landfill methane.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

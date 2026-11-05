@@ -35,7 +35,7 @@ nav_order: 6
 
 #### Interpretations
 
-- The flow is about 0.6–1.2 kt N per year; about a third of the compost and digestate goes to green areas and soil producers.
+- The flow rises from about 0.07 kt N per year in 1990–1995 to 0.6 kt N in 2010 and 0.6–1.5 kt N per year since 2012; about a third of the compost and digestate goes to green areas and soil producers.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

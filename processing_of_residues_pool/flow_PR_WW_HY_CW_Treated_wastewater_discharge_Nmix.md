@@ -26,7 +26,7 @@ nav_order: 5
 
 #### Interpretations
 
-- The flow is about 16–20 kt N per year, rising from about 17.8 kt N in 1990 to 18.5 kt N in 1997, falling to 16 kt N in 2002–2005 and rising again to about 20 kt N in 2024 with population growth.
+- The flow is about 16–20 kt N per year, rising from about 17.6 kt N in 1990 to 18.5 kt N in 1997, falling to 16 kt N in 2002–2005 and rising again to about 20 kt N in 2024 with population growth.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

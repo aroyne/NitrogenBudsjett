@@ -26,7 +26,7 @@ nav_order: 2
 
 #### Interpretations
 
-- The flow rises from 0.1 kt N in 1995 to 1.5–1.6 kt N around 2000, 3.3–3.6 kt N in 2009–2018 and 3.9–4.6 kt N since 2019, as more plants have introduced nitrogen removal and the removal rates have improved.
+- The flow rises from 0.1 kt N in 1995 to 1.3–1.4 kt N in 1998–2001, 3.3–3.6 kt N in 2009–2018 and 3.9–4.6 kt N since 2019, as more plants have introduced nitrogen removal and the removal rates have improved.
 - VEAS discharged more N in 2014–2017 (1.2–1.4 kt N against about 0.9 kt N before) because its removal rate fell to 54–60%, while the N entering the plant was about the same. With the reported removal rate this gives less N removed, not more.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
