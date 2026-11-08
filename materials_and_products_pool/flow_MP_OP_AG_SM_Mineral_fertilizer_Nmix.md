@@ -26,8 +26,8 @@ nav_order: 1
 
 #### Interpretations
 
-- Agricultural use is fairly stable at 100–112 kt N per year, but the domestically produced part falls from about 80–90 kt N in the 1990s to about 55 kt N in 2018–2024, because imports have increased from 12–30 kt N to 39–51 kt N.
-- The value for 2022 is higher (72 kt N) because imports were lower that year.
+- Agricultural use is 85–112 kt N per year<!--range:MP.OP-AG.SM-Mineral fertilizer-Nmix+RW.RW-AG.SM-Mineral fertilizer import-Nmix:1990-2024-->, but the domestically produced part falls from about 80–105 kt N<!--range:MP.OP-AG.SM-Mineral fertilizer-Nmix:1990-1999--> in the 1990s to about 55 kt N<!--mean:MP.OP-AG.SM-Mineral fertilizer-Nmix:2018-2024--> in 2018–2024, because imports have increased from 7–30 kt N<!--range:RW.RW-AG.SM-Mineral fertilizer import-Nmix:1990-1999--> to 39–53 kt N<!--range:RW.RW-AG.SM-Mineral fertilizer import-Nmix:2018-2024-->.
+- The value for 2022 is higher (72 kt N<!--val:MP.OP-AG.SM-Mineral fertilizer-Nmix:2022-->) because imports were lower that year.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

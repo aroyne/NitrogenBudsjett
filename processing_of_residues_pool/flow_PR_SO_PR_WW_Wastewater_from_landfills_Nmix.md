@@ -28,7 +28,7 @@ nav_order: 9
 #### Interpretations
 
 - The flow is about 0.4–0.8 kt N per year<!--range:PR.SO-PR.WW-Wastewater from landfills-Nmix:2011-2024--> since 2011.
-- The extrapolated values fall from about 1.3 kt N in 1990 to 0.8 kt N in 2010, following the decline in landfill methane.
+- The extrapolated values fall from about 1.3 kt N<!--val:PR.SO-PR.WW-Wastewater from landfills-Nmix:1990--> in 1990 to 0.8 kt N<!--val:PR.SO-PR.WW-Wastewater from landfills-Nmix:2010--> in 2010, following the decline in landfill methane.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

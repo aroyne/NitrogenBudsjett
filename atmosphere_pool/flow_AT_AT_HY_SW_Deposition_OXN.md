@@ -28,7 +28,7 @@ nav_order: 12
 
 - The flow falls from about 5.9 kt N<!--mean:AT.AT-HY.SW-Deposition-OXN:1984-1987--> in 1984–1987 to 3.7–3.9 kt N<!--range:AT.AT-HY.SW-Deposition-OXN:2017-2024--> from 2017.
 - The steps follow the five-year periods of the NILU data; the decline reflects lower emissions in Europe, more for oxidised than for reduced N.
-- For comparison, the data used in the TEOTIL model give 3.5 kt N in 2013 and 3.0 kt N in 2023 – a similar declining trend to our combined OXN+RDN values (about 9.4 and 8.1 kt N for the same years), but substantially lower in magnitude, likely reflecting different datasets and different data treatment.
+- For comparison, the data used in the TEOTIL model give 3.5 kt N in 2013 and 3.0 kt N in 2023 – a similar declining trend to our combined OXN+RDN values (about 9.4<!--val:AT.AT-HY.SW-Deposition-OXN+AT.AT-HY.SW-Deposition-RDN:2013--> and 8.1 kt N<!--val:AT.AT-HY.SW-Deposition-OXN+AT.AT-HY.SW-Deposition-RDN:2023--> for the same years), but substantially lower in magnitude, likely reflecting different datasets and different data treatment.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

@@ -22,7 +22,7 @@ nav_order: 1
 
 #### Interpretations
 
-- Emissions from manufacturing industries and construction (1.A.2) have been fairly stable at 0.064–0.083 kt N/year since 1990.
+- Emissions from manufacturing industries and construction (1.A.2) have been fairly stable at 0.064–0.083 kt N/year<!--range:EF.IC-AT.AT-Emissions-N2O:1990-2024--> since 1990.
 - About half comes from 1.A.2.g (other industry, including mobile machinery in construction), and the rest is spread across the other industries.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

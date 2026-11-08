@@ -22,7 +22,7 @@ nav_order: 2
 
 #### Interpretations
 
-- NH<sub>3</sub> emissions in this sub-pool (0.05–0.08 kt N/year) come almost entirely from residential stationary combustion (1A4bi), i.e. wood burning in households, and follow the use of firewood.
+- NH<sub>3</sub> emissions in this sub-pool (0.05–0.08 kt N/year<!--range:EF.OE-AT.AT-Emissions-NH3:1990-2024-->) come almost entirely from residential stationary combustion (1A4bi), i.e. wood burning in households, and follow the use of firewood.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

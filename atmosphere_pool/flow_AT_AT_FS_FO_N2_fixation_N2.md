@@ -26,7 +26,7 @@ nav_order: 6
 
 #### Interpretations
 
-- The flow is constant at about 18 kt N per year; for comparison, the value for Sweden in 2015 was 39.5 kt N (Moldan et al., 2025)<!--cite:moldan_where_2025-->.
+- The flow is constant at about 18 kt N per year<!--mean:AT.AT-FS.FO-N2 fixation-N2:1990-2024-->; for comparison, the value for Sweden in 2015 was 39.5 kt N (Moldan et al., 2025)<!--cite:moldan_where_2025-->.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

@@ -22,7 +22,7 @@ nav_order: 4
 
 #### Interpretations
 
-- The flow is very small, about 0.005 kt N per year, since NO<sub>x</sub> from waste incineration with energy recovery is counted in EF.EC-AT.AT-Emissions-NOx (0.1–0.34 kt N per year).
+- The flow is very small, about 0.005 kt N per year<!--mean:PR.SO-AT.AT-Emissions-NOx:1990-2024-->, since NO<sub>x</sub> from waste incineration with energy recovery is counted in EF.EC-AT.AT-Emissions-NOx (0.1–0.34 kt N per year).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

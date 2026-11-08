@@ -26,8 +26,8 @@ nav_order: 6
 
 #### Interpretations
 
-- The flow is 0.4–1.0 kt N per year in the late 1980s and early 1990s and below 0.2 kt N in 2003–2015.
-- A state subsidy of up to 40% for forest fertilization as a climate measure was introduced in 2016, and subsidies were paid for 310,000 daa in 2016–2020 (Landbruksdirektoratet, 2021)<!--cite:landbruksdirektoratet_vurdering_2021-->; the flow rose to about 1.3 kt N in 2016–2017 (84,000–91,000 daa).
+- The flow is 0.4–1.0 kt N per year<!--range:MP.OP-FS.FO-Mineral fertilizer-Nmix:1985-1994--> in the late 1980s and early 1990s and below 0.2 kt N in 2003–2015.
+- A state subsidy of up to 40% for forest fertilization as a climate measure was introduced in 2016, and subsidies were paid for 310,000 daa in 2016–2020 (Landbruksdirektoratet, 2021)<!--cite:landbruksdirektoratet_vurdering_2021-->; the flow rose to about 1.3 kt N<!--mean:MP.OP-FS.FO-Mineral fertilizer-Nmix:2016-2017--> in 2016–2017 (84,000–91,000 daa).
 - In 2022 only about 3,100 daa were fertilized (0.05 kt N).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

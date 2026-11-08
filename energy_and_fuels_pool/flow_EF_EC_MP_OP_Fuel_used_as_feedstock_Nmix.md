@@ -30,7 +30,7 @@ nav_order: 6
 
 #### Interpretations
 
-- In 2024 the flow is about 1.1 kt N, of which about 0.8 kt comes from coal.
+- In 2024 the flow is about 1.1 kt N<!--val:EF.EC-MP.OP-Fuel used as feedstock-Nmix:2024-->, of which about 0.8 kt comes from coal.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

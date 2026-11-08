@@ -21,7 +21,7 @@ nav_order: 3
 
 #### Interpretations
 
-- The flow rises slowly from 0.09 to 0.14 kt N per year, following the population connected to wastewater treatment.
+- The flow rises slowly from 0.09<!--val:PR.WW-AT.AT-Emissions-N2O:1990--> to 0.14 kt N per year<!--val:PR.WW-AT.AT-Emissions-N2O:2024-->, following the population connected to wastewater treatment.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

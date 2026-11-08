@@ -30,7 +30,7 @@ nav_order: 15
 #### Interpretations
 
 - The flow is about 130–415 kt N per year<!--range:AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2:1988-2024-->, by far the largest input of reactive N to Norway; it dips to 130–220 kt N<!--range:AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2:1997-1999--> in 1997–1999 and 230–280 kt N<!--range:AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2:2005-2007--> in 2005–2007, and has been 310–390 kt N<!--range:AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2:2008-2024--> since 2008.
-- The fixed N leaves Norway mainly as exported mineral fertilizer (MP.OP-RW.RW-Mineral fertilizer export-Nmix, 430–790 kt N per year), which also contains N from imported ammonia.
+- The fixed N leaves Norway mainly as exported mineral fertilizer (MP.OP-RW.RW-Mineral fertilizer export-Nmix, 350–790 kt N per year<!--range:MP.OP-RW.RW-Mineral fertilizer export-Nmix:1990-2024-->), which also contains N from imported ammonia.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

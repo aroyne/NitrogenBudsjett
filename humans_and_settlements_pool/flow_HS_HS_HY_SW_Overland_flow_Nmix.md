@@ -31,7 +31,7 @@ nav_order: 3
 #### Interpretations
 
 - The flow is about 6–8.5 kt N per year<!--range:HS.HS-HY.SW-Overland flow-Nmix:2013-2024--> since 2013, with the highest value in 2020, a wet year.
-- The values for 1990–2012 rise from 5.9 kt N in 1990 to 6.8 kt N in 2012 with the growth of settlement area. They follow the area only, not the year-to-year variation in runoff.
+- The values for 1990–2012 rise from 5.9 kt N<!--val:HS.HS-HY.SW-Overland flow-Nmix:1990--> in 1990 to 6.8 kt N<!--val:HS.HS-HY.SW-Overland flow-Nmix:2012--> in 2012 with the growth of settlement area. They follow the area only, not the year-to-year variation in runoff.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

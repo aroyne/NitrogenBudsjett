@@ -28,7 +28,7 @@ nav_order: 8
 
 #### Interpretations
 
-- The flow rises from about 0.8 kt N<!--val:PR.SO-MP.OP-Recycling-Nmix:1990--> in 1990 to 2.6 kt N<!--val:PR.SO-MP.OP-Recycling-Nmix:2011--> in 2011, jumps to 4.2 kt N<!--val:PR.SO-MP.OP-Recycling-Nmix:2012--> in 2012 with the change of table, and is 3.4–7.7 kt N since.
+- The flow rises from about 0.8 kt N<!--val:PR.SO-MP.OP-Recycling-Nmix:1990--> in 1990 to 2.6 kt N<!--val:PR.SO-MP.OP-Recycling-Nmix:2011--> in 2011, jumps to 4.2 kt N<!--val:PR.SO-MP.OP-Recycling-Nmix:2012--> in 2012 with the change of table, and is 3.4–7.7 kt N<!--range:PR.SO-MP.OP-Recycling-Nmix:2012-2024--> since.
 - Table 10513 introduces a new, large "mixed waste" (blandet avfall) reporting category from 2012 with no equivalent in the earlier table 05281, which shows up as the jump from 2011 to 2012.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

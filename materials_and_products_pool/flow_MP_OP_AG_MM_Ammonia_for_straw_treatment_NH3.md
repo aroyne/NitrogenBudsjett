@@ -27,7 +27,7 @@ nav_order: 14
 
 #### Interpretations
 
-- The flow is 1.8–3.2 kt N per year<!--range:MP.OP-AG.MM-Ammonia for straw treatment-NH3:1990-1997--> in 1990–1997, falls to 0.3–1.2 kt N from 2000, and has a peak of 2.6 kt N<!--val:MP.OP-AG.MM-Ammonia for straw treatment-NH3:2018--> in 2018, when more straw was treated to make up for the poor grass harvest in the drought summer.
+- The flow is 1.8–3.2 kt N per year<!--range:MP.OP-AG.MM-Ammonia for straw treatment-NH3:1990-1997--> in 1990–1997, falls to 0.3–1.2 kt N<!--range:MP.OP-AG.MM-Ammonia for straw treatment-NH3:2000-2017--> from 2000, and has a peak of 2.6 kt N<!--val:MP.OP-AG.MM-Ammonia for straw treatment-NH3:2018--> in 2018, when more straw was treated to make up for the poor grass harvest in the drought summer.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

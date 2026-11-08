@@ -27,7 +27,7 @@ nav_order: 17
 
 #### Interpretations
 
-- The flow is about 10–12 kt N per year<!--range:AT.AT-RW.RW-Atmospheric outflow-RDN:1990-2016--> up to 2016 and 13–14 kt N since, much less than for oxidised N since ammonia is mainly deposited close to the source.
+- The flow is about 10–12 kt N per year<!--range:AT.AT-RW.RW-Atmospheric outflow-RDN:1990-2016--> up to 2016 and 12–16 kt N<!--range:AT.AT-RW.RW-Atmospheric outflow-RDN:2017-2024--> since, much less than for oxidised N since ammonia is mainly deposited close to the source.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

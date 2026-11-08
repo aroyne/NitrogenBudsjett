@@ -30,7 +30,7 @@ nav_order: 7
 
 - The flow is 16–32 kt N per year<!--range:AG.SM-MP.FP-Food crop products-Nmix:1985-2025--> and follows the size of the cereal harvest, since cereals make up about 88% of the N.
 - Most of the cereal is used for animal feed and returns to AG.MM via MP.FP-AG.MM-Farm animal feed-Nmix.
-- The low values in 2018 (16 kt N) and 2023 (19 kt N) are the drought years with poor cereal harvests, and the high value in 1990 (32 kt N) a good harvest.
+- The low values in 2018 (16 kt N<!--val:AG.SM-MP.FP-Food crop products-Nmix:2018-->) and 2023 (19 kt N<!--val:AG.SM-MP.FP-Food crop products-Nmix:2023-->) are the drought years with poor cereal harvests, and the high value in 1990 (32 kt N<!--val:AG.SM-MP.FP-Food crop products-Nmix:1990-->) a good harvest.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

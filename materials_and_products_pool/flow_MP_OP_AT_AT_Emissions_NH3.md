@@ -23,7 +23,7 @@ nav_order: 3
 #### Interpretations
 
 - The flow is about 0.4–0.6 kt N per year<!--range:MP.OP-AT.AT-Emissions-NH3:1990-2024--> without a clear trend.
-- Nitric acid production (2B2) accounts for about 0.4 kt N, and the rest comes mainly from glass production (2A3) and other mineral products (2A6).
+- Nitric acid production (2B2) accounts for about 0.4 kt N<!--val:nfr/2B2/NH3:2024-->, and the rest comes mainly from glass production (2A3) and other mineral products (2A6).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

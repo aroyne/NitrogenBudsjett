@@ -28,7 +28,7 @@ nav_order: 7
 #### Interpretations
 
 - The flow is about 0.2–0.6 kt N per year<!--range:PR.SO-HY.SW-Leaching-Nmix:2011-2024--> since 2011, falling from 0.5–0.6 kt N<!--range:PR.SO-HY.SW-Leaching-Nmix:2011-2013--> in 2011–2013 to 0.2–0.4 kt N<!--range:PR.SO-HY.SW-Leaching-Nmix:2015-2024--> since 2015.
-- The extrapolated values fall from about 0.86 kt N in 1990 to 0.53 kt N in 2010, following the decline in landfill methane.
+- The extrapolated values fall from about 0.86 kt N<!--val:PR.SO-HY.SW-Leaching-Nmix:1990--> in 1990 to 0.53 kt N<!--val:PR.SO-HY.SW-Leaching-Nmix:2010--> in 2010, following the decline in landfill methane.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

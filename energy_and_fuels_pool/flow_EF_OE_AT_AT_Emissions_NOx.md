@@ -22,8 +22,8 @@ nav_order: 3
 
 #### Interpretations
 
-- NO<sub>x</sub> emissions declined from about 9.1 kt N/year in the 1990s to about 5.5 kt N in 2024.
-- The largest source is national fishing (1A4ciii), with 3.7–5.2 kt N/year until 2000 and 1.7 kt N in 2024, reflecting a smaller and more modern fishing fleet and NO<sub>x</sub>-reducing measures.
+- NO<sub>x</sub> emissions declined from about 9.1 kt N/year<!--mean:EF.OE-AT.AT-Emissions-NOx:1990-1999--> in the 1990s to about 5.5 kt N<!--val:EF.OE-AT.AT-Emissions-NOx:2024--> in 2024.
+- The largest source is national fishing (1A4ciii), with 3.7–5.2 kt N/year<!--range:nfr/1A4ciii/NOx:1990-2000--> until 2000 and 1.7 kt N<!--val:nfr/1A4ciii/NOx:2024--> in 2024, reflecting a smaller and more modern fishing fleet and NO<sub>x</sub>-reducing measures.
 - Other important sources are commercial and household mobile machinery (1A4aii, 1A4bii), agricultural and forestry machinery (1A4cii) and other mobile sources including military and recreational boats (1A5b).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

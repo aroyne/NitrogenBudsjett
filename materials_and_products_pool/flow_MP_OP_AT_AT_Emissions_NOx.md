@@ -24,8 +24,8 @@ nav_order: 4
 #### Interpretations
 
 - The flow falls from about 4.2 kt N<!--val:MP.OP-AT.AT-Emissions-NOx:1990--> in 1990 to 2.5 kt N<!--val:MP.OP-AT.AT-Emissions-NOx:2024--> in 2024.
-- Ferroalloy production (2C2) is the largest source (2.8–3.0 kt N until 2005, 1.9 kt N in 2024), followed by aluminium production (2C3, about 0.3 kt N).
-- NO<sub>x</sub> from nitric acid production (2B2) fell from 0.7 kt N in 1990 to 0.1 kt N in 2024, and from pulp and paper (2H1) from 0.24 to 0.09 kt N.
+- Ferroalloy production (2C2) is the largest source (2.4–3.4 kt N<!--range:nfr/2C2/NOx:1990-2005--> until 2005, 1.9 kt N<!--val:nfr/2C2/NOx:2024--> in 2024), followed by aluminium production (2C3, about 0.25 kt N<!--mean:nfr/2C3/NOx:1990-2024-->).
+- NO<sub>x</sub> from nitric acid production (2B2) fell from 0.7 kt N<!--val:nfr/2B2/NOx:1990--> in 1990 to 0.1 kt N<!--val:nfr/2B2/NOx:2024--> in 2024, and from pulp and paper (2H1) from 0.24<!--val:nfr/2H1/NOx:1990--> to 0.09 kt N<!--val:nfr/2H1/NOx:2024-->.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

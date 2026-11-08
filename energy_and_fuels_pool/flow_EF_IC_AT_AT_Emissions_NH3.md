@@ -22,7 +22,7 @@ nav_order: 2
 
 #### Interpretations
 
-- NH<sub>3</sub> emissions from fuel combustion in industry are very small (about 0.008 kt N/year), mainly from combustion of biomass and other fuels in 1A2d (pulp, paper and print) and 1A2gviii (other stationary combustion).
+- NH<sub>3</sub> emissions from fuel combustion in industry are very small (about 0.008 kt N/year<!--mean:EF.IC-AT.AT-Emissions-NH3:1990-2024-->), mainly from combustion of biomass and other fuels in 1A2d (pulp, paper and print) and 1A2gviii (other stationary combustion).
 - NH<sub>3</sub> is not a significant product of combustion except where biomass or catalytic NO<sub>x</sub> reduction is involved.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

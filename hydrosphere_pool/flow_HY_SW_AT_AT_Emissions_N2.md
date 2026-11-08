@@ -28,7 +28,7 @@ nav_order: 1
 
 #### Interpretations
 
-- The flow is about 12–15 kt N per year, following the inflow to coastal waters before 2013 and TEOTIL3's retention from 2013.
+- The flow is about 12–15 kt N per year<!--range:HY.SW-AT.AT-Emissions-N2:1990-2024-->, following the inflow to coastal waters before 2013 and TEOTIL3's retention from 2013.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

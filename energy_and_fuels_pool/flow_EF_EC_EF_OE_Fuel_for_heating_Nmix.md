@@ -33,7 +33,7 @@ nav_order: 4
 
 #### Interpretations
 
-- Since biomass enters via the fuel wood flow, this flow only covers fossil fuels and is small: about 0.7 kt N in 1990 and 0.2 kt N in 2024, mainly from liquid fuels.
+- Since biomass enters via the fuel wood flow, this flow only covers fossil fuels and is small: about 0.7 kt N<!--val:EF.EC-EF.OE-Fuel for heating-Nmix:1990--> in 1990 and 0.2 kt N<!--val:EF.EC-EF.OE-Fuel for heating-Nmix:2024--> in 2024, mainly from liquid fuels.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

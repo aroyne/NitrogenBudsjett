@@ -33,8 +33,8 @@ nav_order: 1
 
 #### Interpretations
 
-- The flow varies between 19 and 26 kt N without a clear trend.
-- Much of the year-to-year variation is consistent with the size of the Norwegian cereal harvest, which determines how much of the carbohydrate raw material can be sourced domestically: the flow is low in 2019 (18.6 kt N), after the drought in 2018, and in 2024 (20.4 kt N), after the poor harvest in 2023, and high in 2023 (23.8 kt N).
+- The flow varies between 19 and 26 kt N<!--range:MP.FP-AG.MM-Farm animal feed-Nmix:1990-2024--> without a clear trend.
+- Much of the year-to-year variation is consistent with the size of the Norwegian cereal harvest, which determines how much of the carbohydrate raw material can be sourced domestically: the flow is low in 2019 (18.6 kt N<!--val:MP.FP-AG.MM-Farm animal feed-Nmix:2019-->), after the drought in 2018, and in 2024 (20.4 kt N<!--val:MP.FP-AG.MM-Farm animal feed-Nmix:2024-->), after the poor harvest in 2023, and high in 2023 (23.8 kt N).
 - In 2024 the total N in concentrate feed (this flow plus RW.RW-AG.MM-Animal feed import-Nmix) is about 54 kt N<!--val:MP.FP-AG.MM-Farm animal feed-Nmix+RW.RW-AG.MM-Animal feed import-Nmix:2024-->, of which almost 40% is domestic.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

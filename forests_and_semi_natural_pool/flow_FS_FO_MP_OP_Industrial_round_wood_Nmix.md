@@ -28,7 +28,7 @@ nav_order: 6
 
 #### Interpretations
 
-- The flow is about 3.4–6.3 kt N per year<!--range:FS.FO-MP.OP-Industrial round wood-Nmix:1984-2024-->. It falls from 5.7 kt N in 1990 to about 3.5–4.5 kt N around 1995–2010 and rises to 6.3 kt N in 2024, following the volume of timber harvested.
+- The flow is about 3.4–6.3 kt N per year<!--range:FS.FO-MP.OP-Industrial round wood-Nmix:1984-2024-->. It falls from 5.7 kt N<!--val:FS.FO-MP.OP-Industrial round wood-Nmix:1990--> in 1990 to about 3.5–4.5 kt N<!--range:FS.FO-MP.OP-Industrial round wood-Nmix:1995-2010--> around 1995–2010 and rises to 6.3 kt N<!--val:FS.FO-MP.OP-Industrial round wood-Nmix:2024--> in 2024, following the volume of timber harvested.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

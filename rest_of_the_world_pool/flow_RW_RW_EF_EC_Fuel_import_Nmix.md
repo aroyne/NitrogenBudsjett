@@ -26,7 +26,7 @@ nav_order: 6
 
 #### Interpretations
 
-- The flow is about 13–28 kt N per year<!--range:RW.RW-EF.EC-Fuel import-Nmix:1988-2024-->, highest around 1996–2000 and lowest in 2010–2013 (13–15 kt N), and about 14–20 kt N per year<!--range:RW.RW-EF.EC-Fuel import-Nmix:2014-2024--> since 2014.
+- The flow is about 12–28 kt N per year<!--range:RW.RW-EF.EC-Fuel import-Nmix:1988-2024-->, highest around 1996–2000 and lowest in 2009–2012 (12–15 kt N<!--range:RW.RW-EF.EC-Fuel import-Nmix:2009-2012-->), and about 14–20 kt N per year<!--range:RW.RW-EF.EC-Fuel import-Nmix:2014-2024--> since 2014.
 - Unlike the export side, coal products (coking coal, bituminous coal, anthracite) dominate here rather than crude oil, since Norway imports comparatively little crude oil but relies on imported coal for coking and industrial use.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

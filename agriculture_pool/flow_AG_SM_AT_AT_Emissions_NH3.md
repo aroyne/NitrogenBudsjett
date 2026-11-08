@@ -28,8 +28,8 @@ nav_order: 4
 #### Interpretations
 
 - The flow is 13–15 kt N per year<!--range:AG.SM-AT.AT-Emissions-NH3:1990-2024-->, falling slowly from about 15.2 kt N<!--val:AG.SM-AT.AT-Emissions-NH3:1990--> in 1990 to 12.8 kt N<!--val:AG.SM-AT.AT-Emissions-NH3:2024--> in 2024.
-- Field burning contributed 0.8 kt N in 1990 and less than 0.1 kt N in 2024.
-- Manure spreading (3Da2a) is the largest source (10 kt N in 2024), followed by grazing animals on agricultural land (1.0 kt N) and mineral fertilizer (1.4 kt N, down from 2.1 kt N in 1990).
+- Field burning contributed 0.8 kt N<!--val:nfr/3F/NH3:1990--> in 1990 and less than 0.1 kt N in 2024.
+- Manure spreading (3Da2a) is the largest source (10 kt N<!--val:nfr/3Da2a/NH3:2024--> in 2024), followed by grazing animals on agricultural land (1.0 kt N) and mineral fertilizer (1.4 kt N<!--val:nfr/3Da1/NH3:2024-->, down from 2.1 kt N<!--val:nfr/3Da1/NH3:1990--> in 1990).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

@@ -28,9 +28,9 @@ nav_order: 3
 #### Interpretations
 
 - The flow is about 9.4–11.8 kt N per year<!--range:AG.MM-AT.AT-Emissions-NH3:1990-2024-->: 10.3 kt N<!--val:AG.MM-AT.AT-Emissions-NH3:1990--> in 1990 and 9.9 kt N<!--val:AG.MM-AT.AT-Emissions-NH3:2024--> in 2024.
-- Straw treatment (3I) contributed 1.2 kt N in 1990 but only 0.3 kt N in 2024, while manure management rose from about 9 to 9.6 kt N.
-- The peak in 2018 (11.8 kt N) comes from straw treatment, which rose to about 1.4 kt N in the drought year.
-- Cattle account for about 70% (dairy cattle 3.0 kt N and other cattle 3.7 kt N in 2024).
+- Straw treatment (3I) contributed 1.2 kt N<!--val:nfr/3I/NH3:1990--> in 1990 but only 0.3 kt N<!--val:nfr/3I/NH3:2024--> in 2024, while manure management rose from about 9<!--val:nfr/3B1a+3B1b+3B2+3B3+3B4a+3B4d+3B4e+3B4f+3B4gi+3B4gii+3B4giii+3B4giv+3B4h/NH3:1990--> to 9.6 kt N<!--val:nfr/3B1a+3B1b+3B2+3B3+3B4a+3B4d+3B4e+3B4f+3B4gi+3B4gii+3B4giii+3B4giv+3B4h/NH3:2024-->.
+- The peak in 2018 (11.8 kt N<!--val:AG.MM-AT.AT-Emissions-NH3:2018-->) comes from straw treatment, which rose to about 1.4 kt N<!--val:nfr/3I/NH3:2018--> in the drought year.
+- Cattle account for about 70% (dairy cattle 3.0 kt N<!--val:nfr/3B1a/NH3:2024--> and other cattle 3.7 kt N<!--val:nfr/3B1b/NH3:2024--> in 2024).
 - Emissions from other cattle, horses and poultry have increased, while emissions from dairy cattle, sheep and pigs have decreased.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

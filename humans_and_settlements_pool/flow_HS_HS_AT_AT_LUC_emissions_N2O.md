@@ -29,8 +29,8 @@ nav_order: 2
 
 #### Interpretations
 
-- The flow rose from about 0.06 kt N<!--val:HS.HS-AT.AT-LUC emissions-N2O:1990--> in 1990 to 0.1 kt N<!--val:HS.HS-AT.AT-LUC emissions-N2O:2010--> around 2010 with the expansion of settlement areas, and has been about 0.1 kt N per year since.
-- Inorganic fertilizer used in settlements (MP.OP-HS.HS-Mineral fertilizer-Nmix, about 2 kt N) is reported as IE (included elsewhere) in Table 4(I). The inventory does not say where; most likely it is included with agricultural soils (3.D). Its N<sub>2</sub>O, below 0.05 kt N per year, would then be part of AG.SM-AT.AT-Emissions-N2O. We have not moved it, since this cannot be confirmed from the inventory.
+- The flow rose from about 0.06 kt N<!--val:HS.HS-AT.AT-LUC emissions-N2O:1990--> in 1990 to 0.1 kt N<!--val:HS.HS-AT.AT-LUC emissions-N2O:2010--> around 2010 with the expansion of settlement areas, and has been about 0.1 kt N per year<!--mean:HS.HS-AT.AT-LUC emissions-N2O:2010-2024--> since.
+- Inorganic fertilizer used in settlements (MP.OP-HS.HS-Mineral fertilizer-Nmix, about 2 kt N<!--mean:MP.OP-HS.HS-Mineral fertilizer-Nmix:1990-2024-->) is reported as IE (included elsewhere) in Table 4(I). The inventory does not say where; most likely it is included with agricultural soils (3.D). Its N<sub>2</sub>O, below 0.05 kt N per year, would then be part of AG.SM-AT.AT-Emissions-N2O. We have not moved it, since this cannot be confirmed from the inventory.
 - The 1.9 kt N of organic fertilizer on settlement areas in the inventory is of the same order as the sewage sludge and biologically treated waste delivered to green areas and soil producers in this model (PR.WW-HS.HS-Sewage sludge fertilizer-Nmix and PR.SO-HS.HS-Biologically treated organic waste-Nmix, together about 2.3 kt N in 2024).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

@@ -28,7 +28,7 @@ nav_order: 9
 
 - The flow is about 6.8–7.4 kt N per year<!--range:AG.MM-FS.OL-Manure from grazing on unmanaged land-Nmix:1990-2024-->.
 - Sheep account for 52–62%, cattle for 19–29% and reindeer, which graze only on unmanaged land, for 14–18%.
-- Without a cap, the manure on unmanaged land would rise from 86% of the feed taken up there (FS.OL-AG.MM-Grazing-Nmix, 7.5–8.6 kt N including reindeer) in 1990 to 99% after 2015, which leaves almost nothing retained in growth, milk and wool. From 2000 the manure is therefore capped at 90% of the uptake (see AG.MM-AG.SM-Manure application-Nmix). Both flows are uncertain: the feed uptake builds on a single estimate for 1996 (Hegrenes & Asheim, 2006)<!--cite:hegrenes_verdi_2006-->, and the manure on the survey of grazing time in 2018.
+- Without a cap, the manure on unmanaged land would rise from 86% of the feed taken up there (FS.OL-AG.MM-Grazing-Nmix, 7.5–8.6 kt N<!--range:FS.OL-AG.MM-Grazing-Nmix:1990-2024--> including reindeer) in 1990 to 99% after 2015, which leaves almost nothing retained in growth, milk and wool. From 2000 the manure is therefore capped at 90% of the uptake (see AG.MM-AG.SM-Manure application-Nmix). Both flows are uncertain: the feed uptake builds on a single estimate for 1996 (Hegrenes & Asheim, 2006)<!--cite:hegrenes_verdi_2006-->, and the manure on the survey of grazing time in 2018.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
