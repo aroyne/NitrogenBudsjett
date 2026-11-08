@@ -23,12 +23,12 @@ nav_order: 6
 #### Assumptions
 
 - The inventory counts all manure deposited by grazing animals as input to managed soils, including the share deposited on unmanaged land (utmark), which this model does not count as input to AG.SM (see AG.MM-AG.SM-Manure application-Nmix). The unmanaged-land share (26–30% of grazing manure, see AG.MM-AG.SM-Manure application-Nmix) of the losses from grazing manure is therefore removed from this flow; the leaching is part of the runoff from upland areas measured by TEOTIL3 (FS.OL-HY.SW-Leaching-Nmix).
-- The removed leaching is FracLEACH (from CRT Table 3.D) times the unmanaged-land share of the grazing manure, about 2 kt N per year.
+- The removed leaching is FracLEACH (from CRT Table 3.D) times the unmanaged-land share of the grazing manure, about 1.5 kt N per year.
 
 #### Interpretations
 
 - The flow is 38–45 kt N per year<!--range:AG.SM-HY.SW-Leaching-Nmix:1990-2024--> and follows the N applied to soils, falling slowly from about 45 kt N<!--val:AG.SM-HY.SW-Leaching-Nmix:1990--> in 1990 to 40 kt N<!--val:AG.SM-HY.SW-Leaching-Nmix:2024--> in 2024.
-- The flow is the N leaving the root zone, not the N reaching the sea; TEOTIL3 gives 43–51 kt N from agriculture including the agricultural background in 2013–2023, before retention in lakes and rivers. The data agree within the error range with what is reported in TEOTIL3 (Sample, 2024<!--cite:sample_kildefordelte_2024-->).
+- The flow is the N leaving the root zone, not the N reaching the sea; TEOTIL3 gives 45–59 kt N from agriculture including the agricultural background (40–53 kt N without it) in 2013–2023, before retention in lakes and rivers. The data agree within the error range with what is reported in TEOTIL3 (Sample, 2024<!--cite:sample_kildefordelte_2024-->).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

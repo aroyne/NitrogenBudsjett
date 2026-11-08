@@ -752,8 +752,10 @@ def load_all_data(selected_pools):
             # AG.MM-MP.FP-Animal products, so aggregates are never counted on
             # top of their own components. Each item needs a matching
             # prod_<item> row in N_parameters.xlsx's animal_products sheet.
+            # Game meat is left out: hunting is counted in FS.FO-HS.HS- and
+            # FS.OL-HS.HS-Game meat-Nmix (SSB hunting statistics), and wild
+            # animals are not part of AG.MM.
             animal_product_items = [
-                'Game meat, fresh, chilled or frozen',
                 'Horse meat, fresh or chilled',
                 'Meat of cattle with the bone, fresh or chilled',
                 'Meat of chickens, fresh or chilled',

@@ -38,7 +38,7 @@ nav_order: 1
 - The flow varies between about 52 and 98 kt N per year<!--range:AG.SM-AG.MM-Fodder crops-Nmix:1990-2024-->.
 - The low value in 2018 (52 kt N<!--val:AG.SM-AG.MM-Fodder crops-Nmix:2018-->) is the drought year.
 - The step from 77 kt N<!--val:AG.SM-AG.MM-Fodder crops-Nmix:2020--> in 2020 to 98 kt N<!--val:AG.SM-AG.MM-Fodder crops-Nmix:2021--> in 2021 follows SSB's change of method for eng til slått in 2021 and is not corrected.
-- Eurostat's Gross Nutrient Balance, which estimates N removed by harvest and grazing of fodder for Norway from the same SSB statistics, gives a similar level (63–85 kt N per year) but a smaller increase from 2020 to 2022.
+- Eurostat's Gross Nutrient Balance, which estimates N removed by harvest and grazing of fodder for Norway from the same SSB statistics, gives a similar level (61–87 kt N per year) but a smaller increase from 2020 to 2022.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

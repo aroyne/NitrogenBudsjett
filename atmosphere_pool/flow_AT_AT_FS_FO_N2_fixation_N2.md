@@ -26,7 +26,7 @@ nav_order: 6
 
 #### Interpretations
 
-- The flow is constant at about 18 kt N per year<!--mean:AT.AT-FS.FO-N2 fixation-N2:1990-2024-->; for comparison, the value for Sweden in 2015 was 39.5 kt N (Moldan et al., 2025)<!--cite:moldan_where_2025-->.
+- The flow is constant at about 18 kt N per year<!--mean:AT.AT-FS.FO-N2 fixation-N2:1990-2024-->; for comparison, the Swedish nitrogen budget gives 39.5 kt N (Jutterström et al., 2020)<!--cite:jutterstrom_swedish_2020-->.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
@@ -40,4 +40,5 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
+* Jutterström, S., Stadmark, J., & Moldan, F. (2020). *Swedish National Nitrogen Budget – Forest and semi-natural vegetation* (C 549). IVL Swedish Environmental Research Institute.
 * Moldan, F., Stadmark, J., Jutterström, S., & Ljunggren, J. (2025). Where does Sweden’s nitrogen go? Building a comprehensive national nitrogen budget. *Environmental Research Letters, 20*(12), 124068. [https://doi.org/10.1088/1748-9326/ae2697](https://doi.org/10.1088/1748-9326/ae2697)

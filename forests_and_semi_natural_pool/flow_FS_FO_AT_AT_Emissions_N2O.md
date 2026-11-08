@@ -22,7 +22,7 @@ nav_order: 2
     - Drained organic forest soils (Table 4(II), 0.36 of 0.38 kt N/year<!--val:FS.FO-AT.AT-Emissions-N2O:2024-->): 128 kha drained organic soil in forest remaining forest with 2.8 kg N<sub>2</sub>O–N per ha, plus a small area of cropland converted to forest.
     - Fertilization of forest (Table 4(I), 0.009 kt N/year): 0.47 kt N of inorganic fertilizer, with direct emissions and indirect emissions from volatilised and leached N.
     - Mineralisation of soil organic matter after land-use change to forest (Table 4(III), 0.001 kt N/year).
-    - Forest fires (Table 4(IV), 427 ha burned in 2024, 0.0006 kt N/year).
+    - Forest fires (Table 4(IV), 427 ha burned in 2024, 0.0007 kt N/year).
 #### Assumptions
 
 - The inventory values are used directly, converted from N<sub>2</sub>O to N.

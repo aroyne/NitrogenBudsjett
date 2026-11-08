@@ -14,7 +14,7 @@ nav_order: 6
 #### Flow description
 
 - **FS.OL-HS.HS-Game meat-Nmix** is the N in meat from wild reindeer shot in ordinary hunting. Wild reindeer live in mountain areas (other land). This flow is not in the flow tables of Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
-- Small game (grouse, hare, ducks and others) is not included. About 350 000–400 000 animals are shot per year (SSB table 03886), which gives a few hundred tonnes of meat, well below 0.01 kt N.
+- Small game (grouse, hare, ducks and others) is not included. About 350 000–400 000 animals were shot per year in 2019–2023 and 0.7–1.3 million in the 1990s (SSB table 03886), which gives at most a few hundred tonnes of meat, about 0.01 kt N or less.
 
 #### Data sources
 

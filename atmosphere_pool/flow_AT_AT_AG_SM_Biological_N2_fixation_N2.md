@@ -20,12 +20,12 @@ nav_order: 1
 - Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> advises using data from the EUROSTAT Gross nutrient balance. According to the EUROSTAT metadata, the BNF in this statistic is calculated based on the area of leguminous crops and fixation coefficients. For Norway this dataset (updated September 2026) gives only 0.06–0.55 kt N per year, since it covers grain legumes and not clover in grassland.
 - Bleken & Bakken (1997)<!--cite:bleken_nitrogen_1997--> based their estimate for BNF on the sale of clover seeds: a sale of about 145 t seeds was estimated to be used to plant 95 000 ha of grass/clover mixtures (655 ha/t seeds). Together with a rate of BNF of 80 kg N/ha on this area, they found a total of 7.6 kt N per year and summed up to 8 kt N to account for BNF from free-living organisms and other sources.
 - Later studies of agricultural BNF in Norway have found average values between 10 and 100 kg N/ha; the highest values in particularly productive areas were up to 260 kg N/ha (Hansen et al., 2020<!--cite:hansen_engbelgvekster_2020-->).
-- Bechmann et al. (2023)<!--cite:bechmann_tiltak_2023--> give 8–16 kt N per year, as also cited in Frøseth et al. (2025)<!--cite:froseth_nitrogenkilder_2025-->.
+- Bechmann et al. (2023)<!--cite:bechmann_tiltak_2023--> estimate 15.8 kt N per year for clover in grassland (4.8 million daa of fully cultivated grassland, 55% of it with 20% clover), higher than the 8 kt N of Bleken & Bakken (1997); Frøseth et al. (2025)<!--cite:froseth_nitrogenkilder_2025--> give the range 8–16 kt N per year.
 - Yearly statistics of clover seed sales are not available, but according to Totalkalkylen (Budsjettnemnda for jordbruket, 2025)<!--cite:bfj_totalkalkylen_2025-->, the area where grass/clover mixes may be sown for pasture and fodder production (fulldyrka eng) has remained constant to within about 3% from 1995 up to today.
 
 #### Assumptions
 
-- A constant value of 12 kt N per year (range 8–16 kt N), the middle of the range given by Bechmann et al. (2023); the lower end of the range corresponds to the estimate of Bleken & Bakken (1997).
+- A constant value of 12 kt N per year (range 8–16 kt N), the middle of the range given by Frøseth et al. (2025), whose lower end is the estimate of Bleken & Bakken (1997) and upper end that of Bechmann et al. (2023).
 
 #### Interpretations
 

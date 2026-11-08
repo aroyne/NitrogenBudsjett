@@ -29,7 +29,7 @@ nav_order: 1
 #### Interpretations
 
 - The flow is about 0.1 kt N per year<!--mean:HS.HS-AT.AT-Emissions-NH3:1986-2025-->.
-- Smoking contributes about 0.016 kt N in 1990 and 0.005 kt N in 2024; the decline in smoking offsets most of the increase from population growth.
+- Smoking contributes about 0.020 kt N in 1990 and 0.006 kt N in 2024; the decline in smoking offsets most of the increase from population growth.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

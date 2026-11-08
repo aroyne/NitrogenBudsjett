@@ -14,6 +14,7 @@ nav_order: 6
 #### Flow description
 
 - **AG.MM-MP.FP-Animal products-Nmix** is the N in meat, milk and eggs produced in Norway.
+- Game meat in the FAOSTAT production statistics is not included, since hunting is counted in FS.FO-HS.HS-Game meat-Nmix and FS.OL-HS.HS-Game meat-Nmix.
 
 #### Data sources
 
