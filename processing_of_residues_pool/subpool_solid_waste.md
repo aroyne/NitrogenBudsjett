@@ -18,7 +18,7 @@ Hover over the chart to inspect specific flows, or click legend items to toggle 
 <iframe src="../output_files/plots/balance_PR_SO.html" width="100%" height="600px" frameborder="0" scrolling="no"></iframe>
 
 <!-- MANUAL:POOL_TEXT:START -->
-It is expected that there should be a surplus for all years because landfilled waste stays in the PR sector and thus does not represent an outflow. The fraction of waste to landfill has been decreasing. Up to 2008 about 2 million tonnes of waste were landfilled each year (SSB table 05281), and the outflows were about 50–65% of the inflows. From 1 July 2009 landfilling of biodegradable waste was banned ([Avfallsforskriften § 9-4](https://lovdata.no/dokument/SF/forskrift/2004-06-01-930/%C2%A79-4), amended by regulation of 27 June 2008 no. 741). Landfilled waste fell to 0.8 million tonnes in 2011 (SSB table 05281; see also [SSB 2011](https://www.ssb.no/natur-og-miljo/statistikker/avfregno/aar/2011-12-14)), more waste went to incineration, and from 2012 the outflows are about 90–100% of the inflows.
+It is expected that there should be a surplus for all years because landfilled waste stays in the PR sector and thus does not represent an outflow. The fraction of waste to landfill has been decreasing. Up to 2008 about 2 million tonnes of waste were landfilled each year (SSB table 05281), and the outflows were about 50–65% of the inflows. From 1 July 2009 landfilling of biodegradable waste was banned ([Avfallsforskriften § 9-4](https://lovdata.no/dokument/SF/forskrift/2004-06-01-930/%C2%A79-4), amended by regulation of 27 June 2008 no. 741). Landfilled waste fell to 0.8 million tonnes in 2011 (SSB table 05281; see also SSB, 2011b<!--cite:ssb_avfallsregnskap_2011-->), more waste went to incineration, and from 2012 the outflows are about 90–100% of the inflows.
 
 ### Flows that are zero or neglected:
 
@@ -36,4 +36,5 @@ It is expected that there should be a surplus for all years because landfilled w
 
 ### References
 
-* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)
+* Schäppi, B., Reutimann, J., Bogler, S., Ehrler, A., & Fehrenbach, H. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets”* (TEXTE 05/2025). Umweltbundesamt. [https://doi.org/10.60810/openumwelt-7845](https://doi.org/10.60810/openumwelt-7845)
+* SSB (2011b). *Avfallsregnskapet: Store endringer i deponert avfall*. [ssb.no](https://www.ssb.no/natur-og-miljo/statistikker/avfregno/aar/2011-12-14)

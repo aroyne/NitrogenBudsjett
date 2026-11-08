@@ -18,7 +18,7 @@ nav_order: 4
 #### Data sources
 
 - SSB's statistics on sewage sludge ([table 05279](https://www.ssb.no/statbank/table/05279) “Avløpsslam, etter slamdisponering, statistikkvariabel, år og region”) give the amount of sludge (tonnes dry matter) from municipal wastewater treatment plants by disposal, based on the plants' reporting through KOSTRA. For 1993–2001 the amounts and shares by disposal are taken from SSB's Naturressurser og miljø series.
-- [NIBIO](https://www.nibio.no/tema/jord/organisk-avfall-som-gjodsel/avlopsslam) gives 20–40 kg total N per tonne dry matter for Norwegian sewage sludge. There are no public Norwegian data on N in sludge from different treatment processes (Frøseth et al., 2025, NIBIO Rapport 11(124)).
+- [NIBIO](https://www.nibio.no/tema/jord/organisk-avfall-som-gjodsel/avlopsslam) gives 20–40 kg total N per tonne dry matter for Norwegian sewage sludge. There are no public Norwegian data on N in sludge from different treatment processes (Frøseth et al., 2025)<!--cite:froseth_nitrogenkilder_2025-->.
 
 #### Assumptions
 
@@ -44,4 +44,5 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)
+* Frøseth, R. B., Kristoffersen, A. Ø., Bechmann, M., & Brod, E. (2025). *Nitrogenkilder og -strømmer i jordbruket* (NIBIO Rapport 11(124)). NIBIO. [landbruksdirektoratet.no](https://www.landbruksdirektoratet.no/nb/filarkiv/prosjektresultater/NIBIO-delrapport%201%20-%20Nitrogenkilder%20-%20og%20str%C3%B8mmer%20i%20jordbruket.pdf/_/attachment/inline/5986a77d-5097-4b6c-838f-27bc6ebad941:917ae8899116a72498026f7ab9a6ca50f03acc7c/NIBIO-delrapport%201%20-%20Nitrogenkilder%20-%20og%20str%C3%B8mmer%20i%20jordbruket.pdf)
+* Schäppi, B., Reutimann, J., Bogler, S., Ehrler, A., & Fehrenbach, H. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets”* (TEXTE 05/2025). Umweltbundesamt. [https://doi.org/10.60810/openumwelt-7845](https://doi.org/10.60810/openumwelt-7845)

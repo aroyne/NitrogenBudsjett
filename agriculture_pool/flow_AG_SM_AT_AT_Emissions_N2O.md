@@ -17,7 +17,7 @@ nav_order: 3
 
 #### Data sources
 
-- N<sub>2</sub>O from "3.D. Agricultural soils" in the UNFCCC Common Reporting Tables (CRT), Table 3, of the national greenhouse gas inventory, calculated as the N applied by each source multiplied by IPCC emission factors ([Miljødirektoratet, NID 2026](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)).
+- N<sub>2</sub>O from "3.D. Agricultural soils" in the UNFCCC Common Reporting Tables (CRT), Table 3, of the national greenhouse gas inventory, calculated as the N applied by each source multiplied by IPCC emission factors (Miljødirektoratet, 2026)<!--cite:miljodirektoratet_nid_2026-->.
 
 #### Assumptions
 
@@ -37,3 +37,7 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
 | N<sub>2</sub>O from agricultural soils (Norway's GHG inventory, CRT 3.D) | Inventory with published uncertainty | −66.7/+200 %, lognormal | 100% | 100% | 1.00 | 1.00 | [Other Land Emissions (N<sub>2</sub>O)](../forests_and_semi_natural_pool/flow_FS_OL_AT_AT_Emissions_N2O.html) |
+
+### References
+
+* Miljødirektoratet (2026). *Greenhouse gas emissions 1990–2024, National Inventory Document* (M-3138). [miljodirektoratet.no](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)

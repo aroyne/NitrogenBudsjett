@@ -20,7 +20,7 @@ nav_order: 3
 
 - SSB's energy balance gives the wood burned in dwellings and holiday homes ([table 09702](https://www.ssb.no/statbank/table/09702), 'Energibalansen. Vedforbruk i boliger og fritidsboliger 1990 – 2024'). From 2005 the figures are based on SSB's survey of households' wood consumption; earlier years build on SSB's energy statistics and household surveys.
 - Biomass consumption (TJ) in 1.A.4.a Commercial/institutional and 1.A.4.c Agriculture/forestry/fishing from the UNFCCC Common Reporting Tables (CRT), Table 1.A(a) sheet 4. Residential biomass (1.A.4.b) is not read from the CRT, since it is the same firewood as in table 09702.
-- N content of broadleaf stems with bark from Table 45 in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)<!--cite:schappi_annexes_2025-->.
+- N content of broadleaf stems with bark from Table 45 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
 
 #### Assumptions
 
@@ -45,5 +45,5 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Jutterström, S., Stadmark, J., & Moldan, F. (2020). *Swedish National Nitrogen Budget – Forest and semi-natural vegetation*.
-* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)
+* Jutterström, S., Stadmark, J., & Moldan, F. (2020). *Swedish National Nitrogen Budget – Forest and semi-natural vegetation* (C 549). IVL Swedish Environmental Research Institute.
+* Schäppi, B., Reutimann, J., Bogler, S., Ehrler, A., & Fehrenbach, H. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets”* (TEXTE 05/2025). Umweltbundesamt. [https://doi.org/10.60810/openumwelt-7845](https://doi.org/10.60810/openumwelt-7845)

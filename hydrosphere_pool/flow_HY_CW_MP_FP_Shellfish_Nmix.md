@@ -19,7 +19,7 @@ nav_order: 2
 #### Data sources
 
 - Catch of crustaceans and molluscs and harvest of macroalgae (wet weight) from Fiskeridirektoratet (2025)<!--cite:fiskeridirektoratet_fangst_2025-->: from the catch statistics by species from 2000, and from a historical compilation for 1990–1999.
-- N content of kelp: 1–2% N in dry matter (Sjøtun et al., 1996; Schiener et al., 2015) and 11–16% dry matter.
+- N content of kelp: 1–2% N in dry matter (Sjøtun et al., 1996; Schiener et al., 2015)<!--cite:sjotun_seasonal_1996,schiener_seasonal_2015--> and 11–16% dry matter.
 
 #### Assumptions
 
@@ -45,5 +45,7 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Fiskeridirektoratet (2025). *Fangst fordelt på art (offisiell statistikk)*. [https://www.fiskeridir.no/statistikk-tall-og-analyse/data-og-statistikk-om-yrkesfiske/fangst/fangst-fordelt-pa-art-offisiell-statistikk](https://www.fiskeridir.no/statistikk-tall-og-analyse/data-og-statistikk-om-yrkesfiske/fangst/fangst-fordelt-pa-art-offisiell-statistikk)
-* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)
+* Fiskeridirektoratet (2025). *Fangst fordelt på art (offisiell statistikk)*. [fiskeridir.no](https://www.fiskeridir.no/statistikk-tall-og-analyse/data-og-statistikk-om-yrkesfiske/fangst/fangst-fordelt-pa-art-offisiell-statistikk)
+* Schäppi, B., Reutimann, J., Bogler, S., Ehrler, A., & Fehrenbach, H. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets”* (TEXTE 05/2025). Umweltbundesamt. [https://doi.org/10.60810/openumwelt-7845](https://doi.org/10.60810/openumwelt-7845)
+* Schiener, P., Black, K. D., Stanley, M. S., & Green, D. H. (2015). The seasonal variation in the chemical composition of the kelp species Laminaria digitata, Laminaria hyperborea, Saccharina latissima and Alaria esculenta. *Journal of Applied Phycology, 27*, 363-373. [https://doi.org/10.1007/s10811-014-0327-1](https://doi.org/10.1007/s10811-014-0327-1)
+* Sjøtun, K., Fredriksen, S., & Rueness, J. (1996). Seasonal growth and carbon and nitrogen content in canopy and first-year plants of Laminaria hyperborea (Laminariales, Phaeophyceae). *Phycologia, 35*(1), 1-8. [https://doi.org/10.2216/i0031-8884-35-1-1.1](https://doi.org/10.2216/i0031-8884-35-1-1.1)

@@ -26,7 +26,7 @@ nav_order: 4
 
 #### Assumptions
 
-- The tonnes of each material are multiplied by an N content, mainly from Table 50 in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)<!--cite:schappi_annexes_2025--> (for example wet organic 0.9%, paper 0.28%, mixed waste 0.9%); typical, assumed values are chosen if none are given.
+- The tonnes of each material are multiplied by an N content, mainly from Table 50 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> (for example wet organic 0.9%, paper 0.28%, mixed waste 0.9%); typical, assumed values are chosen if none are given.
 - Plastic is set to 0.4% N (95% interval 0.2–0.8%) instead of the 2.1% in Table 50: the N-bearing polymers (polyurethane, polyamide, cellulose nitrate, acrylic) make up 0.40–0.44% N of the plastics imported to Norway (HS 39, 1990–2024), domestic polymer production (PE, PP, PVC) contains no N, and amino resins are left out because they are used as glue in wood panels and end up as wood waste. Plastic waste cannot contain more N than the plastic that enters use; the upper bound allows for food residues and other contamination.
 - The change to mixed waste for private households in 2012 changes the N only slightly and is not adjusted.
 - The 1995–2011 values for services and construction are scaled by the ratio of their N in 2012 to that in 2011 (about 1.66).
@@ -37,7 +37,7 @@ nav_order: 4
 - The flow rises from about 10 kt N in 1990 to 26–32 kt N in 2005–2019, with a dip in 2009–2011, and is about 26 kt N in 2024.
 - Private households account for 40–45% of the N; the rest comes from services and construction, which have grown more than households over the period.
 - The flow rises faster than the population up to 2008. For private households the growth is real: waste per inhabitant rose from about 290 kg in 1995 to about 470 kg in 2011, following higher consumption. The services and construction values follow employment and building activity, and because they are scaled by about 1.66 they make up about two thirds of the flow before 2012 and determine its shape.
-- The dip from 2008 to 2009 (about −4.6 kt N) comes mainly from services (about −3.6 kt N). SSB reported a 19% decrease in waste from services from 2008 to 2009 and wrote that the cause is not known ([SSB 2011](https://www.ssb.no/natur-og-miljo/statistikker/avfhandel/aar/2011-12-12)). The composition also changes abruptly (paper 519 → 338 kt, other materials 59 → 103 kt), which points to a break in the data rather than a real change: the expanded sample of waste collectors, and the full change to the SN2007 industry classification from 2009 (which moved e.g. publishing from manufacturing to services). Construction accounts for about −0.8 kt N, probably a real effect of the financial crisis (SSB reported a further 10% decrease for construction from 2009 to 2010; [SSB 2011](https://www.ssb.no/natur-og-miljo/statistikker/avfregno/aar/2011-12-14)), and private households for about −0.3 kt N.
+- The dip from 2008 to 2009 (about −4.6 kt N) comes mainly from services (about −3.6 kt N). SSB reported a 19% decrease in waste from services from 2008 to 2009 and wrote that the cause is not known (SSB, 2011a)<!--cite:ssb_avfallshandel_2011-->. The composition also changes abruptly (paper 519 → 338 kt, other materials 59 → 103 kt), which points to a break in the data rather than a real change: the expanded sample of waste collectors, and the full change to the SN2007 industry classification from 2009 (which moved e.g. publishing from manufacturing to services). Construction accounts for about −0.8 kt N, probably a real effect of the financial crisis (SSB reported a further 10% decrease for construction from 2009 to 2010; SSB, 2011b)<!--cite:ssb_avfallsregnskap_2011-->, and private households for about −0.3 kt N.
 - The services values before 2009 are therefore probably too high. Because the scaling to table 10514 is based on 2011, after the break, the higher pre-2009 level is carried into the scaled series. This is not corrected.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
@@ -54,5 +54,7 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)
-* SSB (1997). *Naturressurser og miljø 1997*.
+* Schäppi, B., Reutimann, J., Bogler, S., Ehrler, A., & Fehrenbach, H. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets”* (TEXTE 05/2025). Umweltbundesamt. [https://doi.org/10.60810/openumwelt-7845](https://doi.org/10.60810/openumwelt-7845)
+* SSB (2011a). *Avfall fra tjenesteytende næringer: Nedgang i avfall fra tjenesteyterne*. [ssb.no](https://www.ssb.no/natur-og-miljo/statistikker/avfhandel/aar/2011-12-12)
+* SSB (2011b). *Avfallsregnskapet: Store endringer i deponert avfall*. [ssb.no](https://www.ssb.no/natur-og-miljo/statistikker/avfregno/aar/2011-12-14)
+* SSB (1997). *Naturressurser og miljø 1997*. Statistisk sentralbyrå.

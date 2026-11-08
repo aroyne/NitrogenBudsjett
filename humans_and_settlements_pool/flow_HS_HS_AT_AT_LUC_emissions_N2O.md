@@ -17,7 +17,7 @@ nav_order: 2
 
 #### Data sources
 
-- N<sub>2</sub>O from "4.E. Settlements" in the UNFCCC Common Reporting Tables (CRT), Table 4, of the national greenhouse gas inventory ([Miljødirektoratet, NID 2026](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)).
+- N<sub>2</sub>O from "4.E. Settlements" in the UNFCCC Common Reporting Tables (CRT), Table 4, of the national greenhouse gas inventory (Miljødirektoratet, 2026)<!--cite:miljodirektoratet_nid_2026-->.
 - The emissions are not measured but calculated in the inventory from activity data (N inputs, areas, losses of soil carbon) and emission factors, following the IPCC guidelines. In 2024 the category consists of three parts (CRT Tables 4(I)–4(III)):
     - N inputs to soils in settlements (Table 4(I), 0.022 kt N/year): 1.9 kt N of organic fertilizers (such as sewage sludge and compost) applied to settlement areas, with direct emissions at an implied emission factor of 0.006 kg N<sub>2</sub>O–N per kg N, plus indirect emissions from the part of the N that volatilises (0.39 kt N) or is lost by leaching and run-off (0.44 kt N). Inorganic fertilizer used in settlements is reported under another category (notation key IE).
     - Drained organic soils (Table 4(II), 0.046 kt N/year): area-based emission factors of about 1.5–1.6 kg N<sub>2</sub>O–N per hectare for forest and wetland converted to settlements (4.0 and 1.6 kha), and emissions from drained organic soils in settlements remaining settlements.
@@ -41,3 +41,7 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
 | N<sub>2</sub>O from land use (Norway's GHG inventory, CRT 4) | Inventory with published uncertainty | ±201 %, lognormal | 100% | 100% | 1.00 | 1.00 | [Forest Emissions (N<sub>2</sub>)](../forests_and_semi_natural_pool/flow_FS_FO_AT_AT_Emissions_N2.html), [Forest Emissions (N<sub>2</sub>O)](../forests_and_semi_natural_pool/flow_FS_FO_AT_AT_Emissions_N2O.html) |
+
+### References
+
+* Miljødirektoratet (2026). *Greenhouse gas emissions 1990–2024, National Inventory Document* (M-3138). [miljodirektoratet.no](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)

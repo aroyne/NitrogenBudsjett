@@ -51,4 +51,4 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Hegrenes, A. & Asheim, L. J. (2006). *Verdi av fôr frå utmarksbeite og sysselsetting i beitebaserte næringar*.
+* Hegrenes, A., & Asheim, L. J. (2006). *Verdi av fôr frå utmarksbeite og sysselsetting i beitebaserte næringar*. NILF.

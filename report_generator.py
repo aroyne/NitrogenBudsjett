@@ -17,6 +17,7 @@ import os
 import re
 import time
 from datetime import datetime
+from urllib.parse import urlparse
 
 import pandas as pd
 
@@ -328,7 +329,8 @@ def format_apa_authors(author_str):
     if num_authors == 1:
         return formatted_names[0]
     elif num_authors == 2:
-        return f"{formatted_names[0]} & {formatted_names[1]}"
+        # APA7 also puts a comma before & for two authors
+        return f"{formatted_names[0]}, & {formatted_names[1]}"
     else:
         # APA7 bruker komma før og-tegnet (&) ved 3 eller flere forfattere
         all_but_last = ", ".join(formatted_names[:-1])
@@ -351,7 +353,7 @@ def get_short_author(raw_author_str):
         else:
             # Every personal author in library.bib uses "Etternavn, Fornavn"
             # with a comma; an author string with no comma is therefore an
-            # institutional name (e.g. "Norwegian Environment Agency") and
+            # institutional name (e.g. "Statens landbruksforvaltning") and
             # must be kept whole rather than reduced to its last word.
             last_names.append(auth.strip())
             
@@ -362,6 +364,20 @@ def get_short_author(raw_author_str):
         return f"{last_names[0]} & {last_names[1]}"
     else:
         return f"{last_names[0]} et al."
+
+def _short_link(url):
+    """
+    Markdown link with the domain as visible text. Report and web-page URLs
+    are often several hundred characters long; the domain keeps the
+    reference list readable while the full address stays behind the link.
+    """
+    if not url.startswith(('http://', 'https://')):
+        url = 'https://' + url
+    host = urlparse(url).netloc
+    if host.startswith('www.'):
+        host = host[4:]
+    return f"[{host}]({url})"
+
 
 def fix_all_citations_in_folder(paths, bib_filename):
     """
@@ -402,7 +418,7 @@ def fix_all_citations_in_folder(paths, bib_filename):
                     # (for å bevare stor forbokstav); disse skal aldri vises til leseren.
                     val = val.replace('{', '').replace('}', '')
                 
-                if key in ['author', 'year', 'title', 'journal', 'booktitle', 'publisher', 'url', 'doi', 'volume', 'number', 'pages']:
+                if key in ['author', 'year', 'title', 'journal', 'booktitle', 'publisher', 'institution', 'type', 'url', 'doi', 'volume', 'number', 'pages']:
                     references_dict[current_entry][key] = val
                     
     # Every resolved in-text citation is tagged with an invisible
@@ -502,7 +518,17 @@ def fix_all_citations_in_folder(paths, bib_filename):
                             if journal:
                                 ref_str += f" {title}."
                             else:
-                                ref_str += f" *{title}*."
+                                # Reports: *Title* (Series Number). Institution.
+                                # The institution is left out when it is also
+                                # the author, as APA7 does for agency reports.
+                                ref_str += f" *{title}*"
+                                if number:
+                                    report_type = entry.get('type', '')
+                                    ref_str += f" ({report_type + ' ' if report_type else ''}{number})"
+                                ref_str += "."
+                                institution = entry.get('institution', '').replace(r'\&', '&')
+                                if institution and institution != raw_author:
+                                    ref_str += f" {institution}."
                             
                             # 3. Journal, Volum(Issue), Sider
                             if journal:
@@ -533,8 +559,7 @@ def fix_all_citations_in_folder(paths, bib_filename):
                                 # APA7 anbefaler å vise hele URL-en som klikkbar lenke
                                 ref_str += f" [{doi_url}]({doi_url})"
                             elif url:
-                                # Gjør den vanlige nettside-urlen klikkbar
-                                ref_str += f" [{url}]({url})"
+                                ref_str += f" {_short_link(url)}"
                                 
                             formatted_refs.append(ref_str)
                             

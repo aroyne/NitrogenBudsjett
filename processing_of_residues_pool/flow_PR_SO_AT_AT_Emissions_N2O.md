@@ -17,7 +17,7 @@ nav_order: 2
 
 #### Data sources
 
-- N<sub>2</sub>O from "5.B. Biological treatment of solid waste" and "5.C. Incineration and open burning of waste" in the UNFCCC Common Reporting Tables (CRT), Table 5, of the national greenhouse gas inventory ([Miljødirektoratet, NID 2026](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)), calculated from the amounts of waste composted, digested and incinerated and emission factors.
+- N<sub>2</sub>O from "5.B. Biological treatment of solid waste" and "5.C. Incineration and open burning of waste" in the UNFCCC Common Reporting Tables (CRT), Table 5, of the national greenhouse gas inventory (Miljødirektoratet, 2026)<!--cite:miljodirektoratet_nid_2026-->, calculated from the amounts of waste composted, digested and incinerated and emission factors.
 
 #### Interpretations
 
@@ -31,3 +31,7 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
 | N<sub>2</sub>O from waste incineration and biological treatment (Norway's GHG inventory, CRT 5) | Inventory with published uncertainty | −66.7/+200 %, lognormal | 100% | 100% | 1.00 | 1.00 | none |
+
+### References
+
+* Miljødirektoratet (2026). *Greenhouse gas emissions 1990–2024, National Inventory Document* (M-3138). [miljodirektoratet.no](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)

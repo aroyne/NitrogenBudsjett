@@ -21,7 +21,7 @@ nav_order: 8
 
 #### Assumptions
 
-- Each commodity code is assigned an N content, mostly from Tables 21 and 25 in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)<!--cite:schappi_annexes_2025-->, and quantities are multiplied by it.
+- Each commodity code is assigned an N content, mostly from Tables 21 and 25 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, and quantities are multiplied by it.
 - Fish meal (HS 2301 20) and meat meal (HS 2301 10) have 10.7% N (Fish Meal and Meat Meal in Table 21 of Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->).
 
 #### Interpretations
@@ -47,4 +47,4 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)
+* Schäppi, B., Reutimann, J., Bogler, S., Ehrler, A., & Fehrenbach, H. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets”* (TEXTE 05/2025). Umweltbundesamt. [https://doi.org/10.60810/openumwelt-7845](https://doi.org/10.60810/openumwelt-7845)

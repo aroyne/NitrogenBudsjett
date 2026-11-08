@@ -21,14 +21,14 @@ nav_order: 1
 - Landbruksdirektoratet's concentrate feed statistics (Landbruksdirektoratet, 2025)<!--cite:landbruksdirektoratet_kraftforstatistikk_2025-->, which give the annual use of raw materials in compound feed from Norwegian feed mills, as reported by the feed producers, split into Norwegian and imported raw materials and by raw material group.
 - The detailed composition of animal feed in Eidem & Ruud (2022)<!--cite:eidem_for-_2022-->, protein contents from FAO (2021)<!--cite:fao_annex_2021--> and specific Jones factors from FAO (2023)<!--cite:fao_chapter_2023-->.
 - Total purchased concentrate feed for 1959–2026 from Totalkalkylen for jordbruket (Budsjettnemnda for jordbruket, 2025)<!--cite:bfj_totalkalkylen_2025-->, the sector account for Norwegian agriculture compiled by NIBIO.
-- Table 6.10 in Bruholt & Longva (1994)<!--cite:bruholt_jordbruksstatistikk_1994--> gives the domestically produced fraction of farm animal feed between 1985 and 1994.
+- Table 6.10 in SSB (1994)<!--cite:bruholt_jordbruksstatistikk_1994--> gives the domestically produced fraction of farm animal feed between 1985 and 1994.
 
 #### Assumptions
 
 - N content is applied separately by raw-material type, derived from the feed composition, protein content and Jones factor sources above: 1.97% (0.0197 kg N/kg) for carbohydrate raw materials (mainly cereals) and 6.48% (0.0648 kg N/kg) for protein raw materials; fat and mineral raw materials are not included.
 - From 2000 the Norwegian raw materials in Landbruksdirektoratet's statistics are used. In these statistics, soy meal crushed in Norway from imported soybeans is already listed among the imported raw materials.
-- For 1985–1999 the total amount of purchased concentrate feed from Totalkalkylen is multiplied by the domestically produced share (Bruholt & Longva (1994) for 1985–1994, the average of 69.4% for 1995–1999) and by the average N content per tonne of Norwegian raw materials in 2004–2024.
-- Soy meal crushed in Norway is counted as imported in both sources: in Landbruksdirektoratet's statistics from 2000, and in Table 6.10 in Bruholt & Longva (1994), which lists all soybean meal as imported (42 600 t in 1994).
+- For 1985–1999 the total amount of purchased concentrate feed from Totalkalkylen is multiplied by the domestically produced share (SSB (1994) for 1985–1994, the average of 69.4% for 1995–1999) and by the average N content per tonne of Norwegian raw materials in 2004–2024.
+- Soy meal crushed in Norway is counted as imported in both sources: in Landbruksdirektoratet's statistics from 2000, and in Table 6.10 in SSB (1994), which lists all soybean meal as imported (42 600 t in 1994).
 - The domestic shares in Table 6.10 include concentrate feed for fish farming (92 900 t in 1985, 331 200 t in 1994, 17% of the total in 1994), which cannot be separated out. Fish feed was largely herring meal, mostly domestic, so the domestic share for farm animals alone was probably somewhat lower than the share used.
 
 #### Interpretations
@@ -50,9 +50,9 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Budsjettnemnda for jordbruket (2025). *Totalkalkylen for jordbruket - statistikk*. [https://www.nibio.no/tjenester/totalkalkylen-statistikk](https://www.nibio.no/tjenester/totalkalkylen-statistikk)
-* Bruholt, L. & Longva, S. (1994). *Jordbruksstatistikk 1994*.
-* Eidem, B. & Ruud, T. (2022). *Fôr- og husdyrbaserte verdikjeder i norsk matproduksjon – nåsituasjon og begreper*.
-* FAO (2021). Annex 1. Food composition tables. *FOOD BALANCE SHEETS. A handbook*. [https://www.fao.org/4/x9892e/X9892e05.htm](https://www.fao.org/4/x9892e/X9892e05.htm)
-* FAO (2023). CHAPTER 2: METHODS OF FOOD ANALYSIS. *Food energy - methods of analysis and conversion factors*. [https://www.fao.org/4/y5022e/y5022e03.htm](https://www.fao.org/4/y5022e/y5022e03.htm)
-* Landbruksdirektoratet (2025). *Kraftforstatistikk - årlig råvareforbruk*. [https://www.landbruksdirektoratet.no/nb/statistikk-og-utviklingstrekk/utvikling-i-jordbruket/kraftforstatistikk](https://www.landbruksdirektoratet.no/nb/statistikk-og-utviklingstrekk/utvikling-i-jordbruket/kraftforstatistikk)
+* Budsjettnemnda for jordbruket (2025). *Totalkalkylen for jordbruket - statistikk*. [nibio.no](https://www.nibio.no/tjenester/totalkalkylen-statistikk)
+* SSB (1994). *Jordbruksstatistikk 1994*. Statistisk sentralbyrå.
+* Eidem, B., & Ruud, T. (2022). *Fôr- og husdyrbaserte verdikjeder i norsk matproduksjon – nåsituasjon og begreper* (Notat 6/22). Ruralis – Institutt for rural- og regionalforskning.
+* FAO (2021). Annex 1. Food composition tables. *Food balance sheets: A handbook*. [fao.org](https://www.fao.org/4/x9892e/X9892e05.htm)
+* FAO (2023). Chapter 2: Methods of food analysis. *Food energy - methods of analysis and conversion factors*. [fao.org](https://www.fao.org/4/y5022e/y5022e03.htm)
+* Landbruksdirektoratet (2025). *Kraftforstatistikk - årlig råvareforbruk*. [landbruksdirektoratet.no](https://www.landbruksdirektoratet.no/nb/statistikk-og-utviklingstrekk/utvikling-i-jordbruket/kraftforstatistikk)

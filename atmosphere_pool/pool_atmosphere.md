@@ -45,5 +45,5 @@ Note that Blake et al. (2023)<!--cite:blake_deposition_2023--> shows a significa
 
 ### References
 
-* Blake, L. R., Aas, W., Denby, B., Hjellbrekke, A., Mu, Q., Simpson, D., & Fagerli, H. (2023). *Deposition of sulfur and nitrogen in Norway 2017-2021*.
-* NIBIO (2016). *AR5*. [https://www.nibio.no/tema/jord/arealressurser/arealressurskart-ar5?locationfilter=true](https://www.nibio.no/tema/jord/arealressurser/arealressurskart-ar5?locationfilter=true)
+* Blake, L. R., Aas, W., Denby, B., Hjellbrekke, A., Mu, Q., Simpson, D., & Fagerli, H. (2023). *Deposition of sulfur and nitrogen in Norway 2017-2021* (02/2023). NILU.
+* NIBIO (2016). *AR5*. [nibio.no](https://www.nibio.no/tema/jord/arealressurser/arealressurskart-ar5?locationfilter=true)

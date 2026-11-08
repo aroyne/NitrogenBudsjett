@@ -20,7 +20,7 @@ nav_order: 6
 #### Data sources
 
 - Feedstock use (GWh) of coal and coal products and of oil and oil products (excluding bio) from the section "11 Netto innenlands forbruk som råstoff" (net domestic consumption as feedstock) in [SSB table 11561](https://www.ssb.no/statbank/table/11561) (Energibalansen), including the product split for section 11.
-- Net calorific values from [IPCC 2006, Vol. 2, Ch. 1, Table 1.2](https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_1_Ch1_Introduction.pdf) and nitrogen contents for coal and oil feedstock from Table 15 in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)<!--cite:schappi_annexes_2025-->.
+- Net calorific values from Table 1.2 in Garg et al. (2006)<!--cite:garg_chapter_2006--> and nitrogen contents for coal and oil feedstock from Table 15 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->.
 
 #### Assumptions
 
@@ -45,4 +45,5 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)
+* Garg, A., Kainou, K., & Pulles, T. (2006). Chapter 1. Introduction. *2006 IPCC Guidelines for National Greenhouse Gas Inventories, Volume 2: Energy*. [ipcc-nggip.iges.or.jp](https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_1_Ch1_Introduction.pdf)
+* Schäppi, B., Reutimann, J., Bogler, S., Ehrler, A., & Fehrenbach, H. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets”* (TEXTE 05/2025). Umweltbundesamt. [https://doi.org/10.60810/openumwelt-7845](https://doi.org/10.60810/openumwelt-7845)

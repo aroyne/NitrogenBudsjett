@@ -17,8 +17,8 @@ nav_order: 6
 
 #### Data sources
 
-- "3.D.2.b. Nitrogen leaching and run-off" in the UNFCCC Common Reporting Tables (CRT), Table 3.D, of the national greenhouse gas inventory ([Miljødirektoratet, NID 2026](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)): the N applied to agricultural soils (mineral fertilizer, manure, sewage sludge, grazing animals, crop residues and mineralisation) multiplied by the fraction lost through leaching and runoff (FracLEACH).
-- Norway uses a country-specific FracLEACH of 22%, derived by Bioforsk in 2011 from the agricultural catchments in the national monitoring programme JOVA; the fraction ranged from 16% on grassland to 44% in intensive vegetable, potato and cereal production ([Bioforsk, 2011](https://partner.sciencenorway.no/agriculture-agriculture--fisheries-bioforsk/updated-estimate-for-nitrogen-losses-in-agriculture/1377328)).
+- "3.D.2.b. Nitrogen leaching and run-off" in the UNFCCC Common Reporting Tables (CRT), Table 3.D, of the national greenhouse gas inventory (Miljødirektoratet, 2026)<!--cite:miljodirektoratet_nid_2026-->: the N applied to agricultural soils (mineral fertilizer, manure, sewage sludge, grazing animals, crop residues and mineralisation) multiplied by the fraction lost through leaching and runoff (FracLEACH).
+- Norway uses a country-specific FracLEACH of 22%, derived by Bioforsk in 2011 from the agricultural catchments in the national monitoring programme JOVA; the fraction ranged from 16% on grassland to 44% in intensive vegetable, potato and cereal production (Bioforsk, 2012)<!--cite:bioforsk_nitrogen_2012-->.
 
 #### Assumptions
 
@@ -41,4 +41,6 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Sample, J. E. (2024). *Kildefordelte tilførsler av nitrogen og fosfor til norske kystområder i 2022 – tabeller, figurer og kart*.
+* Bioforsk (2012). Updated estimate for nitrogen losses in agriculture. *sciencenorway.no*. [partner.sciencenorway.no](https://partner.sciencenorway.no/agriculture-agriculture--fisheries-bioforsk/updated-estimate-for-nitrogen-losses-in-agriculture/1377328)
+* Miljødirektoratet (2026). *Greenhouse gas emissions 1990–2024, National Inventory Document* (M-3138). [miljodirektoratet.no](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)
+* Sample, J. E. (2024). *Kildefordelte tilførsler av nitrogen og fosfor til norske kystområder i 2022 – tabeller, figurer og kart* (M-2730). NIVA.

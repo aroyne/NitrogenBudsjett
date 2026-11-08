@@ -39,17 +39,17 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| Facility reports of N to water (Norwegian Environment Agency) (Findus avd. Tønsberg) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 37% | – | 0.23 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (Seagarden) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 16% | – | 0.22 | none |
+| Facility reports of N to water (Miljødirektoratet) (Findus avd. Tønsberg) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 37% | – | 0.23 | none |
+| Facility reports of N to water (Miljødirektoratet) (Seagarden) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 16% | – | 0.22 | none |
 | Held constant or averaged (2023+) | Gap filling: held constant or averaged | ±15–15 %, lognormal, grows with distance to known year | – | 12% | – | 1.00 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (Nortura SA Steinkjer) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 9% | – | 0.11 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (Nortura Hærland) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 8% | – | 0.10 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (Nortura SA, Avd Bjerka) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 4% | – | 0.08 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (Fatland Oslo) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 3% | – | 0.06 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (Ringnes Bryggeri) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 2% | – | 0.06 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (Nordfjord kjøtt, Loen) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 2% | – | 0.05 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (Tine SA avd. Verdal) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 2% | – | 0.05 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (TINE Meieriet Oslo) | Survey or self-reported data | ±30 %, normal, drawn per year | 10% | 2% | 0.19 | 0.04 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (Idun Fabrikker A.S) | Survey or self-reported data | ±30 %, normal, drawn per year | 8% | – | 0.36 | – | none |
-| Facility reports of N to water (Norwegian Environment Agency) (Norsk Protein A/S, avd. Fredrikstad) | Survey or self-reported data | ±30 %, normal, drawn per year | 64% | – | 0.49 | – | none |
-| Facility reports of N to water (Norwegian Environment Agency) (Norsk Protein AS, Ingeberg, Hamar) | Survey or self-reported data | ±30 %, normal, drawn per year | 17% | – | 0.25 | – | none |
+| Facility reports of N to water (Miljødirektoratet) (Nortura SA Steinkjer) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 9% | – | 0.11 | none |
+| Facility reports of N to water (Miljødirektoratet) (Nortura Hærland) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 8% | – | 0.10 | none |
+| Facility reports of N to water (Miljødirektoratet) (Nortura SA, Avd Bjerka) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 4% | – | 0.08 | none |
+| Facility reports of N to water (Miljødirektoratet) (Fatland Oslo) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 3% | – | 0.06 | none |
+| Facility reports of N to water (Miljødirektoratet) (Ringnes Bryggeri) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 2% | – | 0.06 | none |
+| Facility reports of N to water (Miljødirektoratet) (Nordfjord kjøtt, Loen) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 2% | – | 0.05 | none |
+| Facility reports of N to water (Miljødirektoratet) (Tine SA avd. Verdal) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 2% | – | 0.05 | none |
+| Facility reports of N to water (Miljødirektoratet) (TINE Meieriet Oslo) | Survey or self-reported data | ±30 %, normal, drawn per year | 10% | 2% | 0.19 | 0.04 | none |
+| Facility reports of N to water (Miljødirektoratet) (Idun Fabrikker A.S) | Survey or self-reported data | ±30 %, normal, drawn per year | 8% | – | 0.36 | – | none |
+| Facility reports of N to water (Miljødirektoratet) (Norsk Protein A/S, avd. Fredrikstad) | Survey or self-reported data | ±30 %, normal, drawn per year | 64% | – | 0.49 | – | none |
+| Facility reports of N to water (Miljødirektoratet) (Norsk Protein AS, Ingeberg, Hamar) | Survey or self-reported data | ±30 %, normal, drawn per year | 17% | – | 0.25 | – | none |

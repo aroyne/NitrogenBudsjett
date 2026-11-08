@@ -43,11 +43,11 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| Facility reports of N to water (Norwegian Environment Agency) (Yara Porsgrunn) | Survey or self-reported data | ±30 %, normal, drawn per year | 47% | 66% | 0.47 | 0.41 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (Yara Glomfjord) | Survey or self-reported data | ±30 %, normal, drawn per year | 21% | 20% | 0.23 | 0.22 | none |
+| Facility reports of N to water (Miljødirektoratet) (Yara Porsgrunn) | Survey or self-reported data | ±30 %, normal, drawn per year | 47% | 66% | 0.47 | 0.41 | none |
+| Facility reports of N to water (Miljødirektoratet) (Yara Glomfjord) | Survey or self-reported data | ±30 %, normal, drawn per year | 21% | 20% | 0.23 | 0.22 | none |
 | Held constant or averaged (2023+) | Gap filling: held constant or averaged | ±15–15 %, lognormal, grows with distance to known year | – | 9% | – | 1.00 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
-| Facility reports of N to water (Norwegian Environment Agency) (Herøya Industripark) | Survey or self-reported data | ±30 %, normal, drawn per year | 29% | – | 0.42 | – | none |
+| Facility reports of N to water (Miljødirektoratet) (Herøya Industripark) | Survey or self-reported data | ±30 %, normal, drawn per year | 29% | – | 0.42 | – | none |
 
 ### References
 
-* Miljødirektoratet (2025). *Norske utslipp - Utslipp til luft og vann og generert avfall, Nitrogen totalt*. [https://www.norskeutslipp.no/no/Komponenter/Utslipp/Nitrogen-totalt/?ComponentType=utslipp&ComponentPageID=226](https://www.norskeutslipp.no/no/Komponenter/Utslipp/Nitrogen-totalt/?ComponentType=utslipp&ComponentPageID=226)
+* Miljødirektoratet (2025). *Norske utslipp - Utslipp til luft og vann og generert avfall, Nitrogen totalt*. [norskeutslipp.no](https://www.norskeutslipp.no/no/Komponenter/Utslipp/Nitrogen-totalt/?ComponentType=utslipp&ComponentPageID=226)

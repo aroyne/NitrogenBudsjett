@@ -21,7 +21,7 @@ nav_order: 5
 
 #### Assumptions
 
-- The population is multiplied by 4.56 kg N per person per year (range ±10%), the default value for municipal wastewater in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)<!--cite:schappi_annexes_2025-->. This corresponds to 12.5 g N per person per day.
+- The population is multiplied by 4.56 kg N per person per year (range ±10%), the default value for municipal wastewater in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->. This corresponds to 12.5 g N per person per day.
 - The discharges from private sewage systems are part of SSB's statistics on discharges from the wastewater sector used for PR.WW-HY.CW-Treated wastewater discharge-Nmix, so they are included here as input to PR.WW.
 
 #### Interpretations
@@ -41,4 +41,4 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)
+* Schäppi, B., Reutimann, J., Bogler, S., Ehrler, A., & Fehrenbach, H. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets”* (TEXTE 05/2025). Umweltbundesamt. [https://doi.org/10.60810/openumwelt-7845](https://doi.org/10.60810/openumwelt-7845)

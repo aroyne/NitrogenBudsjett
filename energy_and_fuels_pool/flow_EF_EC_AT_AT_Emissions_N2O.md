@@ -19,8 +19,8 @@ nav_order: 1
 #### Data sources
 
 - N<sub>2</sub>O from the UNFCCC Common Reporting Tables (CRT), Table 1, of the national greenhouse gas inventory.
-- Like other combustion emissions in the inventory, N<sub>2</sub>O from energy industries is calculated as fuel consumption (TJ) multiplied by an emission factor (kg N<sub>2</sub>O per TJ), following the IPCC 2006 Guidelines for stationary combustion ([IPCC 2006, Vol. 2, Ch. 2](https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_2_Ch2_Stationary_Combustion.pdf)); Norway uses a mix of IPCC default and country-specific emission factors ([Miljødirektoratet, NID 2026](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)). Activity data and implied emission factors are reported in CRT Table 1.A(a).
-- N<sub>2</sub>O from flaring (1.B.2.c, included via the 1.B.2 total) is calculated in the same way from the volume of gas flared ([IPCC 2006, Vol. 2, Ch. 4](https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_4_Ch4_Fugitive_Emissions.pdf)).
+- Like other combustion emissions in the inventory, N<sub>2</sub>O from energy industries is calculated as fuel consumption (TJ) multiplied by an emission factor (kg N<sub>2</sub>O per TJ), following the IPCC 2006 Guidelines for stationary combustion (Gómez et al., 2006)<!--cite:gomez_stationary_2006-->; Norway uses a mix of IPCC default and country-specific emission factors (Miljødirektoratet, 2026)<!--cite:miljodirektoratet_nid_2026-->. Activity data and implied emission factors are reported in CRT Table 1.A(a).
+- N<sub>2</sub>O from flaring (1.B.2.c, included via the 1.B.2 total) is calculated in the same way from the volume of gas flared (Picard et al., 2006)<!--cite:picard_fugitive_2006-->.
 
 #### Interpretations
 
@@ -40,4 +40,7 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)
+* Gómez, D. R., Watterson, J. D., Americano, B. B., Ha, C., Marland, G., Matsika, E., Namayanga, L. N., Osman-Elasha, B., Kalenga Saka, J. D., & Treanton, K. (2006). Chapter 2. Stationary Combustion. *2006 IPCC Guidelines for National Greenhouse Gas Inventories, Volume 2: Energy*. [ipcc-nggip.iges.or.jp](https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_2_Ch2_Stationary_Combustion.pdf)
+* Miljødirektoratet (2026). *Greenhouse gas emissions 1990–2024, National Inventory Document* (M-3138). [miljodirektoratet.no](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)
+* Picard, D., Ahmed, A. F. M., Gjerald, E., Nordrum, S., & Yesserkepova, I. (2006). Chapter 4. Fugitive Emissions. *2006 IPCC Guidelines for National Greenhouse Gas Inventories, Volume 2: Energy*. [ipcc-nggip.iges.or.jp](https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_4_Ch4_Fugitive_Emissions.pdf)
+* Schäppi, B., Reutimann, J., Bogler, S., Ehrler, A., & Fehrenbach, H. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets”* (TEXTE 05/2025). Umweltbundesamt. [https://doi.org/10.60810/openumwelt-7845](https://doi.org/10.60810/openumwelt-7845)

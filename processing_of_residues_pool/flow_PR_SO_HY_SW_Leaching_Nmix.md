@@ -37,13 +37,13 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| Facility reports of N to water (Norwegian Environment Agency) (lindum as avd drammen - avfallsdeponi (lindum as)) | Survey or self-reported data | ±30 %, normal, drawn per year | 6% | 73% | 0.33 | 0.34 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (ngir kjevikdalen avfallsdeponi (nordhordland og gulen interkommunale renovasjonsselskap iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 5% | 0.04 | 0.04 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (iris - vikan - deponi for ordinært avfall (iris salten iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 4% | 0.03 | 0.05 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (franzefoss gjenvinning - eide avfallsdeponi (franzefoss gjenvinning as)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 3% | 0.05 | 0.06 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (ulsethsanden deponi - rockwool industrideponi (as rockwool)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 3% | 0.08 | 0.04 | none |
+| Facility reports of N to water (Miljødirektoratet) (lindum as avd drammen - avfallsdeponi (lindum as)) | Survey or self-reported data | ±30 %, normal, drawn per year | 6% | 73% | 0.33 | 0.34 | none |
+| Facility reports of N to water (Miljødirektoratet) (ngir kjevikdalen avfallsdeponi (nordhordland og gulen interkommunale renovasjonsselskap iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 5% | 0.04 | 0.04 | none |
+| Facility reports of N to water (Miljødirektoratet) (iris - vikan - deponi for ordinært avfall (iris salten iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 4% | 0.03 | 0.05 | none |
+| Facility reports of N to water (Miljødirektoratet) (franzefoss gjenvinning - eide avfallsdeponi (franzefoss gjenvinning as)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 3% | 0.05 | 0.06 | none |
+| Facility reports of N to water (Miljødirektoratet) (ulsethsanden deponi - rockwool industrideponi (as rockwool)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 3% | 0.08 | 0.04 | none |
 | Extrapolation (landfill N:CH<sub>4</sub> index) | Gap filling: extrapolation | ±50–50 %, lognormal, grows with distance to known year | 93% | – | 1.00 | – | [Wastewater from Landfills](../processing_of_residues_pool/flow_PR_SO_PR_WW_Wastewater_from_landfills_Nmix.html) |
 
 ### References
 
-* Miljødirektoratet (2026). *Norske Utslipp*. [norskeutslipp.no](norskeutslipp.no)
+* Miljødirektoratet (2026). *Norske Utslipp*. [norskeutslipp.no](https://www.norskeutslipp.no)

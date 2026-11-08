@@ -20,7 +20,7 @@ nav_order: 3
 
 #### Data sources
 
-- Protein in the food supply at wholesale level ("engrosnivå", matforsyningsstatistikken) per person per day, from Helsedirektoratet's annual report Utviklingen i norsk kosthold ([2025 edition, Table 7](https://www.helsedirektoratet.no/rapporter/utviklingen-i-norsk-kosthold-2025/energi-og-naeringsstoffer); earlier years from the 2017, 2022, 2023 and 2024 editions). The food supply is calculated by NIBIO from statistics of production, import, export and sales of food, and gives the edible amount of food available to the whole population. Values are published for 1980, 1990, 2000, 2005 and every year from 2010.
+- Protein in the food supply at wholesale level ("engrosnivå", matforsyningsstatistikken) per person per day, from Helsedirektoratet's annual report Utviklingen i norsk kosthold (Helsedirektoratet, 2025, Table 7; earlier years from the 2017, 2022, 2023 and 2024 editions)<!--cite:helsedirektoratet_kosthold_2025-->. The food supply is calculated by NIBIO from statistics of production, import, export and sales of food, and gives the edible amount of food available to the whole population. Values are published for 1980, 1990, 2000, 2005 and every year from 2010.
 - Population on 1 January from SSB ([table 06913](https://www.ssb.no/statbank/table/06913)).
 - Nitrogen intake per cat and dog per year from Table 19 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->, and the number of cats and dogs from available statistics from a variety of sources.
 
@@ -53,4 +53,5 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)
+* Helsedirektoratet (2025). *Utviklingen i norsk kosthold 2025*. [helsedirektoratet.no](https://www.helsedirektoratet.no/rapporter/utviklingen-i-norsk-kosthold-2025)
+* Schäppi, B., Reutimann, J., Bogler, S., Ehrler, A., & Fehrenbach, H. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets”* (TEXTE 05/2025). Umweltbundesamt. [https://doi.org/10.60810/openumwelt-7845](https://doi.org/10.60810/openumwelt-7845)

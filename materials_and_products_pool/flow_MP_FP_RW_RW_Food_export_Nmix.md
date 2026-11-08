@@ -23,7 +23,7 @@ nav_order: 9
 
 #### Assumptions
 
-- Each commodity code is assigned an N content, mostly from Table 21 in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)<!--cite:schappi_annexes_2025--> (N contents of food products), and quantities are multiplied by it.
+- Each commodity code is assigned an N content, mostly from Table 21 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> (N contents of food products), and quantities are multiplied by it.
 - Catch landed directly abroad that is not in the export statistics is added to the flow, with the N content of fish (2.8%), since it is counted in the catch flows into MP.FP but leaves the country directly:
   - Antarctic krill, all years: it is landed in Uruguay and does not appear as export.
   - Other fish 2000–2009: all landings abroad, which are missing from the exports before 2010.
@@ -54,4 +54,4 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)
+* Schäppi, B., Reutimann, J., Bogler, S., Ehrler, A., & Fehrenbach, H. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets”* (TEXTE 05/2025). Umweltbundesamt. [https://doi.org/10.60810/openumwelt-7845](https://doi.org/10.60810/openumwelt-7845)

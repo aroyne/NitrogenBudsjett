@@ -44,9 +44,9 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| Facility reports of N to water (Norwegian Environment Agency) (DuPont Nutrition Norge AS (tidligere FMC)) | Survey or self-reported data | ±30 %, normal, drawn per year | 73% | 57% | 0.92 | 0.26 | none |
+| Facility reports of N to water (Miljødirektoratet) (DuPont Nutrition Norge AS (tidligere FMC)) | Survey or self-reported data | ±30 %, normal, drawn per year | 73% | 57% | 0.92 | 0.26 | none |
 | Held constant or averaged (2023+) | Gap filling: held constant or averaged | ±15–15 %, lognormal, grows with distance to known year | – | 13% | – | 1.00 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (Biproduktanlegget på Kverva - laks - Nutrimar AS) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 13% | – | 0.09 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (Innovamar - slakteri og fiskeforedling - Kverva) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 3% | – | 0.06 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (Hav Line - Slakteskipet Norwegian Gannet) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 2% | – | 0.05 | none |
+| Facility reports of N to water (Miljødirektoratet) (Biproduktanlegget på Kverva - laks - Nutrimar AS) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 13% | – | 0.09 | none |
+| Facility reports of N to water (Miljødirektoratet) (Innovamar - slakteri og fiskeforedling - Kverva) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 3% | – | 0.06 | none |
+| Facility reports of N to water (Miljødirektoratet) (Hav Line - Slakteskipet Norwegian Gannet) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 2% | – | 0.05 | none |
 | Held constant or averaged (1994-1998) | Gap filling: held constant or averaged | ±15–30 %, lognormal, grows with distance to known year | 27% | – | 1.00 | – | none |

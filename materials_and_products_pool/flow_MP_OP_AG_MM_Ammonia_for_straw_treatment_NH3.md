@@ -19,7 +19,7 @@ nav_order: 14
 #### Data sources
 
 - NH<sub>3</sub> emissions from straw treatment (NFR 3I) reported by Norway to CLRTAP (CLRTAP inventory submissions, EMEP 2025<!--cite:emep_officially_2025-->).
-- The inventory calculates these emissions as the amount of ammonia used for straw treatment (from Budsjettnemnda for jordbruket's Totalkalkylen) times the share that is not bound in the straw, 54% (EEA 2023), as described in Norway's Informative Inventory Report 2025, section 5.7.2.
+- The inventory calculates these emissions as the amount of ammonia used for straw treatment (from Budsjettnemnda for jordbruket's Totalkalkylen) times the share that is not bound in the straw, 54% (European Environment Agency, 2023)<!--cite:eea_guidebook_2023-->, as described in section 5.7.2 of Norway's Informative Inventory Report (Miljødirektoratet, 2026)<!--cite:miljodirektoratet_iir_2026-->.
 
 #### Assumptions
 
@@ -41,5 +41,7 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* EMEP (2025). *Officially reported emission data*. [https://www.ceip.at/webdab-emission-database/reported-emissiondata](https://www.ceip.at/webdab-emission-database/reported-emissiondata)
-* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)
+* European Environment Agency (2023). *EMEP/EEA air pollutant emission inventory guidebook 2023* (EMEP/EEA joint report 06/2023). [eea.europa.eu](https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023)
+* EMEP (2025). *Officially reported emission data*. [ceip.at](https://www.ceip.at/webdab-emission-database/reported-emissiondata)
+* Miljødirektoratet (2026). *Informative Inventory Report (IIR) 2026. Norway. Air pollutant emissions 1990–2024* (M-3140). [miljodirektoratet.no](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/informative-inventory-report-iir-2026-norway-air-pollutant-emissions-1990-2024/)
+* Schäppi, B., Reutimann, J., Bogler, S., Ehrler, A., & Fehrenbach, H. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets”* (TEXTE 05/2025). Umweltbundesamt. [https://doi.org/10.60810/openumwelt-7845](https://doi.org/10.60810/openumwelt-7845)

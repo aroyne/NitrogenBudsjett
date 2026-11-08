@@ -37,16 +37,16 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| Facility reports of N to water (Norwegian Environment Agency) (støleheia avfallsanlegg - deponi (avfall sør husholdning as)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 36% | 0.08 | 0.15 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (bjorstaddalen næring deponi (bjorstaddalen næring as)) | Survey or self-reported data | ±30 %, normal, drawn per year | 1% | 28% | 0.10 | 0.13 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (sele avfallsplass - deponi (ivar iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 8% | 0.07 | 0.07 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (grønmo avfallsanlegg - deponi (nedlagt - avslutningsfase) (etterdrift) (oslo kommune eiendoms- og byfornyelsesetaten)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 4% | 0.05 | 0.05 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (solgård avfallsplass - deponi (movar iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 3% | 0.05 | 0.04 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (roaf miljøpark - deponi (romerike avfallsforedling iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 3% | 0.04 | 0.04 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (glør roverudmyra deponi kategori 2, ordinært avfall (renovasjonsselskapet glør iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 2% | 0.05 | 0.04 | none |
-| Facility reports of N to water (Norwegian Environment Agency) (esval miljøpark - ordinært deponi (esval miljøpark nes kf)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 2% | 0.03 | 0.04 | none |
+| Facility reports of N to water (Miljødirektoratet) (støleheia avfallsanlegg - deponi (avfall sør husholdning as)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 36% | 0.08 | 0.15 | none |
+| Facility reports of N to water (Miljødirektoratet) (bjorstaddalen næring deponi (bjorstaddalen næring as)) | Survey or self-reported data | ±30 %, normal, drawn per year | 1% | 28% | 0.10 | 0.13 | none |
+| Facility reports of N to water (Miljødirektoratet) (sele avfallsplass - deponi (ivar iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 8% | 0.07 | 0.07 | none |
+| Facility reports of N to water (Miljødirektoratet) (grønmo avfallsanlegg - deponi (nedlagt - avslutningsfase) (etterdrift) (oslo kommune eiendoms- og byfornyelsesetaten)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 4% | 0.05 | 0.05 | none |
+| Facility reports of N to water (Miljødirektoratet) (solgård avfallsplass - deponi (movar iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 3% | 0.05 | 0.04 | none |
+| Facility reports of N to water (Miljødirektoratet) (roaf miljøpark - deponi (romerike avfallsforedling iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 3% | 0.04 | 0.04 | none |
+| Facility reports of N to water (Miljødirektoratet) (glør roverudmyra deponi kategori 2, ordinært avfall (renovasjonsselskapet glør iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 2% | 0.05 | 0.04 | none |
+| Facility reports of N to water (Miljødirektoratet) (esval miljøpark - ordinært deponi (esval miljøpark nes kf)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 2% | 0.03 | 0.04 | none |
 | Extrapolation (landfill N:CH<sub>4</sub> index) | Gap filling: extrapolation | ±50–50 %, lognormal, grows with distance to known year | 98% | – | 1.00 | – | [Leaching from Landfills](../processing_of_residues_pool/flow_PR_SO_HY_SW_Leaching_Nmix.html) |
 
 ### References
 
-* Miljødirektoratet (2026). *Norske Utslipp*. [norskeutslipp.no](norskeutslipp.no)
+* Miljødirektoratet (2026). *Norske Utslipp*. [norskeutslipp.no](https://www.norskeutslipp.no)

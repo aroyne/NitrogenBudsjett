@@ -25,7 +25,7 @@ nav_order: 10
 
 - We make the assumption that everything assigned to industry in the category “wet organic waste” is from the food industry, and all other waste is assigned to other producing industry.
 - This flow uses the materials paper, plastics, wood, textiles, other materials, hazardous waste and (from 2012) mixed waste from the source sectors "Bergverk og utvinning", "Industri" and "Annen eller uspesifisert næring", plus wet organic waste from "Bergverk og utvinning".
-- N contents are mainly from Table 50 in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)<!--cite:schappi_annexes_2025-->: paper 0.28%, wood 0.25%, textiles 1%, hazardous waste 0.1%; mixed waste (0.9%) and other materials (0.2%) are assumed values, and typical, assumed values are chosen if none are given.
+- N contents are mainly from Table 50 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025-->: paper 0.28%, wood 0.25%, textiles 1%, hazardous waste 0.1%; mixed waste (0.9%) and other materials (0.2%) are assumed values, and typical, assumed values are chosen if none are given.
 - Plastic is set to 0.4% N (95% interval 0.2–0.8%) instead of the 2.1% in Table 50: the N-bearing polymers (polyurethane, polyamide, cellulose nitrate, acrylic) make up 0.40–0.44% N of the plastics imported to Norway (HS 39, 1990–2024), domestic polymer production (PE, PP, PVC) contains no N, and amino resins are left out because they are used as glue in wood panels and end up as wood waste. Plastic waste cannot contain more N than the plastic that enters use; the upper bound allows for food residues and other contamination.
 - From 2012, 35% of the mixed waste from "Industri" is moved to MP.FP-PR.SO-Food industry waste-Nmix as the food industry's share ([SSB table 14457](https://www.ssb.no/statbank1/table/14457/)), so this flow steps down by about 0.6 kt N in 2012.
 - There is a change in categorization between the two tables, where the main difference is in the category “other waste” and “mixed waste”. To ensure continuity between the data series we chose a lower value for “other waste” than for “mixed waste”.
@@ -55,5 +55,5 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)
-* SSB (1997). *Naturressurser og miljø 1997*.
+* Schäppi, B., Reutimann, J., Bogler, S., Ehrler, A., & Fehrenbach, H. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets”* (TEXTE 05/2025). Umweltbundesamt. [https://doi.org/10.60810/openumwelt-7845](https://doi.org/10.60810/openumwelt-7845)
+* SSB (1997). *Naturressurser og miljø 1997*. Statistisk sentralbyrå.

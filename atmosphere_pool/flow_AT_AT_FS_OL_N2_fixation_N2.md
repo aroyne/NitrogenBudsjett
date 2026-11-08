@@ -17,7 +17,7 @@ nav_order: 9
 
 #### Data sources
 
-- N<sub>2</sub> fixation rates from Table 62 in [Schäppi et al. 2025, Annexes](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)<!--cite:schappi_annexes_2025--> (Reddy and DeLaune, 2008): 11 (0–22) kg N/ha for peat bogs, 29 (0–58) kg N/ha for freshwater marshes and 4 (0–7) kg N/ha for mud flats.
+- N<sub>2</sub> fixation rates from Table 62 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> (Reddy and DeLaune, 2008): 11 (0–22) kg N/ha for peat bogs, 29 (0–58) kg N/ha for freshwater marshes and 4 (0–7) kg N/ha for mud flats.
 - Land type areas from the CORINE land cover inventory (European Environment Agency, 2019<!--cite:european_environment_agency_corine_2019-->): 2.10 million ha peat bogs, 296 ha inland marshes and 18 272 ha intertidal flats.
 
 #### Assumptions
@@ -41,7 +41,7 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* European Environment Agency (2019). *CORINE Land cover inventory*. [https://www.eea.europa.eu/en/datahub/datahubitem-view/a5144888-ee2a-4e5d-a7b0-2bbf21656348](https://www.eea.europa.eu/en/datahub/datahubitem-view/a5144888-ee2a-4e5d-a7b0-2bbf21656348)
-* Jutterström, S., Stadmark, J., & Moldan, F. (2020). *Swedish National Nitrogen Budget – Forest and semi-natural vegetation*.
+* European Environment Agency (2019). *CORINE Land cover inventory*. [eea.europa.eu](https://www.eea.europa.eu/en/datahub/datahubitem-view/a5144888-ee2a-4e5d-a7b0-2bbf21656348)
+* Jutterström, S., Stadmark, J., & Moldan, F. (2020). *Swedish National Nitrogen Budget – Forest and semi-natural vegetation* (C 549). IVL Swedish Environmental Research Institute.
 * Moldan, F., Stadmark, J., Jutterström, S., & Ljunggren, J. (2025). Where does Sweden’s nitrogen go? Building a comprehensive national nitrogen budget. *Environmental Research Letters, 20*(12), 124068. [https://doi.org/10.1088/1748-9326/ae2697](https://doi.org/10.1088/1748-9326/ae2697)
-* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)
+* Schäppi, B., Reutimann, J., Bogler, S., Ehrler, A., & Fehrenbach, H. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets”* (TEXTE 05/2025). Umweltbundesamt. [https://doi.org/10.60810/openumwelt-7845](https://doi.org/10.60810/openumwelt-7845)

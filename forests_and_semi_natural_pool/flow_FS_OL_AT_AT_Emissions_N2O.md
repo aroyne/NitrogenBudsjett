@@ -18,7 +18,7 @@ nav_order: 5
 
 #### Data sources
 
-- N<sub>2</sub>O from grazing manure in the UNFCCC Common Reporting Tables (CRT), Table 3.D, of the national greenhouse gas inventory ([Miljødirektoratet, NID 2026](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)): direct N<sub>2</sub>O from urine and dung deposited by grazing animals (3.D.1.c), and the fractions and implied emission factors for indirect N<sub>2</sub>O from volatilisation (FracGASPRP, 3.D.2.a) and leaching (FracLEACH, 3.D.2.b). The inventory calculates these with IPCC emission factors and reports them for all grazing land combined.
+- N<sub>2</sub>O from grazing manure in the UNFCCC Common Reporting Tables (CRT), Table 3.D, of the national greenhouse gas inventory (Miljødirektoratet, 2026)<!--cite:miljodirektoratet_nid_2026-->: direct N<sub>2</sub>O from urine and dung deposited by grazing animals (3.D.1.c), and the fractions and implied emission factors for indirect N<sub>2</sub>O from volatilisation (FracGASPRP, 3.D.2.a) and leaching (FracLEACH, 3.D.2.b). The inventory calculates these with IPCC emission factors and reports them for all grazing land combined.
 
 #### Assumptions
 
@@ -40,4 +40,5 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Jutterström, S., Stadmark, J., & Moldan, F. (2020). *Swedish National Nitrogen Budget – Forest and semi-natural vegetation*.
+* Jutterström, S., Stadmark, J., & Moldan, F. (2020). *Swedish National Nitrogen Budget – Forest and semi-natural vegetation* (C 549). IVL Swedish Environmental Research Institute.
+* Miljødirektoratet (2026). *Greenhouse gas emissions 1990–2024, National Inventory Document* (M-3138). [miljodirektoratet.no](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)

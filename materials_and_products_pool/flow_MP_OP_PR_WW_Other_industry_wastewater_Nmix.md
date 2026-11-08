@@ -39,12 +39,12 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| Facility reports of N to water (Norwegian Environment Agency) (Biosirk Norge AS, avd. Trehørningen, Hamar) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 88% | – | 0.77 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
-| Facility reports of N to water (Norwegian Environment Agency) (Biosirk Norge AS avd Grødaland) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 7% | 0.05 | 0.22 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| Facility reports of N to water (Miljødirektoratet) (Biosirk Norge AS, avd. Trehørningen, Hamar) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 88% | – | 0.77 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| Facility reports of N to water (Miljødirektoratet) (Biosirk Norge AS avd Grødaland) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 7% | 0.05 | 0.22 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
 | Held constant or averaged (2023+) | Gap filling: held constant or averaged | ±15–15 %, lognormal, grows with distance to known year | – | 5% | – | 1.00 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
-| Facility reports of N to water (Norwegian Environment Agency) (Aarenes Lærfabrikk A.S) | Survey or self-reported data | ±30 %, normal, drawn per year | 86% | – | 0.82 | – | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
-| Facility reports of N to water (Norwegian Environment Agency) (Kverneland Klepp Avd. Øksnevad -galvano) | Survey or self-reported data | ±30 %, normal, drawn per year | 13% | – | 0.30 | – | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| Facility reports of N to water (Miljødirektoratet) (Aarenes Lærfabrikk A.S) | Survey or self-reported data | ±30 %, normal, drawn per year | 86% | – | 0.82 | – | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| Facility reports of N to water (Miljødirektoratet) (Kverneland Klepp Avd. Øksnevad -galvano) | Survey or self-reported data | ±30 %, normal, drawn per year | 13% | – | 0.30 | – | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
 
 ### References
 
-* Miljødirektoratet (2025). *Norske utslipp - Utslipp til luft og vann og generert avfall, Nitrogen totalt*. [https://www.norskeutslipp.no/no/Komponenter/Utslipp/Nitrogen-totalt/?ComponentType=utslipp&ComponentPageID=226](https://www.norskeutslipp.no/no/Komponenter/Utslipp/Nitrogen-totalt/?ComponentType=utslipp&ComponentPageID=226)
+* Miljødirektoratet (2025). *Norske utslipp - Utslipp til luft og vann og generert avfall, Nitrogen totalt*. [norskeutslipp.no](https://www.norskeutslipp.no/no/Komponenter/Utslipp/Nitrogen-totalt/?ComponentType=utslipp&ComponentPageID=226)

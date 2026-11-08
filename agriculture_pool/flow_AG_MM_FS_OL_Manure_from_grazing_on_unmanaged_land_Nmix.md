@@ -17,8 +17,8 @@ nav_order: 9
 
 #### Data sources
 
-- "Urine and dung deposited by grazing animals" (PRP, the IPCC term for N deposited by grazing animals on pasture, range and paddock) in the UNFCCC Common Reporting Tables (CRT), Table 3.D, and the PRP per animal category in Table 3.B(b), of the national greenhouse gas inventory. The inventory calculates the N excreted per animal category from animal numbers and national N excretion rates and the fraction of time spent grazing (Norwegian Environment Agency, 2020<!--cite:miljodirektoratet_manure_2020-->). It does not split the grazing manure between agricultural land and unmanaged land.
-- Weeks on agricultural land, unmanaged land and in exercise yards per animal category in 2018 from SSB's survey of manure use (SSB Rapporter 2020/9 (Bruk av gjødselressurser i jordbruket 2018), Table A79).
+- "Urine and dung deposited by grazing animals" (PRP, the IPCC term for N deposited by grazing animals on pasture, range and paddock) in the UNFCCC Common Reporting Tables (CRT), Table 3.D, and the PRP per animal category in Table 3.B(b), of the national greenhouse gas inventory. The inventory calculates the N excreted per animal category from animal numbers and national N excretion rates and the fraction of time spent grazing (Miljødirektoratet, 2020<!--cite:miljodirektoratet_manure_2020-->). It does not split the grazing manure between agricultural land and unmanaged land.
+- Weeks on agricultural land, unmanaged land and in exercise yards per animal category in 2018 from SSB's survey of manure use (Kolle & Oguz-Alper, 2020, Table A79)<!--cite:ssb_gjodselressurser_2020-->.
 
 #### Assumptions
 
@@ -28,7 +28,7 @@ nav_order: 9
 
 - The flow is about 6.8–7.4 kt N per year.
 - Sheep account for 52–62%, cattle for 19–29% and reindeer, which graze only on unmanaged land, for 14–18%.
-- Without a cap, the manure on unmanaged land would rise from 86% of the feed taken up there (FS.OL-AG.MM-Grazing-Nmix, 7.5–8.6 kt N including reindeer) in 1990 to 99% after 2015, which leaves almost nothing retained in growth, milk and wool. From 2000 the manure is therefore capped at 90% of the uptake (see AG.MM-AG.SM-Manure application-Nmix). Both flows are uncertain: the feed uptake builds on a single estimate for 1996 (Hegrenes & Asheim, 2006), and the manure on the survey of grazing time in 2018.
+- Without a cap, the manure on unmanaged land would rise from 86% of the feed taken up there (FS.OL-AG.MM-Grazing-Nmix, 7.5–8.6 kt N including reindeer) in 1990 to 99% after 2015, which leaves almost nothing retained in growth, milk and wool. From 2000 the manure is therefore capped at 90% of the uptake (see AG.MM-AG.SM-Manure application-Nmix). Both flows are uncertain: the feed uptake builds on a single estimate for 1996 (Hegrenes & Asheim, 2006)<!--cite:hegrenes_verdi_2006-->, and the manure on the survey of grazing time in 2018.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
@@ -50,4 +50,6 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Norwegian Environment Agency (2020). *Calculation of atmospheric nitrogen emissions from manure in Norwegian agriculture: Technical description of the revised model*. [https://www.miljodirektoratet.no/globalassets/publikasjoner/m1848/m1848.pdf](https://www.miljodirektoratet.no/globalassets/publikasjoner/m1848/m1848.pdf)
+* Hegrenes, A., & Asheim, L. J. (2006). *Verdi av fôr frå utmarksbeite og sysselsetting i beitebaserte næringar*. NILF.
+* Miljødirektoratet (2020). *Calculation of atmospheric nitrogen emissions from manure in Norwegian agriculture: Technical description of the revised model* (M-1848). [miljodirektoratet.no](https://www.miljodirektoratet.no/globalassets/publikasjoner/m1848/m1848.pdf)
+* Kolle, S. O., & Oguz-Alper, M. (2020). *Bruk av gjødselressurser i jordbruket 2018. Metodebeskrivelse og resultater fra en utvalgsbasert undersøkelse* (Rapporter 2020/9). Statistisk sentralbyrå.

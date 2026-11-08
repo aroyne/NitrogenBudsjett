@@ -37,4 +37,4 @@ We have chosen to not include the pool groundwater (GW) because N concentrations
 
 ### References
 
-* Kværnø, S. H., Fischer, F., & Bechmann, M. (2024). *AGRITIL - Nutrient loss model for agriculture Modelling soil, organic carbon, nitrogen and phosphorus losses from Norwegian agricultural areas to surface water*.
+* Kværnø, S. H., Fischer, F., & Bechmann, M. (2024). *AGRITIL - Nutrient loss model for agriculture: Modelling soil, organic carbon, nitrogen and phosphorus losses from Norwegian agricultural areas to surface water* (10/43/2024). NIBIO.

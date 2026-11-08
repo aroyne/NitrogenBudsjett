@@ -17,7 +17,7 @@ nav_order: 2
 
 #### Data sources
 
-- N<sub>2</sub>O from industrial processes in the UNFCCC Common Reporting Tables (CRT), Table 2(I), of the national greenhouse gas inventory. N<sub>2</sub>O from nitric acid production is reported by the plants; the methods are documented in the [National Inventory Document (Miljødirektoratet, NID 2026)](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/).
+- N<sub>2</sub>O from industrial processes in the UNFCCC Common Reporting Tables (CRT), Table 2(I), of the national greenhouse gas inventory. N<sub>2</sub>O from nitric acid production is reported by the plants; the methods are documented in the National Inventory Document (Miljødirektoratet, 2026)<!--cite:miljodirektoratet_nid_2026-->.
 
 #### Interpretations
 
@@ -36,4 +36,5 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Schäppi, B., Reutimann, J., Bogler, S., & Ehrler, A. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets*. [https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf](https://www.clrtap-tfrn.org/sites/default/files/2025-05/Annexes%20to%20the%20Guidance%20Document%20on%20NNB.pdf)
+* Miljødirektoratet (2026). *Greenhouse gas emissions 1990–2024, National Inventory Document* (M-3138). [miljodirektoratet.no](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)
+* Schäppi, B., Reutimann, J., Bogler, S., Ehrler, A., & Fehrenbach, H. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets”* (TEXTE 05/2025). Umweltbundesamt. [https://doi.org/10.60810/openumwelt-7845](https://doi.org/10.60810/openumwelt-7845)

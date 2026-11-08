@@ -14,13 +14,13 @@ nav_order: 1
 #### Flow description
 
 - **RW.RW-AG.MM-Animal feed import-Nmix** is the N in imported raw materials for concentrate feed for farm animals.
-- Soy meal produced in Norway from imported soybeans is counted here as imported feed, since the soybeans are imported. Landbruksdirektoratet's statistics (from 2000) list it among the imported raw materials, and so does Table 6.10 in Bruholt & Longva (1994) (all soybean meal imported, 42 600 t in 1994).
+- Soy meal produced in Norway from imported soybeans is counted here as imported feed, since the soybeans are imported. Landbruksdirektoratet's statistics (from 2000) list it among the imported raw materials, and so does Table 6.10 in SSB (1994) (all soybean meal imported, 42 600 t in 1994).
 
 #### Data sources
 
 - From 2000, imported raw materials for concentrate feed from Landbruksdirektoratet's statistics (Årlig råvareforbruk), with the detailed composition of the feed.
 - NIBIO Totalkalkylen gives the total amount of purchased concentrate feed to Norwegian farm animals between 1959 and 2026.
-- Table 6.10 in Bruholt & Longva (1994)<!--cite:bruholt_jordbruksstatistikk_1994--> gives the domestically produced fraction of farm animal feed between 1985 and 1994.
+- Table 6.10 in SSB (1994)<!--cite:bruholt_jordbruksstatistikk_1994--> gives the domestically produced fraction of farm animal feed between 1985 and 1994.
 
 #### Assumptions
 
@@ -47,4 +47,4 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Bruholt, L. & Longva, S. (1994). *Jordbruksstatistikk 1994*.
+* SSB (1994). *Jordbruksstatistikk 1994*. Statistisk sentralbyrå.
