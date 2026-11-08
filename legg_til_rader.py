@@ -280,18 +280,18 @@ def ensure_target_between_markers(
 if __name__ == "__main__":
     input_file = "Report-kopi.xlsx"
     sheet = "2a. Database N flows"
-    start_marker = "FS.OL-AT.AT-Emissions-NOx"
-    end_marker = "FS.OL-AG.MM-Grazing-Nmix"
-    flow_code = "FS.OL-AT.AT-Emissions-N2O"
-    flow = 'FS.FO-AT.AT'
+    start_marker = "FS.FO-MP.OP-Industrial round wood-Nmix"
+    end_marker = "FS.FO-EF.OE-Fuel wood for households-Nmix"
+    flow_code = "FS.FO-EF.EC-Fuel wood for co-fired power plants-Nmix"
+    flow = 'FS.FO-EF.EC'
     pool_out = 'FS'
-    subpool_out = 'OL'
-    pool_in = 'AT'
-    subpool_in = 'AT'
-    flow_name = 'Emissions'
-    STAN_flow_name = 'other land emissions'
+    subpool_out = 'FO'
+    pool_in = 'EF'
+    subpool_in = 'EC'
+    flow_name = 'Fuel wood for co-fired power plants'
+    STAN_flow_name = 'fuel wood for co-fired power plants'
     react = 'reactive'
-    species = 'N2O'
+    species = 'Nmix'
     uncertainty = 0.2
     flow_type = 'useful output'
 
