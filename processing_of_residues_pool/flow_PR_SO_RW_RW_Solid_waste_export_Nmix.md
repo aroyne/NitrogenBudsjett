@@ -26,7 +26,7 @@ nav_order: 12
 
 #### Interpretations
 
-- The flow is below 1 kt N per year, with the highest value in 2012 (0.9 kt N).
+- The flow is below 1 kt N per year<!--val:PR.SO-RW.RW-Solid waste export-Nmix:2012-->, with the highest value in 2012 (0.9 kt N<!--val:PR.SO-RW.RW-Solid waste export-Nmix:2012-->).
 - The increase seen from 2022 to 2023 is in the category municipal waste.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

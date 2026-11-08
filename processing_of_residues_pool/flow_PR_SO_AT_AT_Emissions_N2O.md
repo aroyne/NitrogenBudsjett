@@ -21,7 +21,7 @@ nav_order: 2
 
 #### Interpretations
 
-- The flow is small, about 0.003 kt N in 1990 and 0.02–0.04 kt N per year since 2000, mainly from biological treatment.
+- The flow is small, about 0.003 kt N<!--val:PR.SO-AT.AT-Emissions-N2O:1990--> in 1990 and 0.02–0.04 kt N per year<!--range:PR.SO-AT.AT-Emissions-N2O:2000-2024--> since 2000, mainly from biological treatment.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

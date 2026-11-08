@@ -25,7 +25,7 @@ nav_order: 10
 
 #### Interpretations
 
-- The flow rises from about 0.2 kt N in 1990 to about 2 kt N per year since 2017, mainly plastic waste for recycling.
+- The flow rises from about 0.2 kt N<!--val:PR.SO-RW.RW-Export for recycling-Nmix:1990--> in 1990 to about 2 kt N per year<!--mean:PR.SO-RW.RW-Export for recycling-Nmix:2017-2024--> since 2017, mainly plastic waste for recycling.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

@@ -22,7 +22,7 @@ nav_order: 4
 
 #### Interpretations
 
-- The flow is very small, about 0.03–0.04 kt N per year.
+- The flow is very small, about 0.03–0.04 kt N per year<!--range:AG.MM-AT.AT-Emissions-NOx:1990-2024-->.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

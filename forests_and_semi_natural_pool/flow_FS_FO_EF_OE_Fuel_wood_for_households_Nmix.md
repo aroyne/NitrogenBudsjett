@@ -30,7 +30,7 @@ nav_order: 3
 
 #### Interpretations
 
-- The flow is about 2.3–3.9 kt N per year. It rises from about 2.5 kt N in 1990 to a peak of 3.9 kt N in 2010, a cold winter, falls to about 2.5–2.8 kt N in 2014–2020 and rises again to 3.1 kt N in 2022, when electricity prices were high, and 3.3–3.4 kt N in 2023–2024.
+- The flow is about 1.5–2.7 kt N per year<!--range:FS.FO-EF.OE-Fuel wood for households-Nmix:1990-2024-->. It rises from about 1.7 kt N<!--val:FS.FO-EF.OE-Fuel wood for households-Nmix:1990--> in 1990 to a peak of 2.7 kt N<!--val:FS.FO-EF.OE-Fuel wood for households-Nmix:2010--> in 2010, a cold winter, falls to about 1.8–2.0 kt N<!--range:FS.FO-EF.OE-Fuel wood for households-Nmix:2014-2020--> in 2014–2020 and rises again to 2.2 kt N<!--val:FS.FO-EF.OE-Fuel wood for households-Nmix:2022--> in 2022, when electricity prices were high, and 2.5 kt N<!--range:FS.FO-EF.OE-Fuel wood for households-Nmix:2023-2024--> in 2023–2024.
 - The other sectors add little before 2000 and about 0.2–0.3 kt N per year in 2010–2022. In 2023–2024 they add about 0.6–0.7 kt N, as biomass in commercial buildings doubled and biomass in agriculture, forestry and fishing, almost none before 2023, rose to about 1,100 TJ in 2024.
 - The stem value is close to the 1.1 g/kg for stem with bark of conifers used by Hellsten et al. (2008), cited in the Swedish nitrogen budget (Jutterström et al., 2020)<!--cite:jutterstrom_swedish_2020-->; the Swedish budget uses the whole-tree value for fuel wood, as the guidance suggests when no other data are available.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

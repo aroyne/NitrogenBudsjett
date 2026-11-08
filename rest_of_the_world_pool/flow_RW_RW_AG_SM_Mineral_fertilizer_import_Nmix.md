@@ -26,7 +26,7 @@ nav_order: 3
 
 #### Interpretations
 
-- The flow varies between about 6 and 51 kt N per year and has been 39–51 kt N since 2018, so a growing share of the fertilizer used in Norwegian agriculture is imported.
+- The flow varies between about 7 and 53 kt N per year<!--range:RW.RW-AG.SM-Mineral fertilizer import-Nmix:1990-2024--> and has been 39–53 kt N<!--range:RW.RW-AG.SM-Mineral fertilizer import-Nmix:2018-2024--> since 2018, so a growing share of the fertilizer used in Norwegian agriculture is imported.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

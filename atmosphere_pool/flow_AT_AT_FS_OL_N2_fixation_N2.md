@@ -26,7 +26,7 @@ nav_order: 9
 
 #### Interpretations
 
-- The flow is constant at about 23 kt N per year; almost all comes from peat bogs, while intertidal flats and freshwater marshes contribute less than 0.1 kt N.
+- The flow is constant at about 23 kt N per year<!--mean:AT.AT-FS.OL-N2 fixation-N2:1984-2025-->; almost all comes from peat bogs, while intertidal flats and freshwater marshes contribute less than 0.1 kt N.
 - In the Swedish NNB (Moldan et al., 2025)<!--cite:moldan_where_2025-->, N<sub>2</sub> fixation in the OL compartment was considered negligible. Our total is therefore not directly comparable to that estimate, but corresponds closely to their separate WL estimate of about 30 kt N (Jutterström et al., 2020)<!--cite:jutterstrom_swedish_2020-->.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

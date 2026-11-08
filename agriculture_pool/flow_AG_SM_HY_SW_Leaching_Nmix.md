@@ -27,7 +27,7 @@ nav_order: 6
 
 #### Interpretations
 
-- The flow is 38–45 kt N per year and follows the N applied to soils, falling slowly from about 45 kt N in 1990 to 40 kt N in 2024.
+- The flow is 38–45 kt N per year<!--range:AG.SM-HY.SW-Leaching-Nmix:1990-2024--> and follows the N applied to soils, falling slowly from about 45 kt N<!--val:AG.SM-HY.SW-Leaching-Nmix:1990--> in 1990 to 40 kt N<!--val:AG.SM-HY.SW-Leaching-Nmix:2024--> in 2024.
 - The flow is the N leaving the root zone, not the N reaching the sea; TEOTIL3 gives 43–51 kt N from agriculture including the agricultural background in 2013–2023, before retention in lakes and rivers. The data agree within the error range with what is reported in TEOTIL3 (Sample, 2024<!--cite:sample_kildefordelte_2024-->).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

@@ -25,7 +25,7 @@ nav_order: 11
 
 #### Interpretations
 
-- The flow rises from 0.01 kt N in 1990 to about 0.3 kt N per year since 2015.
+- The flow rises from 0.01 kt N<!--val:PR.SO-RW.RW-Export for reuse-Nmix:1990--> in 1990 to about 0.3 kt N per year<!--mean:PR.SO-RW.RW-Export for reuse-Nmix:2015-2024--> since 2015.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

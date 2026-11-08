@@ -33,7 +33,7 @@ nav_order: 5
 
 #### Interpretations
 
-- The flow rises from about 5.5 kt N in 1990 to 24 kt N in 2011 and 27 kt N in 2012, is 22–26 kt N in 2013–2018 and 19–23 kt N in 2019–2024.
+- The flow rises from about 5.5 kt N<!--val:PR.SO-EF.EC-Waste to energy-Nmix:1990--> in 1990 to 24 kt N<!--val:PR.SO-EF.EC-Waste to energy-Nmix:2011--> in 2011 and 27 kt N<!--val:PR.SO-EF.EC-Waste to energy-Nmix:2012--> in 2012, is 22–26 kt N<!--range:PR.SO-EF.EC-Waste to energy-Nmix:2013-2018--> in 2013–2018 and 19–23 kt N<!--range:PR.SO-EF.EC-Waste to energy-Nmix:2019-2024--> in 2019–2024.
 - The rise until 2011 follows the expansion of waste incineration, which became the main treatment for residual waste after the ban on landfilling of biodegradable waste in 2009.
 - After the scaling, the change from 2011 to 2012 follows the incinerated tonnage.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

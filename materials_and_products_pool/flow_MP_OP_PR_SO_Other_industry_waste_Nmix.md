@@ -33,7 +33,7 @@ nav_order: 10
 
 #### Interpretations
 
-- The flow is about 6–7 kt N per year in the mid-1990s, 5–6 kt N in 2000–2011, 4.1–4.3 kt N in 2012–2015 and about 5 kt N in 2024.
+- The flow is about 6.4–7.0 kt N per year<!--range:MP.OP-PR.SO-Other industry waste-Nmix:1993-1997--> in the mid-1990s, 5.2–6.3 kt N<!--range:MP.OP-PR.SO-Other industry waste-Nmix:2000-2011--> in 2000–2011, 4.1–4.3 kt N<!--range:MP.OP-PR.SO-Other industry waste-Nmix:2012-2015--> in 2012–2015 and about 5 kt N<!--val:MP.OP-PR.SO-Other industry waste-Nmix:2024--> in 2024.
 - In 2024 mixed waste accounts for about 60% of the N, hazardous waste for about 21%, wood for 6% and plastics for 3%.
 - Since the N contents of mixed waste and other materials are assumed, the level is uncertain.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

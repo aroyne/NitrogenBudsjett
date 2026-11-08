@@ -26,7 +26,7 @@ nav_order: 8
 
 #### Interpretations
 
-- The flow is 34–39 kt N per year up to 2016 and 27–29 kt N from 2017.
+- The flow is 34–39 kt N per year<!--range:AT.AT-FS.OL-Deposition-RDN:1990-2016--> up to 2016 and 30 kt N<!--range:AT.AT-FS.OL-Deposition-RDN:2017-2024--> from 2017.
 - The steps follow the five-year periods of the NILU data; the decline reflects lower emissions in Europe, more for oxidised than for reduced N.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

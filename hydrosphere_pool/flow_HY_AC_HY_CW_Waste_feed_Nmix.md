@@ -27,7 +27,7 @@ nav_order: 2
 
 #### Interpretations
 
-- The flow rises to about 7.4 kt N around 2000, falls to 2.5 kt N in 2010 as the feed waste fraction falls, and then rises with production to about 4 kt N in 2024.
+- The flow rises to about 7.4 kt N<!--val:HY.AC-HY.CW-Waste feed-Nmix:2000--> around 2000, falls to 2.5 kt N<!--val:HY.AC-HY.CW-Waste feed-Nmix:2010--> in 2010 as the feed waste fraction falls, and then rises with production to about 4 kt N<!--val:HY.AC-HY.CW-Waste feed-Nmix:2024--> in 2024.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

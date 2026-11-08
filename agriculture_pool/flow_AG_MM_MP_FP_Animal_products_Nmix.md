@@ -26,7 +26,7 @@ nav_order: 6
 
 #### Interpretations
 
-- The flow rises from about 17 kt N in 1990 to 19 kt N in 2024.
+- The flow rises from about 17 kt N<!--val:AG.MM-MP.FP-Animal products-Nmix:1990--> in 1990 to 19 kt N<!--val:AG.MM-MP.FP-Animal products-Nmix:2024--> in 2024.
 - Milk is the largest product but decreases from 10.6 to 7.9 kt N, while chicken meat increases from 0.6 to 3.3 kt N, pork from 2.1 to 3.3 kt N and eggs from 1.0 to 1.4 kt N.
 - Beef is stable at about 2.1 kt N.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

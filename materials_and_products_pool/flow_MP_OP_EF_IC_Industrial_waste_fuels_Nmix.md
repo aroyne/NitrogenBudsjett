@@ -29,7 +29,7 @@ nav_order: 5
 
 #### Interpretations
 
-- The flow is about 3.4–4.1 kt N per year until 2011, falls to about 1.7 kt N in 2014–2015 and has been 2.3–2.7 kt N since.
+- The flow is about 3.5–4.8 kt N per year<!--range:MP.OP-EF.IC-Industrial waste fuels-Nmix:1990-2011--> until 2011, falls to about 1.7 kt N<!--mean:MP.OP-EF.IC-Industrial waste fuels-Nmix:2014-2015--> in 2014–2015 and has been 2.3–2.7 kt N since.
 - The decline coincides with the closure of several pulp and paper mills, among them Norske Skog Follum (2012) and Södra Cell Tofte (2013).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

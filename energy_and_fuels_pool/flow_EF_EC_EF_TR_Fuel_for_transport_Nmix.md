@@ -32,7 +32,7 @@ nav_order: 5
 
 #### Interpretations
 
-- The flow is about 0.4–1.0 kt N per year, rising from 0.4 kt N in 1990 to a peak of about 1.0 kt N in 2007–2008 and about 0.8 kt N in 2024.
+- The flow is about 0.4–1.0 kt N per year<!--range:EF.EC-EF.TR-Fuel for transport-Nmix:1990-2024-->, rising from 0.4 kt N<!--val:EF.EC-EF.TR-Fuel for transport-Nmix:1990--> in 1990 to a peak of about 1.0 kt N<!--mean:EF.EC-EF.TR-Fuel for transport-Nmix:2007-2008--> in 2007–2008 and about 0.8 kt N<!--val:EF.EC-EF.TR-Fuel for transport-Nmix:2024--> in 2024.
 - Domestic aviation (jet kerosene, 0.1% N) and diesel in road transport and navigation are the largest contributions; biofuels contribute about 0.09 kt N in 2024.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

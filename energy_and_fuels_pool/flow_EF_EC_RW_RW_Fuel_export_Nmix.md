@@ -27,7 +27,7 @@ nav_order: 7
 
 #### Interpretations
 
-- Crude oil dominates the flow, accounting for over 99% of its N content. The flow is 70–85 kt N per year in 2012–2024, after a peak of about 145 kt N around 2000 when crude oil exports were highest.
+- Crude oil dominates the flow, accounting for over 99% of its N content. The flow is 70–85 kt N per year<!--range:EF.EC-RW.RW-Fuel export-Nmix:2012-2024--> in 2012–2024, after a peak of about 145 kt N<!--val:EF.EC-RW.RW-Fuel export-Nmix:2000--> around 2000 when crude oil exports were highest.
 - The uncertainty of the flow lies mainly in the N content of crude oil, which varies between fields.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

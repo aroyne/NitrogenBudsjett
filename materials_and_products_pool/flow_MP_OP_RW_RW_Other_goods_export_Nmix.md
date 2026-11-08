@@ -30,7 +30,7 @@ nav_order: 13
 
 #### Interpretations
 
-- The flow is about 8–11 kt N per year until 2013, 12–13 kt N in 2014–2017 and 21–34 kt N from 2018.
+- The flow is about 7–10 kt N per year<!--range:MP.OP-RW.RW-Other goods export-Nmix:1990-2013--> until 2013, 12–13 kt N<!--range:MP.OP-RW.RW-Other goods export-Nmix:2014-2017--> in 2014–2017 and 21–34 kt N<!--range:MP.OP-RW.RW-Other goods export-Nmix:2018-2024--> from 2018.
 - The significant increase from 2018 is due to export of nitric acid, which started that year. Nitric acid is an intermediary in fertilizer production but not counted as fertilizer, so it shows up in this flow.
 - The rise from 2013 comes from roundwood exports, which grew from about 0.5 to 3–4 million tonnes per year after several Norwegian pulp and paper mills closed.
 - In 2024 roundwood, chips and wood residues (6.4 kt N) and nitric acid (7.7 kt N) are the largest items, followed by processed wood products (2.7 kt N), hides and leather (1.0 kt N), wool (0.8 kt N) and detergents (0.75 kt N).

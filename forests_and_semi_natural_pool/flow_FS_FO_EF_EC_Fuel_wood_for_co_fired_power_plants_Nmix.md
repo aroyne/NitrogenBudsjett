@@ -31,7 +31,7 @@ nav_order: 4
 
 #### Interpretations
 
-- The flow rises from about 0.2 kt N in 1990 to 1.1–1.8 kt N per year in 2010–2020 and 2.1–2.4 kt N in 2021–2024, following the expansion of wood-fired district heating.
+- The flow rises from about 0.2 kt N<!--val:FS.FO-EF.EC-Fuel wood for co-fired power plants-Nmix:1990--> in 1990 to 1.1–1.8 kt N per year<!--range:FS.FO-EF.EC-Fuel wood for co-fired power plants-Nmix:2010-2020--> in 2010–2020 and 2.1–2.4 kt N<!--range:FS.FO-EF.EC-Fuel wood for co-fired power plants-Nmix:2021-2024--> in 2021–2024, following the expansion of wood-fired district heating.
 - Before 2010 the CRT biomass in 1.A.1.a is larger than "Bark, flis og tre" in table 04730 (1990: 1 060 against 103 TJ), probably plants outside the district heating statistics.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

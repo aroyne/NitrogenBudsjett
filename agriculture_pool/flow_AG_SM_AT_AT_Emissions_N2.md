@@ -27,7 +27,7 @@ nav_order: 2
 
 #### Interpretations
 
-- The flow is about 14–15 kt N per year and follows the agricultural area, which rose to about 1.04 million ha around 2000 and has since fallen to 0.98 million ha.
+- The flow is about 14–15 kt N per year<!--range:AG.SM-AT.AT-Emissions-N2:1984-2025--> and follows the agricultural area, which rose to about 1.04 million ha around 2000 and has since fallen to 0.98 million ha.
 - It does not reflect changes in fertilization or soil conditions.
 - Schäppi et al. (2025) note that the loss rate can vary from below 10 kg N per ha in well-drained soils to above 150 kg N per ha in waterlogged peat soils, so the uncertainty is large.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

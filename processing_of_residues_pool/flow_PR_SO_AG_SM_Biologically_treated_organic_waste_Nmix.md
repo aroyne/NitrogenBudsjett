@@ -35,7 +35,7 @@ nav_order: 1
 
 #### Interpretations
 
-- The flow rises from about 0.08 kt N per year in 1990–1995 to 0.7 kt N in 2010 and 0.7–1.3 kt N per year since 2012; about a third of the compost and digestate goes to agricultural land.
+- The flow rises from about 0.08 kt N per year<!--mean:PR.SO-AG.SM-Biologically treated organic waste-Nmix:1990-1995--> in 1990–1995 to 0.7 kt N<!--val:PR.SO-AG.SM-Biologically treated organic waste-Nmix:2010--> in 2010 and 0.7–1.3 kt N per year<!--range:PR.SO-AG.SM-Biologically treated organic waste-Nmix:2012-2024--> since 2012; about a third of the compost and digestate goes to agricultural land.
 - It rises from 2012 with more biogas production, and digestate from biogas plants is mostly used in agriculture.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

@@ -27,7 +27,7 @@ nav_order: 6
 
 #### Interpretations
 
-- The flow is below 0.01 kt N per year (about 0.008 kt N around 1990 and 0.003 kt N in 2024).
+- The flow is below 0.01 kt N per year (about 0.008 kt N<!--val:FS.OL-HS.HS-Game meat-Nmix:1990--> around 1990 and 0.003 kt N<!--val:FS.OL-HS.HS-Game meat-Nmix:2024--> in 2024).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

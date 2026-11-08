@@ -28,7 +28,7 @@ nav_order: 1
 
 #### Interpretations
 
-- The flow rises from about 1.5 kt N in 1984 to 77 kt N in 2024, following production, and is the largest N input to Norwegian coastal waters from a single source after the inflow from land.
+- The flow rises from about 1.5 kt N<!--val:HY.AC-HY.CW-Excretia-Nmix:1984--> in 1984 to 77 kt N<!--val:HY.AC-HY.CW-Excretia-Nmix:2024--> in 2024, following production, and is the largest N input to Norwegian coastal waters from a single source after the inflow from land.
 - Our combined losses from aquaculture to coastal waters (excretion plus waste feed) are 6–18% higher than TEOTIL3 (Sample et al., 2024)<!--cite:sample_teotil3_2024--> for 2013–2023, and considerably higher than Miljødirektoratet's earlier estimates before 2005.
 - The total feed N in our budget agrees with reported feed sales (Sjømat Norge, via Fiskeridirektoratet's key figures) to within 2% for 2019–2023, so the difference lies in how much of the feed N is assumed retained in the fish. We use the whole-system apparent retention of 35.75% from Aas et al. (2022)<!--cite:aas_utilization_2022-->, which counts all losses of feed ingredients, feed and fish as unretained, and a lower retention further back in time (Ytrestøyl et al., 2015)<!--cite:ytrestoyl_utilisation_2015-->. TEOTIL3 instead calculates losses as N in reported feed (5.84% N) minus N in the biomass growth of the farmed fish (2.96% N), including fish that are later lost, which implies a retention of about 44%, close to the 45% protein retention for 2012 reported by Torrissen et al. (2016)<!--cite:torrisen_naeringsutslipp_2016-->.
 - Our estimate should therefore be seen as an upper bound for the losses to coastal water.

@@ -27,7 +27,7 @@ nav_order: 16
 
 #### Interpretations
 
-- The flow is about 31–41 kt N per year up to 2021 and falls to 25 kt N in 2024, following lower Norwegian NO<sub>x</sub> emissions.
+- The flow is about 31–41 kt N per year<!--range:AT.AT-RW.RW-Atmospheric outflow-OXN:1990-2021--> up to 2021 and falls to 25 kt N<!--val:AT.AT-RW.RW-Atmospheric outflow-OXN:2024--> in 2024, following lower Norwegian NO<sub>x</sub> emissions.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

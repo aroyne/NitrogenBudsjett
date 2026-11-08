@@ -27,7 +27,7 @@ nav_order: 2
 
 #### Interpretations
 
-- The flow is about 0.13–0.16 kt N per year, with a large uncertainty from the N<sub>2</sub>O share of denitrification.
+- The flow is about 0.11–0.16 kt N per year<!--range:HY.SW-AT.AT-Emissions-N2O:1990-2024-->, with a large uncertainty from the N<sub>2</sub>O share of denitrification.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

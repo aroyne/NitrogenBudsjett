@@ -32,7 +32,7 @@ nav_order: 9
 
 #### Interpretations
 
-- The flow falls from 3.5 kt N in 1990 (5.0 kt N in 1989) to 1.4 kt N in 2024.
+- The flow falls from 3.5 kt N<!--val:MP.OP-HY.SW-Untreated wastewater-Nmix:1990--> in 1990 (5.0 kt N<!--val:MP.OP-HY.SW-Untreated wastewater-Nmix:1989--> in 1989) to 1.4 kt N<!--val:MP.OP-HY.SW-Untreated wastewater-Nmix:2024--> in 2024.
 - The fertilizer and chemical industry dominates: in 1990 Herøya industrial park (1.5 kt N), Yara Glomfjord (0.86 kt N) and Hydro Rjukan (0.32 kt N) were the largest sources, and in 2023 Yara Porsgrunn and Yara Glomfjord together account for about 0.9 kt N.
 - Other sources are Borregaard (about 0.1 kt N), the Mongstad refinery and pulp and paper mills.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

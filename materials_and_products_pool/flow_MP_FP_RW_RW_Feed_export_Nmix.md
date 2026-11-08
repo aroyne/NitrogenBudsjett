@@ -26,7 +26,7 @@ nav_order: 8
 
 #### Interpretations
 
-- The flow is 11 kt N in 1990, 15–27 kt N in 1991–2007, 15–17 kt N in 2008–2014 and rises to 33 kt N in 2024.
+- The flow is 11 kt N<!--val:MP.FP-RW.RW-Feed export-Nmix:1990--> in 1990, 15–27 kt N<!--range:MP.FP-RW.RW-Feed export-Nmix:1991-2007--> in 1991–2007, 15–17 kt N<!--range:MP.FP-RW.RW-Feed export-Nmix:2008-2014--> in 2008–2014 and rises to 33 kt N<!--val:MP.FP-RW.RW-Feed export-Nmix:2024--> in 2024.
 - Fish meal (HS 2301 20) is the largest part in the 1990s (15–17 kt N per year in 1992–1998, from 140 kt fish meal) and again from 2020 (8–11 kt N). In 2024 the flow also contains oilseed cake and meal (7 kt N), pet food (6 kt N, up from 0.2 kt N in 1990), fresh and frozen fish not for human consumption (6 kt N) and meat meal (3 kt N).
 - The 6 kt of fish and crustacean meal exported to Uruguay in 2024 (about 0.6 kt N) is probably krill meal landed there by Norwegian vessels; the krill landed abroad is otherwise added to MP.FP-RW.RW-Food export-Nmix (see that flow).
 - The dip in 1993 comes from the export of soybean meal (HS 2304), which fell from 124 kt in 1992 to 16 kt in 1993 and was back at 118 kt in 1994.

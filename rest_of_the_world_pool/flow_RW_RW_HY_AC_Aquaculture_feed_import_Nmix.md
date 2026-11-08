@@ -27,7 +27,7 @@ nav_order: 8
 
 #### Interpretations
 
-- The flow rises from 0.4 kt N in 1985 to about 119 kt N in 2024, following the growth of aquaculture and the shift from domestic fish meal to imported plant-based ingredients.
+- The flow rises from 0.4 kt N<!--val:RW.RW-HY.AC-Aquaculture feed import-Nmix:1985--> in 1985 to about 119 kt N<!--val:RW.RW-HY.AC-Aquaculture feed import-Nmix:2024--> in 2024, following the growth of aquaculture and the shift from domestic fish meal to imported plant-based ingredients.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

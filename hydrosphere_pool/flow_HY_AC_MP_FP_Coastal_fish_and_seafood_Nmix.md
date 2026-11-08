@@ -30,7 +30,7 @@ nav_order: 3
 
 #### Interpretations
 
-- The flow rises from about 1 kt N in 1984 to 48 kt N in 2024, following the growth of salmon and trout farming.
+- The flow rises from about 1 kt N<!--val:HY.AC-MP.FP-Coastal fish and seafood-Nmix:1984--> in 1984 to 48 kt N<!--val:HY.AC-MP.FP-Coastal fish and seafood-Nmix:2024--> in 2024, following the growth of salmon and trout farming.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

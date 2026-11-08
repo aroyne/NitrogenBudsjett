@@ -30,7 +30,7 @@ nav_order: 1
 
 #### Interpretations
 
-- The flow is about 16–25 kt N per year in 1990–1999 and rises from 14 kt N in 2000 to 33–37 kt N since 2012, as more of the concentrate feed is based on imported protein raw materials.
+- The flow is about 16–25 kt N per year<!--range:RW.RW-AG.MM-Animal feed import-Nmix:1990-1999--> in 1990–1999 and rises from 14 kt N<!--val:RW.RW-AG.MM-Animal feed import-Nmix:2000--> in 2000 to 29–37 kt N<!--range:RW.RW-AG.MM-Animal feed import-Nmix:2012-2024--> since 2012, as more of the concentrate feed is based on imported protein raw materials.
 - 2000 is a low year in the concentrate feed statistics (24% imported raw materials, compared with 25–40% in the following years), not a break between the two sources.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

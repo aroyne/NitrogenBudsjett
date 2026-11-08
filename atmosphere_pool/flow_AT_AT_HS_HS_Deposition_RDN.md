@@ -26,7 +26,7 @@ nav_order: 11
 
 #### Interpretations
 
-- The flow falls from about 2.5 kt N in 1984–1987 to 1.3–1.4 kt N from 2017.
+- The flow falls from about 2.5 kt N<!--mean:AT.AT-HS.HS-Deposition-RDN:1984-1987--> in 1984–1987 to 1.5 kt N<!--range:AT.AT-HS.HS-Deposition-RDN:2017-2024--> from 2017.
 - The steps follow the five-year periods of the NILU data; the decline reflects lower emissions in Europe, more for oxidised than for reduced N.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

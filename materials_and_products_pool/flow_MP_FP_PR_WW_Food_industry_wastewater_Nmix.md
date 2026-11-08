@@ -30,7 +30,7 @@ nav_order: 7
 
 #### Interpretations
 
-- The flow is small, 0.03–0.3 kt N in most years.
+- The flow is small, 0.03–0.2 kt N<!--range:MP.FP-PR.WW-Food industry wastewater-Nmix:1990-2024--> per year.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

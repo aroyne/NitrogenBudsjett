@@ -31,7 +31,7 @@ nav_order: 6
 
 #### Interpretations
 
-- The flow is about 1.2–1.4 kt N per year until 2011, 1.7–2.2 kt N in 2012–2021 (including the food industry's share of mixed waste from 2012) and 2.8–3.2 kt N in 2022–2024.
+- The flow is about 1.2–1.4 kt N per year<!--range:MP.FP-PR.SO-Food industry waste-Nmix:1990-2011--> until 2011, 1.4–2.8 kt N<!--range:MP.FP-PR.SO-Food industry waste-Nmix:2012-2021--> in 2012–2021 (including the food industry's share of mixed waste from 2012) and 2.8–3.2 kt N<!--range:MP.FP-PR.SO-Food industry waste-Nmix:2022-2024--> in 2022–2024.
 - The industry sector (mainly food and fish processing) is the largest source of wet organic waste.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

@@ -33,7 +33,7 @@ nav_order: 3
 
 #### Interpretations
 
-- The flow declines from about 4.5 kt N in 1990 to about 1.8 kt N in 2024.
+- The flow declines from about 4.5 kt N<!--val:EF.EC-EF.IC-Fuel for industry-Nmix:1990--> in 1990 to about 1.8 kt N<!--val:EF.EC-EF.IC-Fuel for industry-Nmix:2024--> in 2024.
 - In 2024, solid fuels (coal and coke) contribute about 1.1 kt, waste fuels about 0.7 kt and liquid fuels about 0.05 kt; in 1990, liquid fuels (mainly heavy fuel oil) contributed about 1.4 kt.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

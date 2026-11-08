@@ -27,7 +27,7 @@ nav_order: 1
 
 #### Interpretations
 
-- The flow is about 7.1–7.7 kt N per year and follows the N<sub>2</sub>O flow.
+- The flow is about 7.1–7.7 kt N per year<!--range:FS.FO-AT.AT-Emissions-N2:1990-2024--> and follows the N<sub>2</sub>O flow.
 - Since both the N<sub>2</sub>O emissions and the ratio are very uncertain, the 95% interval is wide.
 - With the alternative of 1.1 kg N per ha and about 12 million ha of forest, the flow would be about 13 kt N per year.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

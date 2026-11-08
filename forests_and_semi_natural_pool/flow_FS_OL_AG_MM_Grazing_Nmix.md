@@ -31,7 +31,7 @@ nav_order: 1
 
 #### Interpretations
 
-- The flow is about 8.2–8.6 kt N in 1990–1996 and falls slowly to about 7.5 kt N in 2024, following the number of sheep on unmanaged land (2.2 million in 1996, 1.8 million in 2024); the number of cattle on unmanaged land has increased since 2017. Reindeer account for 0.9–1.4 kt N.
+- The flow is about 8.2–8.6 kt N<!--range:FS.OL-AG.MM-Grazing-Nmix:1990-1996--> in 1990–1996 and falls slowly to about 7.5 kt N<!--val:FS.OL-AG.MM-Grazing-Nmix:2024--> in 2024, following the number of sheep on unmanaged land (2.2 million in 1996, 1.8 million in 2024); the number of cattle on unmanaged land has increased since 2017. Reindeer account for 0.9–1.4 kt N.
 - The values for 1990–1994 follow the number of sheep and are less certain than later years.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

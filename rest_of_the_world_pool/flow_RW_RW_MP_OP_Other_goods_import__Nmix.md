@@ -32,7 +32,7 @@ nav_order: 11
 
 #### Interpretations
 
-- The flow is about 18–28 kt N per year since 1995, with peaks of 38–41 kt N in 2014, 2015 and 2017 that come from imports of nitric acid (1.6–20.5 kt N per year), a raw material for the fertilizer industry.
+- The flow is about 18–28 kt N per year since 1995, with peaks of 40–43 kt N<!--val:manual--> in 2014, 2015 and 2017 that come from imports of nitric acid (1.6–20.5 kt N per year), a raw material for the fertilizer industry.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

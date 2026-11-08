@@ -27,7 +27,7 @@ nav_order: 6
 
 #### Interpretations
 
-- The flow is about 0.2–0.7 kt N per year.
+- The flow is about 0.2–0.7 kt N per year<!--range:PR.WW-PR.SO-Sewage sludge landfill-Nmix:1990-2024-->.
 - For comparison, Tables 54 and 55 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> give 2.6–3.7% N in dry matter for dewatered, digested and composted sludge in the JRC models (Huygens et al., 2022) and a median of 4.9% in German analyses (Sichler et al., 2022).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

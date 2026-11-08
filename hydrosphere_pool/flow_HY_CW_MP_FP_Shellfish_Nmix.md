@@ -28,7 +28,7 @@ nav_order: 2
 
 #### Interpretations
 
-- The flow is about 2–2.5 kt N per year up to 2005 and rises to 11 kt N in 2024, almost entirely from Antarctic krill (no catch in 2000 and 2005, 320 kt in 2024, about 9 kt N), which is caught in the Southern Ocean; snow crab and king crab contribute much less.
+- The flow is about 2–2.5 kt N per year<!--range:HY.CW-MP.FP-Shellfish-Nmix:1990-2005--> up to 2005 and rises to 11 kt N<!--val:HY.CW-MP.FP-Shellfish-Nmix:2024--> in 2024, almost entirely from Antarctic krill (no catch in 2000 and 2005, 320 kt in 2024, about 9 kt N), which is caught in the Southern Ocean; snow crab and king crab contribute much less.
 - Kelp contributes about 0.3–0.4 kt N per year.
 - All the krill is landed in Uruguay (Fiskeridirektoratet table F.06.002) and never enters Norway. It does not appear as export to Uruguay in SSB table 08801 (nothing before 2024, 6 kt fish and crustacean meal in 2024), so the krill N (0.3 kt N in 2006, about 9 kt N in 2024) is added to MP.FP-RW.RW-Food export-Nmix.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

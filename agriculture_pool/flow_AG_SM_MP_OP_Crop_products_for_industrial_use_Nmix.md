@@ -27,7 +27,7 @@ nav_order: 8
 
 #### Interpretations
 
-- The flow is small, 0.3–0.8 kt N per year, with large variation from year to year.
+- The flow is small, 0.2–0.8 kt N per year<!--range:AG.SM-MP.OP-Crop products for industrial use-Nmix:1990-2024-->, with large variation from year to year.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

@@ -22,7 +22,7 @@ nav_order: 2
 
 #### Interpretations
 
-- The flow is about 0.4 kt N per year with little change since 1990.
+- The flow is about 0.4 kt N per year<!--mean:AG.MM-AT.AT-Emissions-N2O:1990-2024--> with little change since 1990.
 - The uncertainty is large, since the emission factors for N<sub>2</sub>O are uncertain by a factor of about two.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

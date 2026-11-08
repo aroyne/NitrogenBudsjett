@@ -23,7 +23,7 @@ nav_order: 12
 
 #### Interpretations
 
-- The flow rises from about 430 kt N in 1990 to 650–790 kt N per year after 2010, about seven times the agricultural use of mineral fertilizer in Norway.
+- The flow rises from about 430 kt N<!--val:MP.OP-RW.RW-Mineral fertilizer export-Nmix:1990--> in 1990 to 650–790 kt N per year after 2010, about seven times the agricultural use of mineral fertilizer in Norway.
 - The fertilizer is produced from ammonia made in Norway (AT.AT-MP.OP-Ammonia synthesis N2 fixation-N2, about 345 kt N in 2024) and imported ammonia (RW.RW-MP.OP-Ammonia import -Nmix, about 500 kt N in 2024).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

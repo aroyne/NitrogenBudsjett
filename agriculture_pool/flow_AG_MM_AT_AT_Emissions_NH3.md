@@ -27,7 +27,7 @@ nav_order: 3
 
 #### Interpretations
 
-- The flow is about 9.4–11.8 kt N per year: 10.3 kt N in 1990 and 9.9 kt N in 2024.
+- The flow is about 9.4–11.8 kt N per year<!--range:AG.MM-AT.AT-Emissions-NH3:1990-2024-->: 10.3 kt N<!--val:AG.MM-AT.AT-Emissions-NH3:1990--> in 1990 and 9.9 kt N<!--val:AG.MM-AT.AT-Emissions-NH3:2024--> in 2024.
 - Straw treatment (3I) contributed 1.2 kt N in 1990 but only 0.3 kt N in 2024, while manure management rose from about 9 to 9.6 kt N.
 - The peak in 2018 (11.8 kt N) comes from straw treatment, which rose to about 1.4 kt N in the drought year.
 - Cattle account for about 70% (dairy cattle 3.0 kt N and other cattle 3.7 kt N in 2024).

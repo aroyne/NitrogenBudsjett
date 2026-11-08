@@ -26,7 +26,7 @@ nav_order: 5
 
 #### Interpretations
 
-- The flow rises from about 19 kt N in 1990 to 25 kt N in 2024, in proportion to the population.
+- The flow rises from about 19 kt N<!--val:HS.HS-PR.WW-Municipal wastewater-Nmix:1990--> in 1990 to 25 kt N<!--val:HS.HS-PR.WW-Municipal wastewater-Nmix:2024--> in 2024, in proportion to the population.
 - It is about 95% of the N entering PR.WW. The outputs from PR.WW (discharges, N<sub>2</sub> removal, N<sub>2</sub>O and sewage sludge) are within ±6% of the inputs up to 2012 and 4–15% larger since, with the largest difference in 2014–2017 when N<sub>2</sub> removal at the treatment plants was highest.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

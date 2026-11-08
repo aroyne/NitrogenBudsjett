@@ -26,7 +26,7 @@ nav_order: 8
 
 #### Interpretations
 
-- The flow is about 2 kt N per year and follows agricultural use.
+- The flow is about 2 kt N per year<!--mean:MP.OP-HS.HS-Mineral fertilizer-Nmix:1984-2024--> and follows agricultural use.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

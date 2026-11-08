@@ -27,7 +27,7 @@ nav_order: 3
 
 #### Interpretations
 
-- The flow is about 0.4 kt N per year, about 6% of the manure deposited on unmanaged land.
+- The flow is about 0.4 kt N per year<!--mean:FS.OL-AT.AT-Emissions-NH3:1990-2024-->, about 6% of the manure deposited on unmanaged land.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

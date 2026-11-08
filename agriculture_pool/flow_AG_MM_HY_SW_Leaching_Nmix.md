@@ -22,7 +22,7 @@ nav_order: 5
 
 #### Interpretations
 
-- The flow is about 3 kt N per year with little change since 1990.
+- The flow is about 3 kt N per year<!--mean:AG.MM-HY.SW-Leaching-Nmix:1990-2024--> with little change since 1990.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

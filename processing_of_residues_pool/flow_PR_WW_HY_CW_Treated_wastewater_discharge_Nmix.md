@@ -26,7 +26,7 @@ nav_order: 5
 
 #### Interpretations
 
-- The flow is about 16–20 kt N per year, rising from about 17.6 kt N in 1990 to 18.5 kt N in 1997, falling to 16 kt N in 2002–2005 and rising again to about 20 kt N in 2024 with population growth.
+- The flow is about 16–20 kt N per year<!--range:PR.WW-HY.CW-Treated wastewater discharge-Nmix:1990-2024-->, rising from about 17.6 kt N<!--val:PR.WW-HY.CW-Treated wastewater discharge-Nmix:1990--> in 1990 to 18.5 kt N<!--val:PR.WW-HY.CW-Treated wastewater discharge-Nmix:1997--> in 1997, falling to 16 kt N<!--mean:PR.WW-HY.CW-Treated wastewater discharge-Nmix:2002-2005--> in 2002–2005 and rising again to about 20 kt N<!--val:PR.WW-HY.CW-Treated wastewater discharge-Nmix:2024--> in 2024 with population growth.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

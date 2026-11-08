@@ -33,7 +33,7 @@ nav_order: 5
 
 #### Interpretations
 
-- The flow is about 0.3–0.5 kt N per year until 2012 and 0.6–0.9 kt N from 2013.
+- The flow is about 0.3–0.5 kt N per year<!--range:MP.FP-HY.SW-Untreated wastewater-Nmix:1990-2012--> until 2012 and 0.5–1.0 kt N<!--range:MP.FP-HY.SW-Untreated wastewater-Nmix:2013-2024--> from 2013.
 - From 2013 a number of salmon slaughterhouses and fish processing plants report emissions, which explains much of the increase.
 - The largest single source over the period is DuPont Nutrition Norge (formerly FMC, alginate production from seaweed), with about 0.2 kt N per year.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

@@ -29,7 +29,7 @@ nav_order: 7
 
 #### Interpretations
 
-- The flow is about 1.2–1.3 kt N per year until 2015 and falls to about 1.0 kt N in 2024.
+- The flow is about 1.2–1.3 kt N per year<!--range:AG.MM-MP.OP-Non-edible animal products-Nmix:1990-2015--> until 2015 and falls to about 1.0 kt N<!--val:AG.MM-MP.OP-Non-edible animal products-Nmix:2024--> in 2024.
 - Hides and skins are 0.60–0.67 kt N per year with no trend. Wool is 0.59–0.66 kt N per year until 2015 (about half of the flow) and falls to 0.45 kt N in 2024 (43%), so the decline comes from wool.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

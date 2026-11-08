@@ -28,7 +28,7 @@ nav_order: 4
 
 #### Interpretations
 
-- The flow is about 28–39 kt N per year with large year-to-year variation from the meteorology, and a weak decline after 2016.
+- The flow is about 28–39 kt N per year<!--range:RW.RW-AT.AT-Atmospheric inflow-OXN:1984-2024--> with large year-to-year variation from the meteorology, and a weak decline after 2016.
 - Inflow plus the deposition of Norwegian emissions in Norway is 52–72% of the oxidised N deposition in the NILU data used for the deposition flows, which are based on measurements (see the [Atmospheric Nitrogen Deposition Overview](../atmosphere_pool/pool_atmosphere.html)); Blake et al. (2023)<!--cite:blake_deposition_2023--> also find EMEP model deposition well below the kriging estimates.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

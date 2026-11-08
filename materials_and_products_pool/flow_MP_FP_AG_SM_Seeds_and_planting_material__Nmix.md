@@ -26,7 +26,7 @@ nav_order: 2
 
 #### Interpretations
 
-- The flow is stable at 1.1–1.3 kt N per year.
+- The flow is stable at 1.1–1.3 kt N per year<!--range:MP.FP-AG.SM-Seeds and planting material -Nmix:1984-2025-->.
 - Cereal seed (about 54,000 t in 2024) accounts for over 90% of the N, and grass seed for most of the rest.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

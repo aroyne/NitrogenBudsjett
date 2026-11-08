@@ -26,7 +26,7 @@ nav_order: 3
 
 #### Interpretations
 
-- The flow is about 3.4–3.9 kt N per year, with a slight decrease since 1990.
+- The flow is about 3.4–3.9 kt N per year<!--range:AG.SM-AT.AT-Emissions-N2O:1990-2024-->, with a slight decrease since 1990.
 - The uncertainty is large, mainly from the emission factors (a factor of 3 in Norway's greenhouse gas inventory).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

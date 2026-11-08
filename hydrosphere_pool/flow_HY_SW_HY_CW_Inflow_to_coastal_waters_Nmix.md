@@ -33,7 +33,7 @@ nav_order: 3
 
 #### Interpretations
 
-- The flow is about 100–135 kt N per year without a clear trend; the year-to-year variation follows runoff, with the highest value in the wet year 2020.
+- The flow is about 100–135 kt N per year<!--range:HY.SW-HY.CW-Inflow to coastal waters-Nmix:1990-2024--> without a clear trend; the year-to-year variation follows runoff, with the highest value in the wet year 2020.
 - Agriculture and natural background from forest and other land make up most of the flow.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

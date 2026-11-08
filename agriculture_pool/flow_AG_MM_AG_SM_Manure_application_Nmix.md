@@ -28,7 +28,7 @@ nav_order: 1
 
 #### Interpretations
 
-- The flow is 65–70 kt N per year in the 1990s, rises to about 75 kt N in 2016–2018 and is about 70 kt N in 2024.
+- The flow is 65–70 kt N per year<!--range:AG.MM-AG.SM-Manure application-Nmix:1990-1999--> in the 1990s, rises to about 75 kt N<!--mean:AG.MM-AG.SM-Manure application-Nmix:2016-2018--> in 2016–2018 and is about 70 kt N<!--val:AG.MM-AG.SM-Manure application-Nmix:2024--> in 2024.
 - In 2024 managed manure accounts for about 54 kt N and manure deposited on agricultural land during grazing for about 16 kt N.
 - The changes follow the livestock numbers, with fewer dairy cows and more beef cattle, pigs and poultry over the period.
 - Manure deposited on unmanaged land (about 7 kt N per year) goes to FS.OL, and the losses from it are removed from the AG.SM emission and leaching flows.

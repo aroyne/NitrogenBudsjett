@@ -30,7 +30,7 @@ nav_order: 5
 
 #### Interpretations
 
-- The flow is about 27–42 kt N per year without a clear trend.
+- The flow is about 27–42 kt N per year<!--range:FS.FO-HY.SW-Leaching-Nmix:1990-2024--> without a clear trend.
 - TEOTIL calculates the diffuse loss from land as runoff times area-specific N concentrations, so the year-to-year variation mainly follows precipitation and runoff: low values in dry years (for example 2010) and high values in wet years (for example 2020).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

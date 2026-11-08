@@ -28,7 +28,7 @@ nav_order: 9
 
 #### Interpretations
 
-- The flow rises from about 16 kt N in 1990 to 25–32 kt N per year since 2010.
+- The flow rises from about 16 kt N<!--val:RW.RW-MP.FP-Food import-Nmix:1990--> in 1990 to 25–32 kt N per year<!--range:RW.RW-MP.FP-Food import-Nmix:2010-2024--> since 2010.
 - Foreign vessels landed 170–375 kt live weight of fish per year in Norway in 2005–2024 (Fiskeridirektoratet table F.06.001). These landings are not part of HY.CW-MP.FP-Fish (wild catch)-Nmix, which only covers Norwegian vessels, so they are not counted twice. Landings by British, Faroese and Danish vessels are of the same size as the imports of fresh and frozen fish from those countries. Russian vessels landed 80–145 kt per year, while imports of fish from Russia were only 12–26 kt; most Russian fish landed in Norway goes on to the EU or China ([Regjeringen](https://www.regjeringen.no/no/aktuelt/fiskerisamarbeid_stabilitet/id2926113/)), and goods in transit are not included in the trade statistics.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

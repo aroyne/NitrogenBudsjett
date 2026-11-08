@@ -27,7 +27,7 @@ nav_order: 5
 
 #### Interpretations
 
-- The flow is about 2.0–2.5 kt N per year.
+- The flow is about 2.0–2.5 kt N per year<!--range:AG.SM-AT.AT-Emissions-NOx:1990-2024-->.
 - Field burning contributed 0.3 kt N in 1990 and less than 0.05 kt N in 2024.
 - Mineral fertilizer (1.1 kt N in 2024) and manure spreading (0.65 kt N) are the main sources.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->

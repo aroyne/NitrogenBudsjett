@@ -22,7 +22,7 @@ nav_order: 3
 
 #### Interpretations
 
-- The flow is about 0.1–0.3 kt N per year.
+- The flow is about 0.1–0.3 kt N per year<!--range:PR.SO-AT.AT-Emissions-NH3:1990-2024-->.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

@@ -27,7 +27,7 @@ nav_order: 4
 
 #### Interpretations
 
-- The flow is about 0.1–1.3 kt N per year and has increased as more sludge is delivered to soil producers.
+- The flow is about 0.1–1.3 kt N per year<!--range:PR.WW-HS.HS-Sewage sludge fertilizer-Nmix:1990-2024--> and has increased as more sludge is delivered to soil producers.
 - For comparison, Tables 54 and 55 in Schäppi et al. (2025)<!--cite:schappi_annexes_2025--> give 2.6–3.7% N in dry matter for dewatered, digested and composted sludge in the JRC models (Huygens et al., 2022) and a median of 4.9% in German analyses (Sichler et al., 2022).
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

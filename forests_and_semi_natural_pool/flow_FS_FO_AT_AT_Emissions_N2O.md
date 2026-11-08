@@ -29,8 +29,8 @@ nav_order: 2
 
 #### Interpretations
 
-- The flow is small and nearly constant, about 0.37–0.38 kt N per year, since the area of drained organic forest soil changes little.
-- The 0.47 kt N of fertilizer on forest in the inventory is the same as MP.OP-FS.FO-Mineral fertilizer-Nmix in this model in 2024.
+- The flow is small and nearly constant, about 0.37–0.38 kt N per year<!--range:FS.FO-AT.AT-Emissions-N2O:1990-2024-->, since the area of drained organic forest soil changes little.
+- The 0.47 kt N<!--val:MP.OP-FS.FO-Mineral fertilizer-Nmix:2024--> of fertilizer on forest in the inventory is the same as MP.OP-FS.FO-Mineral fertilizer-Nmix in this model in 2024.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty

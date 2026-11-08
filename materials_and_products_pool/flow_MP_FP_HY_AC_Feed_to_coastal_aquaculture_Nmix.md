@@ -26,7 +26,7 @@ nav_order: 4
 
 #### Interpretations
 
-- The domestically supplied feed stays at about 9–13 kt N per year, while total feed N (this flow plus RW.RW-HY.AC-Aquaculture feed import-Nmix) rises from about 14 kt N in 1990 to about 128 kt N in 2024.
+- The domestically supplied feed stays at about 9–13 kt N per year, while total feed N (this flow plus RW.RW-HY.AC-Aquaculture feed import-Nmix) rises from about 14 kt N<!--val:MP.FP-HY.AC-Feed to coastal aquaculture-Nmix+RW.RW-HY.AC-Aquaculture feed import-Nmix:1990--> in 1990 to about 129 kt N<!--val:MP.FP-HY.AC-Feed to coastal aquaculture-Nmix+RW.RW-HY.AC-Aquaculture feed import-Nmix:2024--> in 2024.
 - The domestic share therefore falls from about 70% in 1990 to 8% in 2024: the growth of the industry has been met with imported marine and plant ingredients.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

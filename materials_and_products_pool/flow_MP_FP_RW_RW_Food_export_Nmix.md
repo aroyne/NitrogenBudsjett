@@ -35,7 +35,7 @@ nav_order: 9
 #### Interpretations
 
 - Fish and fish products (fresh, frozen and processed, including farmed salmon) make up about 98% of the flow, 82 of 84 kt N in 2024 (73 kt N in the export statistics and 9 kt N added landings abroad, almost all krill), of which klippfisk is 8.2 kt N and tørrfisk 0.4 kt N.
-- The flow rises from 30 kt N in 1990 to 75–92 kt N from 2010 and has been roughly stable since. The increase from about 60 kt N in 2006 to 80 kt N in 2009 comes from exports of fresh fish (mainly farmed salmon, HS 0302, +170 kt from 2006 to 2009) and frozen fish (HS 0303, +440 kt). After 2010 the growth in farmed fish has been offset by lower wild catches (see HY.AC-MP.FP-Coastal fish and seafood-Nmix and HY.CW-MP.FP-Fish (wild catch)-Nmix).
+- The flow rises from 30 kt N<!--val:MP.FP-RW.RW-Food export-Nmix:1990--> in 1990 to 75–92 kt N<!--range:MP.FP-RW.RW-Food export-Nmix:2010-2024--> from 2010 and has been roughly stable since. The increase from about 60 kt N in 2006 to 80 kt N in 2009 comes from exports of fresh fish (mainly farmed salmon, HS 0302, +170 kt from 2006 to 2009) and frozen fish (HS 0303, +440 kt). After 2010 the growth in farmed fish has been offset by lower wild catches (see HY.AC-MP.FP-Coastal fish and seafood-Nmix and HY.CW-MP.FP-Fish (wild catch)-Nmix).
 - Exports of meat and of cheese are each below 0.5 kt N.
 - The added landings abroad are 4.5–8.5 kt N per year in 1990–1999, 6–12 kt N in 2000–2009 and 2.6–9 kt N (almost only krill) in 2010–2024. Without them, this N would stay in MP.FP and add to its surplus.
 - The 6 kt of fish and crustacean meal exported to Uruguay in 2024 (about 0.6 kt N, in MP.FP-RW.RW-Feed export-Nmix) is probably krill meal, so up to 0.6 kt N of krill may be counted twice that year.

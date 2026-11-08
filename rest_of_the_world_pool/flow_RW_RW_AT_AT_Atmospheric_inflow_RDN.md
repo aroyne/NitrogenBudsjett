@@ -28,7 +28,7 @@ nav_order: 5
 
 #### Interpretations
 
-- The flow is about 14–20 kt N per year up to 2021 and 23–28 kt N in 2022–2024, with large year-to-year variation from the meteorology.
+- The flow is about 14–27 kt N per year<!--range:RW.RW-AT.AT-Atmospheric inflow-RDN:1990-2021--> up to 2021 and 22–28 kt N<!--range:RW.RW-AT.AT-Atmospheric inflow-RDN:2022-2024--> in 2022–2024, with large year-to-year variation from the meteorology.
 - Inflow plus the deposition of Norwegian emissions in Norway is 34–71% of the reduced N deposition in the NILU data used for the deposition flows, rising over time.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 

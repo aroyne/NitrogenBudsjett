@@ -35,7 +35,7 @@ nav_order: 6
 
 #### Interpretations
 
-- The flow rises from about 0.07 kt N per year in 1990–1995 to 0.6 kt N in 2010 and 0.6–1.5 kt N per year since 2012; about a third of the compost and digestate goes to green areas and soil producers.
+- The flow rises from about 0.07 kt N per year<!--mean:PR.SO-HS.HS-Biologically treated organic waste-Nmix:1990-1995--> in 1990–1995 to 0.6 kt N<!--val:PR.SO-HS.HS-Biologically treated organic waste-Nmix:2010--> in 2010 and 0.5–1.5 kt N per year<!--range:PR.SO-HS.HS-Biologically treated organic waste-Nmix:2012-2024--> since 2012; about a third of the compost and digestate goes to green areas and soil producers.
 <!-- MANUAL:FLOW_DESCRIPTION:END -->
 
 ### Uncertainty
