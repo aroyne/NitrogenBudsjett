@@ -321,9 +321,11 @@ def other_rows(df, sims):
         'AT': [
             s("AT-balanse uten N2-fiksering til ammoniakk (kt N/år)",
               lambda d: cfa.at_balance(d, exclude=cfa.AMMONIA_SYNTHESIS), 'at_balance(exclude=AMMONIA_SYNTHESIS)'),
-            s("AT-balanse, redusert N (kt N/år)", lambda d: cfa.at_balance(d, species='RDN'), "at_balance(species='RDN')"),
-            s("AT-balanse, oksidert N (kt N/år)", lambda d: cfa.at_balance(d, species='OXN'), "at_balance(species='OXN')"),
             s("Grensekryssende innstrøm minus utstrøm (kt N/år)", cfa.cross_border_net_inflow, 'cross_border_net_inflow'),
+            s("Grensekryssende innstrøm minus utstrøm, redusert N (kt N/år)",
+              lambda d: cfa.cross_border_net_inflow(d, species='RDN'), "cross_border_net_inflow(species='RDN')"),
+            s("Grensekryssende innstrøm minus utstrøm, oksidert N (kt N/år)",
+              lambda d: cfa.cross_border_net_inflow(d, species='OXN'), "cross_border_net_inflow(species='OXN')"),
             s("N2-fiksering til ammoniakkproduksjon (kt N/år)",
               lambda d: cfa.sum_flows(d, cfa.AMMONIA_SYNTHESIS), 'sum_flows(AMMONIA_SYNTHESIS)'),
             s("Nedfall totalt, land og ferskvann (kt N/år)", cfa.deposition_total, 'deposition_total'),

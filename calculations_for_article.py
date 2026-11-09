@@ -896,10 +896,12 @@ def bnf_total(df, years=ANALYSIS_YEARS):
     return sum_flows(df, BNF_ALL, years)
 
 
-def cross_border_net_inflow(df, years=ANALYSIS_YEARS):
-    """Atmospheric inflow from abroad minus outflow to abroad, OXN + RDN (kt N/yr)."""
-    inflow = ['RW.RW-AT.AT-Atmospheric inflow-OXN', 'RW.RW-AT.AT-Atmospheric inflow-RDN']
-    outflow = ['AT.AT-RW.RW-Atmospheric outflow-OXN', 'AT.AT-RW.RW-Atmospheric outflow-RDN']
+def cross_border_net_inflow(df, years=ANALYSIS_YEARS, species=('OXN', 'RDN')):
+    """Atmospheric inflow from abroad minus outflow to abroad (EMEP
+    source-receptor transport), kt N/yr; species 'OXN', 'RDN' or both."""
+    species = (species,) if isinstance(species, str) else species
+    inflow = [f'RW.RW-AT.AT-Atmospheric inflow-{sp}' for sp in species]
+    outflow = [f'AT.AT-RW.RW-Atmospheric outflow-{sp}' for sp in species]
     return sum_flows(df, inflow, years) - sum_flows(df, outflow, years)
 
 
@@ -1005,20 +1007,22 @@ def household_waste(df, years=ANALYSIS_YEARS):
     return sum_flows(df, HOUSEHOLD_WASTE, years)
 
 
-# Household waste (HS.HS-PR.SO) split by source sector. Rows and column
-# offsets mirror shared_flow_calculations.find_household_waste exactly and
-# must be kept in sync with it. Table 05282 (1995-2011) covers construction,
-# services and households; table 10514 (2012-) also includes the energy and
-# water/sewage/waste-management sectors. 1990-1994 is extrapolated from
-# waste per person in find_household_waste and has no sector split.
+# Household waste (HS.HS-PR.SO) split by source sector. Rows, column offsets
+# and the handling of the 2012 break mirror
+# shared_flow_calculations.find_household_waste exactly and must be kept in
+# sync with it: table 05282 (1995-2011) and 10514 (2012-) for construction,
+# services and households; construction and services before 2012 scaled by
+# the ratio of their N in 2012 (10514) to 2011 (05282); the energy and
+# water/sewage/waste-management sectors of 10514 left out. 1990-1994 is
+# extrapolated from 1995 with the same factor for all sectors, so the
+# sector shares in 1990-1994 are those of 1995.
 HOUSEHOLD_WASTE_SECTORS = {
     'ssb_05282': {'first_year': 1995, 'last_year': 2011,
                   'sectors': {'Construction': 5, 'Services': 6, 'Households': 9},
                   'rows': {6: 'paper', 8: 'plastic', 11: 'wood', 12: 'textiles', 13: 'wet_organic',
                            16: 'other_materials', 17: 'hazardous', 18: 'contaminated_masses'}},
     'ssb_10514': {'first_year': 2012, 'last_year': 2024,
-                  'sectors': {'Energy supply': 4, 'Water, sewage, waste': 5, 'Construction': 6,
-                              'Services': 7, 'Households': 9},
+                  'sectors': {'Construction': 6, 'Services': 7, 'Households': 9},
                   'rows': {6: 'wet_organic', 7: 'park_garden', 8: 'wood', 10: 'paper', 16: 'plastic',
                            18: 'textiles', 21: 'hazardous', 22: 'mixed_waste', 23: 'other_materials',
                            24: 'contaminated_masses'}},
@@ -1048,12 +1052,18 @@ def household_waste_by_sector(waste_N):
             if not spec['first_year'] <= year <= spec['last_year']:
                 continue
             out[year] = {sector: sum(float(d.iloc[row, col + offset]) * waste_N[cat]
-                                     for row, cat in spec['rows'].items()) / 1000.0  # tonnes -> kt
+                                     for row, cat in spec['rows'].items())  # 1000 t x kg N/kg = kt N
                          for sector, offset in spec['sectors'].items()}
-    return pd.DataFrame(out).T.sort_index().fillna(0.0)
+    t = pd.DataFrame(out).T.sort_index().fillna(0.0)
+    scaled = ['Construction', 'Services']
+    t.loc[:2011, scaled] *= t.loc[2012, scaled].sum() / t.loc[2011, scaled].sum()
+    # Same shares as 1995; the absolute values of 1990-1994 are not used.
+    for year in range(1990, 1995):
+        t.loc[year] = t.loc[1995]
+    return t.sort_index()
 
 
-HOUSEHOLD_WASTE_SHARE_PERIODS = [(1995, 1997), (2009, 2011), (2012, 2014), (2022, 2024)]
+HOUSEHOLD_WASTE_SHARE_PERIODS = [(1990, 1992), (2009, 2011), (2012, 2014), (2022, 2024)]
 
 
 def _period_share(table, periods):
