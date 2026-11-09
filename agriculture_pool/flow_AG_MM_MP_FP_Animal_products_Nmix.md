@@ -34,14 +34,14 @@ nav_order: 6
 
 ### Uncertainty
 
-Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-05). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
+Sources that contribute at least 2% of the variance of this flow in one of the periods (computed 2026-11-09). How the table is computed is explained under [Data and uncertainties](../index.html#data-and-uncertainties) on the front page.
 
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
-| FAOSTAT crops and livestock products (production) | Registered data | ±10 %, normal, drawn per year | 73% | 81% | 1.00 | 1.00 | [Non-edible Animal Products](../agriculture_pool/flow_AG_MM_MP_OP_Non_edible_animal_products_Nmix.html), [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
-| N content of animal product: Milk, Total | Parameter | ±10 % | 24% | 13% | 0.59 | 0.41 | none |
-| N content of animal product: Meat of pig with the bone, fresh or chilled | Parameter | ±10 % | 1% | 2% | 0.13 | 0.17 | none |
-| N content of animal product: Meat of chickens, fresh or chilled | Parameter | ±10 % | <1% | 2% | 0.04 | 0.16 | none |
+| FAOSTAT crops and livestock products (production) | Registered data | ±10 %, normal, drawn per year | 72% | 80% | 1.00 | 1.00 | [Non-edible Animal Products](../agriculture_pool/flow_AG_MM_MP_OP_Non_edible_animal_products_Nmix.html), [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| N content of animal product: Milk, Total | Parameter | ±10 % | 25% | 13% | 0.60 | 0.42 | none |
+| N content of animal product: Meat of pig with the bone, fresh or chilled | Parameter | ±10 % | 1% | 2% | 0.13 | 0.18 | none |
+| N content of animal product: Meat of chickens, fresh or chilled | Parameter | ±10 % | <1% | 2% | 0.04 | 0.17 | none |
 
 ### References
 
