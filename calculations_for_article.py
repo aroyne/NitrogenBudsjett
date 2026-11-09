@@ -1063,12 +1063,12 @@ def household_waste_by_sector(waste_N):
     return t.sort_index()
 
 
-HOUSEHOLD_WASTE_SHARE_PERIODS = [(1990, 1992), (2009, 2011), (2012, 2014), (2022, 2024)]
+HOUSEHOLD_WASTE_SHARE_PERIODS = [(1990, 1992), (1995, 1995), (2009, 2011), (2012, 2014), (2022, 2024), (2024, 2024)]
 
 
 def _period_share(table, periods):
     """Sector shares (%) of the summed N in each period."""
-    rows = {f"{a}–{b}": table.loc[a:b].sum() for a, b in periods}
+    rows = {(str(a) if a == b else f"{a}–{b}"): table.loc[a:b].sum() for a, b in periods}
     t = pd.DataFrame(rows).T
     return 100 * t.div(t.sum(axis=1), axis=0)
 

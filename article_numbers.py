@@ -104,6 +104,31 @@ def emissions_total(df, species, years=cfa.ANALYSIS_YEARS):
     return cfa.sum_flows(df, flows, years)
 
 
+def emissions_share(df, species, pool, years=cfa.ANALYSIS_YEARS):
+    """Share (%) of national emissions of one species from one pool (flows
+    starting with '<pool>.')."""
+    flows = [f for f in cfa.flow_names(df) if f.startswith(f'{pool}.') and f.endswith(f'-AT.AT-Emissions-{species}')]
+    return 100 * cfa.sum_flows(df, flows, years) / emissions_total(df, species, years)
+
+
+AQUACULTURE_TO_CW = cfa.AQUACULTURE_EXCRETA + cfa.AQUACULTURE_WASTE_FEED
+TEOTIL3_YEARS = (2013, 2023)
+
+
+def _teotil3_to_coast():
+    """TEOTIL3 total N delivered to the coast (kt N/yr), NIVA/J. Sample
+    (data_files/teotil3_n_summary.xlsx, sheet totn_to_coast)."""
+    t = pd.read_excel('data_files/teotil3_n_summary.xlsx', sheet_name='totn_to_coast')
+    return t.set_index('year')['totn_to-coast_tonnes'] / 1000.0
+
+
+def cw_inputs_vs_teotil3(df, years=cfa.ANALYSIS_YEARS):
+    """All inflows to HY.CW as a share (%) of TEOTIL3's N to the coast; NaN
+    outside the TEOTIL3 years."""
+    model = cfa.sum_flows(df, cfa.CW_INPUTS, years)
+    return 100 * model / _teotil3_to_coast().reindex(model.index)
+
+
 # =============================================================================
 # Statistics per row
 # =============================================================================
@@ -288,7 +313,16 @@ def nue_rows(df, sims):
 def other_rows(df, sims):
     s = lambda label, fn, function, **kw: summarize(label, fn, df, sims, function=function, **kw)  # noqa: E731
     sections = {
+        'EF': [
+            s("Drivstoffeksport (kt N/år)", lambda d: cfa.sum_flows(d, ['EF.EC-RW.RW-Fuel export-Nmix']),
+              "sum_flows(['EF.EC-RW.RW-Fuel export-Nmix'])"),
+        ],
         'MP': [
+            s("Tilførsel til MP.FP (kt N/år)", lambda d: cfa.sum_flows(d, cfa._pool_flows(d, 'MP.FP', 'in')),
+              "sum_flows(_pool_flows('MP.FP', 'in'))"),
+            s("Akvakulturproduksjon, andel av tilførsel til MP.FP (%)",
+              lambda d: share_of_pool_inputs(d, cfa.AQUACULTURE_PRODUCTION, 'MP.FP'),
+              "share_of_pool_inputs(AQUACULTURE_PRODUCTION, 'MP.FP')"),
             s("Ammoniakkimport (kt N/år)", cfa.ammonia_import, 'ammonia_import'),
             s("Eksport av mineralgjødsel (kt N/år)", cfa.fertilizer_export, 'fertilizer_export'),
         ],
@@ -300,6 +334,8 @@ def other_rows(df, sims):
               'fodder_loss_to_close_sm', fodder=True),
             s("Fodder crops inkl. innmarksbeite (kt N/år)", lambda d: cfa.sum_flows(d, cfa.FODDER_CROPS),
               'sum_flows(FODDER_CROPS)', fodder=True),
+            s("Matplanteprodukter, Food crop products (kt N/år)", lambda d: cfa.sum_flows(d, cfa.FOOD_CROP_PRODUCTS),
+              'sum_flows(FOOD_CROP_PRODUCTS)'),
         ],
         'FS': [
             s("Beite, andel av tilførsel til FS.OL (%)",
@@ -309,6 +345,7 @@ def other_rows(df, sims):
               "share_of_pool_inputs(FORESTRY_PRODUCTS, 'FS.FO')"),
         ],
         'PR': [
+            s("Tilførsel til PR (kt N/år)", cfa.pr_inputs, 'pr_inputs'),
             s("Avfall til energi (kt N/år)", cfa.waste_to_energy, 'waste_to_energy'),
             s("Gjenvinning inkl. eksport til gjenvinning og ombruk (kt N/år)", cfa.recycling_all, 'recycling_all'),
             s("N fjernet som N2 i avløpsrensing, andel (%)", cfa.ww_n2_removal_share, 'ww_n2_removal_share'),
@@ -347,10 +384,24 @@ def other_rows(df, sims):
               lambda d: cfa.cw_input_share(d, cfa.TREATED_WASTEWATER), 'cw_input_share(TREATED_WASTEWATER)'),
             s("Villfisk og skalldyr, i forhold til tilførsel til HY.CW (%)",
               lambda d: cfa.cw_input_share(d, cfa.WILD_CATCH_AND_SHELLFISH), 'cw_input_share(WILD_CATCH_AND_SHELLFISH)'),
+            s("Akvakulturfôr, import (kt N/år)", lambda d: cfa.sum_flows(d, ['RW.RW-HY.AC-Aquaculture feed import-Nmix']),
+              "sum_flows(['RW.RW-HY.AC-Aquaculture feed import-Nmix'])"),
+            s("Utslipp fra akvakultur til kystvann, ekskresjon + fôrspill (kt N/år)",
+              lambda d: cfa.sum_flows(d, AQUACULTURE_TO_CW), 'sum_flows(AQUACULTURE_TO_CW)'),
+            s("Utslipp fra akvakultur til kystvann, i forhold til HY-balansen (%)",
+              lambda d: 100 * cfa.sum_flows(d, AQUACULTURE_TO_CW) / cfa.pool_balance(d, 'HY'),
+              "100 * sum_flows(AQUACULTURE_TO_CW) / pool_balance('HY')"),
         ],
         'Utslipp': [
             s(f"Utslipp {sp}, hele landet (kt N/år)", lambda d, sp=sp: emissions_total(d, sp), f"emissions_total('{sp}')")
             for sp in EMISSION_SPECIES
+        ] + [
+            s(f"{pool}, andel av {sp}-utslipp (%)", lambda d, sp=sp, pool=pool: emissions_share(d, sp, pool),
+              f"emissions_share('{sp}', '{pool}')")
+            for sp, pool in [('NOx', 'EF'), ('NH3', 'AG'), ('N2O', 'AG'), ('N2O', 'MP')]
+        ] + [
+            s("N2O-utslipp fra MP.OP, industri (kt N/år)", lambda d: cfa.sum_flows(d, ['MP.OP-AT.AT-Emissions-N2O']),
+              "sum_flows(['MP.OP-AT.AT-Emissions-N2O'])"),
         ],
     }
     singles = [
@@ -359,11 +410,16 @@ def other_rows(df, sims):
                      FODDER_END, 'fodder_loss_to_close_mm'),
         period_value("N fjernet som N2 i avløpsrensing, andel (%)", cfa.ww_n2_removal_share, df, sims, (2023, 2023),
                      'ww_n2_removal_share'),
+        period_value("Drivstoffeksport, toppen 1998–2002 (kt N/år)",
+                     lambda d: cfa.sum_flows(d, ['EF.EC-RW.RW-Fuel export-Nmix']), df, sims, (1998, 2002),
+                     "sum_flows(['EF.EC-RW.RW-Fuel export-Nmix'])"),
+        period_value(f"Tilførsel til kystvann (alle innstrømmer til HY.CW) i forhold til TEOTIL3 (%)",
+                     cw_inputs_vs_teotil3, df, sims, TEOTIL3_YEARS, 'cw_inputs_vs_teotil3'),
         ratio_row("Akvakulturproduksjon, forhold slutt/start", lambda d: cfa.sum_flows(d, cfa.AQUACULTURE_PRODUCTION),
                   df, sims, START, END, 'sum_flows(AQUACULTURE_PRODUCTION)'),
     ]
     for sp in EMISSION_SPECIES:
-        for year in (2020, 2023, 2024):
+        for year in (2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024):
             singles.append(ratio_row(f"Utslipp {sp}, {year} i forhold til {GOTHENBURG_BASE_YEAR}",
                                      lambda d, sp=sp: emissions_total(d, sp), df, sims,
                                      (GOTHENBURG_BASE_YEAR, GOTHENBURG_BASE_YEAR), (year, year),
