@@ -30,6 +30,10 @@ Hover over the chart to inspect specific flows, or click legend items to toggle 
 * **AG.MM-FS.OL-Manure from grazing on unmanaged land-Nmix** is not in the guidelines. It has been added because a large part of the grazing in Norway takes place on unmanaged land (utmark), which belongs to FS.OL and not to agricultural soils (AG.SM). See the page for [Other land (FS.OL)](../forests_and_semi_natural_pool/subpool_other_land.html).
 * **AG.MM-HY.SW-Leaching-Nmix** goes to groundwater (HY.GW) in Schäppi et al. (2025). We do not include the groundwater subpool (see the [hydrosphere pool page](../hydrosphere_pool/pool_hydrosphere.html)), so the flow goes to surface water (HY.SW).
 
+### Break in the fodder statistics in 2021:
+
+* The surplus in the AG.MM balance increases from 2021 because SSB changed the method for the grass harvest (eng til slått) that year; the fodder crops flow rises by about 27% from 2020 to 2021 while the feed the animals must have eaten does not change. The balance before and after 2021 should therefore not be compared directly. See [Fodder crops](../agriculture_pool/flow_AG_SM_AG_MM_Fodder_crops_Nmix.html).
+
 <!-- MANUAL:POOL_TEXT:END -->
 
 ### References

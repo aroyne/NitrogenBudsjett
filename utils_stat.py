@@ -16,6 +16,31 @@ from datetime import datetime
 import plotly.graph_objects as go
 from data_loader import load_population
 
+# Known breaks in the source statistics. They are left in the data and marked
+# with a vertical line in the plots, keyed by flow code or (sub)pool code.
+# The fodder crops flow is an outflow of AG.SM and an inflow of AG.MM, so the
+# break also shows in both subpool balances (the AG pool balance only shows
+# flows across the pool boundary).
+DATA_BREAKS = {
+    'AG.SM-AG.MM-Fodder crops-Nmix': [(2021, 'SSB method change')],
+    'AG.MM': [(2021, 'Fodder statistics break')],
+    'AG.SM': [(2021, 'Fodder statistics break')],
+}
+
+
+def _mark_breaks_plotly(fig, key):
+    for year, label in DATA_BREAKS.get(key, []):
+        fig.add_vline(x=year - 0.5, line_dash='dash', line_color='gray', line_width=1,
+                      annotation_text=label, annotation_position='top left',
+                      annotation_font_size=9, annotation_font_color='gray')
+
+
+def _mark_breaks_mpl(ax, key):
+    for year, label in DATA_BREAKS.get(key, []):
+        ax.axvline(year - 0.5, color='gray', linestyle='--', linewidth=1)
+        ax.text(year - 0.7, 0.98, label, transform=ax.get_xaxis_transform(),
+                ha='right', va='top', fontsize=8, color='gray')
+
 def plot_pool_balance_interactive(df_flows, pool_code, net_interval, output_dir="output_files/plots"):
     """
     Genererer et INTERAKTIVT og RESPONSIVT balansediagram (HTML) for en spesifikk pool eller subpool.
@@ -129,6 +154,7 @@ def plot_pool_balance_interactive(df_flows, pool_code, net_interval, output_dir=
     ))
 
     # --- 6. LAYOUT OG STYLING ---
+    _mark_breaks_plotly(fig, pool_code)
     fig.update_layout(
         title=dict(
             text=f"Mass Balance Overview: {pool_code}",
@@ -237,6 +263,7 @@ def plot_flow_timeseries_interactive(df_flow, flow_name, population, output_dir=
         for i, (_, unit, axis_title, _, _) in enumerate(variants)
     ]
 
+    _mark_breaks_plotly(fig, flow_name)
     fig.update_layout(
         title=dict(text=flow_name, font=dict(size=13, family="Arial, sans-serif", color="black"),
                    y=0.97, yanchor='top'),
@@ -397,6 +424,7 @@ def plot_pool_balance(df_flows, pool_code, net_interval, output_dir="output_file
         )
         legend_out._legend_box.align = "left"
 
+    _mark_breaks_mpl(ax, pool_code)
     plt.tight_layout()
     
     # Lagre filen
@@ -902,6 +930,7 @@ def process_and_export_mc_results(all_records):
         plt.legend(loc='upper left')
         
         safe_filename = flow.replace('.', '_').replace('-', '_').replace(' ', '_') + '.png'
+        _mark_breaks_mpl(plt.gca(), flow)
         plt.savefig(os.path.join(plot_dir, safe_filename), dpi=150, bbox_inches='tight')
         plt.close()
 

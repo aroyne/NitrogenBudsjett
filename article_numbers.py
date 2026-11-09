@@ -12,10 +12,9 @@ from the start to the end period with its MC interval and the share of
 iterations with the same sign as the central change. The change is relative
 (%) for positive quantities and absolute (kt N, or percentage points for
 NUE) for balances and NUE. Series that depend on Fodder crops (how N is split
-between AG.MM and AG.SM) use Fodder crops scaled from 2021 on so that the
-change from 2020 to 2021 equals that in Eurostat's Gross Nutrient Balance
-(cfa.fodder_crops_level_adjusted), because SSB changed the method for eng til
-slått in 2021 and the model does not correct the step.
+between AG.MM and AG.SM) end in 2017, 2019 and 2020 (FODDER_END), because SSB
+changed the method for eng til slått in 2021 and the model does not correct
+the step; their 2021-2024 level is shown next to it.
 
 Series definitions are taken from calculations_for_article.py so the two
 scripts cannot disagree; that script's method note
@@ -43,6 +42,12 @@ OUTPUT_WORD_TABLE = 'claude_tekst/artikkeltall_balansetabell.xlsx'
 YEARS = list(cfa.ANALYSIS_YEARS)
 START = (1990, 1992)
 END = (2022, 2024)
+# Rows that depend on how Fodder crops splits N between AG.MM and AG.SM end
+# before SSB's change of method for eng til slått in 2021 (the step is not
+# corrected in the model), without the drought year 2018. The level in
+# 2021-2024 is shown next to them. A period is (first, last) or a list of years.
+FODDER_END = [2017, 2019, 2020]
+FODDER_AFTER = (2021, 2024)
 
 POOLS = {
     'EF': ['EF.EC', 'EF.IC', 'EF.TR', 'EF.OE'],
@@ -104,29 +109,22 @@ def emissions_total(df, species, years=cfa.ANALYSIS_YEARS):
 # =============================================================================
 
 _MATRICES = {}
-_FODDER_ADJUSTED = {}
-
-
-def fodder_adjusted(df, sims):
-    """df and sims with cfa.fodder_crops_level_adjusted applied (computed once)."""
-    if not _FODDER_ADJUSTED:
-        _FODDER_ADJUSTED['df'] = cfa.fodder_crops_level_adjusted(df)
-        _FODDER_ADJUSTED['sims'] = [cfa.fodder_crops_level_adjusted(sim) for sim in sims]
-    return _FODDER_ADJUSTED['df'], _FODDER_ADJUSTED['sims']
 
 
 def mc_matrix(fn, sims, function):
     """cfa.mc_series_matrix, computed once per series (keyed by its
-    'Beregning' label, which identifies the calculation, plus whether
-    Fodder crops is adjusted)."""
+    'Beregning' label, which identifies the calculation)."""
     if function not in _MATRICES:
         _MATRICES[function] = cfa.mc_series_matrix(fn, sims, YEARS)
     return _MATRICES[function]
 
 
+def _period_years(period):
+    return list(period) if isinstance(period, list) else list(range(period[0], period[1] + 1))
+
+
 def _mean(series_or_row, period):
-    a, b = period
-    cols = [YEARS.index(y) for y in range(a, b + 1)]
+    cols = [YEARS.index(y) for y in _period_years(period)]
     return series_or_row[..., cols].mean(axis=-1)
 
 
@@ -141,16 +139,14 @@ def summarize(label, fn, df, sims, fodder=False, mc=True, function='', absolute=
     of the change within each iteration, and the share of iterations whose
     change has the same sign as the central one. absolute=True gives the
     change in the quantity's own unit (balances, NUE); otherwise in % (also
-    used when the start value is not positive). If fodder, Fodder crops is
-    level-adjusted (see fodder_adjusted)."""
-    end = END
-    if fodder:
-        df, sims = fodder_adjusted(df, sims)
+    used when the start value is not positive). If fodder, the end period is
+    FODDER_END, and the level in FODDER_AFTER is added."""
+    end = FODDER_END if fodder else END
     values = fn(df).reindex(YEARS).values
     start_value, end_value = _mean(values, START), _mean(values, end)
     absolute = absolute or not start_value > 0
     if mc:
-        matrix = mc_matrix(fn, sims, function + (' [fodder adjusted]' if fodder else ''))
+        matrix = mc_matrix(fn, sims, function)
         starts, ends = _mean(matrix, START), _mean(matrix, end)
         # A relative change is meaningless if the start value can be zero or
         # negative in the Monte Carlo; use the absolute change instead.
@@ -164,16 +160,18 @@ def summarize(label, fn, df, sims, fodder=False, mc=True, function='', absolute=
         changes = _change(starts, ends, absolute)
         row['change_ci'] = np.percentile(changes, [2.5, 97.5])
         row['same_sign'] = float(np.mean(np.sign(changes) == np.sign(row['change'])))
+    if fodder:
+        row['after_value'] = _mean(values, FODDER_AFTER)
+        if mc:
+            row['after_ci'] = np.percentile(_mean(matrix, FODDER_AFTER), [2.5, 97.5])
     return row
 
 
-def period_value(label, fn, df, sims, period, function='', fodder=False):
+def period_value(label, fn, df, sims, period, function=''):
     """Mean of the central series over one period, with the 2.5-97.5 %
     interval across MC iterations."""
-    if fodder:
-        df, sims = fodder_adjusted(df, sims)
     value = _mean(fn(df).reindex(YEARS).values, period)
-    matrix = mc_matrix(fn, sims, function + (' [fodder adjusted]' if fodder else ''))
+    matrix = mc_matrix(fn, sims, function)
     ci = np.percentile(_mean(matrix, period), [2.5, 97.5])
     return {'label': label, 'function': function, 'period': period, 'value': value, 'ci': ci}
 
@@ -203,6 +201,8 @@ def fmt(x):
 
 
 def period_label(period):
+    if isinstance(period, list):
+        return ", ".join(str(y) for y in period)
     return str(period[0]) if period[0] == period[1] else f"{period[0]}–{str(period[1])[2:]}"
 
 
@@ -228,6 +228,9 @@ def trend_table(rows):
             start, end = value_ci(r['start_value'], r['start_ci']), value_ci(r['end_value'], r['end_ci'])
         else:
             start, end = fmt(r['start_value']), fmt(r['end_value'])
+        if 'after_value' in r:
+            after = value_ci(r['after_value'], r['after_ci']) if r['mc'] else fmt(r['after_value'])
+            end += f"; {period_label(FODDER_AFTER)}: {after}"
         out.append(f"| {r['label']}{mark} | {start} | {period_label(r['end'])}: {end} "
                    f"| {change_text(r)} | `{r['function']}` |")
     return "\n".join(out)
@@ -351,7 +354,7 @@ def other_rows(df, sims):
     singles = [
         period_value("Samlede N-tap fra jordbruket (kt N/år)", cfa.ag_losses_total, df, sims, (1990, 1991), 'ag_losses_total'),
         period_value("Fôrtap som lukker AG.MM-balansen (% av Fodder crops) †", cfa.fodder_loss_to_close_mm, df, sims,
-                     END, 'fodder_loss_to_close_mm', fodder=True),
+                     FODDER_END, 'fodder_loss_to_close_mm'),
         period_value("N fjernet som N2 i avløpsrensing, andel (%)", cfa.ww_n2_removal_share, df, sims, (2023, 2023),
                      'ww_n2_removal_share'),
         ratio_row("Akvakulturproduksjon, forhold slutt/start", lambda d: cfa.sum_flows(d, cfa.AQUACULTURE_PRODUCTION),
@@ -407,7 +410,7 @@ def write_word_table(pool_rows_, nue_rows_):
         balances.to_excel(writer, index=False, sheet_name='Balanser')
         nue.to_excel(writer, index=False, sheet_name='NUE')
         note = pd.DataFrame({'Merknad': [
-            "† Fodder crops fra 2021 skalert slik at endringen 2020–2021 er lik Eurostats (GNB), i hver MC-iterasjon (SSBs metodeskifte for eng til slått i 2021).",
+            "† Sluttperioden er 2017, 2019 og 2020 (før SSBs metodeskifte for eng til slått i 2021, uten tørkeåret 2018), og endringen er regnet fra 1990–92 til denne perioden. Spranget i Fodder crops i 2021 er ikke korrigert.",
             "Verdi: periodesnittet i den deterministiske kjøringen (sentralverdi). Intervall: 2,5-97,5 % av samme snitt over MC-iterasjonene (variant (i)).",
             "Endring 1990–92 til 2022–24: balanser i kt N/år, NUE i prosentpoeng, andre størrelser i %; intervall regnet i hver MC-iterasjon; i parentes andelen iterasjoner med samme fortegn som sentralverdien. Balanser i kt N/år, NUE i %, avrundet til hele tall.",
         ]})
@@ -458,7 +461,7 @@ def main():
 - Modellkjøring: `{cfa.STATS_FILE}` skrevet {stats_time}, {len(sims)} MC-iterasjoner
 - Git HEAD ved generering: `{head}`
 
-**Lesing av tabellene.** Hver MC-iterasjon er én sammenhengende tidsserie: registrerte data og spørreundersøkelser har egen usikkerhetsfaktor for hvert år, mens modeller, inventarer, antakelser og skjøter har samme faktor for alle år. Verdien er snittet i den deterministiske kjøringen (sentralverdien), og intervallet er 2,5- og 97,5-persentilen av MC-iterasjonenes snitt. Endringen fra startperioden til sluttperioden er regnet i hver iterasjon; intervallet er 2,5- og 97,5-persentilen av disse, og tallet i parentes er andelen iterasjoner med samme fortegn som sentralverdien. En endring regnes som robust når intervallet ikke omfatter null. Endringen er absolutt for balanser (kt N/år) og NUE (prosentpoeng), ellers relativ (%). Forholdstall mot 2005 for NOx og NH3 har nesten ingen MC-spredning, fordi usikkerheten i disse er en faktor som er lik for alle år og faller bort i forholdet. Rader merket † avhenger av hvordan Fodder crops fordeler N mellom AG.MM og AG.SM. SSB endret metoden for eng til slått i 2021, og modellen korrigerer ikke spranget. For disse radene er Fodder crops fra 2021 derfor skalert slik at endringen fra 2020 til 2021 er lik endringen i Eurostats nitrogenbalanse (Gross Nutrient Balance, grovfôr), regnet i hver MC-iterasjon for seg (`fodder_crops_level_adjusted`). Eurostat beregner den norske balansen selv fra 2020 og har et mye mindre sprang i 2021. Kolonnen «Beregning» viser funksjonen i `calculations_for_article.py` (eller i dette skriptet), dokumentert i `claude_tekst/2026-09-25_calculations_for_article_metodenotat.md`. Alle balanser er tilførsel minus fraførsel (kt N/år), uten interne strømmer mellom delpooler i samme pool.
+**Lesing av tabellene.** Hver MC-iterasjon er én sammenhengende tidsserie: registrerte data og spørreundersøkelser har egen usikkerhetsfaktor for hvert år, mens modeller, inventarer, antakelser og skjøter har samme faktor for alle år. Verdien er snittet i den deterministiske kjøringen (sentralverdien), og intervallet er 2,5- og 97,5-persentilen av MC-iterasjonenes snitt. Endringen fra startperioden til sluttperioden er regnet i hver iterasjon; intervallet er 2,5- og 97,5-persentilen av disse, og tallet i parentes er andelen iterasjoner med samme fortegn som sentralverdien. En endring regnes som robust når intervallet ikke omfatter null. Endringen er absolutt for balanser (kt N/år) og NUE (prosentpoeng), ellers relativ (%). Forholdstall mot 2005 for NOx og NH3 har nesten ingen MC-spredning, fordi usikkerheten i disse er en faktor som er lik for alle år og faller bort i forholdet. Rader merket † avhenger av hvordan Fodder crops fordeler N mellom AG.MM og AG.SM. SSB endret metoden for eng til slått i 2021, og modellen korrigerer ikke spranget. For disse radene er sluttperioden derfor 2017, 2019 og 2020 (de siste årene før bruddet, uten tørkeåret 2018), og nivået i 2021–2024 vises ved siden av uten endringstall. Beregnet fôrinntak (alle AG.MM-utstrømmer minus andre fôrinnstrømmer) har ikke noe sprang i 2021, mens Fodder crops ligger ca. 30 % høyere i forhold til inntaket etter 2021 (se Fodder crops-siden). Kolonnen «Beregning» viser funksjonen i `calculations_for_article.py` (eller i dette skriptet), dokumentert i `claude_tekst/2026-09-25_calculations_for_article_metodenotat.md`. Alle balanser er tilførsel minus fraførsel (kt N/år), uten interne strømmer mellom delpooler i samme pool.
 
 ## 1. Balanser for pooler og delpooler (kt N/år)
 

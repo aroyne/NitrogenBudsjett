@@ -131,6 +131,11 @@ aei_pr_gnb__custom_18744910_spreadsheet.xlsx
 Eurostat Gross nutrient balance
 downloaded 04.11.2025
 
+aei_pr_gnb_NO_N_2026-10-22.json
+Eurostat Gross nutrient balance (aei_pr_gnb), Norway, nitrogen, all indicators, 1985-2023 (dataset updated 22.10.2026); used only to check numbers in the flow descriptions (biological fixation, removal by harvest and grazing of fodder), not by the model
+https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/aei_pr_gnb?geo=NO&nutrient=N&format=JSON
+downloaded 09.11.2026
+
 akvakultur_1984_1994.xlsx
 Historical aquaculture production compilation, 1984-1994 (tonnes), used to extend the modern Fiskeridirektoratet series backward
 values read from Figure 1.1 in Grefsrud, S. (2025). Risikorapport for norsk fiskeoppdrett 2025. Havforskningsinstituttet.
@@ -156,6 +161,11 @@ FAOSTAT_data_en_9-24-2026-2.csv
 Fertilizer by nutrient, nutrient nitrogen N (total): production, agricultural use, import and export quantity, 1961-2024
 https://www.fao.org/faostat/en/#data/RFN
 downloaded 24.09.2026
+
+FAOSTAT_data_en_11-9-2026.csv
+Food Balances (2010-), Norway, Protein supply quantity (g/capita/day), Grand Total, 2010-2023; used only to check the comparison in the MP.FP-HS.HS-Food products description, not by the model
+https://www.fao.org/faostat/en/#data/FBS
+downloaded 09.11.2026
 
 FAOSTAT_data_en_9-24-2026.csv
 Crop and livestock products: production quantity, all items (crops and livestock), 1961-2024
