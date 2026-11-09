@@ -248,7 +248,7 @@ def trend_table(rows):
     out = ["| Størrelse | 1990–92 [MC 2,5–97,5 %] | Slutt [MC 2,5–97,5 %] | Endring [MC 2,5–97,5 %] (andel samme fortegn) | Beregning |",
            "|---|---:|---:|---:|---|"]
     for r in rows:
-        mark = ' †' if r['fodder'] else ''
+        mark = (' †' if r['fodder'] else '') + (' ‡' if r.get('smoothing') else '')
         if r['mc']:
             start, end = value_ci(r['start_value'], r['start_ci']), value_ci(r['end_value'], r['end_ci'])
         else:
@@ -276,18 +276,39 @@ def single_table(rows):
 # Main
 # =============================================================================
 
+# Balances that contain the smoothed ammonia synthesis N2 fixation flow
+# across their boundary. MP.OP closes each year apart from the 3-year
+# smoothing of that flow (it and Consumer goods are residuals), so its
+# balance, and the parts of these balances that come from it, swing by tens
+# of kt N from year to year without a trend. The MC does not vary this
+# timing effect, so their period changes can look robust although they are not.
+SMOOTHING_AFFECTED = {'MP', 'MP.OP', 'AT', 'national_balance'}
+
+
+def smoothing_text(df):
+    """Mean, standard deviation and Theil-Sen trend of the MP.OP balance over
+    all years (central values), for the notes on rows marked ‡."""
+    b = cfa.pool_balance(df, 'MP.OP').dropna()
+    slope = cfa.theil_sen(np.array(b.index), b.values)[0]
+    return (f"{b.index.min()}–{b.index.max()}: snitt {b.mean():.1f}, standardavvik {b.std():.0f} kt N, "
+            f"Theil–Sen {slope:+.2f} kt N/år").replace('-', '−').replace(f"{b.index.min()}−", f"{b.index.min()}–")
+
+
 def pool_rows(df, sims):
     rows = []
     for pool, subpools in POOLS.items():
         rows.append(summarize(f"**{pool}**", lambda d, p=pool: cfa.pool_balance(d, p), df, sims,
                               function=f"pool_balance('{pool}')", absolute=True))
         rows[-1]['code'] = WORD_TABLE_LABELS.get(pool, pool)
+        rows[-1]['smoothing'] = pool in SMOOTHING_AFFECTED
         for sub in subpools:
             rows.append(summarize(f"&nbsp;&nbsp;{sub}", lambda d, p=sub: cfa.pool_balance(d, p), df, sims,
                                   fodder=sub in FODDER_DEPENDENT_POOLS, function=f"pool_balance('{sub}')", absolute=True))
             rows[-1]['code'] = sub
+            rows[-1]['smoothing'] = sub in SMOOTHING_AFFECTED
     rows.append(summarize("**Hele økonomien** (mot AT.AT, HY.CW, RW.RW)", national_balance, df, sims,
                           function='national_balance', absolute=True))
+    rows[-1]['smoothing'] = True
     rows.append(summarize("**Hele økonomien uten olje og gjødselproduksjon**",
                           lambda d: national_balance(d, exclude=OIL_FERTILIZER_FLOWS), df, sims,
                           function='national_balance(exclude=…)', absolute=True))
@@ -447,7 +468,7 @@ def _word_rows(rows, first_column, label_of):
         label = label_of(r)
         if label is None:
             continue
-        mark = '†' if r['fodder'] else ''
+        mark = ('†' if r['fodder'] else '') + ('‡' if r.get('smoothing') else '')
         out.append({
             first_column: label,
             '1990-1992 central [2.5-97.5 %]': f"{whole(r['start_value'])} [{whole(r['start_ci'][0])}, {whole(r['start_ci'][1])}]",
@@ -457,7 +478,7 @@ def _word_rows(rows, first_column, label_of):
     return pd.DataFrame(out)
 
 
-def write_word_table(pool_rows_, nue_rows_):
+def write_word_table(pool_rows_, nue_rows_, smoothing):
     """The balance and NUE tables laid out as in the manuscript (one sheet
     each, three value columns), rounded to whole kt N or whole %. Copy the
     value cells in Excel and paste them into the selected cells of the Word
@@ -469,6 +490,7 @@ def write_word_table(pool_rows_, nue_rows_):
         nue.to_excel(writer, index=False, sheet_name='NUE')
         note = pd.DataFrame({'Merknad': [
             "† Sluttperioden er 2017, 2019 og 2020 (før SSBs metodeskifte for eng til slått i 2021, uten tørkeåret 2018), og endringen er regnet fra 1990–92 til denne perioden. Spranget i Fodder crops i 2021 er ikke korrigert.",
+            f"‡ Balansen inneholder N2-fikseringen til ammoniakk, som er glattet med et treårs glidende snitt. MP.OP går i null hvert år bortsett fra denne glattingen og svinger derfor med flere titalls kt N fra år til år uten trend (MP.OP {smoothing}). Endringen mellom treårsperioder er derfor dominert av tidspunktet for svingningene, og MC-intervallet fanger ikke dette.",
             "Verdi: periodesnittet i den deterministiske kjøringen (sentralverdi). Intervall: 2,5-97,5 % av samme snitt over MC-iterasjonene (variant (i)).",
             "Endring 1990–92 til 2022–24: balanser i kt N/år, NUE i prosentpoeng, andre størrelser i %; intervall regnet i hver MC-iterasjon; i parentes andelen iterasjoner med samme fortegn som sentralverdien. Balanser i kt N/år, NUE i %, avrundet til hele tall.",
         ]})
@@ -504,6 +526,7 @@ def check_balances(df):
 def main():
     df = cfa.load_stats()
     check_balances(df)
+    smoothing = smoothing_text(df)
     sims = cfa.load_raw_simulations(all_flows=True)
     head = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'], capture_output=True, text=True).stdout.strip()
     stats_time = datetime.datetime.fromtimestamp(os.path.getmtime(cfa.STATS_FILE)).strftime('%Y-%m-%d %H:%M')
@@ -519,7 +542,7 @@ def main():
 - Modellkjøring: `{cfa.STATS_FILE}` skrevet {stats_time}, {len(sims)} MC-iterasjoner
 - Git HEAD ved generering: `{head}`
 
-**Lesing av tabellene.** Hver MC-iterasjon er én sammenhengende tidsserie: registrerte data og spørreundersøkelser har egen usikkerhetsfaktor for hvert år, mens modeller, inventarer, antakelser og skjøter har samme faktor for alle år. Verdien er snittet i den deterministiske kjøringen (sentralverdien), og intervallet er 2,5- og 97,5-persentilen av MC-iterasjonenes snitt. Endringen fra startperioden til sluttperioden er regnet i hver iterasjon; intervallet er 2,5- og 97,5-persentilen av disse, og tallet i parentes er andelen iterasjoner med samme fortegn som sentralverdien. En endring regnes som robust når intervallet ikke omfatter null. Endringen er absolutt for balanser (kt N/år) og NUE (prosentpoeng), ellers relativ (%). Forholdstall mot 2005 for NOx og NH3 har nesten ingen MC-spredning, fordi usikkerheten i disse er en faktor som er lik for alle år og faller bort i forholdet. Rader merket † avhenger av hvordan Fodder crops fordeler N mellom AG.MM og AG.SM. SSB endret metoden for eng til slått i 2021, og modellen korrigerer ikke spranget. For disse radene er sluttperioden derfor 2017, 2019 og 2020 (de siste årene før bruddet, uten tørkeåret 2018), og nivået i 2021–2024 vises ved siden av uten endringstall. Beregnet fôrinntak (alle AG.MM-utstrømmer minus andre fôrinnstrømmer) har ikke noe sprang i 2021, mens Fodder crops ligger ca. 30 % høyere i forhold til inntaket etter 2021 (se Fodder crops-siden). Kolonnen «Beregning» viser funksjonen i `calculations_for_article.py` (eller i dette skriptet), dokumentert i `claude_tekst/2026-09-25_calculations_for_article_metodenotat.md`. Alle balanser er tilførsel minus fraførsel (kt N/år), uten interne strømmer mellom delpooler i samme pool.
+**Lesing av tabellene.** Hver MC-iterasjon er én sammenhengende tidsserie: registrerte data og spørreundersøkelser har egen usikkerhetsfaktor for hvert år, mens modeller, inventarer, antakelser og skjøter har samme faktor for alle år. Verdien er snittet i den deterministiske kjøringen (sentralverdien), og intervallet er 2,5- og 97,5-persentilen av MC-iterasjonenes snitt. Endringen fra startperioden til sluttperioden er regnet i hver iterasjon; intervallet er 2,5- og 97,5-persentilen av disse, og tallet i parentes er andelen iterasjoner med samme fortegn som sentralverdien. En endring regnes som robust når intervallet ikke omfatter null. Endringen er absolutt for balanser (kt N/år) og NUE (prosentpoeng), ellers relativ (%). Forholdstall mot 2005 for NOx og NH3 har nesten ingen MC-spredning, fordi usikkerheten i disse er en faktor som er lik for alle år og faller bort i forholdet. Rader merket † avhenger av hvordan Fodder crops fordeler N mellom AG.MM og AG.SM. SSB endret metoden for eng til slått i 2021, og modellen korrigerer ikke spranget. For disse radene er sluttperioden derfor 2017, 2019 og 2020 (de siste årene før bruddet, uten tørkeåret 2018), og nivået i 2021–2024 vises ved siden av uten endringstall. Beregnet fôrinntak (alle AG.MM-utstrømmer minus andre fôrinnstrømmer) har ikke noe sprang i 2021, mens Fodder crops ligger ca. 30 % høyere i forhold til inntaket etter 2021 (se Fodder crops-siden). Rader merket ‡ inneholder N2-fikseringen til ammoniakk, som er glattet med et treårs glidende snitt; MP.OP går i null hvert år bortsett fra glattingen og svinger med flere titalls kt N fra år til år uten trend (MP.OP {smoothing}). Endringen mellom treårsperioder for disse radene er dominert av svingningene, som er like i alle MC-iterasjoner, så intervallet og andelen samme fortegn overdriver hvor robust endringen er. Kolonnen «Beregning» viser funksjonen i `calculations_for_article.py` (eller i dette skriptet), dokumentert i `claude_tekst/2026-09-25_calculations_for_article_metodenotat.md`. Alle balanser er tilførsel minus fraførsel (kt N/år), uten interne strømmer mellom delpooler i samme pool.
 
 ## 1. Balanser for pooler og delpooler (kt N/år)
 
@@ -536,7 +559,7 @@ def main():
     parts.append(f"### Andel av husholdnings- og næringsavfall per sektor (%) [MC over N-innhold i avfallet]\n\n"
                  f"`household_waste_sector_shares`\n\n{household_waste_shares_table()}\n")
 
-    write_word_table(pools, nue)
+    write_word_table(pools, nue, smoothing)
     with open(OUTPUT_NOTE, 'w') as f:
         f.write("\n".join(parts))
     print(f"Skrevet: {OUTPUT_NOTE}")
