@@ -20,7 +20,7 @@ Hover over the chart to inspect specific flows, or click legend items to toggle 
 <!-- MANUAL:POOL_TEXT:START -->
 ### Flows that are zero or neglected:
 
-* **AG.MM-RW.RW-Manure export-Nmix** is neglected. The export of animal and vegetable fertilizers (HS 3101, which also includes processed and plant-based products) was 0.4–1.8 kt per year up to 2015 and 7–12 kt per year in 2020–2024 (SSB table 08801), so the N content is at most about 0.5 kt N per year (with up to 4% N in dried manure products).
+* **AG.MM-RW.RW-Manure export-Nmix** is neglected. The export of animal and vegetable fertilizers (HS 3101, which also includes processed and plant-based products; SSB table 08801) is 0.01–0.16 kt N per year up to 2019 and 0.22–0.35 kt N per year in 2020–2024, assuming 3 % N (2–4 % in dried manure products). This is small enough to be left out, and HS 3101 is not included in any other flow (the same applies to imports, see RW.RW-AG.SM-Manure import-Nmix on the [Rest of the World](../rest_of_the_world_pool/pool_rest_of_the_world.html) page).
 
 
 * **AG.MM-PR.SO-Manure for biofuel production-Nmix** is neglected because the Eurostat data used to calculate manure application to soil includes manure that has been processed for biogas. SSB table 12359 gives the amount of manure processed for biogas or through composting. Composting values are negligible compared with biogas.  The nitrogen content of manure for biogas production is found to rise from zero before 2012 to around 0.5 kt/year in 2023 (data from Landbruksdirektoratet (2025)<!--cite:landbruksdirektoratet_biogass_2025-->, a value which is still negligible compared with the total amount of manure application. We therefore do not introduce a correction for the amount of nitrogen lost through biogas processing.  
@@ -38,5 +38,5 @@ Hover over the chart to inspect specific flows, or click legend items to toggle 
 
 ### References
 
-* Landbruksdirektoratet (2025). *Biogass*. [landbruksdirektoratet.no](https://www.landbruksdirektoratet.no/nb/statistikk-og-utviklingstrekk/statistikk-over-miljotilskudd-i-jordbruket/biogass)
-* Schäppi, B., Reutimann, J., Bogler, S., Ehrler, A., & Fehrenbach, H. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets”* (TEXTE 05/2025). Umweltbundesamt. [https://doi.org/10.60810/openumwelt-7845](https://doi.org/10.60810/openumwelt-7845)
+* <span id="ref-landbruksdirektoratet_biogass_2025" data-cite="Landbruksdirektoratet" data-year="2025"></span>Landbruksdirektoratet (2025). *Biogass*. [landbruksdirektoratet.no](https://www.landbruksdirektoratet.no/nb/statistikk-og-utviklingstrekk/statistikk-over-miljotilskudd-i-jordbruket/biogass)
+* <span id="ref-schappi_annexes_2025" data-cite="Schäppi et al." data-year="2025"></span>Schäppi, B., Reutimann, J., Bogler, S., Ehrler, A., & Fehrenbach, H. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets”* (TEXTE 05/2025). Umweltbundesamt. [https://doi.org/10.60810/openumwelt-7845](https://doi.org/10.60810/openumwelt-7845)

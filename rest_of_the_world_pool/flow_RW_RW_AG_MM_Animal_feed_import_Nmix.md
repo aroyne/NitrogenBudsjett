@@ -47,4 +47,4 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* SSB (1994). *Jordbruksstatistikk 1994*. Statistisk sentralbyrå.
+* <span id="ref-bruholt_jordbruksstatistikk_1994" data-cite="SSB" data-year="1994"></span>SSB (1994). *Jordbruksstatistikk 1994*. Statistisk sentralbyrå.

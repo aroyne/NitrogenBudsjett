@@ -44,4 +44,4 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Sample, J. E., Jackson-Blake, L., Vogelsang, C., & Kaste, Ø. (2024). *TEOTIL3: En modell for beregning av kildebaserte tilførsler via elver og direktetilførsler til kyst*. NIVA.
+* <span id="ref-sample_teotil3_2024" data-cite="Sample et al." data-year="2024"></span>Sample, J. E., Jackson-Blake, L., Vogelsang, C., & Kaste, Ø. (2024). *TEOTIL3: En modell for beregning av kildebaserte tilførsler via elver og direktetilførsler til kyst*. NIVA.

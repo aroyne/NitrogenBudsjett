@@ -41,6 +41,6 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Bioforsk (2012). Updated estimate for nitrogen losses in agriculture. *sciencenorway.no*. [partner.sciencenorway.no](https://partner.sciencenorway.no/agriculture-agriculture--fisheries-bioforsk/updated-estimate-for-nitrogen-losses-in-agriculture/1377328)
-* Miljødirektoratet (2026). *Greenhouse gas emissions 1990–2024, National Inventory Document* (M-3138). [miljodirektoratet.no](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)
-* Sample, J. E. (2024). *Kildefordelte tilførsler av nitrogen og fosfor til norske kystområder i 2022 – tabeller, figurer og kart* (M-2730). NIVA.
+* <span id="ref-bioforsk_nitrogen_2012" data-cite="Bioforsk" data-year="2012"></span>Bioforsk (2012). Updated estimate for nitrogen losses in agriculture. *sciencenorway.no*. [partner.sciencenorway.no](https://partner.sciencenorway.no/agriculture-agriculture--fisheries-bioforsk/updated-estimate-for-nitrogen-losses-in-agriculture/1377328)
+* <span id="ref-miljodirektoratet_nid_2026" data-cite="Miljødirektoratet" data-year="2026"></span>Miljødirektoratet (2026). *Greenhouse gas emissions 1990–2024, National Inventory Document* (M-3138). [miljodirektoratet.no](https://www.miljodirektoratet.no/publikasjoner/2026/mars-2026/greenhouse-gas-emissions-1990-2024-national-inventory-document/)
+* <span id="ref-sample_kildefordelte_2024" data-cite="Sample" data-year="2024"></span>Sample, J. E. (2024). *Kildefordelte tilførsler av nitrogen og fosfor til norske kystområder i 2022 – tabeller, figurer og kart* (M-2730). NIVA.

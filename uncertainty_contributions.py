@@ -282,7 +282,8 @@ def compute(run_once, preloaded_data, base_params, pools, seed):
     summary = pd.concat(out, ignore_index=True)
     is_fill = summary['source_id'].str.startswith('fill|')
     summary.loc[is_fill, 'uncertainty'] = summary[is_fill].apply(
-        lambda r: (f"±{r.fill_u_min:.0f}–{r.fill_u_max:.0f} %, lognormal, grows with distance to known year"
+        lambda r: (f"±{r.fill_u_min:.0f} %, lognormal" if f"{r.fill_u_min:.0f}" == f"{r.fill_u_max:.0f}"
+                   else f"±{r.fill_u_min:.0f}–{r.fill_u_max:.0f} %, lognormal, grows with distance to known year")
                    if pd.notna(r.fill_u_min) else 'grows with distance to known year'), axis=1)
     summary['other_flows'] = [';'.join(f for f in affected[sid] if f != flow)
                               for flow, sid in zip(summary['flow_name'], summary['source_id'])]

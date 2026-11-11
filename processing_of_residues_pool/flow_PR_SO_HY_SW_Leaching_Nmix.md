@@ -46,4 +46,4 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Miljødirektoratet (2026). *Norske Utslipp*. [norskeutslipp.no](https://www.norskeutslipp.no)
+* <span id="ref-miljodirektoratet_norske_2026" data-cite="Miljødirektoratet" data-year="2026"></span>Miljødirektoratet (2026). *Norske Utslipp*. [norskeutslipp.no](https://www.norskeutslipp.no)

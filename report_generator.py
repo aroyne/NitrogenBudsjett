@@ -14,6 +14,7 @@ flow page with a placeholder text, under the same parent as the existing
 flows with the same pool and subpool code.
 """
 import os
+import html
 import re
 import time
 from datetime import datetime
@@ -511,8 +512,11 @@ def fix_all_citations_in_folder(paths, bib_filename):
                             doi = entry.get('doi', '')
                             url = entry.get('url', '')
                             
-                            # 1. Forfatter (År).
-                            ref_str = f"* {author} ({year})."
+                            # 1. Forfatter (År). The empty span is the target of the
+                            # citation links made in _includes/head_custom.html.
+                            anchor = (f'<span id="ref-{key}" data-cite="{html.escape(get_short_author(raw_author))}" '
+                                      f'data-year="{html.escape(year)}"></span>')
+                            ref_str = f"* {anchor}{author} ({year})."
                             
                             # 2. Tittel på artikkelen (Vanlig tekst i APA7 hvis journal er oppgitt)
                             if journal:
@@ -640,7 +644,7 @@ def build_landing_page(output_filename, current_date_str, bib_filename, target_f
         f.write("or any other application is **strongly discouraged** at this stage.\n\n")
         f.write("---\n\n### Project Overview\n")
         f.write("Welcome to the interactive data and documentation portal for the Norwegian national nitrogen budget. ")
-        f.write("This NNB follows the methodology of the guidelines \\citep{winiwarter_inms_2025} and their detailed annexes "
+        f.write("This NNB follows the methodology described in the NNB guidelines of the International Nitrogen Management System (INMS) \\citep{winiwarter_inms_2025} and their detailed annexes "
                 "\\citep{schappi_annexes_2025}, including the division into pools and sub-pools and the naming of flows. "
                 "Where flows are omitted or added to better fit the Norwegian nitrogen system, this is commented. "
                 "The data come mainly from official statistics (Statistics Norway and other national agencies), Norway's emission inventories to the UNFCCC and CLRTAP and international databases such as FAOSTAT, combined with N contents and other parameters from the literature. ")
@@ -672,12 +676,12 @@ def build_landing_page(output_filename, current_date_str, bib_filename, target_f
                     "version of this report.\n\n")
             f.write("---\n\n")
             
-        f.write("For flows connected to the hydrosphere, and for land-related emissions and nitrogen deposition, "
+        f.write("For land-related emissions and nitrogen deposition, "
                 "we only consider the Norwegian mainland. For emissions to air reported through the UNFCCC framework we "
                 "also include emissions from Norwegian economic activity on Svalbard (these are minor and mainly related to coal extraction, "
                 "which has now been discontinued). We also include emissions and N flows that originate in petroleum extraction on the Norwegian "
                 "continental shelf."
-                " The wild catch is an exception: the catch statistics cover all catch by Norwegian vessels, wherever it is taken. In 2018–2024, 58–74 % was taken in the Norwegian economic zone; the rest came from the zones of other countries, international waters in the North-East Atlantic and, at 8–14 %, Antarctic krill from the Southern Ocean. Coastal water (HY.CW) is therefore treated as a boundary node, like the rest of the world (see [Coastal Water (HY.CW)](hydrosphere_pool/subpool_coastal_water.html)).\n")
+                " For the hydrosphere pool, wild catch is an exception: the catch statistics cover all catch by Norwegian vessels, wherever it is taken. In 2018–2024, 58–74 % was taken in the Norwegian economic zone; the rest came from the zones of other countries, international waters in the North-East Atlantic and, at 8–14 %, Antarctic krill from the Southern Ocean. Coastal water (HY.CW) is therefore treated as a boundary node, like the rest of the world (RW) (see [Coastal Water (HY.CW)](hydrosphere_pool/subpool_coastal_water.html)).\n")
         append_bibtex_references(f, bib_filename)
         
         

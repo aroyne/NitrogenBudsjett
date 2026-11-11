@@ -50,9 +50,9 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Budsjettnemnda for jordbruket (2025). *Totalkalkylen for jordbruket - statistikk*. [nibio.no](https://www.nibio.no/tjenester/totalkalkylen-statistikk)
-* SSB (1994). *Jordbruksstatistikk 1994*. Statistisk sentralbyrå.
-* Eidem, B., & Ruud, T. (2022). *Fôr- og husdyrbaserte verdikjeder i norsk matproduksjon – nåsituasjon og begreper* (Notat 6/22). Ruralis – Institutt for rural- og regionalforskning.
-* FAO (2021). Annex 1. Food composition tables. *Food balance sheets: A handbook*. [fao.org](https://www.fao.org/4/x9892e/X9892e05.htm)
-* FAO (2023). Chapter 2: Methods of food analysis. *Food energy - methods of analysis and conversion factors*. [fao.org](https://www.fao.org/4/y5022e/y5022e03.htm)
-* Landbruksdirektoratet (2025). *Kraftforstatistikk - årlig råvareforbruk*. [landbruksdirektoratet.no](https://www.landbruksdirektoratet.no/nb/statistikk-og-utviklingstrekk/utvikling-i-jordbruket/kraftforstatistikk)
+* <span id="ref-bfj_totalkalkylen_2025" data-cite="Budsjettnemnda for jordbruket" data-year="2025"></span>Budsjettnemnda for jordbruket (2025). *Totalkalkylen for jordbruket - statistikk*. [nibio.no](https://www.nibio.no/tjenester/totalkalkylen-statistikk)
+* <span id="ref-bruholt_jordbruksstatistikk_1994" data-cite="SSB" data-year="1994"></span>SSB (1994). *Jordbruksstatistikk 1994*. Statistisk sentralbyrå.
+* <span id="ref-eidem_for-_2022" data-cite="Eidem &amp; Ruud" data-year="2022"></span>Eidem, B., & Ruud, T. (2022). *Fôr- og husdyrbaserte verdikjeder i norsk matproduksjon – nåsituasjon og begreper* (Notat 6/22). Ruralis – Institutt for rural- og regionalforskning.
+* <span id="ref-fao_annex_2021" data-cite="FAO" data-year="2021"></span>FAO (2021). Annex 1. Food composition tables. *Food balance sheets: A handbook*. [fao.org](https://www.fao.org/4/x9892e/X9892e05.htm)
+* <span id="ref-fao_chapter_2023" data-cite="FAO" data-year="2023"></span>FAO (2023). Chapter 2: Methods of food analysis. *Food energy - methods of analysis and conversion factors*. [fao.org](https://www.fao.org/4/y5022e/y5022e03.htm)
+* <span id="ref-landbruksdirektoratet_kraftforstatistikk_2025" data-cite="Landbruksdirektoratet" data-year="2025"></span>Landbruksdirektoratet (2025). *Kraftforstatistikk - årlig råvareforbruk*. [landbruksdirektoratet.no](https://www.landbruksdirektoratet.no/nb/statistikk-og-utviklingstrekk/utvikling-i-jordbruket/kraftforstatistikk)

@@ -42,4 +42,4 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Blake, L. R., Aas, W., Denby, B., Hjellbrekke, A., Mu, Q., Simpson, D., & Fagerli, H. (2023). *Deposition of sulfur and nitrogen in Norway 2017-2021* (02/2023). NILU.
+* <span id="ref-blake_deposition_2023" data-cite="Blake et al." data-year="2023"></span>Blake, L. R., Aas, W., Denby, B., Hjellbrekke, A., Mu, Q., Simpson, D., & Fagerli, H. (2023). *Deposition of sulfur and nitrogen in Norway 2017-2021* (02/2023). NILU.

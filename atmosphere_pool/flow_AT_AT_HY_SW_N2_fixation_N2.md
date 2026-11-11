@@ -39,5 +39,5 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* NIBIO (2026). *Arealbarometer for Norge*. [arealbarometer.nibio.no](https://arealbarometer.nibio.no/nb/norge/)
-* Schäppi, B., Reutimann, J., Bogler, S., Ehrler, A., & Fehrenbach, H. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets”* (TEXTE 05/2025). Umweltbundesamt. [https://doi.org/10.60810/openumwelt-7845](https://doi.org/10.60810/openumwelt-7845)
+* <span id="ref-nibio_arealbarometer_2026" data-cite="NIBIO" data-year="2026"></span>NIBIO (2026). *Arealbarometer for Norge*. [arealbarometer.nibio.no](https://arealbarometer.nibio.no/nb/norge/)
+* <span id="ref-schappi_annexes_2025" data-cite="Schäppi et al." data-year="2025"></span>Schäppi, B., Reutimann, J., Bogler, S., Ehrler, A., & Fehrenbach, H. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets”* (TEXTE 05/2025). Umweltbundesamt. [https://doi.org/10.60810/openumwelt-7845](https://doi.org/10.60810/openumwelt-7845)

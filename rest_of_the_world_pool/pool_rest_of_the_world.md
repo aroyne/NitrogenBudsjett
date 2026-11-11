@@ -31,7 +31,7 @@ Hover over the chart to inspect specific flows, or click legend items to toggle 
 ### Flows that are zero or neglected:
 
 * **RW.RW-MP.FP-Sea fish (landings)-Nmix** is set to zero because all wild fish catch is accounted for as a flow from coastal water (HY.CW-MP.FP-Fish (wild catch)-Nmix). HY.CW is treated as a boundary node like RW; see the page for [Coastal Water (HY.CW)](../hydrosphere_pool/subpool_coastal_water.html).
-* **RW.RW-AG.SM-Manure import-Nmix** is neglected. Manure is bulky and is normally used close to where it is produced. The only trade in it is animal or vegetable fertilizer (HS 3101, mostly processed products such as pelleted manure) in [SSB table 08801](https://www.ssb.no/statbank/table/08801): 3–5 kt of product imported per year (14 kt in 2000) and up to 12 kt exported, about 0.1–0.4 kt N with 2–4% N.
+* **RW.RW-AG.SM-Manure import-Nmix** is neglected. Manure is bulky and is normally used close to where it is produced. The only trade in it is animal or vegetable fertilizer (HS 3101, mostly processed products such as pelleted manure) in [SSB table 08801](https://www.ssb.no/statbank/table/08801): 0.06–0.17 kt N imported per year (0.26–0.43 kt N in 2000–2001) and up to 0.35 kt N exported, assuming 3 % N (2–4 % in dried manure products). This is small enough to be left out, and HS 3101 is not included in any other flow.
 * **RW.RW-HY.SW-Import of surface water-Nmix** are assumed negligible due to Norwegian topography.
 
 <!-- MANUAL:POOL_TEXT:END -->

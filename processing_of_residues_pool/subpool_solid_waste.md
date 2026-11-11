@@ -36,5 +36,5 @@ It is expected that there should be a surplus for all years because landfilled w
 
 ### References
 
-* Schäppi, B., Reutimann, J., Bogler, S., Ehrler, A., & Fehrenbach, H. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets”* (TEXTE 05/2025). Umweltbundesamt. [https://doi.org/10.60810/openumwelt-7845](https://doi.org/10.60810/openumwelt-7845)
-* SSB (2011b). *Avfallsregnskapet: Store endringer i deponert avfall*. [ssb.no](https://www.ssb.no/natur-og-miljo/statistikker/avfregno/aar/2011-12-14)
+* <span id="ref-schappi_annexes_2025" data-cite="Schäppi et al." data-year="2025"></span>Schäppi, B., Reutimann, J., Bogler, S., Ehrler, A., & Fehrenbach, H. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets”* (TEXTE 05/2025). Umweltbundesamt. [https://doi.org/10.60810/openumwelt-7845](https://doi.org/10.60810/openumwelt-7845)
+* <span id="ref-ssb_avfallsregnskap_2011" data-cite="SSB" data-year="2011b"></span>SSB (2011b). *Avfallsregnskapet: Store endringer i deponert avfall*. [ssb.no](https://www.ssb.no/natur-og-miljo/statistikker/avfregno/aar/2011-12-14)

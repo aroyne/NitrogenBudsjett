@@ -1,0 +1,48 @@
+<style>
+  a.cite-link { color: inherit; text-decoration: underline dotted; }
+  a.cite-link:hover { text-decoration: underline; }
+</style>
+<script>
+// Turns in-text citations into links to the reference list on the same page,
+// with the full reference as hover text. Each citation in the Markdown is
+// followed by an HTML comment "cite:key1,key2" (written by
+// report_generator.fix_all_citations_in_folder), and each reference list item
+// starts with <span id="ref-key" data-cite="short author" data-year="year">.
+document.addEventListener('DOMContentLoaded', function () {
+  var refs = {};
+  document.querySelectorAll('span[id^="ref-"]').forEach(function (s) {
+    var li = s.closest('li');
+    refs[s.id.slice(4)] = { id: s.id, short: s.dataset.cite || '', text: li ? li.textContent.trim() : '' };
+  });
+  var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_COMMENT);
+  var comments = [];
+  while (walker.nextNode()) {
+    if (walker.currentNode.nodeValue.indexOf('cite:') === 0) comments.push(walker.currentNode);
+  }
+  comments.forEach(function (c) {
+    var keys = c.nodeValue.slice(5).split(',').map(function (k) { return k.trim(); })
+      .filter(function (k) { return refs[k]; });
+    var prev = c.previousSibling;
+    if (!keys.length || !prev || prev.nodeType !== 3) return;
+    var t = prev.nodeValue;
+    var first = refs[keys[0]];
+    var p = first.short ? t.lastIndexOf(first.short) : -1;
+    var start;
+    if (p >= 0) {
+      // "(Author, 2025)" starts at the parenthesis, "Author (2025)" at the name.
+      var open = t.lastIndexOf('(', p);
+      start = (open >= 0 && t.slice(open + 1, p).trim() === '') ? open : p;
+    } else {
+      start = t.lastIndexOf('(');
+    }
+    if (start < 0) return;
+    var a = document.createElement('a');
+    a.className = 'cite-link';
+    a.href = '#' + first.id;
+    a.title = keys.map(function (k) { return refs[k].text; }).join('\n\n');
+    a.textContent = t.slice(start);
+    prev.nodeValue = t.slice(0, start);
+    prev.parentNode.insertBefore(a, c);
+  });
+});
+</script>

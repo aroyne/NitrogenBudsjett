@@ -50,6 +50,6 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Hegrenes, A., & Asheim, L. J. (2006). *Verdi av fôr frå utmarksbeite og sysselsetting i beitebaserte næringar*. NILF.
-* Miljødirektoratet (2020). *Calculation of atmospheric nitrogen emissions from manure in Norwegian agriculture: Technical description of the revised model* (M-1848). [miljodirektoratet.no](https://www.miljodirektoratet.no/globalassets/publikasjoner/m1848/m1848.pdf)
-* Kolle, S. O., & Oguz-Alper, M. (2020). *Bruk av gjødselressurser i jordbruket 2018. Metodebeskrivelse og resultater fra en utvalgsbasert undersøkelse* (Rapporter 2020/9). Statistisk sentralbyrå.
+* <span id="ref-hegrenes_verdi_2006" data-cite="Hegrenes &amp; Asheim" data-year="2006"></span>Hegrenes, A., & Asheim, L. J. (2006). *Verdi av fôr frå utmarksbeite og sysselsetting i beitebaserte næringar*. NILF.
+* <span id="ref-miljodirektoratet_manure_2020" data-cite="Miljødirektoratet" data-year="2020"></span>Miljødirektoratet (2020). *Calculation of atmospheric nitrogen emissions from manure in Norwegian agriculture: Technical description of the revised model* (M-1848). [miljodirektoratet.no](https://www.miljodirektoratet.no/globalassets/publikasjoner/m1848/m1848.pdf)
+* <span id="ref-ssb_gjodselressurser_2020" data-cite="Kolle &amp; Oguz-Alper" data-year="2020"></span>Kolle, S. O., & Oguz-Alper, M. (2020). *Bruk av gjødselressurser i jordbruket 2018. Metodebeskrivelse og resultater fra en utvalgsbasert undersøkelse* (Rapporter 2020/9). Statistisk sentralbyrå.

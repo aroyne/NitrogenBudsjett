@@ -14,7 +14,7 @@ nav_order: 7
 #### Flow description
 
 - **MP.OP-HS.HS-Consumer goods-Nmix** is the N in domestic consumer goods, calculated by mass balance, assuming that all incoming flows to OP that are not accounted for in outgoing flows end up in domestic consumer goods.
-- The fertilizer industry is kept out of the balance: we have excluded N<sub>2</sub> fixation for ammonia synthesis, ammonia import and export, mineral fertilizer flows, and the wastewater from fertilizer plants (Yara Porsgrunn, Yara Glomfjord, Herøya industrial park and Hydro Rjukan). We also exclude emissions to air from the balance because they result mainly from fertilizer production.
+- The fertilizer industry is kept out of the balance: we have excluded N<sub>2</sub> fixation for ammonia synthesis, ammonia import and export, mineral fertilizer flows, and the wastewater from fertilizer plants (Yara Porsgrunn, Yara Glomfjord, Herøya industrial park and Hydro Rjukan). We also exclude emissions to air from the balance because they result to a large extent from fertilizer production.
 
 #### Data sources
 

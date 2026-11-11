@@ -24,8 +24,8 @@ nav_order: 9
 
 #### Assumptions
 
-- The report from Nor Tekstilservice for 2010 (306 t N, against 0 t N in 2011–2014; its first reported year) is left out as a reporting error.
-- Each facility is assigned manually to FP or OP (industry_categories.xlsx), based on the information given in the statistic.
+- One unexpectedly large value from a single facility is left out as a reporting error.
+- Each facility is assigned manually to FP or OP, based on the information given in the statistic.
 - A year missing inside a facility's reporting period is filled by linear interpolation between its neighbouring reported years.
 - Facilities that are not connected to the municipal network, or whose connection is unknown, are counted in this flow.
 - Miljødirektoratet's data has not been updated for 2024 at the time of writing; the 2024 value is held at the 2023 value.
@@ -50,4 +50,4 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Miljødirektoratet (2025). *Norske utslipp - Utslipp til luft og vann og generert avfall, Nitrogen totalt*. [norskeutslipp.no](https://www.norskeutslipp.no/no/Komponenter/Utslipp/Nitrogen-totalt/?ComponentType=utslipp&ComponentPageID=226)
+* <span id="ref-miljodirektoratet_norske_2025" data-cite="Miljødirektoratet" data-year="2025"></span>Miljødirektoratet (2025). *Norske utslipp - Utslipp til luft og vann og generert avfall, Nitrogen totalt*. [norskeutslipp.no](https://www.norskeutslipp.no/no/Komponenter/Utslipp/Nitrogen-totalt/?ComponentType=utslipp&ComponentPageID=226)

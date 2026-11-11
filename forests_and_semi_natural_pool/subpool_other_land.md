@@ -41,8 +41,8 @@ Hover over the chart to inspect specific flows, or click legend items to toggle 
 
 ### References
 
-* Hegrenes, A., & Asheim, L. J. (2006). *Verdi av fôr frå utmarksbeite og sysselsetting i beitebaserte næringar*. NILF.
-* Jutterström, S., Stadmark, J., & Moldan, F. (2020). *Swedish National Nitrogen Budget – Forest and semi-natural vegetation* (C 549). IVL Swedish Environmental Research Institute.
-* Miljødirektoratet (2020). *Calculation of atmospheric nitrogen emissions from manure in Norwegian agriculture: Technical description of the revised model* (M-1848). [miljodirektoratet.no](https://www.miljodirektoratet.no/globalassets/publikasjoner/m1848/m1848.pdf)
-* Schäppi, B., Reutimann, J., Bogler, S., Ehrler, A., & Fehrenbach, H. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets”* (TEXTE 05/2025). Umweltbundesamt. [https://doi.org/10.60810/openumwelt-7845](https://doi.org/10.60810/openumwelt-7845)
-* Kolle, S. O., & Oguz-Alper, M. (2020). *Bruk av gjødselressurser i jordbruket 2018. Metodebeskrivelse og resultater fra en utvalgsbasert undersøkelse* (Rapporter 2020/9). Statistisk sentralbyrå.
+* <span id="ref-hegrenes_verdi_2006" data-cite="Hegrenes &amp; Asheim" data-year="2006"></span>Hegrenes, A., & Asheim, L. J. (2006). *Verdi av fôr frå utmarksbeite og sysselsetting i beitebaserte næringar*. NILF.
+* <span id="ref-jutterstrom_swedish_2020" data-cite="Jutterström et al." data-year="2020"></span>Jutterström, S., Stadmark, J., & Moldan, F. (2020). *Swedish National Nitrogen Budget – Forest and semi-natural vegetation* (C 549). IVL Swedish Environmental Research Institute.
+* <span id="ref-miljodirektoratet_manure_2020" data-cite="Miljødirektoratet" data-year="2020"></span>Miljødirektoratet (2020). *Calculation of atmospheric nitrogen emissions from manure in Norwegian agriculture: Technical description of the revised model* (M-1848). [miljodirektoratet.no](https://www.miljodirektoratet.no/globalassets/publikasjoner/m1848/m1848.pdf)
+* <span id="ref-schappi_annexes_2025" data-cite="Schäppi et al." data-year="2025"></span>Schäppi, B., Reutimann, J., Bogler, S., Ehrler, A., & Fehrenbach, H. (2025). *Detailed Annexes to ECE/EB.AIR/119 – “Guidance document on national nitrogen budgets”* (TEXTE 05/2025). Umweltbundesamt. [https://doi.org/10.60810/openumwelt-7845](https://doi.org/10.60810/openumwelt-7845)
+* <span id="ref-ssb_gjodselressurser_2020" data-cite="Kolle &amp; Oguz-Alper" data-year="2020"></span>Kolle, S. O., & Oguz-Alper, M. (2020). *Bruk av gjødselressurser i jordbruket 2018. Metodebeskrivelse og resultater fra en utvalgsbasert undersøkelse* (Rapporter 2020/9). Statistisk sentralbyrå.

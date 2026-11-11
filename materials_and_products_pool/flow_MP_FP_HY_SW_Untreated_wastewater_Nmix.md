@@ -24,8 +24,8 @@ nav_order: 5
 
 #### Assumptions
 
-- Two single facility-year reports, 5–10 times higher than all other years of the same facility, are left out as reporting errors: Sildeslakteriet på Uthaug 2013 (374 t N, against 6–47 t N in 2014–2024; its first reported year, so not filled) and Norsk Protein Stranda 2004 (168 t N, against 0–39 t N; filled by interpolation).
-- Each facility is assigned manually to FP or OP (industry_categories.xlsx), based on the information given in the statistic.
+- Two data points from single facilities are at least 5x larger than all other years of the same facility, and are left out as reporting errors.
+- Each facility is assigned manually to FP or OP, based on the information given in the statistic.
 - A year missing inside a facility's reporting period is filled by linear interpolation between its neighbouring reported years.
 - Facilities that are not connected to the municipal network, or whose connection is unknown, are counted in this flow.
 - We extrapolate back to 1990 using the mean value for 1994–1998.

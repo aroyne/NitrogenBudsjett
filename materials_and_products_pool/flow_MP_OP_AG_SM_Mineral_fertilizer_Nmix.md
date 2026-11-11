@@ -41,4 +41,4 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* FAO (2025). *Fertilizer by nutrient*. [fao.org](https://www.fao.org/faostat/en/#data/RFN)
+* <span id="ref-fao_fertilizer_2025" data-cite="FAO" data-year="2025"></span>FAO (2025). *Fertilizer by nutrient*. [fao.org](https://www.fao.org/faostat/en/#data/RFN)

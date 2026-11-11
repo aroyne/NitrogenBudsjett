@@ -45,4 +45,4 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Fiskeridirektoratet (2025). *A.06.002 Matfisk. Salg av laks, regnbueørret og ørret, etter art (Fylke) (1994-2024)*. [statistikkbanken.fiskeridir.no](https://statistikkbanken.fiskeridir.no/PxWeb/pxweb/no/Fiskeridirektoratet/Fiskeridirektoratet__A%20Akvakultur__A.06%20Salg/A06002.px/)
+* <span id="ref-fiskeridirektoratet_06002_2025" data-cite="Fiskeridirektoratet" data-year="2025"></span>Fiskeridirektoratet (2025). *A.06.002 Matfisk. Salg av laks, regnbueørret og ørret, etter art (Fylke) (1994-2024)*. [statistikkbanken.fiskeridir.no](https://statistikkbanken.fiskeridir.no/PxWeb/pxweb/no/Fiskeridirektoratet/Fiskeridirektoratet__A%20Akvakultur__A.06%20Salg/A06002.px/)

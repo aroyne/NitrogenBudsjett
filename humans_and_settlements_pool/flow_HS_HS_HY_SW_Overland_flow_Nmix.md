@@ -19,7 +19,7 @@ nav_order: 3
 #### Data sources
 
 - From 2013, the 'urban' component of the TEOTIL3 model outputs from NIVA (Sample et al., 2024)<!--cite:sample_teotil3_2024-->. TEOTIL3 calculates the N load from urban areas as the area of built-up land in each catchment (from land-cover maps) times an export coefficient per area, so the year-to-year variation mainly follows changes in area and runoff.
-- For 1990–2012, the urban loading from TEOTIL2 model results in NIVA's public repository (NIVANorge/teotil2 on GitHub, https://github.com/NIVANorge/teotil2, commit bf3c380), summed to national totals over the outlets of the main river basins 001–247 and 315 (inputs to the coast, after retention in lakes and rivers). TEOTIL2 uses the same urban value in every year.
+- For 1990–2012, the urban loading from TEOTIL2 model results in NIVA's public repository ([NIVANorge/teotil2 on GitHub](https://github.com/NIVANorge/teotil2/tree/bf3c380), commit bf3c380), summed to national totals over the outlets of the main river basins 001–247 and 315 (inputs to the coast, after retention in lakes and rivers). TEOTIL2 uses the same urban value in every year.
 
 #### Assumptions
 
@@ -46,5 +46,5 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 
 ### References
 
-* Sample, J. E. (2025). *Kildefordelte tilførsler av nitrogen og fosfor til norske kystområder i 2023 – tabeller, figurer og kart* (M-2995). NIVA.
-* Sample, J. E., Jackson-Blake, L., Vogelsang, C., & Kaste, Ø. (2024). *TEOTIL3: En modell for beregning av kildebaserte tilførsler via elver og direktetilførsler til kyst*. NIVA.
+* <span id="ref-sample_kildefordelte_2025" data-cite="Sample" data-year="2025"></span>Sample, J. E. (2025). *Kildefordelte tilførsler av nitrogen og fosfor til norske kystområder i 2023 – tabeller, figurer og kart* (M-2995). NIVA.
+* <span id="ref-sample_teotil3_2024" data-cite="Sample et al." data-year="2024"></span>Sample, J. E., Jackson-Blake, L., Vogelsang, C., & Kaste, Ø. (2024). *TEOTIL3: En modell for beregning av kildebaserte tilførsler via elver og direktetilførsler til kyst*. NIVA.
