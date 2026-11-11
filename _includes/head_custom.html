@@ -1,15 +1,34 @@
 <style>
   a.cite-link { color: inherit; text-decoration: underline dotted; }
   a.cite-link:hover { text-decoration: underline; }
+  .cite-tip { position: absolute; z-index: 1000; max-width: 32rem; padding: 0.5rem 0.75rem; background: #fff; color: #27262b;
+    border: 1px solid #d0d0d6; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); font-size: 0.85rem; line-height: 1.4;
+    display: none; }
+  .cite-tip p { margin: 0 0 0.4rem 0; }
+  .cite-tip p:last-child { margin-bottom: 0; }
 </style>
 <script>
-/* Turns in-text citations into links to the reference list on the same page, with the full reference as hover text. Each citation in the Markdown is followed by an HTML comment "cite:key1,key2" (written by report_generator.fix_all_citations_in_folder), and each reference list item starts with <span id="ref-key" data-cite="short author" data-year="year">. */
+/* Turns in-text citations into links to the reference list on the same page, with the full reference shown in a box while the pointer is on the citation. Each citation in the Markdown is followed by an HTML comment "cite:key1,key2" (written by report_generator.fix_all_citations_in_folder), and each reference list item starts with <span id="ref-key" data-cite="short author" data-year="year">. */
 document.addEventListener('DOMContentLoaded', function () {
   var refs = {};
   document.querySelectorAll('span[id^="ref-"]').forEach(function (s) {
     var li = s.closest('li');
     refs[s.id.slice(4)] = { id: s.id, short: s.dataset.cite || '', text: li ? li.textContent.trim() : '' };
   });
+  /* One shared box shows the full reference(s) while the pointer is on a citation. */
+  var tip = document.createElement('div');
+  tip.className = 'cite-tip';
+  document.body.appendChild(tip);
+  function showTip(a) {
+    tip.innerHTML = '';
+    a.dataset.refs.split('\u0001').forEach(function (s) { var p = document.createElement('p'); p.textContent = s; tip.appendChild(p); });
+    tip.style.display = 'block';
+    var r = a.getBoundingClientRect();
+    var left = Math.min(r.left + window.scrollX, window.scrollX + document.documentElement.clientWidth - tip.offsetWidth - 8);
+    tip.style.left = Math.max(window.scrollX + 8, left) + 'px';
+    tip.style.top = (r.bottom + window.scrollY + 6) + 'px';
+  }
+  function hideTip() { tip.style.display = 'none'; }
   var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_COMMENT);
   var comments = [];
   while (walker.nextNode()) {
@@ -35,7 +54,11 @@ document.addEventListener('DOMContentLoaded', function () {
     var a = document.createElement('a');
     a.className = 'cite-link';
     a.href = '#' + first.id;
-    a.title = keys.map(function (k) { return refs[k].text; }).join('\n\n');
+    a.dataset.refs = keys.map(function (k) { return refs[k].text; }).join('\u0001');
+    a.addEventListener('mouseenter', function () { showTip(a); });
+    a.addEventListener('mouseleave', hideTip);
+    a.addEventListener('focus', function () { showTip(a); });
+    a.addEventListener('blur', hideTip);
     a.textContent = t.slice(start);
     prev.nodeValue = t.slice(0, start);
     prev.parentNode.insertBefore(a, c);
