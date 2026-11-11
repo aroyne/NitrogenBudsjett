@@ -45,7 +45,7 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 |---|---|---|---|---|---|---|---|
 | Facility reports of N to water (Miljødirektoratet) (Yara Porsgrunn) | Survey or self-reported data | ±30 %, normal, drawn per year | 47% | 66% | 0.47 | 0.41 | none |
 | Facility reports of N to water (Miljødirektoratet) (Yara Glomfjord) | Survey or self-reported data | ±30 %, normal, drawn per year | 21% | 20% | 0.23 | 0.22 | none |
-| Held constant or averaged (2023+) | Gap filling: held constant or averaged | ±15–15 %, lognormal, grows with distance to known year | – | 9% | – | 1.00 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| Held constant or averaged (2023+) | Gap filling: held constant or averaged | ±15 %, lognormal | – | 9% | – | 1.00 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
 | Facility reports of N to water (Miljødirektoratet) (Herøya Industripark) | Survey or self-reported data | ±30 %, normal, drawn per year | 29% | – | 0.42 | – | none |
 
 ### References

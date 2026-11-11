@@ -37,7 +37,7 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
 | Eurostat gross nutrient balance | Modelled statistics | ±40 %, normal | 100% | 98% | 1.00 | 1.00 | [Food crop products](../agriculture_pool/flow_AG_SM_MP_FP_Food_crop_products_Nmix.html), [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
-| Held constant or averaged (industrial crops:2021-2023) | Gap filling: held constant or averaged | ±15–15 %, lognormal, grows with distance to known year | – | 2% | – | 1.00 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| Held constant or averaged (industrial crops:2021-2023) | Gap filling: held constant or averaged | ±15 %, lognormal | – | 2% | – | 1.00 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
 
 ### References
 

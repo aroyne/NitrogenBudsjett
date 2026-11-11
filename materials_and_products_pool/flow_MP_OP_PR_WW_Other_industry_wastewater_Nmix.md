@@ -41,7 +41,7 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 |---|---|---|---|---|---|---|---|
 | Facility reports of N to water (Miljødirektoratet) (Biosirk Norge AS, avd. Trehørningen, Hamar) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 88% | – | 0.77 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
 | Facility reports of N to water (Miljødirektoratet) (Biosirk Norge AS avd Grødaland) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 7% | 0.05 | 0.22 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
-| Held constant or averaged (2023+) | Gap filling: held constant or averaged | ±15–15 %, lognormal, grows with distance to known year | – | 5% | – | 1.00 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
+| Held constant or averaged (2023+) | Gap filling: held constant or averaged | ±15 %, lognormal | – | 5% | – | 1.00 | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
 | Facility reports of N to water (Miljødirektoratet) (Aarenes Lærfabrikk A.S) | Survey or self-reported data | ±30 %, normal, drawn per year | 86% | – | 0.82 | – | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
 | Facility reports of N to water (Miljødirektoratet) (Kverneland Klepp Avd. Øksnevad -galvano) | Survey or self-reported data | ±30 %, normal, drawn per year | 13% | – | 0.30 | – | [Consumer Goods (Mass Balance)](../materials_and_products_pool/flow_MP_OP_HS_HS_Consumer_goods_Nmix.html) |
 

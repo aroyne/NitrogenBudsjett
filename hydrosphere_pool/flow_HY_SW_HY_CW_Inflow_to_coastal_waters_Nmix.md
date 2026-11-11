@@ -44,7 +44,7 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
 | TEOTIL, total input to the coast | Modelled statistics | ±20 %, normal | 82% | 93% | 1.00 | 1.17 | none |
-| Held constant or averaged (2023+) | Gap filling: held constant or averaged | ±15–15 %, lognormal, grows with distance to known year | – | 5% | – | 1.00 | none |
+| Held constant or averaged (2023+) | Gap filling: held constant or averaged | ±15 %, lognormal | – | 5% | – | 1.00 | none |
 | Splice TEOTIL2 to TEOTIL3, agriculture | Splice between data sources | ±20 %, normal | 11% | – | 0.37 | – | [N<sub>2</sub> emissions from denitrification in surface waters](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2.html), [Surface water N<sub>2</sub>O emissions](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2O.html) |
 | Splice TEOTIL3 share of inputs reaching the coast | Splice between data sources | ±5 %, normal | 5% | – | 1.00 | – | [N<sub>2</sub> emissions from denitrification in surface waters](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2.html), [Surface water N<sub>2</sub>O emissions](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2O.html) |
 

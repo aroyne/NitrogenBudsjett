@@ -40,7 +40,7 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 | TEOTIL, retention in lakes and rivers | Modelled statistics | ±40 %, normal | 43% | 83% | 1.00 | 1.00 | [Surface water N<sub>2</sub>O emissions](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2O.html) |
 | Share of retained N in surface water emitted as N<sub>2</sub>O | Parameter | 0.005–0.2, lognormal | 8% | 15% | −0.01 | −0.01 | [Surface water N<sub>2</sub>O emissions](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2O.html) |
 | Splice TEOTIL3 retention ratio applied before 2013 | Splice between data sources | ±10 %, normal | 3% | – | 1.00 | – | [Surface water N<sub>2</sub>O emissions](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2O.html) |
-| Extrapolation (surface water retention:2013) | Gap filling: extrapolation | ±50–50 %, lognormal, grows with distance to known year | 44% | – | 1.00 | – | [Surface water N<sub>2</sub>O emissions](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2O.html) |
+| Extrapolation (surface water retention:2013) | Gap filling: extrapolation | ±50 %, lognormal | 44% | – | 1.00 | – | [Surface water N<sub>2</sub>O emissions](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2O.html) |
 
 ### References
 

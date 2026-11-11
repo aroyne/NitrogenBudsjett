@@ -40,7 +40,7 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 |---|---|---|---|---|---|---|---|
 | Facility reports of N to water (Miljødirektoratet) (Findus avd. Tønsberg) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 37% | – | 0.23 | none |
 | Facility reports of N to water (Miljødirektoratet) (Seagarden) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 16% | – | 0.22 | none |
-| Held constant or averaged (2023+) | Gap filling: held constant or averaged | ±15–15 %, lognormal, grows with distance to known year | – | 12% | – | 1.00 | none |
+| Held constant or averaged (2023+) | Gap filling: held constant or averaged | ±15 %, lognormal | – | 12% | – | 1.00 | none |
 | Facility reports of N to water (Miljødirektoratet) (Nortura SA Steinkjer) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 9% | – | 0.11 | none |
 | Facility reports of N to water (Miljødirektoratet) (Nortura Hærland) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 8% | – | 0.10 | none |
 | Facility reports of N to water (Miljødirektoratet) (Nortura SA, Avd Bjerka) | Survey or self-reported data | ±30 %, normal, drawn per year | – | 4% | – | 0.08 | none |

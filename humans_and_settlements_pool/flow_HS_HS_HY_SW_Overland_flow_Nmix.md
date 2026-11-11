@@ -42,7 +42,7 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 |---|---|---|---|---|---|---|---|
 | TEOTIL, run-off from urban areas | Modelled statistics | −50/+100 %, lognormal | 74% | 99% | 1.00 | 1.00 | none |
 | Splice TEOTIL2 to TEOTIL3, urban areas | Splice between data sources | ±20 %, normal | 5% | – | 1.00 | – | [N<sub>2</sub> emissions from denitrification in surface waters](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2.html), [Surface water N<sub>2</sub>O emissions](../hydrosphere_pool/flow_HY_SW_AT_AT_Emissions_N2O.html), [Inflow to coastal waters](../hydrosphere_pool/flow_HY_SW_HY_CW_Inflow_to_coastal_waters_Nmix.html) |
-| Extrapolation (settlement area) | Gap filling: extrapolation | ±50–50 %, lognormal, grows with distance to known year | 21% | – | 1.00 | – | none |
+| Extrapolation (settlement area) | Gap filling: extrapolation | ±50 %, lognormal | 21% | – | 1.00 | – | none |
 
 ### References
 

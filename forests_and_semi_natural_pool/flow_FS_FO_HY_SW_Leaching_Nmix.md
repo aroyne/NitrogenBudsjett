@@ -41,7 +41,7 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 | Source | Type | Uncertainty (95 %) | Share of variance 1990–1994 | Share of variance 2020–2024 | Elasticity 1990–1994 | Elasticity 2020–2024 | Other flows affected |
 |---|---|---|---|---|---|---|---|
 | TEOTIL, leaching from forest and other land | Modelled statistics | ±30 %, normal | 50% | 96% | 1.00 | 1.00 | [Other Land Leaching](../forests_and_semi_natural_pool/flow_FS_OL_HY_SW_Leaching_Nmix.html) |
-| Held constant or averaged (2023+) | Gap filling: held constant or averaged | ±15–15 %, lognormal, grows with distance to known year | – | 4% | – | 1.00 | none |
+| Held constant or averaged (2023+) | Gap filling: held constant or averaged | ±15 %, lognormal | – | 4% | – | 1.00 | none |
 | Share of background leaching assigned to forest | Parameter | ±30 %, normal | 49% | – | 1.00 | – | none |
 
 ### References

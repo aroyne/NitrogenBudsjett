@@ -42,7 +42,7 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 | Facility reports of N to water (Miljødirektoratet) (iris - vikan - deponi for ordinært avfall (iris salten iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 4% | 0.03 | 0.05 | none |
 | Facility reports of N to water (Miljødirektoratet) (franzefoss gjenvinning - eide avfallsdeponi (franzefoss gjenvinning as)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 3% | 0.05 | 0.06 | none |
 | Facility reports of N to water (Miljødirektoratet) (ulsethsanden deponi - rockwool industrideponi (as rockwool)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 3% | 0.08 | 0.04 | none |
-| Extrapolation (landfill N:CH<sub>4</sub> index) | Gap filling: extrapolation | ±50–50 %, lognormal, grows with distance to known year | 93% | – | 1.00 | – | [Wastewater from Landfills](../processing_of_residues_pool/flow_PR_SO_PR_WW_Wastewater_from_landfills_Nmix.html) |
+| Extrapolation (landfill N:CH<sub>4</sub> index) | Gap filling: extrapolation | ±50 %, lognormal | 93% | – | 1.00 | – | [Wastewater from Landfills](../processing_of_residues_pool/flow_PR_SO_PR_WW_Wastewater_from_landfills_Nmix.html) |
 
 ### References
 

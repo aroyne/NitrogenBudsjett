@@ -45,7 +45,7 @@ Sources that contribute at least 2% of the variance of this flow in one of the p
 | Facility reports of N to water (Miljødirektoratet) (roaf miljøpark - deponi (romerike avfallsforedling iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 3% | 0.04 | 0.04 | none |
 | Facility reports of N to water (Miljødirektoratet) (glør roverudmyra deponi kategori 2, ordinært avfall (renovasjonsselskapet glør iks)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 2% | 0.05 | 0.04 | none |
 | Facility reports of N to water (Miljødirektoratet) (esval miljøpark - ordinært deponi (esval miljøpark nes kf)) | Survey or self-reported data | ±30 %, normal, drawn per year | <1% | 2% | 0.03 | 0.04 | none |
-| Extrapolation (landfill N:CH<sub>4</sub> index) | Gap filling: extrapolation | ±50–50 %, lognormal, grows with distance to known year | 98% | – | 1.00 | – | [Leaching from Landfills](../processing_of_residues_pool/flow_PR_SO_HY_SW_Leaching_Nmix.html) |
+| Extrapolation (landfill N:CH<sub>4</sub> index) | Gap filling: extrapolation | ±50 %, lognormal | 98% | – | 1.00 | – | [Leaching from Landfills](../processing_of_residues_pool/flow_PR_SO_HY_SW_Leaching_Nmix.html) |
 
 ### References
 
